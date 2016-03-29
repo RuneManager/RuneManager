@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneOptim", "RuneOptim\RuneOptim.csproj", "{657ABF4B-06BD-4F67-A94F-304F7F155E7D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneApp", "RuneApp\RuneApp.csproj", "{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneClasses", "RuneClasses\RuneClasses.csproj", "{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{657ABF4B-06BD-4F67-A94F-304F7F155E7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{657ABF4B-06BD-4F67-A94F-304F7F155E7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{657ABF4B-06BD-4F67-A94F-304F7F155E7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{657ABF4B-06BD-4F67-A94F-304F7F155E7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

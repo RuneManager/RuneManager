@@ -1,0 +1,4 @@
+0.0.0.3
+https://www.dropbox.com/s/5gznd5d1r0u7tti/RuneManager_0.0.0.3.zip?dl=0
+Checks for updates!
+EHP, DPS, etc scoring
