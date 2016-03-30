@@ -95,7 +95,7 @@ namespace RuneOptim
                 case "DPS":
                     return (int)(ExtraValue("AvD") * (Speed / (double) 100));
                 case "AvD":
-                    return (int)(ExtraValue("MxD") * (Math.Max(CritRate, 100) / (double) 100));
+                    return (int)(ExtraValue("MxD") * (Math.Min(CritRate, 100) / (double) 100));
                 case "MxD":
                     return (int)(Attack * CritDamage / (double)100);
             }

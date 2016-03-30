@@ -51,6 +51,12 @@ namespace RuneOptim
         [JsonProperty("runeScoring")]
         public Dictionary<string, KeyValuePair<int, int>> runeScoring = new Dictionary<string, KeyValuePair<int, int>>();
 
+        // if to raise the runes level, and use the appropriate main stat value.
+        // also, attempt to give weight to unassigned powerup bonuses
+        // tab, RAISE, magic
+        [JsonProperty("runePrediction")]
+        public Dictionary<string, KeyValuePair<int, bool>> runePrediction = new Dictionary<string, KeyValuePair<int, bool>>();
+
         [JsonProperty("AllowBroken")]
         public bool AllowBroken = false;
         
@@ -142,7 +148,7 @@ namespace RuneOptim
                         pts += m[stat] / Sort[stat];
                         // if exceeding max, subtracted the gained points and then some
                         if (Maximum[stat] != 0)
-                            pts -= Math.Max(0, m[stat] - Maximum[stat]) / Sort[stat] * 2;
+                            pts -= Math.Max(0, m[stat] - Maximum[stat]) / Sort[stat];
                     }
                 }
                 // look, cool metrics!
@@ -152,12 +158,50 @@ namespace RuneOptim
                     {
                         pts += m.ExtraValue(extra) / Sort.ExtraGet(extra);
                         if (Maximum.ExtraGet(extra) != 0)
-                            pts -= Math.Max(0, m.ExtraValue(extra) - Maximum.ExtraGet(extra)) / Sort.ExtraGet(extra) * 2;
+                            pts -= Math.Max(0, m.ExtraValue(extra) - Maximum.ExtraGet(extra)) / Sort.ExtraGet(extra);
                     }
                 }
 
                 return pts;
             };
+
+            // crank the rune prediction
+            for (int i = 0; i < 6; i++)
+            {
+                Rune[] rs = runes[i];
+                int raiseTo = 0;
+                bool predictSubs = false;
+
+                // find the largest number to raise to
+                // if any along the tree say to predict, do it
+                if (runePrediction.ContainsKey("g"))
+                {
+                    int glevel = runePrediction["g"].Key;
+                    if (glevel > raiseTo)
+                        raiseTo = glevel;
+                    predictSubs |= runePrediction["g"].Value;
+                }
+                if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
+                {
+                    int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                    if (mlevel > raiseTo)
+                        raiseTo = mlevel;
+                    predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
+                }
+                if (runePrediction.ContainsKey((i + 1).ToString()))
+                {
+                    int slevel = runePrediction[(i + 1).ToString()].Key;
+                    if (slevel > raiseTo)
+                        raiseTo = slevel;
+                    predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                }
+
+                foreach (Rune r in rs)
+                {
+                    r.FakeLevel = raiseTo;
+                    r.PredictSubs = predictSubs;
+                }
+            }
 
             // set to running
             isRun = true;
@@ -285,6 +329,16 @@ namespace RuneOptim
                 }
             });
 
+            // turn off prediction
+            foreach (Rune[] rs in runes)
+            {
+                foreach (Rune r in rs)
+                {
+                    r.FakeLevel = 0;
+                    r.PredictSubs = false;
+                }
+            }
+
             // write out completion
             Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
             if (printTo != null)
@@ -376,6 +430,41 @@ namespace RuneOptim
             {
                 // put the right ones in
                 runes[i] = rsGlobal.Where(r => r.Slot == i + 1).ToArray();
+
+                // crank the rune prediction
+                Rune[] rs = runes[i];
+                int raiseTo = 0;
+                bool predictSubs = false;
+
+                // find the largest number to raise to
+                // if any along the tree say to predict, do it
+                if (runePrediction.ContainsKey("g"))
+                {
+                    int glevel = runePrediction["g"].Key;
+                    if (glevel > raiseTo)
+                        raiseTo = glevel;
+                    predictSubs |= runePrediction["g"].Value;
+                }
+                if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
+                {
+                    int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                    if (mlevel > raiseTo)
+                        raiseTo = mlevel;
+                    predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
+                }
+                if (runePrediction.ContainsKey((i + 1).ToString()))
+                {
+                    int slevel = runePrediction[(i + 1).ToString()].Key;
+                    if (slevel > raiseTo)
+                        raiseTo = slevel;
+                    predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                }
+
+                foreach (Rune r in rs)
+                {
+                    r.FakeLevel = raiseTo;
+                    r.PredictSubs = predictSubs;
+                }
 
                 // default fail OR
                 Predicate<Rune> slotTest = r => false;
@@ -552,7 +641,13 @@ namespace RuneOptim
                     if (slotStats[i].Count > 0)
                         runes[i] = runes[i].Where(r => slotStats[i].Contains(r.MainType.ToForms())).ToArray();
                 }
-			}
+
+                foreach (Rune r in rs)
+                {
+                    r.FakeLevel = 0;
+                    r.PredictSubs = false;
+                }
+            }
 
             // Make sure that for each set type, there are enough slots with runes in them
             // Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4

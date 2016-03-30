@@ -225,7 +225,7 @@ namespace RuneOptim
             if (runes[rune.Slot - 1] == null)
                 runeCount++;
 
-            runes[rune.Slot - 1] = rune;
+            runes[rune.Slot - 1] = new Rune(rune);
             if (runeCount % 2 == 0)
                 CheckSets();
         }

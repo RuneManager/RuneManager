@@ -235,7 +235,7 @@ namespace RuneApp
                 label.Text = "YES";
                 label.Name = tab + "Check";
                 label.Size = new Size(60, 14);
-                label.Location = new Point(370, 250);
+                label.Location = new Point(372, 246);
 
 
                 ComboBox filterJoin = new ComboBox();
@@ -261,6 +261,7 @@ namespace RuneApp
 
                 int testX = 0;
                 int testY = 0;
+                int predX = 0;
                 y = 45;
                 foreach (var stat in statNames)
                 {
@@ -287,9 +288,7 @@ namespace RuneApp
                                     label.Text = "Flat";
                                 if (type == "perc")
                                     label.Text = "Percent";
-                                label.Size = new System.Drawing.Size(45, 20);
-
-
+                                label.Size = new System.Drawing.Size(45, 16);
                             }
                             
                             if (type == "perc" && stat == "SPD")
@@ -312,12 +311,14 @@ namespace RuneApp
                                 textBox = new Label();
                             page.Controls.Add(textBox);
                             textBox.Name = tab + pref + stat + type;
-                            textBox.Location = new Point(x, y);
+                            textBox.Location = new Point(x, y - 2);
 
                             textBox.Size = new System.Drawing.Size(40, 20);
                             x += colWidth;
                         }
                     }
+
+                    predX = x;
 
                     label = new Label();
                     page.Controls.Add(label);
@@ -332,7 +333,7 @@ namespace RuneApp
                     textBox = new TextBox();
                     page.Controls.Add(textBox);
                     textBox.Name = tab + stat + "test";
-                    textBox.Location = new Point(x, y);
+                    textBox.Location = new Point(x, y - 2);
                     textBox.Text = "";
                     textBox.Size = new System.Drawing.Size(40, 20);
                     textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
@@ -354,7 +355,7 @@ namespace RuneApp
                 textBox = new TextBox();
                 page.Controls.Add(textBox);
                 textBox.Name = tab + "test";
-                textBox.Location = new Point(testX, testY);
+                textBox.Location = new Point(testX, testY - 2);
                 textBox.Text = "";
                 textBox.Size = new System.Drawing.Size(40, 20);
                 textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
@@ -362,6 +363,64 @@ namespace RuneApp
                 textBox.Enabled = false;
                 x += colWidth;
 
+                x = predX;
+                y += rowHeight;
+
+                label = new Label();
+                page.Controls.Add(label);
+                label.Name = tab + "raiseLabel";
+                label.Location = new Point(x, y);
+                label.Text = "Make+";
+                label.Size = new System.Drawing.Size(40, 20);
+                x += colWidth;
+
+                textBox = new TextBox();
+                page.Controls.Add(textBox);
+                textBox.Name = tab + "raise";
+                textBox.Location = new Point(x, y-2);
+                textBox.Text = "";
+                textBox.Size = new System.Drawing.Size(40, 20);
+                textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
+                x += colWidth;
+
+                label = new Label();
+                page.Controls.Add(label);
+                label.Name = tab + "raiseInherit";
+                label.Location = new Point(x, y);
+                label.Text = "0";
+                label.Size = new System.Drawing.Size(40, 20);
+                x += colWidth;
+
+                x = predX;
+                y += rowHeight;
+
+                CheckBox check = new CheckBox();
+                page.Controls.Add(check);
+                check.Name = tab + "bonus";
+                check.Location = new Point(x, y);
+                check.Checked = false;
+                check.Size = new System.Drawing.Size(17, 17);
+                check.CheckedChanged += new System.EventHandler(this.global_CheckChanged);
+                x += 17;
+
+                label = new Label();
+                page.Controls.Add(label);
+                label.Name = tab + "bonusLabel";
+                label.Location = new Point(x, y);
+                label.Text = "Predict Subs";
+                label.Size = new System.Drawing.Size(67, 20);
+                label.Click += (s,e) => { check.Checked = !check.Checked; };
+                x += colWidth;
+
+                x += colWidth - 17;
+
+                label = new Label();
+                page.Controls.Add(label);
+                label.Name = tab + "bonusInherit";
+                label.Location = new Point(x, y);
+                label.Text = "FT";
+                label.Size = new System.Drawing.Size(80, 20);
+                x += colWidth;
 
             }
         }
@@ -548,6 +607,21 @@ namespace RuneApp
                     }
                 }
             }
+            foreach (var tab in build.runePrediction)
+            {
+                TextBox tb = (TextBox)this.Controls.Find(tab.Key + "raise", true).FirstOrDefault();
+                if (tb != null)
+                {
+                    if (tab.Value.Key != 0)
+                        tb.Text = tab.Value.Key.ToString();
+                }
+                CheckBox cb = (CheckBox)this.Controls.Find(tab.Key + "bonus", true).FirstOrDefault();
+                if (cb != null)
+                {
+                    cb.Checked = tab.Value.Value;
+                }
+            }
+
             // for each tabs scoring
             foreach (var tab in build.runeScoring)
             {
@@ -890,6 +964,29 @@ namespace RuneApp
                     if (ctrlTest.Text != "")
                         build.runeScoring[tab] = new KeyValuePair<int, int>(kv.Key, int.Parse(ctrlTest.Text));
                 }
+                TextBox tb = (TextBox)this.Controls.Find(tab + "raise", true).FirstOrDefault();
+                int raiseLevel = 0;
+                int.TryParse(tb.Text, out raiseLevel);
+                CheckBox cb = (CheckBox)this.Controls.Find(tab + "bonus", true).FirstOrDefault();
+                /*if (!build.runePrediction.ContainsKey(tab))
+                {
+                    build.runePrediction.Add(tab, new KeyValuePair<int, bool>(raiseLevel, cb.Checked));
+                }
+                if (build.runePrediction.ContainsKey(tab))
+                {
+                    var kv = build.runePrediction[tab];*/
+                    build.runePrediction[tab] = new KeyValuePair<int, bool>(raiseLevel, cb.Checked);
+                //}
+                if (build.runePrediction.ContainsKey(tab))
+                {
+                    var kv = build.runePrediction[tab];
+                    var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
+                    ctrlRaise.Text = kv.Key.ToString();
+                    var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
+                    ctrlPred.Text = (kv.Value ? "T" : "F");
+
+                }
+
             }
             foreach (string stat in statNames)
             {
@@ -961,8 +1058,6 @@ namespace RuneApp
 
         private void UpdateStat(string tab, string stat)
         {
-            Predicate<Rune> predStat = r => true;
-
             var ctest = this.Controls.Find(tab + stat + "test", true).First();
             int test = 0;
             int.TryParse(ctest.Text, out test);
@@ -977,13 +1072,7 @@ namespace RuneApp
                 fd.Add(stat, new RuneFilter());
             }
             var fi = fd[stat];
-            /*
-            var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-            KeyValuePair<Label, Label> kvBaseBonus = (KeyValuePair<Label, Label>)ctrlTotal.Tag;
-            int valTotal = 0;
-            int.TryParse(ctrlTotal.Text, out valTotal);
-            kvBaseBonus.Value.Text = "+" + (valTotal - build.mon[stat]);
-            */
+            
             foreach (string type in new string[] { "flat", "perc" })
             {
                 if (type == "perc" && stat == "SPD")
@@ -1031,11 +1120,7 @@ namespace RuneApp
                     else
                         c.Text = "";
                 }
-
                 
-                //Predicate<Rune> p = r => r[stat + type] / val >= test;
-                //predStat = r => predStat.Invoke(r) && p.Invoke(r);
-
                 fi[type] = t;
             }
 
@@ -1208,6 +1293,13 @@ namespace RuneApp
             UpdateGlobal();
         }
 
+        private void global_CheckChanged(object sender, EventArgs e)
+        {
+            CheckBox check = (CheckBox)sender;
+            
+            UpdateGlobal();
+        }
+
         private void groupBox1_Enter(object sender, EventArgs e)
         {
 
@@ -1234,8 +1326,11 @@ namespace RuneApp
                     {
                         var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
                         //ctrlWorth.Text = "";
+
                         if (build.Sort[stat] > 0)
                             ctrlWorth.Text = build.Sort[stat].ToString();
+                        else
+                            ctrlWorth.Text = "";
                     }
                     loading = false;
                 }

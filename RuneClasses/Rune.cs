@@ -81,6 +81,38 @@ namespace RuneOptim
 
     public class Rune
     {
+        public Rune()
+        {
+
+        }
+
+        public Rune(Rune rhs)
+        {
+            ID = rhs.ID;
+            Set = rhs.Set;
+            Grade = rhs.Grade;
+            Slot = rhs.Slot;
+            Level = rhs.Level;
+            FakeLevel = rhs.FakeLevel;
+            PredictSubs = rhs.PredictSubs;
+            Locked = rhs.Locked;
+            AssignedId = rhs.AssignedId;
+            AssignedName = rhs.AssignedName;
+            MainType = rhs.MainType;
+            MainValue = rhs.MainValue;
+            InnateType = rhs.InnateType;
+            InnateValue = rhs.InnateValue;
+            Sub1Type = rhs.Sub1Type;
+            Sub1Value = rhs.Sub1Value;
+            Sub2Type = rhs.Sub2Type;
+            Sub2Value = rhs.Sub2Value;
+            Sub3Type = rhs.Sub3Type;
+            Sub3Value = rhs.Sub3Value;
+            Sub4Type = rhs.Sub4Type;
+            Sub4Value = rhs.Sub4Value;
+            Parent = rhs;
+        }
+
         [JsonProperty("id")]
         public int ID;
 
@@ -96,8 +128,33 @@ namespace RuneOptim
         [JsonProperty("level")]
         public int Level;
 
+        [JsonIgnore]
+        public int FakeLevel = 0;
+
+        [JsonIgnore]
+        public bool PredictSubs = false;
+
+        [JsonIgnore]
+        public Rune Parent = null;
+
         [JsonProperty("locked")]
-        public bool Locked;
+        private bool locked;
+
+        [JsonIgnore]
+        public bool Locked
+        {
+            get
+            {
+                if (Parent != null && Parent.locked) return true;
+                return locked;
+            }
+            set
+            {
+                locked = value;
+                if (Parent != null)
+                    Parent.Locked = value;
+            }
+        }
 
         [JsonProperty("monster")]
         public int AssignedId;
@@ -154,6 +211,18 @@ namespace RuneOptim
         public int HealthPercent { get { return GetValue(Attr.HealthPercent); } }
         public int Resistance { get { return GetValue(Attr.Resistance); } }
         public int Speed { get { return GetValue(Attr.Speed); } }
+
+        public int Rarity
+        {
+            get
+            {
+                if (Sub1Type == Attr.Null) return 0; // Normal
+                if (Sub2Type == Attr.Null) return 1; // Magic
+                if (Sub3Type == Attr.Null) return 2; // Rare
+                if (Sub4Type == Attr.Null) return 3; // Hero
+                return 4; // Legend
+            }
+        }
 
         // Number of sets
         public static int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
@@ -253,14 +322,44 @@ namespace RuneOptim
         public int GetValue(Attr stat)
         {
             // the stat can only be present once per rune, early exit
-            if (MainType == stat) return MainValue;
+            if (MainType == stat)
+            {
+                if (FakeLevel <= Level || Grade < 3)
+                {
+                    return MainValue;
+                }
+                else
+                {
+                    return MainValues[MainType][Grade - 3][FakeLevel];
+                }
+            }
             // Need to be able to load in null values (requiring int?) but xType shouldn't be a Type if xValue is null
             if (InnateType == stat) return InnateValue ?? 0;
             // Here, if a subs type is null, there is not further subs (it's how runes work), so we quit early.
-            if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value ?? 0;
-            if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value ?? 0;
-            if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value ?? 0;
-            if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value ?? 0;
+            if (PredictSubs == false)
+            {
+                if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value ?? 0;
+                if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value ?? 0;
+                if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value ?? 0;
+                if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value ?? 0;
+            }
+            else
+            {
+                // count how many upgrades have gone into the rune
+                int maxUpgrades = Math.Min(4, (int)Math.Floor(FakeLevel / (double)3));
+                int upgradesGone = Math.Min(4, (int)Math.Floor(Level / (double)3));
+                // how many new sub are to appear (0 legend will be 4 - 4 = 0, 6 rare will be 4 - 3 = 1, 6 magic will be 4 - 2 = 2)
+                int subNew = 4 - Rarity;
+                // how many subs will go into existing stats (0 legend will be 4 - 0 - 0 = 4, 6 rare will be 4 - 1 - 2 = 1, 6 magic will be 4 - 2 - 2 = 0)
+                int subEx = maxUpgrades - upgradesGone - subNew;
+                int subVal = (subNew > 0 ? 1 : 0);
+
+                if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value + subEx ?? subVal;
+                if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value + subEx ?? subVal;
+                if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value + subEx ?? subVal;
+                if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value + subEx ?? subVal;
+            }
+        
             return 0;
         }
 
@@ -378,5 +477,75 @@ namespace RuneOptim
                 return 0;
             }
         }
+
+        #region stats
+
+        public static int[][] MainValues_Speed = new int[][] {
+            new int[]{3,4,5,6,8,9,10,12,13,14,16,17,18,19,21,25},
+            new int[]{4,5,7,8,10,11,13,14,16,17,19,20,22,23,25,30},
+            new int[]{5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,39},
+            new int[]{7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,42}
+        };
+
+        public static int[][] MainValues_Flat = new int[][] {
+            new int[]{7,12,17,22,27,32,37,42,47,52,57,62,67,72,77,92},
+            new int[]{10,16,22,28,34,40,46,52,58,64,70,76,82,88,94,112},
+            new int[]{15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,135},
+            new int[]{22,30,38,46,54,62,70,78,86,94,102,110,118,126,134,160}
+        };
+
+        public static int[][] MainValues_HPflat = new int[][] {
+            new int[]{100,175,250,325,400,475,550,625,700,775,850,925,1000,1075,1150,1380},
+            new int[]{160,250,340,430,520,610,700,790,880,970,1060,1150,1240,1330,1420,1704},
+            new int[]{270,375,480,585,690,795,900,1005,1110,1215,1320,1425,1530,1635,1740,2088},
+            new int[]{360,480,600,720,840,960,1080,1200,1320,1440,1560,1680,1800,1920,2040,2448}
+        };
+
+        public static int[][] MainValues_Percent = new int[][] {
+            new int[]{4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
+            new int[]{5,7,9,11,13,16,18,20,22,23,27,29,31,33,36,43},
+            new int[]{8,10,12,15,17,20,22,24,27,29,32,34,37,40,43,51},
+            new int[]{11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,63}
+        };
+        public static int[][] MainValues_CRate = new int[][] {
+            new int[]{3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,37},
+            new int[]{4,6,8,11,13,15,17,19,22,24,26,28,30,33,35,41},
+            new int[]{5,7,10,12,15,17,19,22,24,27,29,31,34,36,39,47},
+            new int[]{7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,58}
+        };
+
+        public static int[][] MainValues_CDmg = new int[][] {
+            new int[]{4,6,9,11,13,16,18,20,22,25,27,29,32,34,36,43},
+            new int[]{6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,57},
+            new int[]{8,11,15,18,21,25,28,31,34,38,41,44,48,51,54,65},
+            new int[]{11,15,19,23,27,31,35,39,43,47,51,55,59,63,67,80}
+        };
+
+        public static int[][] MainValues_ResAcc = new int[][] {
+            new int[] {4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
+            new int[] {6,8,10,13,15,17,19,21,24,26,28,30,32,35,37,44},
+            new int[] {9,11,14,16,19,21,23,26,28,31,33,35,38,40,43,51},
+            new int[] {12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,64}
+        };
+
+        public static Dictionary<Attr, int[][]> MainValues = new Dictionary<Attr, int[][]>
+        {
+            {Attr.HealthFlat, MainValues_HPflat },
+            {Attr.AttackFlat, MainValues_Flat },
+            {Attr.DefenseFlat, MainValues_Flat },
+            {Attr.Speed,MainValues_Speed },
+
+            {Attr.HealthPercent, MainValues_Percent },
+            {Attr.AttackPercent, MainValues_Percent },
+            {Attr.DefensePercent, MainValues_Percent },
+
+            {Attr.CritRate, MainValues_CRate },
+            {Attr.CritDamage, MainValues_CDmg },
+
+            {Attr.Accuracy, MainValues_ResAcc },
+            {Attr.Resistance, MainValues_ResAcc },
+        };
+
+        #endregion
     }
 }

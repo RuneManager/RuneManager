@@ -128,7 +128,7 @@ namespace RuneApp
 						{
 							int p = Cur[stat] / build.Sort[stat];
 							if (build.Maximum[stat] != 0)
-								p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat] * 2;
+								p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat];
 							str = p.ToString() + " (" + Cur[stat].ToString() + ")";
 							pts += p;
 						}
@@ -141,7 +141,7 @@ namespace RuneApp
                         {
                             int p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
                             if (build.Maximum.ExtraGet(extra) != 0)
-                                p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra) * 2;
+                                p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
                             str = p.ToString() + " (" + Cur.ExtraValue(extra).ToString() + ")";
                             pts += p;
                         }
@@ -217,7 +217,7 @@ namespace RuneApp
                 {
                     int p = Cur[stat] / build.Sort[stat];
 					if (build.Maximum[stat] != 0)
-						p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat] * 2;
+						p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat];
                     str = p.ToString() + " (" + Cur[stat].ToString() + ")";
                     pts += p;
                 }
@@ -231,7 +231,7 @@ namespace RuneApp
                 {
                     int p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
                     if (build.Maximum.ExtraGet(extra) != 0)
-                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra) * 2;
+                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
                     str = p.ToString() + " (" + Cur.ExtraValue(extra).ToString() + ")";
                     pts += p;
                 }
