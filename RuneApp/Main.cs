@@ -44,7 +44,7 @@ namespace RuneApp
                 using (WebClient client = new WebClient())
                 {
                     client.DownloadStringCompleted += client_DownloadStringCompleted;
-                    client.DownloadStringAsync(new Uri("https://www.dropbox.com/s/nrfmjzsw9cltorf/version.txt?dl=1"));
+					client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
                 }
             });
         }
@@ -872,10 +872,13 @@ namespace RuneApp
             Invoke((MethodInvoker)delegate
             {
                 updateBox.Visible = true;
-                string result = e.Result;
-                string newvernum = result.Substring(0, result.IndexOf('\r'));
-                if (newvernum.IndexOf('\n') != -1)
-                    newvernum = newvernum.Substring(0, newvernum.IndexOf('\n'));
+                string result = e.Result.Replace("\r\n", "\n");
+				int firstline = result.IndexOf('\n');
+
+                string newvernum = result;
+				if (firstline != -1)
+					newvernum = newvernum.Substring(0, firstline);
+
                 Console.WriteLine(newvernum);
                 int ind1 = result.IndexOf('\n');
                 
@@ -886,8 +889,7 @@ namespace RuneApp
                         filelink = e.Result.Substring(ind1 + 1);
                     else
                     {
-                        int offset = (e.Result.Contains('\r') ? 2 : 1);
-                        filelink = e.Result.Substring(ind1 + 1, ind2 - ind1 - offset);
+                        filelink = e.Result.Substring(ind1 + 1, ind2 - ind1 - 1);
                         whatsNewText = e.Result.Substring(ind2 + 1);
                     }
 
@@ -945,7 +947,7 @@ namespace RuneApp
         {
             if (whatsNewText != "")
             {
-                MessageBox.Show(whatsNewText);
+                MessageBox.Show(whatsNewText, "What's New");
             }
         }
     }
