@@ -894,6 +894,7 @@ namespace RuneApp
                     }
 
                 }
+
                 var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
                 string oldvernum = ver.ProductVersion;
                 updateNew.Text = "New: " + newvernum;
