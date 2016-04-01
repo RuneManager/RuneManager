@@ -457,6 +457,7 @@ namespace RuneApp
                 listView3.Items.Remove(li);
             }
             //builds.Clear();
+            checkLocked();
         }
 
 
@@ -629,6 +630,7 @@ namespace RuneApp
 
                 listView3.Items.Remove(li);
             }
+            checkLocked();
 		}
 
         private Task runTask = null;
