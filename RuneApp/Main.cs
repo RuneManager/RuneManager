@@ -135,12 +135,33 @@ namespace RuneApp
             if (result == DialogResult.OK) // Test result.
             {
                 string file = openFileDialog1.FileName;
-                try
+                if (file != null)
                 {
-                    size = LoadFile(file);
-                }
-                catch (IOException)
-                {
+                    try
+                    {
+                        size = LoadFile(file);
+                        if (size > 0)
+                        {
+                            if (File.Exists("save.json"))
+                            {
+                                if (MessageBox.Show("Do you want to override the existing startup save?", "Load Save" , MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                {
+                                    File.Copy(file, "save.json", true);
+                                }
+                            }
+                            else
+                            {
+                                if (MessageBox.Show("Do you want to load this save on startup?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                {
+                                    File.Copy(file, "save.json");
+                                }
+                            }
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
                 }
             }
             Console.WriteLine(size); // <-- Shows file size in debugging mode.
@@ -171,9 +192,38 @@ namespace RuneApp
         public void LoadBuildJSON(string text)
         {
             builds = JsonConvert.DeserializeObject<List<Build>>(text);
+            if (builds.Count > 0 && (data == null || data.Monsters == null))
+            {
+                // backup, just in case
+                string destFile = Path.Combine("", string.Format("{0}.backup{1}", "builds", ".json"));
+                int num = 2;
+                while (File.Exists(destFile))
+                {
+                    destFile = Path.Combine("", string.Format("{0}.backup{1}{2}", "builds", num, ".json"));
+                    num++;
+                }
+
+                File.Copy("builds.json", destFile);
+                if (MessageBox.Show("Couldn't locate save.json loading builds.json.\r\nManually locate file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    button1_Click(null, new EventArgs());
+                }
+                else
+                {
+                    MessageBox.Show("Couldn't load monster stats, builds may not work");
+                }
+            }
+
             foreach (Build b in builds)
             {
-                b.mon = data.GetMonster(b.MonName);
+                if (data != null)
+                    b.mon = data.GetMonster(b.MonName);
+                else
+                {
+                    b.mon = new Monster();
+                    b.mon.Name = b.MonName;
+                }
+
 				int id = b.ID;
 				if (b.ID == 0)
 				{
@@ -537,9 +587,9 @@ namespace RuneApp
 
                         if (b.Best == null)
                         {
-                            this.Invoke((MethodInvoker)delegate {
+                            /*this.Invoke((MethodInvoker)delegate {
                                 li.SubItems[3].Text = "No builds :(";
-                            });
+                            });*/
                             return;
                         }
 

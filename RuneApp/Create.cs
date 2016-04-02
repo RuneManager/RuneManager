@@ -230,14 +230,6 @@ namespace RuneApp
                 label.Size = new Size(60, 14);
                 label.Location = new Point(214, 6);
 
-                label = new Label();
-                page.Controls.Add(label);
-                label.Text = "YES";
-                label.Name = tab + "Check";
-                label.Size = new Size(60, 14);
-                label.Location = new Point(372, 246);
-
-
                 ComboBox filterJoin = new ComboBox();
                 filterJoin.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
                 filterJoin.FormattingEnabled = true;
@@ -343,7 +335,7 @@ namespace RuneApp
                     page.Controls.Add(label);
                     label.Name = tab + "r" + stat + "test";
                     label.Location = new Point(x, y);
-                    label.Text = "10";
+                    label.Text = "";
                     label.Size = new System.Drawing.Size(30, 20);
                     x += colWidth;
 
@@ -352,10 +344,21 @@ namespace RuneApp
                     first = false;
                 }
 
+                y += 8;
+                x = predX;
+
+                label = new Label();
+                page.Controls.Add(label);
+                label.Name = tab + "testGt";
+                label.Location = new Point(x - 3, y);
+                label.Text = "Sum >=";
+                label.Size = new System.Drawing.Size(45, 20);
+                x += colWidth;
+
                 textBox = new TextBox();
                 page.Controls.Add(textBox);
                 textBox.Name = tab + "test";
-                textBox.Location = new Point(testX, testY - 2);
+                textBox.Location = new Point(x, y - 2);
                 textBox.Text = "";
                 textBox.Size = new System.Drawing.Size(40, 20);
                 textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
@@ -363,8 +366,16 @@ namespace RuneApp
                 textBox.Enabled = false;
                 x += colWidth;
 
+                label = new Label();
+                page.Controls.Add(label);
+                label.Text = "";
+                label.Name = tab + "Check";
+                label.Size = new Size(60, 14);
+                label.Location = new Point(x, y);
+
+
                 x = predX;
-                y += rowHeight;
+                y += rowHeight + 8;
 
                 label = new Label();
                 page.Controls.Add(label);
@@ -1198,7 +1209,6 @@ namespace RuneApp
             }
 
             return false;
-            //return points;
         }
 
         private void TestRuneTab(Rune rune, string tab)
@@ -1222,19 +1232,24 @@ namespace RuneApp
                     res |= s;
             }
 
-            //var page = this.tabControl1.TabPages[tab];
             var ctrl = Controls.Find(tab + "Check", true).FirstOrDefault();
 
             ctrl.Text = res.ToString();
 
             if (scoring == 2)
+            {
                 ctrl.Text = points.ToString();
+                ctrl.ForeColor = Color.Red;
+                if (points >= build.runeScoring[tab].Value)
+                    ctrl.ForeColor = Color.Green;
+            }
 
             
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
+            build.GenRunes(Main.data, false, true);
             using (var ff = new RuneSelect())
             {
                 ff.returnedRune = runeTest;
@@ -1261,6 +1276,8 @@ namespace RuneApp
                         ff.runes = Main.data.Runes.Where(r => r.Slot == slot);
                         break;
                 }
+
+                ff.slot = tabControl1.SelectedTab.Text;
 
                 ff.runes = ff.runes.Where(r => build.BuildSets.Contains(r.Set));
 

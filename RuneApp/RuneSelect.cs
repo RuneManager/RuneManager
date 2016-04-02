@@ -20,6 +20,8 @@ namespace RuneApp
 
         public Build build = null;
 
+        public string slot = "";
+
         public RuneSelect()
         {
             InitializeComponent();
@@ -30,7 +32,7 @@ namespace RuneApp
         void RuneSelect_Shown(object sender, EventArgs e)
         {
             // dump out the rune details
-            foreach (Rune rune in runes)
+            foreach (Rune rune in runes.OrderBy(r => r.ID))
             {
                 ListViewItem item = new ListViewItem(new string[]{
                     rune.Set.ToString(),
@@ -39,10 +41,65 @@ namespace RuneApp
                     Rune.StringIt(rune.MainType, true),
                     rune.MainValue.ToString()
                 });
+                if (build != null)
+                    item.ForeColor = Color.Gray;
+                if (rune.AssignedName != "unknown name" && !Main.useEquipped)
+                    item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
                 listView2.Items.Add(item);
             }
+            if (build != null)
+            {
+                // Find all the runes in the build for the slot
+                List<Rune> fr = new List<Rune>();
+                switch (slot)
+                {
+                    case "Evens":
+                        fr.AddRange(build.runes[1]);
+                        fr.AddRange(build.runes[3]);
+                        fr.AddRange(build.runes[5]);
+                        break;
+                    case "Odds":
+                        fr.AddRange(build.runes[0]);
+                        fr.AddRange(build.runes[2]);
+                        fr.AddRange(build.runes[4]);
+                        break;
+                    case "Global":
+                        fr.AddRange(build.runes[0]);
+                        fr.AddRange(build.runes[1]);
+                        fr.AddRange(build.runes[2]);
+                        fr.AddRange(build.runes[3]);
+                        fr.AddRange(build.runes[4]);
+                        fr.AddRange(build.runes[5]);
+                        break;
+                    default:
+                        int slotn = int.Parse(slot);
+                        fr.AddRange(build.runes[slotn]);
+                        break;
+                }
+                // find the chosen runes in the list and colour them in
+                foreach (Rune r in fr.OrderBy(r => r.ID))
+                {
+                    foreach (ListViewItem li in listView2.Items)
+                    {
+                        Rune rt = (Rune)li.Tag;
+                        if (rt != null)
+                        {
+                            if (rt.ID < r.ID)
+                                continue;
+
+                            if (rt.ID == r.ID)
+                            {
+                                li.ForeColor = Color.Black;
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             // if we are given a rune, see if we can pre-select it
             if (returnedRune != null)
             {

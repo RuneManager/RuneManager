@@ -16,12 +16,18 @@ namespace RuneOptim
         // Ask for monsters nicely
         public Monster GetMonster(string name)
         {
-            return Monsters.Where(m => m.Name == name).FirstOrDefault();
+            return getMonster(name, 1);
         }
 
         public Monster GetMonster(string name, int num)
         {
-            return Monsters.Where(m => m.Name == name).Skip(num - 1).FirstOrDefault();
+            return getMonster(name, num);
+        }
+
+        private Monster getMonster(string name, int num)
+        {
+            Monster mon = Monsters.Where(m => m.Name == name).Skip(num - 1).FirstOrDefault(); ;
+            return mon ?? new Monster();
         }
 
         public Monster GetMonster(int id)

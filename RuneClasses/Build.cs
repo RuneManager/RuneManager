@@ -129,6 +129,46 @@ namespace RuneOptim
             total *= runes[5].Count();
             long complete = total;
 
+            if (total == 0)
+            {
+                if (printTo != null)
+                    printTo.Invoke("0 perms");
+                Console.WriteLine("Zero permuations");
+                return;
+            }
+            if (!AllowBroken && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
+            {
+                if (printTo != null)
+                    printTo.Invoke("Bad sets");
+                Console.WriteLine("Cannot use 4 set with no broken");
+                return;
+            }
+
+            bool hasSort = false;
+            foreach (string stat in statNames)
+            {
+                if (Sort[stat] != 0)
+                {
+                    hasSort = true;
+                    break;
+                }
+            }
+            foreach (string extra in extraNames)
+            {
+                if (Sort.ExtraGet(extra) != 0)
+                {
+                    hasSort = true;
+                    break;
+                }
+            }
+            if (top == 0 && !hasSort)
+            {
+                if (printTo != null)
+                    printTo.Invoke("No sort");
+                Console.WriteLine("No method of determining best");
+                return;
+            }
+
             DateTime begin = DateTime.Now;
             DateTime timer = DateTime.Now;
 

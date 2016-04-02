@@ -324,7 +324,7 @@ namespace RuneOptim
             // the stat can only be present once per rune, early exit
             if (MainType == stat)
             {
-                if (FakeLevel <= Level || Grade < 3)
+                if (FakeLevel <= Level || FakeLevel > 15 || Grade < 3)
                 {
                     return MainValue;
                 }

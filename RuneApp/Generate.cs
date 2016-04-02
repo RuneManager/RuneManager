@@ -112,9 +112,9 @@ namespace RuneApp
 					});
 				});
                 
-                // pick the top 400
-                // Believe it or not, putting 400 into the list takes a *lot* longer than making 5000
-				foreach (var b in build.loads.Take(400))
+                // pick the top 100
+                // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
+				foreach (var b in build.loads.Take(100))
 				{
 					ListViewItem li = new ListViewItem();
 					int pts = 0;
