@@ -332,22 +332,22 @@ namespace RuneOptim
             {
                 // I could use sets.Where(s => s.Equals(RuneSet.SET)).Count() * BONUS, but it was too slow
                 case Attr.HealthPercent:
-                    return sets[0] == RuneSet.Energy ? 15 : 0 + sets[1] == RuneSet.Energy ? 15 : 0 + sets[2] == RuneSet.Energy ? 15 : 0;
+                    return (sets[0] == RuneSet.Energy ? 15 : 0) + (sets[1] == RuneSet.Energy ? 15 : 0) + (sets[2] == RuneSet.Energy ? 15 : 0);
                 // 4 slot sets aren't going to be in [2]
                 case Attr.AttackPercent:
                     return sets[0] == RuneSet.Fatal ? 35 : sets[1] == RuneSet.Fatal ? 35 : 0;
                 case Attr.CritRate:
-                    return sets[0] == RuneSet.Blade ? 12 : 0 + sets[1] == RuneSet.Blade ? 12 : 0 + sets[2] == RuneSet.Blade ? 12 : 0;
+                    return (sets[0] == RuneSet.Blade ? 12 : 0) + (sets[1] == RuneSet.Blade ? 12 : 0) + (sets[2] == RuneSet.Blade ? 12 : 0);
                 case Attr.CritDamage:
                     return sets[0] == RuneSet.Rage ? 40 : sets[1] == RuneSet.Rage ? 40 : 0;
                 case Attr.SpeedPercent:
                     return sets[0] == RuneSet.Swift ? 25 : sets[1] == RuneSet.Swift ? 25 : 0;
                 case Attr.Accuracy:
-                    return sets[0] == RuneSet.Focus ? 20 : 0 + sets[1] == RuneSet.Focus ? 20 : 0 + sets[2] == RuneSet.Focus ? 20 : 0;
+                    return (sets[0] == RuneSet.Focus ? 20 : 0) + (sets[1] == RuneSet.Focus ? 20 : 0) + (sets[2] == RuneSet.Focus ? 20 : 0);
                 case Attr.DefensePercent:
-                    return sets[0] == RuneSet.Guard ? 15 : 0 + sets[1] == RuneSet.Guard ? 15 : 0 + sets[2] == RuneSet.Guard ? 15 : 0;
+                    return (sets[0] == RuneSet.Guard ? 15 : 0) + (sets[1] == RuneSet.Guard ? 15 : 0) + (sets[2] == RuneSet.Guard ? 15 : 0);
                 case Attr.Resistance:
-                    return sets[0] == RuneSet.Endure ? 20 : 0 + sets[1] == RuneSet.Endure ? 20 : 0 + sets[2] == RuneSet.Endure ? 20 : 0;
+                    return (sets[0] == RuneSet.Endure ? 20 : 0) + (sets[1] == RuneSet.Endure ? 20 : 0) + (sets[2] == RuneSet.Endure ? 20 : 0);
             }
             return 0;
         }

@@ -1,7 +1,3 @@
-0.0.0.5
+0.0.0.6
 https://github.com/Skibisky/RuneManager/releases/latest
-Clarified controls a little.
-Picks top 100 instead of 400 for a little more speed (still generates 5000).
-Dies a little less during loading #6
-Slightly smarter about when to spend time generating builds #5
-Rune filter for test rune selection colours entries based on availability and eligibility #2
+Correctly adds 2-set bonuses to builds.
