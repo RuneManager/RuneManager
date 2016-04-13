@@ -1,3 +1,7 @@
-0.0.0.6
+0.0.1.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Correctly adds 2-set bonuses to builds.
+**Backup builds** This will try to upgrade them to new format.
+Displays swaps/powerups/upgrades in main form.
+Reasonable performance increases in opening forms.
+Threshold stops points, Max stops builds.
+Started RuneReview. Makes a CSV after >>.
