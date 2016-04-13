@@ -19,6 +19,9 @@ namespace RuneOptim
         public int runeCount = 0;
         public RuneSet[] sets = new RuneSet[3];
         public bool SetsFull = false;
+
+        public int[] FakeLevel = new int[6];
+        public bool[] PredictSubs = new bool[6];
         
         // Debugging niceness
         public override string ToString()
@@ -53,12 +56,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.HealthFlat) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.HealthFlat) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.HealthFlat) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.HealthFlat) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.HealthFlat) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.HealthFlat) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.HealthFlat, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.HealthFlat, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.HealthFlat, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.HealthFlat, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.HealthFlat, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.HealthFlat, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.HealthFlat);
             }
         }
@@ -67,12 +70,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.HealthPercent) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.HealthPercent) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.HealthPercent) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.HealthPercent) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.HealthPercent) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.HealthPercent) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.HealthPercent, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.HealthPercent, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.HealthPercent, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.HealthPercent, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.HealthPercent, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.HealthPercent, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.HealthPercent);
             }
         }
@@ -82,12 +85,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.AttackFlat) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.AttackFlat) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.AttackFlat) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.AttackFlat) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.AttackFlat) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.AttackFlat) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.AttackFlat, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.AttackFlat, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.AttackFlat, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.AttackFlat, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.AttackFlat, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.AttackFlat, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.AttackFlat);
             }
         }
@@ -96,12 +99,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.AttackPercent) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.AttackPercent) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.AttackPercent) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.AttackPercent) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.AttackPercent) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.AttackPercent) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.AttackPercent, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.AttackPercent, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.AttackPercent, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.AttackPercent, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.AttackPercent, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.AttackPercent, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.AttackPercent);
             }
         }
@@ -111,12 +114,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.DefenseFlat) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.DefenseFlat) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.DefenseFlat) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.DefenseFlat) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.DefenseFlat) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.DefenseFlat) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.DefenseFlat, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.DefenseFlat, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.DefenseFlat, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.DefenseFlat, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.DefenseFlat, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.DefenseFlat, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.DefenseFlat);
             }
         }
@@ -125,12 +128,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.DefensePercent) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.DefensePercent) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.DefensePercent) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.DefensePercent) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.DefensePercent) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.DefensePercent) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.DefensePercent, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.DefensePercent, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.DefensePercent, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.DefensePercent, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.DefensePercent, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.DefensePercent, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.DefensePercent);
             }
         }
@@ -140,12 +143,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.Speed) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.Speed) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.Speed) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.Speed) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.Speed) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.Speed) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.Speed, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.Speed, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.Speed, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.Speed, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.Speed, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.Speed, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.Speed);
             }
         }
@@ -158,12 +161,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.CritRate) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.CritRate) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.CritRate) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.CritRate) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.CritRate) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.CritRate) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.CritRate, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.CritRate, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.CritRate, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.CritRate, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.CritRate, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.CritRate, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.CritRate);
             }
         }
@@ -173,12 +176,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.CritDamage) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.CritDamage) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.CritDamage) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.CritDamage) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.CritDamage) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.CritDamage) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.CritDamage, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.CritDamage, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.CritDamage, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.CritDamage, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.CritDamage, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.CritDamage, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.CritDamage);
             }
         }
@@ -188,12 +191,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.Accuracy) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.Accuracy) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.Accuracy) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.Accuracy) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.Accuracy) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.Accuracy) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.Accuracy, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.Accuracy, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.Accuracy, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.Accuracy, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.Accuracy, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.Accuracy, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.Accuracy);
             }
         }
@@ -203,12 +206,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0] != null ? runes[0].GetValue(Attr.Resistance) : 0) +
-                    (runes[1] != null ? runes[1].GetValue(Attr.Resistance) : 0) +
-                    (runes[2] != null ? runes[2].GetValue(Attr.Resistance) : 0) +
-                    (runes[3] != null ? runes[3].GetValue(Attr.Resistance) : 0) +
-                    (runes[4] != null ? runes[4].GetValue(Attr.Resistance) : 0) +
-                    (runes[5] != null ? runes[5].GetValue(Attr.Resistance) : 0) +
+                    (runes[0] != null ? runes[0].GetValue(Attr.Resistance, FakeLevel[0], PredictSubs[0]) : 0) +
+                    (runes[1] != null ? runes[1].GetValue(Attr.Resistance, FakeLevel[1], PredictSubs[1]) : 0) +
+                    (runes[2] != null ? runes[2].GetValue(Attr.Resistance, FakeLevel[2], PredictSubs[2]) : 0) +
+                    (runes[3] != null ? runes[3].GetValue(Attr.Resistance, FakeLevel[3], PredictSubs[3]) : 0) +
+                    (runes[4] != null ? runes[4].GetValue(Attr.Resistance, FakeLevel[4], PredictSubs[4]) : 0) +
+                    (runes[5] != null ? runes[5].GetValue(Attr.Resistance, FakeLevel[5], PredictSubs[5]) : 0) +
                     SetStat(Attr.Resistance);
             }
         }
@@ -225,7 +228,7 @@ namespace RuneOptim
             if (runes[rune.Slot - 1] == null)
                 runeCount++;
 
-            runes[rune.Slot - 1] = new Rune(rune);
+            runes[rune.Slot - 1] = rune;//new Rune(rune);
             if (runeCount % 2 == 0)
                 CheckSets();
         }

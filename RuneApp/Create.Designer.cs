@@ -39,6 +39,13 @@
             System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
             this.monLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.runeNums = new System.Windows.Forms.Label();
+            this.runeNum6 = new System.Windows.Forms.Label();
+            this.runeNum5 = new System.Windows.Forms.Label();
+            this.runeNum4 = new System.Windows.Forms.Label();
+            this.runeNum3 = new System.Windows.Forms.Label();
+            this.runeNum2 = new System.Windows.Forms.Label();
+            this.runeNum1 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
@@ -89,13 +96,8 @@
             this.tab5 = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.runeNum1 = new System.Windows.Forms.Label();
-            this.runeNum2 = new System.Windows.Forms.Label();
-            this.runeNum3 = new System.Windows.Forms.Label();
-            this.runeNum4 = new System.Windows.Forms.Label();
-            this.runeNum5 = new System.Windows.Forms.Label();
-            this.runeNum6 = new System.Windows.Forms.Label();
-            this.runeNums = new System.Windows.Forms.Label();
+            this.btnPerms = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -118,6 +120,10 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.runeNums);
             this.groupBox1.Controls.Add(this.runeNum6);
             this.groupBox1.Controls.Add(this.runeNum5);
@@ -127,6 +133,7 @@
             this.groupBox1.Controls.Add(this.runeNum1);
             this.groupBox1.Controls.Add(this.label6);
             this.groupBox1.Controls.Add(this.label5);
+            this.groupBox1.Controls.Add(this.btnPerms);
             this.groupBox1.Controls.Add(this.button3);
             this.groupBox1.Controls.Add(this.label14);
             this.groupBox1.Controls.Add(this.button2);
@@ -150,26 +157,116 @@
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Dock = System.Windows.Forms.DockStyle.Right;
             this.groupBox1.Location = new System.Drawing.Point(545, 0);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox1.Size = new System.Drawing.Size(399, 562);
+            this.groupBox1.Size = new System.Drawing.Size(463, 730);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Stats";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
+            // runeNums
+            // 
+            this.runeNums.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNums.AutoSize = true;
+            this.runeNums.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNums.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNums.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNums.Location = new System.Drawing.Point(46, 683);
+            this.runeNums.Name = "runeNums";
+            this.runeNums.Size = new System.Drawing.Size(84, 15);
+            this.runeNums.TabIndex = 84;
+            this.runeNums.Text = "32000000000";
+            // 
+            // runeNum6
+            // 
+            this.runeNum6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum6.AutoSize = true;
+            this.runeNum6.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum6.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum6.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum6.Location = new System.Drawing.Point(8, 512);
+            this.runeNum6.Name = "runeNum6";
+            this.runeNum6.Size = new System.Drawing.Size(32, 22);
+            this.runeNum6.TabIndex = 83;
+            this.runeNum6.Text = "32";
+            // 
+            // runeNum5
+            // 
+            this.runeNum5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum5.AutoSize = true;
+            this.runeNum5.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum5.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum5.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum5.Location = new System.Drawing.Point(8, 613);
+            this.runeNum5.Name = "runeNum5";
+            this.runeNum5.Size = new System.Drawing.Size(32, 22);
+            this.runeNum5.TabIndex = 82;
+            this.runeNum5.Text = "32";
+            // 
+            // runeNum4
+            // 
+            this.runeNum4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum4.AutoSize = true;
+            this.runeNum4.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum4.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum4.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum4.Location = new System.Drawing.Point(98, 651);
+            this.runeNum4.Name = "runeNum4";
+            this.runeNum4.Size = new System.Drawing.Size(32, 22);
+            this.runeNum4.TabIndex = 81;
+            this.runeNum4.Text = "32";
+            // 
+            // runeNum3
+            // 
+            this.runeNum3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum3.AutoSize = true;
+            this.runeNum3.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum3.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum3.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum3.Location = new System.Drawing.Point(187, 613);
+            this.runeNum3.Name = "runeNum3";
+            this.runeNum3.Size = new System.Drawing.Size(32, 22);
+            this.runeNum3.TabIndex = 80;
+            this.runeNum3.Text = "32";
+            // 
+            // runeNum2
+            // 
+            this.runeNum2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum2.AutoSize = true;
+            this.runeNum2.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum2.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum2.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum2.Location = new System.Drawing.Point(187, 512);
+            this.runeNum2.Name = "runeNum2";
+            this.runeNum2.Size = new System.Drawing.Size(32, 22);
+            this.runeNum2.TabIndex = 79;
+            this.runeNum2.Text = "32";
+            // 
+            // runeNum1
+            // 
+            this.runeNum1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.runeNum1.AutoSize = true;
+            this.runeNum1.BackColor = System.Drawing.SystemColors.Control;
+            this.runeNum1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.runeNum1.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.runeNum1.Location = new System.Drawing.Point(98, 474);
+            this.runeNum1.Name = "runeNum1";
+            this.runeNum1.Size = new System.Drawing.Size(32, 22);
+            this.runeNum1.TabIndex = 78;
+            this.runeNum1.Text = "32";
+            // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(350, 76);
+            this.label6.Location = new System.Drawing.Point(346, 76);
             this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(27, 13);
+            this.label6.Size = new System.Drawing.Size(40, 13);
             this.label6.TabIndex = 77;
-            this.label6.Text = "Max";
+            this.label6.Text = "Thresh";
             // 
             // label5
             // 
@@ -183,7 +280,7 @@
             // 
             // button3
             // 
-            this.button3.Location = new System.Drawing.Point(251, 286);
+            this.button3.Location = new System.Drawing.Point(251, 434);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(39, 21);
             this.button3.TabIndex = 21;
@@ -204,7 +301,7 @@
             // button2
             // 
             this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(312, 527);
+            this.button2.Location = new System.Drawing.Point(376, 695);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(75, 23);
             this.button2.TabIndex = 20;
@@ -214,12 +311,13 @@
             // 
             // runeControl6
             // 
+            this.runeControl6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl6.BackColor = System.Drawing.Color.Transparent;
             this.runeControl6.BackImage = null;
             this.runeControl6.Coolness = 0;
             this.runeControl6.Gamma = 1F;
             this.runeControl6.Grade = 1;
-            this.runeControl6.Location = new System.Drawing.Point(48, 366);
+            this.runeControl6.Location = new System.Drawing.Point(48, 534);
             this.runeControl6.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl6.Name = "runeControl6";
             this.runeControl6.SetImage = null;
@@ -234,12 +332,13 @@
             // 
             // runeControl5
             // 
+            this.runeControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl5.BackColor = System.Drawing.Color.Transparent;
             this.runeControl5.BackImage = null;
             this.runeControl5.Coolness = 0;
             this.runeControl5.Gamma = 1F;
             this.runeControl5.Grade = 1;
-            this.runeControl5.Location = new System.Drawing.Point(49, 402);
+            this.runeControl5.Location = new System.Drawing.Point(49, 570);
             this.runeControl5.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl5.Name = "runeControl5";
             this.runeControl5.SetImage = null;
@@ -254,12 +353,13 @@
             // 
             // runeControl4
             // 
+            this.runeControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl4.BackColor = System.Drawing.Color.Transparent;
             this.runeControl4.BackImage = null;
             this.runeControl4.Coolness = 0;
             this.runeControl4.Gamma = 1F;
             this.runeControl4.Grade = 1;
-            this.runeControl4.Location = new System.Drawing.Point(91, 419);
+            this.runeControl4.Location = new System.Drawing.Point(91, 587);
             this.runeControl4.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl4.Name = "runeControl4";
             this.runeControl4.SetImage = null;
@@ -274,12 +374,13 @@
             // 
             // runeControl3
             // 
+            this.runeControl3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl3.BackColor = System.Drawing.Color.Transparent;
             this.runeControl3.BackImage = null;
             this.runeControl3.Coolness = 0;
             this.runeControl3.Gamma = 1F;
             this.runeControl3.Grade = 1;
-            this.runeControl3.Location = new System.Drawing.Point(123, 402);
+            this.runeControl3.Location = new System.Drawing.Point(123, 570);
             this.runeControl3.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl3.Name = "runeControl3";
             this.runeControl3.SetImage = null;
@@ -294,12 +395,13 @@
             // 
             // runeControl2
             // 
+            this.runeControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl2.BackColor = System.Drawing.Color.Transparent;
             this.runeControl2.BackImage = null;
             this.runeControl2.Coolness = 0;
             this.runeControl2.Gamma = 1F;
             this.runeControl2.Grade = 1;
-            this.runeControl2.Location = new System.Drawing.Point(123, 365);
+            this.runeControl2.Location = new System.Drawing.Point(123, 533);
             this.runeControl2.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl2.Name = "runeControl2";
             this.runeControl2.SetImage = null;
@@ -314,12 +416,13 @@
             // 
             // runeControl1
             // 
+            this.runeControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.runeControl1.BackColor = System.Drawing.Color.Transparent;
             this.runeControl1.BackImage = null;
             this.runeControl1.Coolness = 0;
             this.runeControl1.Gamma = 1F;
             this.runeControl1.Grade = 1;
-            this.runeControl1.Location = new System.Drawing.Point(93, 334);
+            this.runeControl1.Location = new System.Drawing.Point(93, 502);
             this.runeControl1.Margin = new System.Windows.Forms.Padding(2);
             this.runeControl1.Name = "runeControl1";
             this.runeControl1.SetImage = null;
@@ -334,8 +437,9 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.pictureBox1.Image = global::RuneApp.Runes.runes;
-            this.pictureBox1.Location = new System.Drawing.Point(44, 330);
+            this.pictureBox1.Location = new System.Drawing.Point(44, 498);
             this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(138, 151);
@@ -418,8 +522,9 @@
             // 
             // Set3Label
             // 
+            this.Set3Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Set3Label.AutoSize = true;
-            this.Set3Label.Location = new System.Drawing.Point(186, 393);
+            this.Set3Label.Location = new System.Drawing.Point(186, 561);
             this.Set3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Set3Label.Name = "Set3Label";
             this.Set3Label.Size = new System.Drawing.Size(63, 13);
@@ -428,8 +533,9 @@
             // 
             // Set2Label
             // 
+            this.Set2Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Set2Label.AutoSize = true;
-            this.Set2Label.Location = new System.Drawing.Point(186, 380);
+            this.Set2Label.Location = new System.Drawing.Point(186, 548);
             this.Set2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Set2Label.Name = "Set2Label";
             this.Set2Label.Size = new System.Drawing.Size(40, 13);
@@ -438,8 +544,9 @@
             // 
             // Set1Label
             // 
+            this.Set1Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.Set1Label.AutoSize = true;
-            this.Set1Label.Location = new System.Drawing.Point(186, 366);
+            this.Set1Label.Location = new System.Drawing.Point(186, 534);
             this.Set1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Set1Label.Name = "Set1Label";
             this.Set1Label.Size = new System.Drawing.Size(30, 13);
@@ -496,7 +603,7 @@
             listViewGroup12});
             this.listView1.Location = new System.Drawing.Point(6, 44);
             this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(90, 476);
+            this.listView1.Size = new System.Drawing.Size(90, 644);
             this.listView1.TabIndex = 8;
             this.listView1.UseCompatibleStateImageBehavior = false;
             this.listView1.View = System.Windows.Forms.View.Details;
@@ -516,7 +623,7 @@
             this.groupBox2.Controls.Add(this.listView1);
             this.groupBox2.Location = new System.Drawing.Point(12, 23);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(102, 526);
+            this.groupBox2.Size = new System.Drawing.Size(102, 694);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Rune Sets";
@@ -565,9 +672,8 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.tabControl1.Controls.Add(this.tabg);
             this.tabControl1.Controls.Add(this.tabo);
             this.tabControl1.Controls.Add(this.tabe);
@@ -580,7 +686,7 @@
             this.tabControl1.Location = new System.Drawing.Point(120, 23);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(420, 526);
+            this.tabControl1.Size = new System.Drawing.Size(420, 694);
             this.tabControl1.TabIndex = 11;
             // 
             // tabg
@@ -588,7 +694,7 @@
             this.tabg.Location = new System.Drawing.Point(4, 22);
             this.tabg.Name = "tabg";
             this.tabg.Padding = new System.Windows.Forms.Padding(3);
-            this.tabg.Size = new System.Drawing.Size(412, 500);
+            this.tabg.Size = new System.Drawing.Size(412, 668);
             this.tabg.TabIndex = 0;
             this.tabg.Text = "Global";
             this.tabg.UseVisualStyleBackColor = true;
@@ -763,95 +869,32 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // runeNum1
+            // btnPerms
             // 
-            this.runeNum1.AutoSize = true;
-            this.runeNum1.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum1.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum1.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum1.Location = new System.Drawing.Point(98, 306);
-            this.runeNum1.Name = "runeNum1";
-            this.runeNum1.Size = new System.Drawing.Size(32, 22);
-            this.runeNum1.TabIndex = 78;
-            this.runeNum1.Text = "32";
+            this.btnPerms.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPerms.Location = new System.Drawing.Point(244, 652);
+            this.btnPerms.Name = "btnPerms";
+            this.btnPerms.Size = new System.Drawing.Size(55, 21);
+            this.btnPerms.TabIndex = 21;
+            this.btnPerms.Text = "Update";
+            this.btnPerms.UseVisualStyleBackColor = true;
+            this.btnPerms.Click += new System.EventHandler(this.button4_Click);
             // 
-            // runeNum2
+            // label7
             // 
-            this.runeNum2.AutoSize = true;
-            this.runeNum2.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum2.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum2.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum2.Location = new System.Drawing.Point(187, 344);
-            this.runeNum2.Name = "runeNum2";
-            this.runeNum2.Size = new System.Drawing.Size(32, 22);
-            this.runeNum2.TabIndex = 79;
-            this.runeNum2.Text = "32";
-            // 
-            // runeNum3
-            // 
-            this.runeNum3.AutoSize = true;
-            this.runeNum3.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum3.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum3.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum3.Location = new System.Drawing.Point(187, 445);
-            this.runeNum3.Name = "runeNum3";
-            this.runeNum3.Size = new System.Drawing.Size(32, 22);
-            this.runeNum3.TabIndex = 80;
-            this.runeNum3.Text = "32";
-            // 
-            // runeNum4
-            // 
-            this.runeNum4.AutoSize = true;
-            this.runeNum4.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum4.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum4.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum4.Location = new System.Drawing.Point(98, 483);
-            this.runeNum4.Name = "runeNum4";
-            this.runeNum4.Size = new System.Drawing.Size(32, 22);
-            this.runeNum4.TabIndex = 81;
-            this.runeNum4.Text = "32";
-            // 
-            // runeNum5
-            // 
-            this.runeNum5.AutoSize = true;
-            this.runeNum5.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum5.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum5.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum5.Location = new System.Drawing.Point(8, 445);
-            this.runeNum5.Name = "runeNum5";
-            this.runeNum5.Size = new System.Drawing.Size(32, 22);
-            this.runeNum5.TabIndex = 82;
-            this.runeNum5.Text = "32";
-            // 
-            // runeNum6
-            // 
-            this.runeNum6.AutoSize = true;
-            this.runeNum6.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNum6.Font = new System.Drawing.Font("Microsoft Sans Serif", 13F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNum6.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNum6.Location = new System.Drawing.Point(8, 344);
-            this.runeNum6.Name = "runeNum6";
-            this.runeNum6.Size = new System.Drawing.Size(32, 22);
-            this.runeNum6.TabIndex = 83;
-            this.runeNum6.Text = "32";
-            // 
-            // runeNums
-            // 
-            this.runeNums.AutoSize = true;
-            this.runeNums.BackColor = System.Drawing.SystemColors.Control;
-            this.runeNums.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.runeNums.ForeColor = System.Drawing.SystemColors.ControlText;
-            this.runeNums.Location = new System.Drawing.Point(46, 515);
-            this.runeNums.Name = "runeNums";
-            this.runeNums.Size = new System.Drawing.Size(84, 15);
-            this.runeNums.TabIndex = 84;
-            this.runeNums.Text = "32000000000";
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(394, 76);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(27, 13);
+            this.label7.TabIndex = 85;
+            this.label7.Text = "Max";
             // 
             // Create
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(944, 562);
+            this.ClientSize = new System.Drawing.Size(1008, 730);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.groupBox2);
@@ -938,5 +981,7 @@
         private System.Windows.Forms.Label runeNum3;
         private System.Windows.Forms.Label runeNum2;
         private System.Windows.Forms.Label runeNums;
+        private System.Windows.Forms.Button btnPerms;
+        private System.Windows.Forms.Label label7;
     }
 }

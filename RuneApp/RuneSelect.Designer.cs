@@ -37,7 +37,6 @@
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.runeBox2 = new System.Windows.Forms.GroupBox();
-            this.button3 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.runeInventory = new RuneApp.RuneControl();
             this.IRuneSub4 = new System.Windows.Forms.Label();
@@ -46,7 +45,9 @@
             this.IRuneSub1 = new System.Windows.Forms.Label();
             this.IRuneInnate = new System.Windows.Forms.Label();
             this.IRuneMain = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
+            this.IRuneMon = new System.Windows.Forms.Label();
             this.toolStrip1.SuspendLayout();
             this.runeBox2.SuspendLayout();
             this.SuspendLayout();
@@ -124,6 +125,7 @@
             // runeBox2
             // 
             this.runeBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.runeBox2.Controls.Add(this.IRuneMon);
             this.runeBox2.Controls.Add(this.label8);
             this.runeBox2.Controls.Add(this.runeInventory);
             this.runeBox2.Controls.Add(this.IRuneSub4);
@@ -136,23 +138,11 @@
             this.runeBox2.Margin = new System.Windows.Forms.Padding(2);
             this.runeBox2.Name = "runeBox2";
             this.runeBox2.Padding = new System.Windows.Forms.Padding(2);
-            this.runeBox2.Size = new System.Drawing.Size(217, 150);
+            this.runeBox2.Size = new System.Drawing.Size(217, 167);
             this.runeBox2.TabIndex = 13;
             this.runeBox2.TabStop = false;
             this.runeBox2.Text = "Rune";
             this.runeBox2.Visible = false;
-            // 
-            // button3
-            // 
-            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(517, 545);
-            this.button3.Margin = new System.Windows.Forms.Padding(2);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(61, 24);
-            this.button3.TabIndex = 19;
-            this.button3.Text = "Select";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
             // label8
             // 
@@ -244,6 +234,18 @@
             this.IRuneMain.TabIndex = 12;
             this.IRuneMain.Text = "Main";
             // 
+            // button3
+            // 
+            this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button3.Location = new System.Drawing.Point(517, 545);
+            this.button3.Margin = new System.Windows.Forms.Padding(2);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(61, 24);
+            this.button3.TabIndex = 19;
+            this.button3.Text = "Select";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -255,6 +257,16 @@
             this.button1.Text = "Cancel";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // IRuneMon
+            // 
+            this.IRuneMon.AutoSize = true;
+            this.IRuneMon.Location = new System.Drawing.Point(14, 143);
+            this.IRuneMon.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.IRuneMon.Name = "IRuneMon";
+            this.IRuneMon.Size = new System.Drawing.Size(52, 13);
+            this.IRuneMon.TabIndex = 18;
+            this.IRuneMon.Text = "Equipped";
             // 
             // RuneSelect
             // 
@@ -298,5 +310,6 @@
         private System.Windows.Forms.Label IRuneMain;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label IRuneMon;
     }
 }

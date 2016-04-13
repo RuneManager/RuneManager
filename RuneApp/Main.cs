@@ -25,6 +25,7 @@ namespace RuneApp
         public static bool useEquipped = false;
         string filelink = "";
         string whatsNewText = "";
+        Build currentBuild = null;
 
         public Main()
         {
@@ -236,8 +237,21 @@ namespace RuneApp
                 }
 				ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "" });
                 li.Tag = b;
-                listView5.Items.Add(li); 
-                
+                listView5.Items.Add(li);
+
+                // upgrade builds, hopefully
+                while (b.VERSIONNUM < Create.VERSIONNUM)
+                {
+                    switch (b.VERSIONNUM)
+                    {
+                        case 0: // unversioned to 1
+                            b.Threshold = b.Maximum;
+                            b.Maximum = new Stats();
+                            break;
+
+                    }
+                    b.VERSIONNUM++;
+                }
             }
         }
 
@@ -556,76 +570,127 @@ namespace RuneApp
             }
         }
 
+        private void RunBuild(ListViewItem pli, bool isBatch = false)
+        {
+            if (plsDie)
+                return;
+
+            if (currentBuild != null)
+                currentBuild.isRun = false;
+
+            if (pli.Tag != null)
+            {
+                Build b = (Build)pli.Tag;
+                currentBuild = b;
+
+                ListViewItem[] olvs = null;
+                Invoke((MethodInvoker)delegate { olvs = listView3.Items.Find(b.ID.ToString(), false); });
+
+                if (olvs.Length > 0)
+                {
+                    var olv = olvs.First();
+                    Loadout ob = (Loadout)olv.Tag;
+                    foreach (Rune r in ob.runes)
+                    {
+                        r.Locked = false;
+                    }
+                }
+
+                b.GenRunes(data, false, useEquipped, isBatch);
+
+                string nR = "";
+
+                for (int i = 0; i < b.runes.Length; i++)
+                {
+                    if (b.runes[i].Length == 0)
+                        nR += (i + 1) + " ";
+                }
+
+                if (nR != "")
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        pli.SubItems[3].Text = ":( " + nR + "Runes";
+                    });
+                    return;
+                }
+                
+                b.GenBuilds(0, 0, (str) =>
+                {
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        pli.SubItems[3].Text = str;
+                    });
+                }, null, true, isBatch);
+
+                if (b.Best == null)
+                {
+                    return;
+                }
+
+                int numchanged = 0;
+                int powerup = 0;
+                int upgrades = 0;
+                foreach (Rune r in b.Best.Current.runes)
+                {
+                    r.Locked = true;
+                    if (r.AssignedName != b.Best.Name)
+                        numchanged++;
+                    powerup += Math.Max(0, b.Best.Current.FakeLevel[r.Slot - 1] - r.Level);
+                    if (b.Best.Current.FakeLevel[r.Slot -1] != 0)
+                    {
+                        int tup = (int)Math.Floor(Math.Min(12, b.Best.Current.FakeLevel[r.Slot - 1]) / (double)3);
+                        int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
+                        upgrades += Math.Max(0, tup - cup);
+                    }
+                }
+                checkLocked();
+                currentBuild = null;
+
+                this.Invoke((MethodInvoker)delegate
+                {
+                    var lvs = listView3.Items.Find(b.ID.ToString(), false);
+                    if (lvs.Length == 0)
+                    {
+                        var nli = new ListViewItem();
+                        nli.Tag = b.Best.Current;
+                        nli.Text = b.ID.ToString();
+                        nli.SubItems.Add(b.Best.Name);
+                        nli.SubItems.Add(b.Best.ID.ToString());
+                        nli.SubItems.Add(numchanged.ToString());
+                        nli.SubItems.Add(powerup.ToString());
+                        nli.SubItems.Add(upgrades.ToString());
+                        nli.Name = b.ID.ToString();
+                        listView3.Items.Add(nli);
+                    }
+                    else
+                    {
+                        var nli = lvs.First();
+                        nli.Tag = b.Best.Current;
+                        nli.Text = b.ID.ToString();
+                        nli.SubItems.Add(b.Best.Name);
+                        nli.SubItems.Add(b.Best.ID.ToString());
+                        nli.SubItems.Add(numchanged.ToString());
+                        nli.SubItems.Add(powerup.ToString());
+                        nli.SubItems.Add(upgrades.ToString());
+                        nli.Name = b.ID.ToString();
+                    }
+                });
+
+            }
+
+        }
+
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
             var lis = listView5.SelectedItems;
             if (lis.Count > 0)
             {
                 var li = lis[0];
-                if (li.Tag != null)
+                Task.Factory.StartNew(() =>
                 {
-                    Build b = (Build)li.Tag;
-
-					var olvs = listView3.Items.Find(b.ID.ToString(), false);
-                    if (olvs.Length > 0)
-                    {
-                        var olv = olvs.First();
-                        Loadout ob = (Loadout)olv.Tag;
-                        foreach (Rune r in ob.runes)
-                        {
-                            r.Locked = false;
-                        }
-                    }
-                    
-                    Task.Factory.StartNew(() => {
-                        b.GenRunes(data, false, useEquipped);
-                        b.GenBuilds(0, 0, (str) => {
-                            this.Invoke((MethodInvoker) delegate {
-                                li.SubItems[3].Text = str;
-                            }); 
-                        }, null, true);
-
-                        if (b.Best == null)
-                        {
-                            /*this.Invoke((MethodInvoker)delegate {
-                                li.SubItems[3].Text = "No builds :(";
-                            });*/
-                            return;
-                        }
-
-                        foreach (Rune r in b.Best.Current.runes)
-                        {
-                            r.Locked = true;
-                        }
-                        checkLocked();
-                        
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            var lvs = listView3.Items.Find(b.ID.ToString(), false);
-                            if (lvs.Length == 0)
-                            {
-                                li = new ListViewItem();
-                                li.Tag = b.Best.Current;
-                                li.Text = b.ID.ToString();
-                                li.SubItems.Add(b.Best.Name);
-                                li.SubItems.Add(b.Best.ID.ToString());
-                                li.Name = b.ID.ToString();
-                                listView3.Items.Add(li);
-                            }
-                            else
-                            {
-                                li = lvs.First();
-                                li.Tag = b.Best.Current;
-                                li.Text = b.ID.ToString();
-                                li.SubItems.Add(b.Best.Name);
-                                li.SubItems.Add(b.Best.ID.ToString());
-                                li.Name = b.ID.ToString();
-                            }
-                        }); 
-
-                    });
-
-                }
+                    RunBuild(li);
+                });
             }
         }
 
@@ -693,12 +758,14 @@ namespace RuneApp
             if (runTask != null && runTask.Status == TaskStatus.Running)
             {
                 runSource.Cancel();
-                //runTask = null;
+                if (currentBuild != null)
+                    currentBuild.isRun = false;
                 plsDie = true;
                 return;
             }
             plsDie = false;
 
+            // unlock and remove all current builds
 			foreach (ListViewItem li in listView3.Items)
 			{
 				Loadout l = (Loadout)li.Tag;
@@ -712,6 +779,7 @@ namespace RuneApp
 			}
             builds.Clear();
 
+            // collect the builds
 			List<ListViewItem> list5 = new List<ListViewItem>();
 			foreach (ListViewItem li in listView5.Items)
 			{
@@ -724,96 +792,89 @@ namespace RuneApp
             runToken = runSource.Token;
 			runTask = Task.Factory.StartNew(() =>
 			{
+                foreach (Rune r in data.Runes)
+                {
+                    r.ResetStats();
+                }
+
 				foreach (ListViewItem li in list5)
 				{
-                    if (plsDie)
-                        return;
-
-					if (li.Tag != null)
-					{
-						Build b = (Build)li.Tag;
-
-						ListViewItem[] olvs = null;
-						Invoke((MethodInvoker)delegate { olvs = listView3.Items.Find(b.ID.ToString(), false); });
-						
-						if (olvs.Length > 0)
-						{
-							var olv = olvs.First();
-							Loadout ob = (Loadout)olv.Tag;
-							foreach (Rune r in ob.runes)
-							{
-								r.Locked = false;
-							}
-						}
-
-						b.GenRunes(data, false, useEquipped);
-
-                        string nR = "";
-
-                        for(int i = 0; i < b.runes.Length; i++)
-                        {
-                            if (b.runes[i].Length == 0)
-                                nR += (i+1) + " ";
-                        }
-
-						if (nR != "")
-						{
-                            this.Invoke((MethodInvoker)delegate
-                            {
-                                li.SubItems[3].Text = ":( " + nR + "Runes";
-                            });
-                            continue;
-						}
-
-
-						b.GenBuilds(0, 0, (str) =>
-						{
-							this.Invoke((MethodInvoker)delegate
-							{
-								li.SubItems[3].Text = str;
-							});
-						});
-
-                        if (b.Best == null)
-                        {
-                            continue;
-                        }
-
-						foreach (Rune r in b.Best.Current.runes)
-						{
-							r.Locked = true;
-						}
-                        checkLocked();
-
-						this.Invoke((MethodInvoker)delegate
-						{
-							var lvs = listView3.Items.Find(b.ID.ToString(), false);
-							if (lvs.Length == 0)
-							{
-								var nli = new ListViewItem();
-								nli.Tag = b.Best.Current;
-								nli.Text = b.ID.ToString();
-								nli.SubItems.Add(b.Best.Name);
-                                nli.SubItems.Add(b.Best.ID.ToString());
-								nli.Name = b.ID.ToString();
-								listView3.Items.Add(nli);
-							}
-							else
-							{
-								var nli = lvs.First();
-								nli.Tag = b.Best.Current;
-								nli.Text = b.ID.ToString();
-								nli.SubItems.Add(b.Best.Name);
-                                nli.SubItems.Add(b.Best.ID.ToString());
-                                nli.Name = b.ID.ToString();
-							}
-						});
-
-					}
-
+                    RunBuild(li, true);
 				}
+
+                GenerateStats();
+
             }, runSource.Token);
 		}
+
+        void GenerateStats()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine("ID,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points");
+
+            foreach (Rune r in data.Runes.OrderByDescending(r => ((6-r.Grade) + (15-r.Level)/3
+                + (int)(10 * (1 - r.manageStats_RuneFilt / (double)(r.manageStats_Set+2)))
+                + (int)(20 * (1 - r.manageStats_TypeFilt / (double)(r.manageStats_Set+2)))
+                + (int)(15 * (1 - r.manageStats_LoadFilt / (double)(r.manageStats_LoadGen+2)))
+                + r.Level / 3 - r.Rarity
+                + (int)(15 * (1 - r.Efficiency)))
+                // / (r.manageStats_In ? 3 : 1)
+                ))
+            {
+                int pts = 0;
+                sb.Append(r.ID + ",");
+
+                sb.Append(r.Grade + ",");
+                pts += 6 - r.Grade;
+
+                sb.Append(r.Set + ",");
+                sb.Append(r.Slot + ",");
+                sb.Append(r.MainType + ",");
+
+                sb.Append(r.Level + ",");
+                pts += (15 - r.Level)/3;
+
+                pts += r.Level / 3 - r.Rarity;
+
+                sb.Append(r.manageStats_Set + ",");
+                sb.Append(r.manageStats_RuneFilt + ",");
+                sb.Append(r.manageStats_TypeFilt + ",");
+                pts += (int)(10 * (1 - r.manageStats_RuneFilt / (double)(r.manageStats_Set+2)));
+                pts += (int)(20 * (1 - r.manageStats_TypeFilt / (double)(r.manageStats_Set+2)));
+
+                sb.Append(r.manageStats_LoadFilt + ",");
+                sb.Append(r.manageStats_LoadGen + ",");
+                pts += (int)(15 * (1 - r.manageStats_LoadFilt / (double)(r.manageStats_LoadGen+2)));
+
+                sb.Append(r.Efficiency.ToString("0.####") + ",");
+                pts += (int)(15 * (1 - r.Efficiency));
+
+                sb.Append((r.manageStats_In ? "TRUE" : "FALSE") + ",");
+                //if (r.manageStats_In)
+                //    pts /= 3;
+                sb.AppendLine(pts.ToString());
+            }
+            int status = 0;
+            while (status != 1)
+            {
+                try
+                {
+                    File.WriteAllText("runestats.csv", sb.ToString());
+                    status = 1;
+                }
+                catch (Exception e)
+                {
+                    if (status == 0)
+                    {
+                        if (MessageBox.Show("Please close runestats.csv\r\nOr ensure you can create a file here.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
+                        {
+                            status = 1;
+                        }
+                    }
+                }
+            }
+        }
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e)
 		{
@@ -924,51 +985,58 @@ namespace RuneApp
             Invoke((MethodInvoker)delegate
             {
                 updateBox.Visible = true;
-                string result = e.Result.Replace("\r\n", "\n");
-				int firstline = result.IndexOf('\n');
+                try {
+                    string result = e.Result.Replace("\r\n", "\n");
+                    int firstline = result.IndexOf('\n');
 
-                string newvernum = result;
-				if (firstline != -1)
-					newvernum = newvernum.Substring(0, firstline);
+                    string newvernum = result;
+                    if (firstline != -1)
+                        newvernum = newvernum.Substring(0, firstline);
 
-                Console.WriteLine(newvernum);
-                int ind1 = result.IndexOf('\n');
-                
-                if (result.IndexOf('\n') != -1)
-                {
-                    int ind2 = result.IndexOf('\n', ind1 + 1);
-                    if (ind2 == -1)
-                        filelink = e.Result.Substring(ind1 + 1);
+                    Console.WriteLine(newvernum);
+                    int ind1 = result.IndexOf('\n');
+
+                    if (result.IndexOf('\n') != -1)
+                    {
+                        int ind2 = result.IndexOf('\n', ind1 + 1);
+                        if (ind2 == -1)
+                            filelink = e.Result.Substring(ind1 + 1);
+                        else
+                        {
+                            filelink = e.Result.Substring(ind1 + 1, ind2 - ind1 - 1);
+                            whatsNewText = e.Result.Substring(ind2 + 1);
+                        }
+
+                    }
+
+                    var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+                    string oldvernum = ver.ProductVersion;
+                    updateNew.Text = "New: " + newvernum;
+                    updateCurrent.Text = "Current: " + oldvernum;
+                    int newver = VersionCompare(oldvernum, newvernum);
+                    if (newver > 0)
+                    {
+                        //MessageBox.Show("You have a newer version than available");
+                        updateComplain.Text = "You hacker";
+                    }
+                    else if (newver < 0)
+                    {
+                        updateComplain.Text = "Update available!";
+                        if (filelink != "")
+                        {
+                            updateDownload.Enabled = true;
+                            if (whatsNewText != "")
+                                updateWhat.Visible = true;
+                        }
+                    }
                     else
                     {
-                        filelink = e.Result.Substring(ind1 + 1, ind2 - ind1 - 1);
-                        whatsNewText = e.Result.Substring(ind2 + 1);
-                    }
-
-                }
-
-                var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
-                string oldvernum = ver.ProductVersion;
-                updateNew.Text = "New: " + newvernum;
-                updateCurrent.Text = "Current: " + oldvernum;
-                int newver = VersionCompare(oldvernum, newvernum);
-                if (newver > 0)
-                {
-                    //MessageBox.Show("You have a newer version than available");
-                    updateComplain.Text = "You hacker";
-                }
-                else if (newver < 0)
-                {
-                    updateComplain.Text = "Update available!";
-                    if (filelink != "")
-                    {
-                        updateDownload.Enabled = true;
-                        if (whatsNewText != "")
-                            updateWhat.Visible = true;
+                        updateComplain.Visible = false;
                     }
                 }
-                else
+                catch(Exception ex)
                 {
+                    updateComplain.Text = e.Error.ToString();
                     updateComplain.Visible = false;
                 }
             });

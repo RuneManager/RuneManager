@@ -18,6 +18,8 @@ namespace RuneApp
 		private static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
         private static string[] extraNames = new string[] { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
 
+        public static int numBuilds = 100;
+
         // the build to use
 		public Build build = null;
 
@@ -108,13 +110,15 @@ namespace RuneApp
 				{
 					Invoke((MethodInvoker)delegate
 					{
-						toolStripProgressBar1.Value = (int)(d * 500);
+						toolStripProgressBar1.Value = (int)(d * numBuilds);
 					});
 				});
-                
+
+                int num = 0;
+                int tbuilds = build.loads.Take(numBuilds).Count();
                 // pick the top 100
                 // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
-				foreach (var b in build.loads.Take(100))
+                foreach (var b in build.loads.Take(numBuilds))
 				{
 					ListViewItem li = new ListViewItem();
 					int pts = 0;
@@ -127,8 +131,8 @@ namespace RuneApp
 						if (build.Sort[stat] != 0)
 						{
 							int p = Cur[stat] / build.Sort[stat];
-							if (build.Maximum[stat] != 0)
-								p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat];
+							if (build.Threshold[stat] != 0)
+								p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
 							str = p.ToString() + " (" + Cur[stat].ToString() + ")";
 							pts += p;
 						}
@@ -140,8 +144,8 @@ namespace RuneApp
                         if (build.Sort.ExtraGet(extra) != 0)
                         {
                             int p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
-                            if (build.Maximum.ExtraGet(extra) != 0)
-                                p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
+                            if (build.Threshold.ExtraGet(extra) != 0)
+                                p -= Math.Max(0, Cur.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
                             str = p.ToString() + " (" + Cur.ExtraValue(extra).ToString() + ")";
                             pts += p;
                         }
@@ -154,7 +158,8 @@ namespace RuneApp
 					{
                         // put the thing in on the main thread and bump the progress bar
 						listView1.Items.Add(li);
-						toolStripProgressBar1.Value = 500 + (int)(500 * listView1.Items.Count / (double) build.loads.Count());
+                        num++;
+						toolStripProgressBar1.Value = numBuilds + (int)(numBuilds * num / (double)tbuilds);
 					});
 				}
 
@@ -216,8 +221,8 @@ namespace RuneApp
                 if (build.Sort[stat] != 0)
                 {
                     int p = Cur[stat] / build.Sort[stat];
-					if (build.Maximum[stat] != 0)
-						p -= Math.Max(0, Cur[stat] - build.Maximum[stat]) / build.Sort[stat];
+					if (build.Threshold[stat] != 0)
+						p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
                     str = p.ToString() + " (" + Cur[stat].ToString() + ")";
                     pts += p;
                 }
@@ -230,8 +235,8 @@ namespace RuneApp
                 if (build.Sort.ExtraGet(extra) != 0)
                 {
                     int p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
-                    if (build.Maximum.ExtraGet(extra) != 0)
-                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Maximum.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
+                    if (build.Threshold.ExtraGet(extra) != 0)
+                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
                     str = p.ToString() + " (" + Cur.ExtraValue(extra).ToString() + ")";
                     pts += p;
                 }
@@ -263,5 +268,75 @@ namespace RuneApp
             DialogResult = System.Windows.Forms.DialogResult.Cancel;
             Close();
 		}
+
+        private void listView1_DoubleClick(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count > 0)
+            {
+                ListViewItem lit = listView1.Items[0];
+                ListViewItem lis = listView1.SelectedItems[0];
+
+                if (lit == lis)
+                    return;
+
+                Monster mY = (Monster)lis.Tag;
+                Monster mN = (Monster)lit.Tag;
+
+                List<string> better = new List<string>();
+
+                building = true;
+
+                foreach (var stat in statNames)
+                {
+                    if (mY.GetStats()[stat] > mN.GetStats()[stat])
+                        better.Add(stat);
+                }
+                int totalsort = 0;
+                foreach (var stat in statNames)
+                {
+                    if (build.Sort[stat] != 0)
+                        totalsort += Math.Abs(build.Sort[stat]);
+                }
+                foreach (var extra in extraNames)
+                {
+                    if (build.Sort.ExtraGet(extra) != 0)
+                        totalsort += Math.Abs(build.Sort.ExtraGet(extra));
+                }
+                if (totalsort == 0)
+                {
+                    int totalstats = 0;
+                    foreach (var stat in better)
+                    {
+                        if (statNames.Contains(stat))
+                            totalstats += mY.GetStats()[stat];
+                        else
+                            totalstats += mY.GetStats().ExtraValue(stat);
+                    }
+                    int amount = (int)Math.Max(30, Math.Sqrt(Math.Max(100, totalstats)));
+                    foreach (var stat in better)
+                    {
+                        if (statNames.Contains(stat))
+                        {
+                            build.Sort[stat] = (int)(amount * (double)(mY.GetStats()[stat] / (double)totalstats));
+                            TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
+                            tb.Text = build.Sort[stat].ToString();
+                        }
+                        else
+                        {
+                            build.Sort.ExtraSet(stat, (int)(amount * (double)(mY.GetStats().ExtraValue(stat) / (double)totalstats)));
+                            TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
+                            tb.Text = build.Sort.ExtraGet(stat).ToString();
+                        }
+                    }
+                }
+                else
+                {
+                    // to do
+                }
+
+                building = false;
+                textBox_TextChanged(null, null);
+            }
+        }
     }
 }

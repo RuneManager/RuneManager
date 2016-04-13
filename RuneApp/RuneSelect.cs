@@ -43,7 +43,7 @@ namespace RuneApp
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
-                if (rune.AssignedName != "unknown name" && !Main.useEquipped)
+                if (rune.AssignedName != "Unknown name" && !Main.useEquipped)
                     item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
@@ -89,7 +89,7 @@ namespace RuneApp
                             if (rt.ID < r.ID)
                                 continue;
 
-                            if (rt.ID == r.ID)
+                            if (rt.ID == r.ID && (Main.useEquipped || rt.AssignedName == "Unknown name" || rt.AssignedName == build.MonName))
                             {
                                 li.ForeColor = Color.Black;
 
@@ -139,6 +139,7 @@ namespace RuneApp
             IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
             IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
             IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
+            IRuneMon.Text = rune.AssignedName;
         }
 
         // return the highlighted rune

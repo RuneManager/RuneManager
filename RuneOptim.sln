@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.30501.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneOptim", "RuneOptim\RuneOptim.csproj", "{657ABF4B-06BD-4F67-A94F-304F7F155E7D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneApp", "RuneApp\RuneApp.csproj", "{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneClasses", "RuneClasses\RuneClasses.csproj", "{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{03470FA8-7F9D-4707-BD32-A7FB9D0A08DB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

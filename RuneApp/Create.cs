@@ -16,6 +16,9 @@ namespace RuneApp
     public partial class Create : Form
     {
         public Build build = null;
+
+        // controls builds version numbers
+        public static int VERSIONNUM = 1;
         
         // Keep track of the runeset groups for speed swaps
         private ListViewGroup rsInc;
@@ -32,6 +35,7 @@ namespace RuneApp
 
         private static string[] tabNames = new string[] { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
         private static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
+        private static string[] extraNames = new string[] { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
 
         public Create()
         {
@@ -62,6 +66,10 @@ namespace RuneApp
 
             // track all the clickable rune things
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
+            for (int i = 0; i < runes.Length; i++)
+            {
+                runes[i].Tag = i + 1;
+            }
 
             toolStripButton1.Tag = 0;
 
@@ -133,7 +141,11 @@ namespace RuneApp
             int colWidth = 50;
             int rowHeight = 24;
 
-            foreach (var stat in statNames)
+            string[] comb = statNames.Concat(extraNames).ToArray();
+
+            int genX = 0;
+
+            foreach (var stat in comb)
             {
                 x = 4; 
                 label = new Label();
@@ -177,6 +189,8 @@ namespace RuneApp
                 label.Location = new Point(x, y);
                 x += colWidth;
 
+                genX = x;
+
                 textBox = new TextBox();
                 groupBox1.Controls.Add(textBox);
                 textBox.Name = stat + "Worth";
@@ -195,6 +209,14 @@ namespace RuneApp
 
                 textBox = new TextBox();
                 groupBox1.Controls.Add(textBox);
+                textBox.Name = stat + "Thresh";
+                textBox.Size = new Size(40, 20);
+                textBox.Location = new Point(x, y);
+                textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
+                x += colWidth;
+
+                textBox = new TextBox();
+                groupBox1.Controls.Add(textBox);
                 textBox.Name = stat + "Max";
                 textBox.Size = new Size(40, 20);
                 textBox.Location = new Point(x, y);
@@ -202,6 +224,8 @@ namespace RuneApp
 
                 y += rowHeight;
             }
+
+            button3.Location = new Point(genX, y);
 
             // put the grid on all the tabs
             foreach (var tab in tabNames)
@@ -436,11 +460,8 @@ namespace RuneApp
             }
         }
 
-        // when the scoring type changes
-        void filterJoin_SelectedIndexChanged(object sender, EventArgs e)
+        private TabPage GetTab(string tabName)
         {
-            ComboBox box = (ComboBox)sender;
-            string tabName = (string)box.Tag;
             // figure out which tab it's on
             int tabId = tabName == "g" ? 0 : tabName == "e" ? -2 : tabName == "o" ? -1 : int.Parse(tabName);
             TabPage tab = null;
@@ -449,10 +470,19 @@ namespace RuneApp
             if (tabId > 0)
             {
                 if (tabId % 2 == 0)
-                    tab = tabControl1.TabPages[2 + tabId/2];
+                    tab = tabControl1.TabPages[2 + tabId / 2];
                 else
                     tab = tabControl1.TabPages[6 + tabId / 2];
             }
+            return tab;
+        }
+
+        // when the scoring type changes
+        void filterJoin_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            ComboBox box = (ComboBox)sender;
+            string tabName = (string)box.Tag;
+            TabPage tab = GetTab(tabName);
             Control ctrl;
 
             foreach (var stat in statNames)
@@ -503,6 +533,8 @@ namespace RuneApp
             Monster mon = (Monster)build.mon;
             Stats cur = mon.GetStats();
             monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
+
+            build.VERSIONNUM = VERSIONNUM;
 
             // move the sets around in the list a little
             foreach (RuneSet s in build.BuildSets)
@@ -579,15 +611,48 @@ namespace RuneApp
 
                 var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
                 
+                var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+
                 var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
-                
+
                 if (build.Minimum[stat] > 0)
                     ctrlTotal.Text = build.Minimum[stat].ToString();
                 if (build.Sort[stat] != 0)
                     ctrlWorth.Text = build.Sort[stat].ToString();
                 if (build.Maximum[stat] != 0)
                     ctrlMax.Text = build.Maximum[stat].ToString();
+                if (build.Threshold[stat] != 0)
+                    ctrlThresh.Text = build.Threshold[stat].ToString();
 
+            }
+
+            foreach (var extra in extraNames)
+            {
+                var ctrlBase = (Label)groupBox1.Controls.Find(extra + "Base", true).FirstOrDefault();
+                ctrlBase.Text = mon.ExtraValue(extra).ToString();
+
+                var ctrlBonus = (Label)groupBox1.Controls.Find(extra + "Bonus", true).FirstOrDefault();
+                var ctrlTotal = (TextBox)groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
+
+                ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+
+                var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
+                ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
+
+                var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+
+                var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
+
+                var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
+
+                if (build.Minimum.ExtraGet(extra) > 0)
+                    ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
+                if (build.Sort.ExtraGet(extra) != 0)
+                    ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
+                if (build.Maximum.ExtraGet(extra) != 0)
+                    ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
+                if (build.Threshold.ExtraGet(extra) != 0)
+                    ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
             }
 
             // do we allow broken sets?
@@ -597,6 +662,7 @@ namespace RuneApp
             foreach (var rs in build.runeFilters)
             {
                 var tab = rs.Key;
+                TabPage ctab = GetTab(tab);
                 // for each stats filter
                 foreach (var f in rs.Value)
                 {
@@ -605,7 +671,7 @@ namespace RuneApp
                     foreach (var type in new string[] { "flat", "perc", "test" })
                     {
                         // find the controls and shove the value in it
-                        var ctrl = this.Controls.Find(tab + stat + type, true).FirstOrDefault();
+                        var ctrl = ctab.Controls.Find(tab + stat + type, true).FirstOrDefault();
                         if (ctrl != null)
                         {
                             int val = f.Value[type];
@@ -620,13 +686,14 @@ namespace RuneApp
             }
             foreach (var tab in build.runePrediction)
             {
-                TextBox tb = (TextBox)this.Controls.Find(tab.Key + "raise", true).FirstOrDefault();
+                TabPage ctab = GetTab(tab.Key);
+                TextBox tb = (TextBox)ctab.Controls.Find(tab.Key + "raise", true).FirstOrDefault();
                 if (tb != null)
                 {
                     if (tab.Value.Key != 0)
                         tb.Text = tab.Value.Key.ToString();
                 }
-                CheckBox cb = (CheckBox)this.Controls.Find(tab.Key + "bonus", true).FirstOrDefault();
+                CheckBox cb = (CheckBox)ctab.Controls.Find(tab.Key + "bonus", true).FirstOrDefault();
                 if (cb != null)
                 {
                     cb.Checked = tab.Value.Value;
@@ -636,8 +703,9 @@ namespace RuneApp
             // for each tabs scoring
             foreach (var tab in build.runeScoring)
             {
+                TabPage ctab = GetTab(tab.Key);
                 // find that box
-                ComboBox box = (ComboBox)this.Controls.Find(tab.Key + "join", true).FirstOrDefault();
+                ComboBox box = (ComboBox)ctab.Controls.Find(tab.Key + "join", true).FirstOrDefault();
                 if (box != null)
                 {
                     // manually kajigger it
@@ -651,16 +719,16 @@ namespace RuneApp
                                 continue;
                             if (type == "flat" && (stat == "ACC" || stat == "RES" || stat == "CD" || stat == "CR"))
                                 continue;
-                            ctrl = Controls.Find(tab.Key + stat + type, true).FirstOrDefault();
+                            ctrl = ctab.Controls.Find(tab.Key + stat + type, true).FirstOrDefault();
                         }
-                        ctrl = Controls.Find(tab.Key + stat + "test", true).FirstOrDefault();
+                        ctrl = ctab.Controls.Find(tab.Key + stat + "test", true).FirstOrDefault();
                         ctrl.Enabled = (box.SelectedIndex != 2);
-                        ctrl = Controls.Find(tab.Key + "test", true).FirstOrDefault();
+                        ctrl = ctab.Controls.Find(tab.Key + "test", true).FirstOrDefault();
                         ctrl.Enabled = (box.SelectedIndex == 2);
                     }
                 }
 
-                var tb = (TextBox)this.Controls.Find(tab.Key + "test", true).FirstOrDefault();
+                var tb = (TextBox)ctab.Controls.Find(tab.Key + "test", true).FirstOrDefault();
                 if (tab.Value.Value != 0)
                     tb.Text = tab.Value.Value.ToString();
             }
@@ -670,6 +738,7 @@ namespace RuneApp
             build.New = false;
             // oh yeah, update everything now that it's finally loaded
             UpdateGlobal();
+            CalcPerms();
         }
 
         // switch the cool icon on the button (and the bool in the build)
@@ -753,7 +822,7 @@ namespace RuneApp
                 toolStripButton1.Image = global::RuneApp.App.subtract;
                 toolStripButton1.Text = "Exclude selected set";
             }
-
+            btnPerms.Enabled = true;
         }
 
         // flip the icon for the REQUIRED set button
@@ -770,6 +839,7 @@ namespace RuneApp
                 toolStripButton3.Image = global::RuneApp.App.down;
                 toolStripButton3.Text = "Option selected set";
             }
+            btnPerms.Enabled = true;
 
         }
 
@@ -909,43 +979,14 @@ namespace RuneApp
             // good idea, generate right now whenever the user clicks a... whatever
             build.GenRunes(Main.data, false, Main.useEquipped);
 
-            // figure stuff out
-            long perms = 0;
-            Label ctrl;
-            for (int i = 0; i < 6; i++)
+            using (RuneSelect rs = new RuneSelect())
             {
-                int num = build.runes[i].Length;
-
-                if (perms == 0)
-                    perms = num;
-                else
-                    perms *= num;
-                if (num == 0)
-                    perms = 0;
-
-                ctrl = (Label)Controls.Find("runeNum" + (i + 1).ToString(), true).FirstOrDefault();
-                ctrl.Text = num.ToString();
-                ctrl.ForeColor = Color.Black;
-
-                // arbitrary colours for goodness/badness
-                if (num < 12)
-                    ctrl.ForeColor = Color.Green;
-                if (num > 24)
-                    ctrl.ForeColor = Color.Orange;
-                if (num > 32)
-                    ctrl.ForeColor = Color.Red;
+                rs.build = build;
+                rs.slot = ((int)tc.Tag-1).ToString();
+                rs.runes = build.runes[(int)tc.Tag-1];
+                rs.ShowDialog();
             }
-            ctrl = (Label)Controls.Find("runeNums", true).FirstOrDefault();
-            ctrl.Text = String.Format("{0:#,##0}", perms);
-            ctrl.ForeColor = Color.Black;
 
-            // arbitrary colours for goodness/badness
-            if (perms < 500000) // 500k
-                ctrl.ForeColor = Color.Green;
-            if (perms > 5000000) // 5m
-                ctrl.ForeColor = Color.Orange;
-            if (perms > 20000000 || perms == 0) // 20m
-                ctrl.ForeColor = Color.Red;
         }
 
         private void UpdateGlobal()
@@ -953,6 +994,8 @@ namespace RuneApp
             // if the window is loading, try not to save the window
             if (loading)
                 return;
+
+            btnPerms.Enabled = true;
             
             foreach (string tab in tabNames)
             {
@@ -1017,6 +1060,13 @@ namespace RuneApp
                 if (int.TryParse(ctrlMax.Text, out val))
                     max = val;
                 build.Maximum[stat] = val;
+
+                var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+                val = 0; int thr = 0;
+                if (int.TryParse(ctrlThresh.Text, out val))
+                    thr = val;
+                build.Threshold[stat] = val;
+
                 var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
                 val = 0; int current = 0;
                 if (int.TryParse(ctrlCurrent.Text, out val))
@@ -1028,6 +1078,49 @@ namespace RuneApp
                     if (max != 0)
                         pts = Math.Min(max, current);
                     ctrlWorthPts.Text = ((int)(pts / (double)worth)).ToString();
+                }
+            }
+
+            foreach (string extra in extraNames)
+            {
+                var ctrlTotal = groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
+                int val = 0; int total = 0;
+                if (int.TryParse(ctrlTotal.Text, out val))
+                    total = val;
+                build.Minimum.ExtraSet(extra, val);
+                var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+                val = 0; int worth = 0;
+                if (int.TryParse(ctrlWorth.Text, out val))
+                    worth = val;
+                build.Sort.ExtraSet(extra, val);
+
+                var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
+                val = 0; int max = 0;
+                if (int.TryParse(ctrlMax.Text, out val))
+                    max = val;
+                build.Maximum.ExtraSet(extra, val);
+
+                var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
+                val = 0; int thr = 0;
+                if (int.TryParse(ctrlThresh.Text, out val))
+                    thr = val;
+                build.Threshold.ExtraSet(extra, val);
+
+                var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
+                val = 0; int current = 0;
+                if (int.TryParse(ctrlCurrent.Text, out val))
+                    current = val;
+                var ctrlWorthPts = groupBox1.Controls.Find(extra + "CurrentPts", true).FirstOrDefault();
+                if (worth != 0 && current != 0)
+                {
+                    double pts = current;
+                    if (max != 0)
+                        pts = Math.Min(max, current);
+                    ctrlWorthPts.Text = ((int)(pts / (double)worth)).ToString();
+                }
+                else
+                {
+                    ctrlWorthPts.Text = "";
                 }
             }
 
@@ -1069,7 +1162,8 @@ namespace RuneApp
 
         private void UpdateStat(string tab, string stat)
         {
-            var ctest = this.Controls.Find(tab + stat + "test", true).First();
+            TabPage ctab = GetTab(tab);
+            var ctest = ctab.Controls.Find(tab + stat + "test", true).First();
             int test = 0;
             int.TryParse(ctest.Text, out test);
 
@@ -1096,26 +1190,26 @@ namespace RuneApp
                 }
 
                 if (tab == "g")
-                    this.Controls.Find(tab + "i" + stat + type, true).First().Text = "";
+                    ctab.Controls.Find(tab + "i" + stat + type, true).First().Text = "";
                 else if (tab == "e" || tab == "o")
                 {
-                    this.Controls.Find(tab + "i" + stat + type, true).First().Text = this.Controls.Find("gc" + stat + type, true).First().Text;
+                    ctab.Controls.Find(tab + "i" + stat + type, true).First().Text = tabg.Controls.Find("gc" + stat + type, true).First().Text;
                 }
                 else
                 {
                     int s = int.Parse(tab);
                     if (s % 2 == 0)
-                        this.Controls.Find(tab + "i" + stat + type, true).First().Text = this.Controls.Find("ec" + stat + type, true).First().Text;
+                        ctab.Controls.Find(tab + "i" + stat + type, true).First().Text = tabe.Controls.Find("ec" + stat + type, true).First().Text;
                     else
-                        this.Controls.Find(tab + "i" + stat + type, true).First().Text = this.Controls.Find("oc" + stat + type, true).First().Text;
+                        ctab.Controls.Find(tab + "i" + stat + type, true).First().Text = tabo.Controls.Find("oc" + stat + type, true).First().Text;
                 }
 
-                var c = this.Controls.Find(tab + "c" + stat + type, true).First();
+                var c = ctab.Controls.Find(tab + "c" + stat + type, true).First();
 
                 int i = 0;
                 int t = 0;
-                var ip = int.TryParse(this.Controls.Find(tab + "i" + stat + type, true).First().Text, out i);
-                var tp = int.TryParse(this.Controls.Find(tab + stat + type, true).First().Text, out t);
+                var ip = int.TryParse(ctab.Controls.Find(tab + "i" + stat + type, true).First().Text, out i);
+                var tp = int.TryParse(ctab.Controls.Find(tab + stat + type, true).First().Text, out t);
 
                 if (ip)
                 {
@@ -1169,7 +1263,7 @@ namespace RuneApp
                 return 0;
         }
 
-        private bool GetPts(Rune rune, string tab, string stat, ref int points)
+        private bool GetPts(Rune rune, string tab, string stat, ref int points, int fake, bool pred)
         {
             int pts = 0;
 
@@ -1179,8 +1273,8 @@ namespace RuneApp
                 
             }
 
-            pts += DivCtrl(rune[stat + "flat"], tab, stat, "flat");
-            pts += DivCtrl(rune[stat + "perc"], tab, stat, "perc");
+            pts += DivCtrl(rune[stat + "flat", fake, pred], tab, stat, "flat");
+            pts += DivCtrl(rune[stat + "perc", fake, pred], tab, stat, "perc");
             points += pts;
 
             var lCtrls = this.Controls.Find(tab + "r" + stat + "test", true);
@@ -1217,6 +1311,14 @@ namespace RuneApp
             if (!build.runeScoring.ContainsKey(tab))
                 return;
 
+            int fake = 0;
+            bool pred = false;
+            if (build.runePrediction.ContainsKey(tab))
+            {
+                fake = build.runePrediction[tab].Key;
+                pred = build.runePrediction[tab].Value;
+            }
+
             var kv = build.runeScoring[tab];
             int scoring = kv.Key;
             if (scoring == 1)
@@ -1225,7 +1327,7 @@ namespace RuneApp
             int points = 0;
             foreach (var stat in statNames)
             {
-                bool s = GetPts(rune, tab, stat, ref points);
+                bool s = GetPts(rune, tab, stat, ref points, fake, pred);
                 if (scoring == 1)
                     res &= s;
                 else if (scoring == 0)
@@ -1380,6 +1482,56 @@ namespace RuneApp
 
                 UpdateGlobal();
             }
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            CalcPerms();
+        }
+
+        private void CalcPerms()
+        { // good idea, generate right now whenever the user clicks a... whatever
+            build.GenRunes(Main.data, false, Main.useEquipped);
+
+            // figure stuff out
+            long perms = 0;
+            Label ctrl;
+            for (int i = 0; i < 6; i++)
+            {
+                int num = build.runes[i].Length;
+
+                if (perms == 0)
+                    perms = num;
+                else
+                    perms *= num;
+                if (num == 0)
+                    perms = 0;
+
+                ctrl = (Label)Controls.Find("runeNum" + (i + 1).ToString(), true).FirstOrDefault();
+                ctrl.Text = num.ToString();
+                ctrl.ForeColor = Color.Black;
+
+                // arbitrary colours for goodness/badness
+                if (num < 12)
+                    ctrl.ForeColor = Color.Green;
+                if (num > 24)
+                    ctrl.ForeColor = Color.Orange;
+                if (num > 32)
+                    ctrl.ForeColor = Color.Red;
+            }
+            ctrl = (Label)Controls.Find("runeNums", true).FirstOrDefault();
+            ctrl.Text = String.Format("{0:#,##0}", perms);
+            ctrl.ForeColor = Color.Black;
+
+            // arbitrary colours for goodness/badness
+            if (perms < 500000) // 500k
+                ctrl.ForeColor = Color.Green;
+            if (perms > 5000000) // 5m
+                ctrl.ForeColor = Color.Orange;
+            if (perms > 20000000 || perms == 0) // 20m
+                ctrl.ForeColor = Color.Red;
+
+            btnPerms.Enabled = false;
         }
     }
 }
