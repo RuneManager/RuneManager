@@ -1444,14 +1444,22 @@ namespace RuneApp
                     foreach (var stat in statNames)
                     {
                         var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                        //ctrlWorth.Text = "";
 
                         if (build.Sort[stat] > 0)
                             ctrlWorth.Text = build.Sort[stat].ToString();
                         else
                             ctrlWorth.Text = "";
                     }
-                    loading = false;
+					foreach (var extra in extraNames)
+					{
+						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+
+						if (build.Sort.ExtraGet(extra) > 0)
+							ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
+						else
+							ctrlWorth.Text = "";
+					}
+					loading = false;
                 }
                 else
                 {
@@ -1462,8 +1470,16 @@ namespace RuneApp
                         int.TryParse(ctrlWorth.Text, out val);
                         build.Sort[stat] = val;
                     }
-                }
-                UpdateGlobal();
+					foreach (var extra in extraNames)
+					{
+						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+						int val = 0;
+						int.TryParse(ctrlWorth.Text, out val);
+						build.Sort.ExtraSet(extra, val);
+					}
+
+				}
+				UpdateGlobal();
             }
         }
 

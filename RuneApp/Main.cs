@@ -539,7 +539,7 @@ namespace RuneApp
                     var res = ff.ShowDialog();
                     if (res == System.Windows.Forms.DialogResult.OK)
                     {
-                        ff.build.priority = (listView5.Items.Count + 1);
+                        ff.build.priority = builds.Max(b => b.priority) + 1;
                         ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"0%"});
                         li.Tag = ff.build;
                         listView5.Items.Add(li);
