@@ -186,6 +186,139 @@ namespace RuneOptim
             }
         }
 
+		[JsonIgnore]
+		public int ScoringBad
+		{
+			get
+			{
+				int val = 0;
+				val += 6 - Grade;
+				val += 15 - Level / 3;
+				val += (int)(10 * (1 - manageStats_RuneFilt / (double)(manageStats_Set + 2)));
+				val += (int)(20 * (1 - manageStats_TypeFilt / (double)(manageStats_Set + 2)));
+				val += (int)(15 * (1 - manageStats_LoadFilt / (double)(manageStats_LoadGen + 2)));
+				val += Level / 3 - Rarity;
+				val += (int)(15 * (1 - Efficiency));
+				//if (manageStats_In)
+				//    pts /= 3;
+				return val;
+			}
+		}
+
+		[JsonIgnore]
+		public string ScoringAct
+		{
+			get
+			{
+				if (manageStats_In)
+					return "Keep";
+				if (Grade < 4)
+				{
+					if (HealthPercent > 5 || Speed > 3)
+						return "Consider";
+					return "Sell";
+				}
+				else
+				{
+					
+					if (FlatCount() > 0)
+					{
+						if (Rarity < 2)
+							return "Sell";
+					}
+					if (Level < 6)
+						return "To 6";
+					if (Efficiency > 0.7)
+						return "Keep";
+					if (FlatPoints() > 2.5)
+						return "Sell";
+
+					if (Grade < 5)
+					{
+						if (Level < 9)
+							return "To 9";
+						if (FlatCount() > 1)
+							return "Sell";
+					}
+					else
+					{
+						if (FlatCount() < 2 && Efficiency > 0.5)
+							return "Keep";
+						if (Grade > 5)
+						{
+							if (FlatCount() < 3 && Efficiency > 0.6)
+								return "Keep";
+						}
+						if (Level < 12)
+							return "To 12";
+					}
+				}
+				if (HealthPercent > 6 || Speed > 4)
+					return "Consider";
+				return "Sell";
+			}
+		}
+
+		public int FlatCount()
+		{
+			int count = 0;
+			if (Sub1Type == Attr.Null) return count;
+			count += (Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat || Sub1Type == Attr.AttackFlat) ? 1 : 0;
+			if (Sub2Type == Attr.Null) return count;
+			count += (Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat || Sub2Type == Attr.AttackFlat) ? 1 : 0;
+			if (Sub3Type == Attr.Null) return count;
+			count += (Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat || Sub3Type == Attr.AttackFlat) ? 1 : 0;
+			if (Sub4Type == Attr.Null) return count;
+			count += (Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat || Sub4Type == Attr.AttackFlat) ? 1 : 0;
+
+			return count;
+		}
+
+		public double FlatPoints()
+		{
+			double pts = 0;
+			if (Grade < 4)
+				return 0;
+
+			if (Slot != 1)
+				pts += AttackFlat / (double)subUpgrades[Attr.AttackFlat][Grade-4];
+			else if (Slot != 3)
+				pts += DefenseFlat / (double)subUpgrades[Attr.DefenseFlat][Grade-4];
+			else if (Slot != 5)
+				pts += HealthFlat / (double)subUpgrades[Attr.HealthFlat][Grade - 4];
+
+			return pts;
+		}
+
+		[JsonIgnore]
+		public int ScoringSell
+		{
+			get
+			{
+				int val = 0;
+
+				val += 6 - Grade;
+				val += 15 - Level / 3;
+
+				val += (int)(20 - 20 * Efficiency);
+
+				val += FlatCount() * 2;
+				val += (int)(FlatPoints() * 5);
+
+				if (manageStats_In)
+					val = (int)Math.Max(0, val - 10);
+
+				if (Level < 6 && Rarity > 1)
+					val /= 2;
+
+
+				
+				val = (int)(val*(100 - 100 * Efficiency))/10;
+
+				return val;
+			}
+		}
+
         [JsonIgnore]
         private Dictionary<Attr, int[]> subUpgrades = new Dictionary<Attr, int[]>()
         {

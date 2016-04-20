@@ -644,11 +644,11 @@ namespace RuneApp
                         upgrades += Math.Max(0, tup - cup);
                     }
                 }
-                checkLocked();
                 currentBuild = null;
 
                 this.Invoke((MethodInvoker)delegate
                 {
+					checkLocked();
                     var lvs = listView3.Items.Find(b.ID.ToString(), false);
                     if (lvs.Length == 0)
                     {
@@ -811,49 +811,41 @@ namespace RuneApp
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendLine("ID,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points");
+            sb.AppendLine("Id,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,FlatCount,FlatPts,SellScore,Action");
 
-            foreach (Rune r in data.Runes.OrderByDescending(r => ((6-r.Grade) + (15-r.Level)/3
-                + (int)(10 * (1 - r.manageStats_RuneFilt / (double)(r.manageStats_Set+2)))
-                + (int)(20 * (1 - r.manageStats_TypeFilt / (double)(r.manageStats_Set+2)))
-                + (int)(15 * (1 - r.manageStats_LoadFilt / (double)(r.manageStats_LoadGen+2)))
-                + r.Level / 3 - r.Rarity
-                + (int)(15 * (1 - r.Efficiency)))
-                // / (r.manageStats_In ? 3 : 1)
-                ))
+            foreach (Rune r in data.Runes.OrderByDescending(r => r.ScoringBad))
             {
-                int pts = 0;
                 sb.Append(r.ID + ",");
 
                 sb.Append(r.Grade + ",");
-                pts += 6 - r.Grade;
 
                 sb.Append(r.Set + ",");
                 sb.Append(r.Slot + ",");
                 sb.Append(r.MainType + ",");
 
                 sb.Append(r.Level + ",");
-                pts += (15 - r.Level)/3;
-
-                pts += r.Level / 3 - r.Rarity;
 
                 sb.Append(r.manageStats_Set + ",");
                 sb.Append(r.manageStats_RuneFilt + ",");
                 sb.Append(r.manageStats_TypeFilt + ",");
-                pts += (int)(10 * (1 - r.manageStats_RuneFilt / (double)(r.manageStats_Set+2)));
-                pts += (int)(20 * (1 - r.manageStats_TypeFilt / (double)(r.manageStats_Set+2)));
 
                 sb.Append(r.manageStats_LoadFilt + ",");
                 sb.Append(r.manageStats_LoadGen + ",");
-                pts += (int)(15 * (1 - r.manageStats_LoadFilt / (double)(r.manageStats_LoadGen+2)));
 
                 sb.Append(r.Efficiency.ToString("0.####") + ",");
-                pts += (int)(15 * (1 - r.Efficiency));
 
                 sb.Append((r.manageStats_In ? "TRUE" : "FALSE") + ",");
-                //if (r.manageStats_In)
-                //    pts /= 3;
-                sb.AppendLine(pts.ToString());
+                
+                sb.Append(r.ScoringBad.ToString() + ",");
+
+				sb.Append(r.FlatCount().ToString() + ",");
+				sb.Append(r.FlatPoints().ToString("0.####") + ",");
+
+				sb.Append(r.ScoringSell.ToString() + ",");
+
+				sb.Append(r.ScoringAct + ",");
+
+				sb.AppendLine();
             }
             int status = 0;
             while (status != 1)
@@ -1071,5 +1063,10 @@ namespace RuneApp
                 MessageBox.Show(whatsNewText, "What's New");
             }
         }
-    }
+
+		private void toolStripButton17_Click(object sender, EventArgs e)
+		{
+                GenerateStats();
+		}
+	}
 }
