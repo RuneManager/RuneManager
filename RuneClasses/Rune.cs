@@ -214,6 +214,10 @@ namespace RuneOptim
 					return "Keep";
 				if (Grade < 4)
 				{
+					if (Efficiency > 0.6)
+						return "Keep";
+					if (Efficiency > 0.4)
+						return "Consider";
 					if (HealthPercent > 5 || Speed > 3)
 						return "Consider";
 					return "Sell";
@@ -235,25 +239,76 @@ namespace RuneOptim
 
 					if (Grade < 5)
 					{
-						if (Level < 9)
-							return "To 9";
-						if (FlatCount() > 1)
+						if (Efficiency < 0.3)
+						{
+							if (FlatCount() > 0)
+								return "Sell";
+							if (Level < 6)
+								return "To 6";
 							return "Sell";
+						}
+						else
+						{
+							if (Level < 9)
+								return "To 9";
+							if (Efficiency > 0.6)
+								return "Keep";
+							if (Efficiency > 0.45)
+								return "Consider";
+							if (FlatCount() > 1)
+								return "Sell";
+						}
 					}
 					else
 					{
+						
 						if (FlatCount() < 2 && Efficiency > 0.5)
 							return "Keep";
 						if (Grade > 5)
 						{
 							if (FlatCount() < 3 && Efficiency > 0.6)
 								return "Keep";
+							if (ScoringBad < 50)
+								return "Keep";
+							if (ScoringBad < 60)
+								return "Consider";
 						}
-						if (Level < 12)
-							return "To 12";
+						if (Efficiency > 0.5)
+						{
+							if (Level < 12)
+								return "To 12";
+							if (Efficiency > 0.7)
+								return "Keep";
+
+							return "Consider";
+						}
+						else
+						{
+							if (Level < 9)
+								return "To 9";
+							if (Efficiency < 0.35)
+							{
+								if (Slot == 2 && MainType == Attr.Speed)
+									return "Consider";
+								if (Slot == 4 && (MainType == Attr.CritDamage || MainType == Attr.CritRate))
+									return "Consider";
+								if (Slot == 6 && (MainType == Attr.Accuracy || MainType == Attr.HealthPercent))
+									return "Consider";
+								return "Sell";
+							}
+
+							return "Consider";
+						}
+						
 					}
 				}
 				if (HealthPercent > 6 || Speed > 4)
+					return "Consider";
+				if (Slot == 2 && MainType == Attr.Speed)
+					return "Consider";
+				if (Slot == 4 && (MainType == Attr.CritDamage || MainType == Attr.CritRate))
+					return "Consider";
+				if (Slot == 6 && (MainType == Attr.Accuracy || MainType == Attr.HealthPercent))
 					return "Consider";
 				return "Sell";
 			}
@@ -277,15 +332,13 @@ namespace RuneOptim
 		public double FlatPoints()
 		{
 			double pts = 0;
-			if (Grade < 4)
-				return 0;
-
+			
 			if (Slot != 1)
-				pts += AttackFlat / (double)subUpgrades[Attr.AttackFlat][Grade-4];
+				pts += AttackFlat / (double)subUpgrades[Attr.AttackFlat][Grade - 1];
 			else if (Slot != 3)
-				pts += DefenseFlat / (double)subUpgrades[Attr.DefenseFlat][Grade-4];
+				pts += DefenseFlat / (double)subUpgrades[Attr.DefenseFlat][Grade - 1];
 			else if (Slot != 5)
-				pts += HealthFlat / (double)subUpgrades[Attr.HealthFlat][Grade - 4];
+				pts += HealthFlat / (double)subUpgrades[Attr.HealthFlat][Grade - 1];
 
 			return pts;
 		}
@@ -322,30 +375,30 @@ namespace RuneOptim
         [JsonIgnore]
         private Dictionary<Attr, int[]> subUpgrades = new Dictionary<Attr, int[]>()
         {
-            {Attr.HealthFlat, new int[] { 222, 279, 365 } },
-            {Attr.AttackFlat, new int[] { 9, 15, 23 } },
-            {Attr.DefenseFlat, new int[] { 9, 15, 23 } },
-            {Attr.Speed, new int[] { 4, 5, 6} },
+            {Attr.HealthFlat, new int[] { 20, 90, 160, 222, 279, 365 } },
+            {Attr.AttackFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
+            {Attr.DefenseFlat, new int[] { 3,4,6, 9, 15, 23 } },
+            {Attr.Speed, new int[] { 1,2,3,4, 5, 6} },
 
-            {Attr.HealthPercent, new int[] { 6, 7, 8} },
-            {Attr.AttackPercent, new int[] { 6, 7, 8} },
-            {Attr.DefensePercent, new int[] { 6, 7, 8 } },
+            {Attr.HealthPercent, new int[] { 3, 4, 5, 6, 7, 8} },
+            {Attr.AttackPercent, new int[] { 3, 4, 5, 6, 7, 8} },
+            {Attr.DefensePercent, new int[] { 3, 4, 5, 6, 7, 8 } },
 
-            { Attr.CritRate, new int[] { 4, 5, 6 } },
-            { Attr.CritDamage, new int[] { 5, 6, 7 } },
+            { Attr.CritRate, new int[] { 1,2,3,4, 5, 6 } },
+            { Attr.CritDamage, new int[] { 2,3,4,5, 6, 7 } },
 
-            {Attr.Resistance, new int[] { 6, 7, 8 } },
-            {Attr.Accuracy, new int[] { 6, 7, 8 } },
+            {Attr.Resistance, new int[] { 3, 4, 5, 6, 7, 8 } },
+            {Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },
         };
 
         public double GetEfficiency(Attr a, int val)
         {
-            if (Grade < 4 || a == Attr.Null)
+            if (a == Attr.Null)
                 return 0;
             if (a == Attr.HealthFlat || a == Attr.AttackFlat || a == Attr.DefenseFlat)
-                return val / 2 / (double)(5 * subUpgrades[a][Grade - 4]);
+                return val / 2 / (double)(5 * subUpgrades[a][Grade - 1]);
 
-            return val / (double) (5 * subUpgrades[a][Grade - 4]);
+            return val / (double) (5 * subUpgrades[a][Grade - 1]);
         }
 
         [JsonIgnore]

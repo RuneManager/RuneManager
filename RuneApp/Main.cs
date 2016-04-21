@@ -580,6 +580,7 @@ namespace RuneApp
 
             if (pli.Tag != null)
             {
+				Stopwatch buildTime = Stopwatch.StartNew();
                 Build b = (Build)pli.Tag;
                 currentBuild = b;
 
@@ -645,37 +646,39 @@ namespace RuneApp
                     }
                 }
                 currentBuild = null;
+				b.Time = buildTime.ElapsedMilliseconds;
+				buildTime.Stop();
 
-                this.Invoke((MethodInvoker)delegate
+				this.Invoke((MethodInvoker)delegate
                 {
 					checkLocked();
+
+					ListViewItem nli;
+
                     var lvs = listView3.Items.Find(b.ID.ToString(), false);
-                    if (lvs.Length == 0)
-                    {
-                        var nli = new ListViewItem();
-                        nli.Tag = b.Best.Current;
-                        nli.Text = b.ID.ToString();
-                        nli.SubItems.Add(b.Best.Name);
-                        nli.SubItems.Add(b.Best.ID.ToString());
-                        nli.SubItems.Add(numchanged.ToString());
-                        nli.SubItems.Add(powerup.ToString());
-                        nli.SubItems.Add(upgrades.ToString());
-                        nli.Name = b.ID.ToString();
-                        listView3.Items.Add(nli);
-                    }
+
+					if (lvs.Length == 0)
+                        nli = new ListViewItem();
                     else
-                    {
-                        var nli = lvs.First();
-                        nli.Tag = b.Best.Current;
-                        nli.Text = b.ID.ToString();
-                        nli.SubItems.Add(b.Best.Name);
-                        nli.SubItems.Add(b.Best.ID.ToString());
-                        nli.SubItems.Add(numchanged.ToString());
-                        nli.SubItems.Add(powerup.ToString());
-                        nli.SubItems.Add(upgrades.ToString());
-                        nli.Name = b.ID.ToString();
-                    }
-                });
+                        nli = lvs.First();
+
+					nli.Tag = b.Best.Current;
+					nli.Text = b.ID.ToString();
+					nli.Name = b.ID.ToString();
+					while (nli.SubItems.Count < 6)
+						nli.SubItems.Add("");
+					nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
+					nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
+					nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
+					nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, numchanged.ToString());
+					nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
+					//nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, upgrades.ToString());
+					nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time/(double)1000).ToString("0.##"));
+
+					if (lvs.Length == 0)
+						listView3.Items.Add(nli);
+
+				});
 
             }
 

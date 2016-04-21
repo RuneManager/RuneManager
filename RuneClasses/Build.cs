@@ -114,16 +114,19 @@ namespace RuneOptim
         
         // if currently running
         public bool isRun = false;
-        
-        /// <summary>
-        /// Generates builds based on the instances variables.
-        /// </summary>
-        /// <param name="top">If non-zero, runs until N builds are generated</param>
-        /// <param name="time">If non-zero, runs for N seconds</param>
-        /// <param name="printTo">Periodically gives progress% and if it failed</param>
-        /// <param name="progTo">Periodically gives the progress% as a double</param>
-        /// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
-        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
+
+		[JsonIgnore]
+		public long Time;
+
+		/// <summary>
+		/// Generates builds based on the instances variables.
+		/// </summary>
+		/// <param name="top">If non-zero, runs until N builds are generated</param>
+		/// <param name="time">If non-zero, runs for N seconds</param>
+		/// <param name="printTo">Periodically gives progress% and if it failed</param>
+		/// <param name="progTo">Periodically gives the progress% as a double</param>
+		/// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
+		public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
         {
             SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
             long count = 0;
