@@ -128,6 +128,7 @@ namespace RuneOptim
 		/// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
 		public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
         {
+            Best = null;
             SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
             long count = 0;
             long total = runes[0].Count();

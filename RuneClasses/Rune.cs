@@ -335,9 +335,9 @@ namespace RuneOptim
 			
 			if (Slot != 1)
 				pts += AttackFlat / (double)subUpgrades[Attr.AttackFlat][Grade - 1];
-			else if (Slot != 3)
+			if (Slot != 3)
 				pts += DefenseFlat / (double)subUpgrades[Attr.DefenseFlat][Grade - 1];
-			else if (Slot != 5)
+			if (Slot != 5)
 				pts += HealthFlat / (double)subUpgrades[Attr.HealthFlat][Grade - 1];
 
 			return pts;
