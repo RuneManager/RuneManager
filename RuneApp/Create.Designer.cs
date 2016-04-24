@@ -28,17 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-            System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+            System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
             this.monLabel = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.leaderAmountBox = new System.Windows.Forms.ComboBox();
+            this.leaderTypeBox = new System.Windows.Forms.ComboBox();
+            this.label7 = new System.Windows.Forms.Label();
             this.runeNums = new System.Windows.Forms.Label();
             this.runeNum6 = new System.Windows.Forms.Label();
             this.runeNum5 = new System.Windows.Forms.Label();
@@ -48,6 +51,7 @@
             this.runeNum1 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
+            this.btnPerms = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.label14 = new System.Windows.Forms.Label();
             this.button2 = new System.Windows.Forms.Button();
@@ -96,8 +100,6 @@
             this.tab5 = new System.Windows.Forms.TabPage();
             this.label1 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
-            this.btnPerms = new System.Windows.Forms.Button();
-            this.label7 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
@@ -123,6 +125,8 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.leaderAmountBox);
+            this.groupBox1.Controls.Add(this.leaderTypeBox);
             this.groupBox1.Controls.Add(this.label7);
             this.groupBox1.Controls.Add(this.runeNums);
             this.groupBox1.Controls.Add(this.runeNum6);
@@ -166,6 +170,39 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Stats";
             this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // leaderAmountBox
+            // 
+            this.leaderAmountBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.leaderAmountBox.Enabled = false;
+            this.leaderAmountBox.FormattingEnabled = true;
+            this.leaderAmountBox.Location = new System.Drawing.Point(285, 29);
+            this.leaderAmountBox.Name = "leaderAmountBox";
+            this.leaderAmountBox.Size = new System.Drawing.Size(121, 21);
+            this.leaderAmountBox.TabIndex = 87;
+            this.leaderAmountBox.SelectedIndexChanged += new System.EventHandler(this.leaderAmountBox_SelectedIndexChanged);
+            // 
+            // leaderTypeBox
+            // 
+            this.leaderTypeBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Append;
+            this.leaderTypeBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.leaderTypeBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.leaderTypeBox.FormattingEnabled = true;
+            this.leaderTypeBox.Location = new System.Drawing.Point(146, 29);
+            this.leaderTypeBox.Name = "leaderTypeBox";
+            this.leaderTypeBox.Size = new System.Drawing.Size(121, 21);
+            this.leaderTypeBox.TabIndex = 86;
+            this.leaderTypeBox.SelectedIndexChanged += new System.EventHandler(this.leaderTypeBox_SelectedIndexChanged);
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(394, 76);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(27, 13);
+            this.label7.TabIndex = 85;
+            this.label7.Text = "Max";
             // 
             // runeNums
             // 
@@ -277,6 +314,17 @@
             this.label5.Size = new System.Drawing.Size(22, 13);
             this.label5.TabIndex = 76;
             this.label5.Text = "Pts";
+            // 
+            // btnPerms
+            // 
+            this.btnPerms.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnPerms.Location = new System.Drawing.Point(244, 652);
+            this.btnPerms.Name = "btnPerms";
+            this.btnPerms.Size = new System.Drawing.Size(55, 21);
+            this.btnPerms.TabIndex = 21;
+            this.btnPerms.Text = "Update";
+            this.btnPerms.UseVisualStyleBackColor = true;
+            this.btnPerms.Click += new System.EventHandler(this.button4_Click);
             // 
             // button3
             // 
@@ -591,16 +639,16 @@
             this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
             this.listView1.FullRowSelect = true;
-            listViewGroup10.Header = "Required";
-            listViewGroup10.Name = "listViewGroup3";
-            listViewGroup11.Header = "Included";
-            listViewGroup11.Name = "listViewGroup1";
-            listViewGroup12.Header = "Excluded";
-            listViewGroup12.Name = "listViewGroup2";
+            listViewGroup1.Header = "Required";
+            listViewGroup1.Name = "listViewGroup3";
+            listViewGroup2.Header = "Included";
+            listViewGroup2.Name = "listViewGroup1";
+            listViewGroup3.Header = "Excluded";
+            listViewGroup3.Name = "listViewGroup2";
             this.listView1.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
             this.listView1.Location = new System.Drawing.Point(6, 44);
             this.listView1.Name = "listView1";
             this.listView1.Size = new System.Drawing.Size(90, 644);
@@ -704,7 +752,7 @@
             this.tabo.Location = new System.Drawing.Point(4, 22);
             this.tabo.Name = "tabo";
             this.tabo.Padding = new System.Windows.Forms.Padding(3);
-            this.tabo.Size = new System.Drawing.Size(412, 500);
+            this.tabo.Size = new System.Drawing.Size(412, 668);
             this.tabo.TabIndex = 1;
             this.tabo.Text = "Odds";
             this.tabo.UseVisualStyleBackColor = true;
@@ -713,7 +761,7 @@
             // 
             this.tabe.Location = new System.Drawing.Point(4, 22);
             this.tabe.Name = "tabe";
-            this.tabe.Size = new System.Drawing.Size(412, 500);
+            this.tabe.Size = new System.Drawing.Size(412, 668);
             this.tabe.TabIndex = 2;
             this.tabe.Text = "Evens";
             this.tabe.UseVisualStyleBackColor = true;
@@ -723,7 +771,7 @@
             this.tab2.Controls.Add(this.listView2);
             this.tab2.Location = new System.Drawing.Point(4, 22);
             this.tab2.Name = "tab2";
-            this.tab2.Size = new System.Drawing.Size(412, 500);
+            this.tab2.Size = new System.Drawing.Size(412, 668);
             this.tab2.TabIndex = 3;
             this.tab2.Text = "2";
             this.tab2.UseVisualStyleBackColor = true;
@@ -732,13 +780,13 @@
             // 
             this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-            listViewGroup13.Header = "Include";
-            listViewGroup13.Name = "listViewGroup1";
-            listViewGroup14.Header = "Excluded";
-            listViewGroup14.Name = "listViewGroup2";
+            listViewGroup4.Header = "Include";
+            listViewGroup4.Name = "listViewGroup1";
+            listViewGroup5.Header = "Excluded";
+            listViewGroup5.Name = "listViewGroup2";
             this.listView2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup13,
-            listViewGroup14});
+            listViewGroup4,
+            listViewGroup5});
             this.listView2.Location = new System.Drawing.Point(3, 241);
             this.listView2.Name = "listView2";
             this.listView2.Size = new System.Drawing.Size(123, 256);
@@ -758,7 +806,7 @@
             this.tab4.Controls.Add(this.listView4);
             this.tab4.Location = new System.Drawing.Point(4, 22);
             this.tab4.Name = "tab4";
-            this.tab4.Size = new System.Drawing.Size(412, 500);
+            this.tab4.Size = new System.Drawing.Size(412, 668);
             this.tab4.TabIndex = 4;
             this.tab4.Text = "4";
             this.tab4.UseVisualStyleBackColor = true;
@@ -767,13 +815,13 @@
             // 
             this.listView4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-            listViewGroup15.Header = "Include";
-            listViewGroup15.Name = "listViewGroup1";
-            listViewGroup16.Header = "Excluded";
-            listViewGroup16.Name = "listViewGroup2";
+            listViewGroup6.Header = "Include";
+            listViewGroup6.Name = "listViewGroup1";
+            listViewGroup7.Header = "Excluded";
+            listViewGroup7.Name = "listViewGroup2";
             this.listView4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup15,
-            listViewGroup16});
+            listViewGroup6,
+            listViewGroup7});
             this.listView4.Location = new System.Drawing.Point(3, 241);
             this.listView4.Name = "listView4";
             this.listView4.Size = new System.Drawing.Size(123, 256);
@@ -793,7 +841,7 @@
             this.tab6.Controls.Add(this.listView6);
             this.tab6.Location = new System.Drawing.Point(4, 22);
             this.tab6.Name = "tab6";
-            this.tab6.Size = new System.Drawing.Size(412, 500);
+            this.tab6.Size = new System.Drawing.Size(412, 668);
             this.tab6.TabIndex = 5;
             this.tab6.Text = "6";
             this.tab6.UseVisualStyleBackColor = true;
@@ -802,13 +850,13 @@
             // 
             this.listView6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-            listViewGroup17.Header = "Include";
-            listViewGroup17.Name = "listViewGroup1";
-            listViewGroup18.Header = "Excluded";
-            listViewGroup18.Name = "listViewGroup2";
+            listViewGroup8.Header = "Include";
+            listViewGroup8.Name = "listViewGroup1";
+            listViewGroup9.Header = "Excluded";
+            listViewGroup9.Name = "listViewGroup2";
             this.listView6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup17,
-            listViewGroup18});
+            listViewGroup8,
+            listViewGroup9});
             this.listView6.Location = new System.Drawing.Point(3, 241);
             this.listView6.Name = "listView6";
             this.listView6.Size = new System.Drawing.Size(123, 256);
@@ -827,7 +875,7 @@
             // 
             this.tab1.Location = new System.Drawing.Point(4, 22);
             this.tab1.Name = "tab1";
-            this.tab1.Size = new System.Drawing.Size(412, 500);
+            this.tab1.Size = new System.Drawing.Size(412, 668);
             this.tab1.TabIndex = 6;
             this.tab1.Text = "1";
             this.tab1.UseVisualStyleBackColor = true;
@@ -836,7 +884,7 @@
             // 
             this.tab3.Location = new System.Drawing.Point(4, 22);
             this.tab3.Name = "tab3";
-            this.tab3.Size = new System.Drawing.Size(412, 500);
+            this.tab3.Size = new System.Drawing.Size(412, 668);
             this.tab3.TabIndex = 7;
             this.tab3.Text = "3";
             this.tab3.UseVisualStyleBackColor = true;
@@ -845,7 +893,7 @@
             // 
             this.tab5.Location = new System.Drawing.Point(4, 22);
             this.tab5.Name = "tab5";
-            this.tab5.Size = new System.Drawing.Size(412, 500);
+            this.tab5.Size = new System.Drawing.Size(412, 668);
             this.tab5.TabIndex = 8;
             this.tab5.Text = "5";
             this.tab5.UseVisualStyleBackColor = true;
@@ -868,27 +916,6 @@
             this.button1.Text = "Test";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // btnPerms
-            // 
-            this.btnPerms.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnPerms.Location = new System.Drawing.Point(244, 652);
-            this.btnPerms.Name = "btnPerms";
-            this.btnPerms.Size = new System.Drawing.Size(55, 21);
-            this.btnPerms.TabIndex = 21;
-            this.btnPerms.Text = "Update";
-            this.btnPerms.UseVisualStyleBackColor = true;
-            this.btnPerms.Click += new System.EventHandler(this.button4_Click);
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(394, 76);
-            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(27, 13);
-            this.label7.TabIndex = 85;
-            this.label7.Text = "Max";
             // 
             // Create
             // 
@@ -983,5 +1010,7 @@
         private System.Windows.Forms.Label runeNums;
         private System.Windows.Forms.Button btnPerms;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.ComboBox leaderAmountBox;
+        private System.Windows.Forms.ComboBox leaderTypeBox;
     }
 }

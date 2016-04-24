@@ -33,9 +33,60 @@ namespace RuneApp
         // is the form loading? wouldn't want to trigger any OnChanges, eh?
         private bool loading = false;
 
+        private LeaderType[] leadTypes = {
+            new LeaderType(Attr.Null),
+            new LeaderType(Attr.SpeedPercent).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 })
+        };
+
         private static string[] tabNames = new string[] { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
         private static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
         private static string[] extraNames = new string[] { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
+
+        public class LeaderType
+        {
+            public LeaderType(Attr t)
+            {
+                type = t;
+            }
+
+            public Attr type = Attr.Null;
+            public class LeaderValue
+            {
+                public LeaderValue(Attr t, int v)
+                {
+                    type = t;
+                    value = v;
+                }
+                public int value = 0;
+                public Attr type = Attr.Null;
+                public override string ToString()
+                {
+                    return value.ToString() + ((type == Attr.HealthFlat || type == Attr.DefenseFlat || type == Attr.AttackFlat || type == Attr.Speed) ? "" : "%");
+                }
+            }
+
+            public void Add(int i)
+            {
+                values.Add(new LeaderValue(type, i));
+            }
+
+            public LeaderType AddRange(int[] ii)
+            {
+                foreach (int i in ii)
+                    Add(i);
+
+                return this;
+            }
+
+            public List<LeaderValue> values = new List<LeaderValue>();
+
+            public override string ToString()
+            {
+                if (type == Attr.Null) return "(None)";
+                return type.ToString();
+            }
+        }
+
 
         public Create()
         {
@@ -50,6 +101,8 @@ namespace RuneApp
             rsExc = listView1.Groups[2];
             listView1.Groups[0].Tag = false;
             rsReq = listView1.Groups[0];
+            
+            leaderTypeBox.Items.AddRange(leadTypes);
 
             // for each runeset, put it in the list as excluded
             foreach (var rs in Enum.GetNames(typeof(RuneSet)))
@@ -159,7 +212,6 @@ namespace RuneApp
                 label = new Label();
                 groupBox1.Controls.Add(label);
                 label.Name = stat + "Base";
-                label.Text = stat;
                 label.Size = new Size(50, 20);
                 label.Location = new Point(x, y);
                 x += colWidth;
@@ -167,7 +219,6 @@ namespace RuneApp
                 label = new Label();
                 groupBox1.Controls.Add(label);
                 label.Name = stat + "Bonus";
-                label.Text = "+0";
                 label.Size = new Size(50, 20);
                 label.Location = new Point(x, y);
                 x += colWidth;
@@ -184,7 +235,6 @@ namespace RuneApp
                 label = new Label();
                 groupBox1.Controls.Add(label);
                 label.Name = stat + "Current";
-                label.Text = stat;
                 label.Size = new Size(50, 20);
                 label.Location = new Point(x, y);
                 x += colWidth;
@@ -202,7 +252,6 @@ namespace RuneApp
                 label = new Label();
                 groupBox1.Controls.Add(label);
                 label.Name = stat + "CurrentPts";
-                label.Text = stat;
                 label.Size = new Size((int)(50 * 0.8), 20);
                 label.Location = new Point(x, y);
                 x += (int)(colWidth * 0.8);
@@ -350,7 +399,6 @@ namespace RuneApp
                     page.Controls.Add(textBox);
                     textBox.Name = tab + stat + "test";
                     textBox.Location = new Point(x, y - 2);
-                    textBox.Text = "";
                     textBox.Size = new System.Drawing.Size(40, 20);
                     textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
                     x += colWidth;
@@ -359,7 +407,6 @@ namespace RuneApp
                     page.Controls.Add(label);
                     label.Name = tab + "r" + stat + "test";
                     label.Location = new Point(x, y);
-                    label.Text = "";
                     label.Size = new System.Drawing.Size(30, 20);
                     x += colWidth;
 
@@ -383,7 +430,6 @@ namespace RuneApp
                 page.Controls.Add(textBox);
                 textBox.Name = tab + "test";
                 textBox.Location = new Point(x, y - 2);
-                textBox.Text = "";
                 textBox.Size = new System.Drawing.Size(40, 20);
                 textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
                 // default scoring is OR which doesn't need this box
@@ -392,7 +438,6 @@ namespace RuneApp
 
                 label = new Label();
                 page.Controls.Add(label);
-                label.Text = "";
                 label.Name = tab + "Check";
                 label.Size = new Size(60, 14);
                 label.Location = new Point(x, y);
@@ -413,7 +458,6 @@ namespace RuneApp
                 page.Controls.Add(textBox);
                 textBox.Name = tab + "raise";
                 textBox.Location = new Point(x, y-2);
-                textBox.Text = "";
                 textBox.Size = new System.Drawing.Size(40, 20);
                 textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
                 x += colWidth;
@@ -529,12 +573,21 @@ namespace RuneApp
             // warning, now loading
             loading = true;
 
-			build = (Build)Tag;
+            build = (Build)Tag;
             Monster mon = (Monster)build.mon;
             Stats cur = mon.GetStats();
             monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
 
             build.VERSIONNUM = VERSIONNUM;
+
+            if (build.leader.NonZero())
+            {
+                Attr t = build.leader.FirstNonZero();
+                if (t != Attr.Null)
+                {
+                    leaderTypeBox.SelectedIndex = leadTypes.ToList().FindIndex(lt => lt.type == t);
+                }
+            }
 
             // move the sets around in the list a little
             foreach (RuneSet s in build.BuildSets)
@@ -565,7 +618,6 @@ namespace RuneApp
 
 					
                     string stat = statNames[i];
-                    ListViewItem li = null;
                     if (i < 3)
                     {
                         if (bl.Contains(stat + "flat"))
@@ -773,16 +825,16 @@ namespace RuneApp
             // did someone put a k in?
             if (total.Text.ToLower().Contains("k"))
             {
-                total.Text = (int.Parse(total.Text.ToLower().Replace("k", "")) * 1000).ToString();
+                total.Text = (double.Parse(total.Text.ToLower().Replace("k", "")) * 1000).ToString();
             }
 
             // calculate the difference between base and minimum, put it in bonus
             var hasPercent = mBase.Text.Contains("%");
-			int val = 0;
-			if (int.TryParse(total.Text.Replace("%", ""), out val))
+            double val = 0;
+			if (double.TryParse(total.Text.Replace("%", ""), out val))
 			{
-				int sub = 0;
-				int.TryParse(mBase.Text.Replace("%", ""), out sub);
+                double sub = 0;
+                double.TryParse(mBase.Text.Replace("%", ""), out sub);
 				val -= sub;
 			}
             if (val < 0)
@@ -1044,32 +1096,33 @@ namespace RuneApp
             }
             foreach (string stat in statNames)
             {
+                double val = 0; double total = 0;
                 var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-                int val = 0; int total = 0;
-                if (int.TryParse(ctrlTotal.Text, out val))
+                double.TryParse(ctrlTotal.Text, out val);
                     total = val;
                 build.Minimum[stat] = val;
+
                 var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                val = 0; int worth = 0;
-                if (int.TryParse(ctrlWorth.Text, out val))
+                val = 0; double worth = 0;
+                if (double.TryParse(ctrlWorth.Text, out val))
                     worth = val;
                 build.Sort[stat] = val;
 
                 var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
-                val = 0; int max = 0;
-                if (int.TryParse(ctrlMax.Text, out val))
+                val = 0; double max = 0;
+                if (double.TryParse(ctrlMax.Text, out val))
                     max = val;
                 build.Maximum[stat] = val;
 
                 var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
-                val = 0; int thr = 0;
-                if (int.TryParse(ctrlThresh.Text, out val))
+                val = 0; double thr = 0;
+                if (double.TryParse(ctrlThresh.Text, out val))
                     thr = val;
                 build.Threshold[stat] = val;
 
                 var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-                val = 0; int current = 0;
-                if (int.TryParse(ctrlCurrent.Text, out val))
+                val = 0; double current = 0;
+                if (double.TryParse(ctrlCurrent.Text, out val))
                     current = val;
                 var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
                 if (worth != 0 && current != 0)
@@ -1077,38 +1130,38 @@ namespace RuneApp
                     double pts = current;
                     if (max != 0)
                         pts = Math.Min(max, current);
-                    ctrlWorthPts.Text = ((int)(pts / (double)worth)).ToString();
+                    ctrlWorthPts.Text = ((double)(pts / (double)worth)).ToString("0.##");
                 }
             }
 
             foreach (string extra in extraNames)
             {
                 var ctrlTotal = groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
-                int val = 0; int total = 0;
-                if (int.TryParse(ctrlTotal.Text, out val))
+                double val = 0; double total = 0;
+                if (double.TryParse(ctrlTotal.Text, out val))
                     total = val;
                 build.Minimum.ExtraSet(extra, val);
                 var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-                val = 0; int worth = 0;
-                if (int.TryParse(ctrlWorth.Text, out val))
+                val = 0; double worth = 0;
+                if (double.TryParse(ctrlWorth.Text, out val))
                     worth = val;
                 build.Sort.ExtraSet(extra, val);
 
                 var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
-                val = 0; int max = 0;
-                if (int.TryParse(ctrlMax.Text, out val))
+                val = 0; double max = 0;
+                if (double.TryParse(ctrlMax.Text, out val))
                     max = val;
                 build.Maximum.ExtraSet(extra, val);
 
                 var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
-                val = 0; int thr = 0;
-                if (int.TryParse(ctrlThresh.Text, out val))
+                val = 0; double thr = 0;
+                if (double.TryParse(ctrlThresh.Text, out val))
                     thr = val;
                 build.Threshold.ExtraSet(extra, val);
 
                 var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
-                val = 0; int current = 0;
-                if (int.TryParse(ctrlCurrent.Text, out val))
+                val = 0; double current = 0;
+                if (double.TryParse(ctrlCurrent.Text, out val))
                     current = val;
                 var ctrlWorthPts = groupBox1.Controls.Find(extra + "CurrentPts", true).FirstOrDefault();
                 if (worth != 0 && current != 0)
@@ -1116,7 +1169,7 @@ namespace RuneApp
                     double pts = current;
                     if (max != 0)
                         pts = Math.Min(max, current);
-                    ctrlWorthPts.Text = ((int)(pts / (double)worth)).ToString();
+                    ctrlWorthPts.Text = ((double)(pts / (double)worth)).ToString("0.##");
                 }
                 else
                 {
@@ -1407,7 +1460,7 @@ namespace RuneApp
             TextBox text = (TextBox)sender;
 
             if (text.Text.ToLower().Contains("k"))
-                text.Text = (int.Parse(text.Text.ToLower().Replace("k", "")) * 1000).ToString();
+                text.Text = (double.Parse(text.Text.ToLower().Replace("k", "")) * 1000).ToString();
 
             UpdateGlobal();
         }
@@ -1548,6 +1601,41 @@ namespace RuneApp
                 ctrl.ForeColor = Color.Red;
 
             btnPerms.Enabled = false;
+        }
+
+        private void leaderTypeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            leaderAmountBox.Items.Clear();
+            if (leaderTypeBox.SelectedIndex == 0)
+            {
+                leaderAmountBox.Enabled = false;
+                build.leader.SetZero();
+            }
+            else
+            {
+                LeaderType lt = (LeaderType)leaderTypeBox.SelectedItem;
+                foreach (var o in lt.values)
+                    leaderAmountBox.Items.Add(o);
+                leaderAmountBox.Enabled = true;
+                if (loading)
+                    leaderAmountBox.SelectedIndex = lt.values.FindIndex(l => l.value == build.leader.Sum());
+                else
+                    leaderAmountBox.SelectedIndex = 0;
+            }
+        }
+
+        private void leaderAmountBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (loading)
+                return;
+            build.leader.SetZero();
+            var lv = (LeaderType.LeaderValue)leaderAmountBox.SelectedItem;
+            switch (lv.type)
+            {
+                case Attr.SpeedPercent:
+                    build.leader.Speed = lv.value; 
+                    break;
+            }
         }
     }
 }

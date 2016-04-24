@@ -22,6 +22,10 @@ namespace RuneOptim
 
         public int[] FakeLevel = new int[6];
         public bool[] PredictSubs = new bool[6];
+
+
+        public Stats shrines = new Stats();
+        public Stats leader = new Stats();
         
         // Debugging niceness
         public override string ToString()
@@ -154,7 +158,13 @@ namespace RuneOptim
         }
 
         // Runes don't get SPD%
-        public int SpeedPercent { get { return SetStat(Attr.SpeedPercent); } }
+        public int SpeedPercent
+        {
+            get
+            {
+                return SetStat(Attr.SpeedPercent) + (int)shrines.Speed + (int)leader.Speed;
+            }
+        }
 
         public int CritRate
         {

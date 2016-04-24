@@ -1,7 +1,8 @@
-0.0.1.0
+0.1.0.0
 https://github.com/Skibisky/RuneManager/releases/latest
-**Backup builds** This will try to upgrade them to new format.
-Displays swaps/powerups/upgrades in main form.
-Reasonable performance increases in opening forms.
-Threshold stops points, Max stops builds.
-Started RuneReview. Makes a CSV after >>.
+Speed totem and Speed Leader options.
+Fixed build ordering bug.
+Maybe speed improvements?
+Decimal sorting support.
+More CSV stats.
+Build timer.

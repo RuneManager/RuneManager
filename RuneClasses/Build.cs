@@ -48,17 +48,65 @@ namespace RuneOptim
         [JsonProperty("runeFilters")]
         public Dictionary<string, Dictionary<string, RuneFilter>> runeFilters = new Dictionary<string, Dictionary<string, RuneFilter>>();
 
+        public bool ShouldSerializeruneFilters()
+        {
+            Dictionary<string, Dictionary<string, RuneFilter>> nfilters = new Dictionary<string, Dictionary<string, RuneFilter>>();
+            foreach (var tabPair in runeFilters)
+            {
+                List<string> keep = new List<string>();
+                foreach (var statPair in tabPair.Value)
+                {
+                    if (statPair.Value.NonZero)
+                        keep.Add(statPair.Key);
+                }
+                Dictionary<string, RuneFilter> n = new Dictionary<string, RuneFilter>();
+                foreach (var key in keep)
+                    n.Add(key, tabPair.Value[key]);
+                if (n.Count > 0)
+                    nfilters.Add(tabPair.Key, n);
+            }
+            runeFilters = nfilters;
+
+            return true;
+        }
+
         // For when you want to map 2 pieces of info to a key, just be *really* lazy
         // Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value
         // tab, TYPE, test
         [JsonProperty("runeScoring")]
         public Dictionary<string, KeyValuePair<int, int>> runeScoring = new Dictionary<string, KeyValuePair<int, int>>();
 
+        public bool ShouldSerializeruneScoring()
+        {
+            Dictionary<string, KeyValuePair<int, int>> nscore = new Dictionary<string, KeyValuePair<int, int>>();
+            foreach (var tabPair in runeScoring)
+            {
+                if (tabPair.Value.Key != 0 || tabPair.Value.Value != 0)
+                    nscore.Add(tabPair.Key, new KeyValuePair<int, int>(tabPair.Value.Key, tabPair.Value.Value));
+            }
+            runeScoring = nscore;
+
+            return true;
+        }
+
         // if to raise the runes level, and use the appropriate main stat value.
         // also, attempt to give weight to unassigned powerup bonuses
         // tab, RAISE, magic
         [JsonProperty("runePrediction")]
         public Dictionary<string, KeyValuePair<int, bool>> runePrediction = new Dictionary<string, KeyValuePair<int, bool>>();
+
+        public bool ShouldSerializerunePrediction()
+        {
+            Dictionary<string, KeyValuePair<int, bool>> npred = new Dictionary<string, KeyValuePair<int, bool>>();
+            foreach (var tabPair in runePrediction)
+            {
+                if (tabPair.Value.Key != 0 || tabPair.Value.Value)
+                    npred.Add(tabPair.Key, new KeyValuePair<int, bool>(tabPair.Value.Key, tabPair.Value.Value));
+            }
+            runePrediction = npred;
+
+            return true;
+        }
 
         [JsonProperty("AllowBroken")]
         public bool AllowBroken = false;
@@ -67,6 +115,11 @@ namespace RuneOptim
         // eg. 300 hp is worth 1 speed
         [JsonProperty("Sort")]
         public Stats Sort = new Stats();
+
+        public bool ShouldSerializeSort()
+        {
+            return Sort.NonZero();
+        }
 
         // resulting build must have every set in this array
         [JsonProperty("RequiredSets")]
@@ -81,6 +134,19 @@ namespace RuneOptim
         // builds with individual stats exceeding these values are penalised as wasteful
         [JsonProperty("Threshold")]
         public Stats Threshold = new Stats();
+
+        public bool ShouldSerializeMinimum()
+        {
+            return Minimum.NonZero();
+        }
+        public bool ShouldSerializeMaximum()
+        {
+            return Maximum.NonZero();
+        }
+        public bool ShouldSerializeThreshold()
+        {
+            return Threshold.NonZero();
+        }
 
         // Which primary stat types are allowed per slot (should be 2,4,6 only)
         [JsonProperty("slotStats")]
@@ -118,149 +184,166 @@ namespace RuneOptim
 		[JsonIgnore]
 		public long Time;
 
-		/// <summary>
-		/// Generates builds based on the instances variables.
-		/// </summary>
-		/// <param name="top">If non-zero, runs until N builds are generated</param>
-		/// <param name="time">If non-zero, runs for N seconds</param>
-		/// <param name="printTo">Periodically gives progress% and if it failed</param>
-		/// <param name="progTo">Periodically gives the progress% as a double</param>
-		/// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
-		public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
+        [JsonIgnore]
+        public Stats shrines = new Stats();
+
+        [JsonProperty("LeaderBonus")]
+        public Stats leader = new Stats();
+
+        public bool ShouldSerializeleader()
         {
-            Best = null;
-            SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
-            long count = 0;
-            long total = runes[0].Count();
-            total *= runes[1].Count();
-            total *= runes[2].Count();
-            total *= runes[3].Count();
-            total *= runes[4].Count();
-            total *= runes[5].Count();
-            long complete = total;
+            return leader.NonZero();
+        }
 
-            if (total == 0)
-            {
-                if (printTo != null)
-                    printTo.Invoke("0 perms");
-                Console.WriteLine("Zero permuations");
+        /// <summary>
+        /// Generates builds based on the instances variables.
+        /// </summary>
+        /// <param name="top">If non-zero, runs until N builds are generated</param>
+        /// <param name="time">If non-zero, runs for N seconds</param>
+        /// <param name="printTo">Periodically gives progress% and if it failed</param>
+        /// <param name="progTo">Periodically gives the progress% as a double</param>
+        /// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
+        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
+        {
+            if (runes.Any(r => r == null))
                 return;
-            }
-            if (!AllowBroken && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
+            try
             {
-                if (printTo != null)
-                    printTo.Invoke("Bad sets");
-                Console.WriteLine("Cannot use 4 set with no broken");
-                return;
-            }
 
-            bool hasSort = false;
-            foreach (string stat in statNames)
-            {
-                if (Sort[stat] != 0)
+
+                Best = null;
+                SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
+                long count = 0;
+                long total = runes[0].Count();
+                total *= runes[1].Count();
+                total *= runes[2].Count();
+                total *= runes[3].Count();
+                total *= runes[4].Count();
+                total *= runes[5].Count();
+                long complete = total;
+
+                if (total == 0)
                 {
-                    hasSort = true;
-                    break;
+                    if (printTo != null)
+                        printTo.Invoke("0 perms");
+                    Console.WriteLine("Zero permuations");
+                    return;
                 }
-            }
-            foreach (string extra in extraNames)
-            {
-                if (Sort.ExtraGet(extra) != 0)
+                if (!AllowBroken && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
                 {
-                    hasSort = true;
-                    break;
+                    if (printTo != null)
+                        printTo.Invoke("Bad sets");
+                    Console.WriteLine("Cannot use 4 set with no broken");
+                    return;
                 }
-            }
-            if (top == 0 && !hasSort)
-            {
-                if (printTo != null)
-                    printTo.Invoke("No sort");
-                Console.WriteLine("No method of determining best");
-                return;
-            }
 
-            DateTime begin = DateTime.Now;
-            DateTime timer = DateTime.Now;
-
-            Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
-            
-            // build the scoring function
-            Func<Stats, int> sort = (m) =>
-            {
-                int pts = 0;
-
+                bool hasSort = false;
                 foreach (string stat in statNames)
                 {
-                    // if this stat is used for sorting
                     if (Sort[stat] != 0)
                     {
-                        // sum points for the stat
-                        pts += m[stat] / Sort[stat];
-                        // if exceeding max, subtracted the gained points and then some
-                        if (Threshold[stat] != 0)
-                            pts -= Math.Max(0, m[stat] - Threshold[stat]) / Sort[stat];
+                        hasSort = true;
+                        break;
                     }
                 }
-                // look, cool metrics!
                 foreach (string extra in extraNames)
                 {
                     if (Sort.ExtraGet(extra) != 0)
                     {
-                        pts += m.ExtraValue(extra) / Sort.ExtraGet(extra);
-                        if (Threshold.ExtraGet(extra) != 0)
-                            pts -= Math.Max(0, m.ExtraValue(extra) - Threshold.ExtraGet(extra)) / Sort.ExtraGet(extra);
+                        hasSort = true;
+                        break;
                     }
                 }
-
-                return pts;
-            };
-
-            int[] slotFakes = new int[6];
-            bool[] slotPred = new bool[6];
-
-            // crank the rune prediction
-            for (int i = 0; i < 6; i++)
-            {
-                Rune[] rs = runes[i];
-                int raiseTo = 0;
-                bool predictSubs = false;
-
-                // find the largest number to raise to
-                // if any along the tree say to predict, do it
-                if (runePrediction.ContainsKey("g"))
+                if (top == 0 && !hasSort)
                 {
-                    int glevel = runePrediction["g"].Key;
-                    if (glevel > raiseTo)
-                        raiseTo = glevel;
-                    predictSubs |= runePrediction["g"].Value;
-                }
-                if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
-                {
-                    int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
-                    if (mlevel > raiseTo)
-                        raiseTo = mlevel;
-                    predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
-                }
-                if (runePrediction.ContainsKey((i + 1).ToString()))
-                {
-                    int slevel = runePrediction[(i + 1).ToString()].Key;
-                    if (slevel > raiseTo)
-                        raiseTo = slevel;
-                    predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                    if (printTo != null)
+                        printTo.Invoke("No sort");
+                    Console.WriteLine("No method of determining best");
+                    return;
                 }
 
-                slotFakes[i] = raiseTo;
-                slotPred[i] = predictSubs;
-                
-            }
+                DateTime begin = DateTime.Now;
+                DateTime timer = DateTime.Now;
 
-            // set to running
-            isRun = true;
+                Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
-            // Parallel the outer loop
-            var loopRes = Parallel.ForEach<Rune>(runes[0], (r0, loopState) =>
-            {
-                if (!isRun)
+                // build the scoring function
+                Func<Stats, double> sort = (m) =>
+                {
+                    double pts = 0;
+
+                    foreach (string stat in statNames)
+                    {
+                    // if this stat is used for sorting
+                    if (Sort[stat] != 0)
+                        {
+                        // sum points for the stat
+                        pts += m[stat] / Sort[stat];
+                        // if exceeding max, subtracted the gained points and then some
+                        if (Threshold[stat] != 0)
+                                pts -= Math.Max(0, m[stat] - Threshold[stat]) / Sort[stat];
+                        }
+                    }
+                // look, cool metrics!
+                foreach (string extra in extraNames)
+                    {
+                        if (Sort.ExtraGet(extra) != 0)
+                        {
+                            pts += m.ExtraValue(extra) / Sort.ExtraGet(extra);
+                            if (Threshold.ExtraGet(extra) != 0)
+                                pts -= Math.Max(0, m.ExtraValue(extra) - Threshold.ExtraGet(extra)) / Sort.ExtraGet(extra);
+                        }
+                    }
+
+                    return pts;
+                };
+
+                int[] slotFakes = new int[6];
+                bool[] slotPred = new bool[6];
+
+                // crank the rune prediction
+                for (int i = 0; i < 6; i++)
+                {
+                    Rune[] rs = runes[i];
+                    int raiseTo = 0;
+                    bool predictSubs = false;
+
+                    // find the largest number to raise to
+                    // if any along the tree say to predict, do it
+                    if (runePrediction.ContainsKey("g"))
+                    {
+                        int glevel = runePrediction["g"].Key;
+                        if (glevel > raiseTo)
+                            raiseTo = glevel;
+                        predictSubs |= runePrediction["g"].Value;
+                    }
+                    if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
+                    {
+                        int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                        if (mlevel > raiseTo)
+                            raiseTo = mlevel;
+                        predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
+                    }
+                    if (runePrediction.ContainsKey((i + 1).ToString()))
+                    {
+                        int slevel = runePrediction[(i + 1).ToString()].Key;
+                        if (slevel > raiseTo)
+                            raiseTo = slevel;
+                        predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                    }
+
+                    slotFakes[i] = raiseTo;
+                    slotPred[i] = predictSubs;
+
+                }
+
+                // set to running
+                isRun = true;
+
+                // Parallel the outer loop
+                var loopRes = Parallel.ForEach<Rune>(runes[0], (r0, loopState) =>
+                {
+                    if (!isRun)
                     //break;
                     loopState.Break();
 
@@ -269,187 +352,206 @@ namespace RuneOptim
                 // number of builds added since last sync
                 int plus = 0;
 
-                foreach (Rune r1 in runes[1])
-                {
-                    if (!isRun) // Can't break to a lable, don't want to goto
-                        break;
-                    foreach (Rune r2 in runes[2])
+                    foreach (Rune r1 in runes[1])
                     {
-                        if (!isRun)
-                            break;
-                        foreach (Rune r3 in runes[3])
+                        if (!isRun) // Can't break to a lable, don't want to goto
+                        break;
+                        foreach (Rune r2 in runes[2])
                         {
                             if (!isRun)
                                 break;
-                            foreach (Rune r4 in runes[4])
+                            foreach (Rune r3 in runes[3])
                             {
                                 if (!isRun)
                                     break;
-                                foreach (Rune r5 in runes[5])
+                                foreach (Rune r4 in runes[4])
                                 {
                                     if (!isRun)
                                         break;
-
-                                    Monster test = new Monster(mon);
-
-                                    test.Current.FakeLevel = slotFakes;
-                                    test.Current.PredictSubs = slotPred;
-
-                                    test.ApplyRune(r0);
-                                    test.ApplyRune(r1);
-                                    test.ApplyRune(r2);
-                                    test.ApplyRune(r3);
-                                    test.ApplyRune(r4);
-                                    test.ApplyRune(r5);
-
-                                    if (saveStats)
-                                        foreach (Rune r in test.Current.runes)
-                                        {
-                                            r.manageStats_LoadGen++;
-                                        }
-
-                                    var cstats = test.GetStats();
-
-                                    bool maxdead = false;
-
-                                    if (Maximum != null)
+                                    foreach (Rune r5 in runes[5])
                                     {
-                                        foreach(var stat in statNames)
-                                        {
-                                            if (Maximum[stat] > 0 && cstats[stat] > Maximum[stat])
-                                            {
-                                                maxdead = true;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    
-                                    // check if build meets minimum
-                                    if (Minimum != null && !(cstats > Minimum))
-                                    {
-                                        kill++;
-                                    }
-                                    else if (maxdead)
-                                    {
-                                        kill++;
-                                    }
-                                    // if no broken sets, check for broken sets
-                                    else if (!AllowBroken && !test.Current.SetsFull)
-									{
-										kill++;
-									}
-                                    // if there are required sets, ensure we have them
-									else if (RequiredSets != null && RequiredSets.Count > 0 && !RequiredSets.All(s => test.Current.sets.Contains(s)))
-                                    {
-                                        kill++;
-                                    }
-                                    else
-                                    {
-                                        // we found an okay build!
-                                        plus++;
+                                        if (!isRun)
+                                            break;
+
+                                        Monster test = new Monster(mon);
+                                        test.Current.shrines = shrines;
+                                        test.Current.leader = leader;
+
+                                        test.Current.FakeLevel = slotFakes;
+                                        test.Current.PredictSubs = slotPred;
+
+                                        test.ApplyRune(r0);
+                                        test.ApplyRune(r1);
+                                        test.ApplyRune(r2);
+                                        test.ApplyRune(r3);
+                                        test.ApplyRune(r4);
+                                        test.ApplyRune(r5);
 
                                         if (saveStats)
                                             foreach (Rune r in test.Current.runes)
                                             {
-                                                r.manageStats_LoadFilt++;
+                                                r.manageStats_LoadGen++;
                                             }
+
+                                        var cstats = test.GetStats();
+
+                                        bool maxdead = false;
+
+                                        if (Maximum != null)
+                                        {
+                                            foreach (var stat in statNames)
+                                            {
+                                                if (Maximum[stat] > 0 && cstats[stat] > Maximum[stat])
+                                                {
+                                                    maxdead = true;
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                    // check if build meets minimum
+                                    if (Minimum != null && !(cstats > Minimum))
+                                        {
+                                            kill++;
+                                        }
+                                        else if (maxdead)
+                                        {
+                                            kill++;
+                                        }
+                                    // if no broken sets, check for broken sets
+                                    else if (!AllowBroken && !test.Current.SetsFull)
+                                        {
+                                            kill++;
+                                        }
+                                    // if there are required sets, ensure we have them
+                                    else if (RequiredSets != null && RequiredSets.Count > 0 && !RequiredSets.All(s => test.Current.sets.Contains(s)))
+                                        {
+                                            kill++;
+                                        }
+                                        else
+                                        {
+                                        // we found an okay build!
+                                        plus++;
+
+                                            if (saveStats)
+                                                foreach (Rune r in test.Current.runes)
+                                                {
+                                                    r.manageStats_LoadFilt++;
+                                                }
 
                                         // if we are to track all good builds, keep it
                                         if (!dumpBads)
-                                            tests.Add(test);
-                                        else
-                                        {
-                                            lock (tests)
+                                                tests.Add(test);
+                                            else
                                             {
+                                                //lock (tests)
+                                                //{
                                                 // if there are currently no good builds, keep it
-                                                if (tests.Count == 0)
+
+                                                if (tests.FirstOrDefault() == null)
+                                                {
                                                     tests.Add(test);
+                                                    Best = test;
+                                                }
                                                 else
                                                 {
+                                                    if (Best.GetStats() < test.GetStats())
+                                                    {
+                                                        Best = test;
+                                                        tests.Add(test);
+                                                    }
+
                                                     // take a snapshot of the builds (multithread /may/ cause a "collection modified" excepion in next step)
-                                                    var tt = tests.ToList();
+                                                    /*var tt = tests.ToList();
                                                     // if this build is better than any other build, keep it
                                                     // can't just keep a copy of Max becaues of threading
                                                     if (tt.Max(t => sort(t.GetStats())) < sort(test.GetStats()))
                                                     {
                                                         tests.Add(test);
-                                                    }
+                                                    }*/
+                                                }
+                                            //}
+                                        }
+                                        }
+
+                                    // every second, give a bit of feedback to those watching
+                                    if (DateTime.Now > timer.AddSeconds(1))
+                                        {
+                                            timer = DateTime.Now;
+                                            Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+                                            if (printTo != null)
+                                                printTo.Invoke(String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+                                            if (progTo != null)
+                                                progTo.Invoke((double)(count + complete - total) / (double)complete);
+
+                                            if (time > 0)
+                                            {
+                                                if (DateTime.Now > begin.AddSeconds(time))
+                                                {
+                                                    isRun = false;
+                                                    break;
                                                 }
                                             }
                                         }
                                     }
-
-                                    // every second, give a bit of feedback to those watching
-                                    if (DateTime.Now > timer.AddSeconds(1))
-                                    {
-                                        timer = DateTime.Now;
-                                        Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
-                                        if (printTo != null)
-                                            printTo.Invoke(String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
-										if (progTo != null)
-											progTo.Invoke((double)(count + complete - total) / (double)complete);
-                                        
-                                        if (time > 0)
-                                        {
-                                            if (DateTime.Now > begin.AddSeconds(time))
-                                            {
-                                                isRun = false;
-                                                break;
-                                            }
-                                        }
-                                    }
-                                }
                                 // sum up what work we've done
                                 Interlocked.Add(ref total, -kill);
-                                kill = 0;
-                                Interlocked.Add(ref count, plus);
-                                plus = 0;
+                                    kill = 0;
+                                    Interlocked.Add(ref count, plus);
+                                    plus = 0;
 
                                 // if we've got enough, stop
                                 if (top > 0 && count >= top)
-                                {
-                                    isRun = false;
-                                    break;
+                                    {
+                                        isRun = false;
+                                        break;
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
-            
-            // write out completion
-            Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
-            if (printTo != null)
-                printTo.Invoke("100%");
-			if (progTo != null)
-				progTo.Invoke(1);
+                });
 
-            // sort *all* the builds
-            loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1));
+                // write out completion
+                Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+                if (printTo != null)
+                    printTo.Invoke("100%");
+                if (progTo != null)
+                    progTo.Invoke(1);
 
-            // dump everything to console, if nothing to print to
-			if (printTo == null)
-				foreach (var l in loads)
-				{
-					Console.WriteLine(l.GetStats().Health + "  " + l.GetStats().Attack + "  " + l.GetStats().Defense + "  " + l.GetStats().Speed
-						+ "  " + l.GetStats().CritRate + "%" + "  " + l.GetStats().CritDamage + "%" + "  " + l.GetStats().Resistance + "%" + "  " + l.GetStats().Accuracy + "%");
-				}
-            
-            // sadface if no builds
-            if (loads.Count() == 0)
-            {
-                Console.WriteLine("No builds :(");
-				if (printTo != null)
-					printTo.Invoke("Zero :(");
-            }
-            else
-            {
-                // remember the good one
-                Best = loads.First();
-                foreach (Rune r in Best.Current.runes)
+                // sort *all* the builds
+                loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1));
+
+                // dump everything to console, if nothing to print to
+                if (printTo == null)
+                    foreach (var l in loads)
+                    {
+                        Console.WriteLine(l.GetStats().Health + "  " + l.GetStats().Attack + "  " + l.GetStats().Defense + "  " + l.GetStats().Speed
+                            + "  " + l.GetStats().CritRate + "%" + "  " + l.GetStats().CritDamage + "%" + "  " + l.GetStats().Resistance + "%" + "  " + l.GetStats().Accuracy + "%");
+                    }
+
+                // sadface if no builds
+                if (loads.Count() == 0)
                 {
-                    r.manageStats_In = true;
+                    Console.WriteLine("No builds :(");
+                    if (printTo != null)
+                        printTo.Invoke("Zero :(");
                 }
+                else
+                {
+                    // remember the good one
+                    Best = loads.First();
+                    foreach (Rune r in Best.Current.runes)
+                    {
+                        r.manageStats_In = true;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Error " + e);
+                if (printTo != null)
+                    printTo.Invoke(e.ToString());
             }
         }
         
@@ -461,6 +563,11 @@ namespace RuneOptim
         /// <param name="useEquipped">If it should include equipped runes (other than the current monster)</param>
         public void GenRunes(Save save, bool useLocked = false, bool useEquipped = false, bool saveStats = false)
         {
+            if (save == null)
+                return;
+            if (save.Runes == null)
+                return;
+
             IEnumerable<Rune> rsGlobal = save.Runes;
             
             // Only using 'inventory' or runes on mon

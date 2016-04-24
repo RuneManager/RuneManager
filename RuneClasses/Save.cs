@@ -42,5 +42,9 @@ namespace RuneOptim
         // Don't care right now, perhaps a fuzzy-import later?
         [JsonProperty("savedBuilds")]
         public IList<object> Builds;
+
+        [JsonIgnore]
+        public Stats shrines;
+        
     }
 }

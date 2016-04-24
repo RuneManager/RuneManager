@@ -442,7 +442,7 @@ namespace RuneOptim
             return runesSlot;
         }
 
-        public static Loadout MakeBuild(Monster mon, IEnumerable<Rune>[] runesSlot, Func<Stats, int> sort, Predicate<RuneSet[]> reqsets = null, Predicate<Stats> minimum = null)
+        public static Loadout MakeBuild(Monster mon, IEnumerable<Rune>[] runesSlot, Func<Stats, double> sort, Predicate<RuneSet[]> reqsets = null, Predicate<Stats> minimum = null)
         {
 
             System.Collections.Generic.SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();//new List<Monster>();

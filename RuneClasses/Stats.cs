@@ -11,28 +11,28 @@ namespace RuneOptim
     {
         // allows mapping save.json into the program via Monster
         [JsonProperty("b_hp")]
-        public int Health = 0;
+        public double Health = 0;
 
         [JsonProperty("b_atk")]
-        public int Attack = 0;
+        public double Attack = 0;
 
         [JsonProperty("b_def")]
-        public int Defense = 0;
+        public double Defense = 0;
 
         [JsonProperty("b_spd")]
-        public int Speed = 0;
+        public double Speed = 0;
 
         [JsonProperty("b_crate")]
-        public int CritRate = 0;
+        public double CritRate = 0;
 
         [JsonProperty("b_cdmg")]
-        public int CritDamage = 0;
+        public double CritDamage = 0;
 
         [JsonProperty("b_res")]
-        public int Resistance = 0;
+        public double Resistance = 0;
 
         [JsonProperty("b_acc")]
-        public int Accuracy = 0;
+        public double Accuracy = 0;
 
         public Stats() { }
         // copy constructor, amrite?
@@ -50,22 +50,22 @@ namespace RuneOptim
 
         // fake "stats", need to be stored for scoring
         [JsonProperty("fake_ehp")]
-        public int EffectiveHP = 0;
+        public double EffectiveHP = 0;
 
         [JsonProperty("fake_ehpdb")]
-        public int EffectiveHPDefenseBreak = 0;
+        public double EffectiveHPDefenseBreak = 0;
         
         [JsonProperty("fake_dps")]
-        public int DamagePerSpeed = 0;
+        public double DamagePerSpeed = 0;
 
         [JsonProperty("fake_avd")]
-        public int AverageDamage = 0;
+        public double AverageDamage = 0;
 
         [JsonProperty("fake_mxd")]
-        public int MaxDamage = 0;
+        public double MaxDamage = 0;
 
         // Gets the Extra stat manually stored (for scoring)
-        public int ExtraGet(string extra)
+        public double ExtraGet(string extra)
         {
             switch (extra)
             {
@@ -84,26 +84,26 @@ namespace RuneOptim
         }
         
         // Computes and returns the Extra stat
-        public int ExtraValue(string extra)
+        public double ExtraValue(string extra)
         {
             switch (extra)
             {
                 case "EHP":
-                    return (int)(Health / ((1000 / (double)(1000 + Defense * 3))));
+                    return (Health / ((1000 / (double)(1000 + Defense * 3))));
                 case "EHPDB":
-                    return (int)(Health / ((1000 / (double)(1000 + Defense * 1.5))));
+                    return (Health / ((1000 / (double)(1000 + Defense * 1.5))));
                 case "DPS":
-                    return (int)(ExtraValue("AvD") * (Speed / (double) 100));
+                    return (ExtraValue("AvD") * (Speed / (double) 100));
                 case "AvD":
-                    return (int)(ExtraValue("MxD") * (Math.Min(CritRate, 100) / (double) 100));
+                    return (ExtraValue("MxD") * (Math.Min(CritRate, 100) / (double) 100));
                 case "MxD":
-                    return (int)(Attack * CritDamage / (double)100);
+                    return (Attack * CritDamage / (double)100);
             }
             return 0;
         }
 
         // manually sets the Extra stat (used for scoring)
-        public void ExtraSet(string extra, int value)
+        public void ExtraSet(string extra, double value)
         {
             switch (extra)
             {
@@ -125,8 +125,43 @@ namespace RuneOptim
             }
         }
 
+        public void SetZero()
+        {
+            Accuracy = 0;
+            Attack = 0;
+            CritDamage = 0;
+            CritRate = 0;
+            Defense = 0;
+            Health = 0;
+            Resistance = 0;
+            Speed = 0;
+
+            EffectiveHP = 0;
+            EffectiveHPDefenseBreak = 0;
+            DamagePerSpeed = 0;
+            AverageDamage = 0;
+            MaxDamage = 0;
+        }
+
+        public double Sum()
+        {
+            return Accuracy
+                + Attack
+                + CritDamage
+                + CritRate
+                + Defense
+                + Health
+                + Resistance
+                + Speed
+                + EffectiveHP
+                + EffectiveHPDefenseBreak
+                + DamagePerSpeed
+                + AverageDamage
+                + MaxDamage;
+        }
+
         // Allows speedy iteration through the entity
-        public int this[string stat]
+        public double this[string stat]
         {
             get
             {
@@ -217,6 +252,61 @@ namespace RuneOptim
 
 
             return true;
+        }
+
+        public bool NonZero()
+        {
+            if (Accuracy != 0)
+                return true;
+            if (Attack != 0)
+                return true;
+            if (CritDamage != 0)
+                return true;
+            if (CritRate != 0)
+                return true;
+            if (Defense != 0)
+                return true;
+            if (Health != 0)
+                return true;
+            if (Resistance != 0)
+                return true;
+            if (Speed != 0)
+                return true;
+
+            if (EffectiveHP != 0)
+                return true;
+            if (EffectiveHPDefenseBreak != 0)
+                return true;
+            if (DamagePerSpeed != 0)
+                return true;
+            if (AverageDamage != 0)
+                return true;
+            if (MaxDamage != 0)
+                return true;
+
+            return false;
+        }
+
+        public Attr FirstNonZero()
+        {
+            if (Accuracy != 0)
+                return Attr.Accuracy;
+            if (Attack != 0)
+                return Attr.AttackPercent;
+            if (CritDamage != 0)
+                return Attr.CritDamage;
+            if (CritRate != 0)
+                return Attr.CritRate;
+            if (Defense != 0)
+                return Attr.DefensePercent;
+            if (Health != 0)
+                return Attr.HealthPercent;
+            if (Resistance != 0)
+                return Attr.Resistance;
+            if (Speed != 0)
+                return Attr.SpeedPercent;
+            
+            return Attr.Null;
         }
     }
 }

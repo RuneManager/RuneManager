@@ -121,16 +121,16 @@ namespace RuneApp
                 foreach (var b in build.loads.Take(numBuilds))
 				{
 					ListViewItem li = new ListViewItem();
-					int pts = 0;
-
 					var Cur = b.GetStats();
 
+                    double pts = GetPoints(Cur, (str, i)=> { li.SubItems.Add(str); });
+                    /*
 					foreach (var stat in statNames)
 					{
 						string str = Cur[stat].ToString();
 						if (build.Sort[stat] != 0)
 						{
-							int p = Cur[stat] / build.Sort[stat];
+                            double p = Cur[stat] / build.Sort[stat];
 							if (build.Threshold[stat] != 0)
 								p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
 							str = p.ToString() + " (" + Cur[stat].ToString() + ")";
@@ -143,7 +143,7 @@ namespace RuneApp
                         string str = Cur.ExtraValue(extra).ToString();
                         if (build.Sort.ExtraGet(extra) != 0)
                         {
-                            int p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
+                            double p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
                             if (build.Threshold.ExtraGet(extra) != 0)
                                 p -= Math.Max(0, Cur.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
                             str = p.ToString() + " (" + Cur.ExtraValue(extra).ToString() + ")";
@@ -151,8 +151,9 @@ namespace RuneApp
                         }
                         li.SubItems.Add(str);
                     }
+                    */
                     // put the sum points into the first item
-					li.SubItems[0].Text = pts.ToString();
+					li.SubItems[0].Text = pts.ToString("0.##");
 					li.Tag = b;
 					Invoke((MethodInvoker)delegate
 					{
@@ -182,15 +183,15 @@ namespace RuneApp
 			foreach (string stat in statNames)
             {
                 TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
-                int val = 0;
-                int.TryParse(tb.Text, out val);
+                double val = 0;
+                double.TryParse(tb.Text, out val);
                 build.Sort[stat] = val;
             }
             foreach (string extra in extraNames)
             {
                 TextBox tb = (TextBox)Controls.Find(extra + "Worth", true).FirstOrDefault();
-                int val = 0;
-                int.TryParse(tb.Text, out val);
+                double val = 0;
+                double.TryParse(tb.Text, out val);
                 build.Sort.ExtraSet(extra, val);
             }
             // "sort" as in, recalculate the whole number
@@ -205,15 +206,54 @@ namespace RuneApp
 			lv.Sort();
 		}
 
+        private double GetPoints(Stats Cur, Action<string, int> w = null)
+        {
+            double pts = 0;
+            double p;
+            int i = 1;
+            foreach (var stat in statNames)
+            {
+                string str = Cur[stat].ToString();
+                if (build.Sort[stat] != 0)
+                {
+                    p = Cur[stat] / build.Sort[stat];
+                    if (build.Threshold[stat] != 0)
+                        p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
+                    str = p.ToString("0.#") + " (" + Cur[stat].ToString() + ")";
+                    pts += p;
+                }
+                w.Invoke(str, i);
+                i++;
+            }
+            foreach (var extra in extraNames)
+            {
+                string str = Cur.ExtraValue(extra).ToString();
+                if (build.Sort.ExtraGet(extra) != 0)
+                {
+                    p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
+                    if (build.Threshold.ExtraGet(extra) != 0)
+                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
+                    str = p.ToString("0.#") + " (" + Cur.ExtraValue(extra).ToString() + ")";
+                    pts += p;
+                }
+                w.Invoke(str, i);
+                i++;
+            }
+            return pts;
+        }
+
         // recalculate all the points for this monster
         // TODO: consider hiding point values in the subitem tags and only recalcing the changed column
         // TODO: pull the scoring algorithm into a neater function
         public void ListItemSort(ListViewItem li)
         {
             Monster load = (Monster)li.Tag;
+            var Cur = load.GetStats();
+
+            double pts = GetPoints(Cur, (str, num) => { li.SubItems[num].Text = str; });
+            /*
             int pts = 0;
 
-            var Cur = load.GetStats();
             int i = 1;
             foreach (var stat in statNames)
             {
@@ -243,7 +283,8 @@ namespace RuneApp
                 li.SubItems[i].Text = str;
                 i++;
             }
-            li.SubItems[0].Text = pts.ToString();
+            */
+            li.SubItems[0].Text = pts.ToString("0.##");
 
         }
 
@@ -291,7 +332,7 @@ namespace RuneApp
                     if (mY.GetStats()[stat] > mN.GetStats()[stat])
                         better.Add(stat);
                 }
-                int totalsort = 0;
+                double totalsort = 0;
                 foreach (var stat in statNames)
                 {
                     if (build.Sort[stat] != 0)
@@ -304,7 +345,7 @@ namespace RuneApp
                 }
                 if (totalsort == 0)
                 {
-                    int totalstats = 0;
+                    double totalstats = 0;
                     foreach (var stat in better)
                     {
                         if (statNames.Contains(stat))

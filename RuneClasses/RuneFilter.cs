@@ -85,11 +85,11 @@ namespace RuneOptim
         {
             get
             {
-                if (Flat > 0)
+                if (Flat != 0)
                     return true;
-                if (Percent > 0)
+                if (Percent != 0)
                     return true;
-                if (Test > 0)
+                if (Test != 0)
                     return true;
                 return false;
             }

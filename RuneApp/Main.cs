@@ -14,6 +14,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using System.Configuration;
 
 namespace RuneApp
 {
@@ -26,10 +27,22 @@ namespace RuneApp
         string filelink = "";
         string whatsNewText = "";
         Build currentBuild = null;
+        Configuration config = null;
 
         public Main()
         {
             InitializeComponent();
+            config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+            if (config != null)
+            {
+                // it's stored as string, what is fasted yescompare?
+                if (config.AppSettings.Settings.AllKeys.Contains("useEquipped") && config.AppSettings.Settings["useEquipped"].Value == true.ToString())
+                {
+                    useRunesCheck.Checked = true;
+                    useEquipped = true;
+                }
+            }
+
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
             var sorter = new ListViewSort();
             sorter.OnColumnClick(MonPriority.Index);
@@ -48,7 +61,34 @@ namespace RuneApp
 					client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
                 }
             });
+
+            for (int i = 0; i < 11; i++)
+            {
+                ToolStripItem it = new ToolStripMenuItem(i.ToString() + (i > 0 ? " (" + Math.Ceiling(i * 1.5).ToString() + "%)" : ""));
+                it.Tag = (int)Math.Floor(i * 1.5);
+                it.Click += ShrineClickSpeed;
+                speedToolStripMenuItem.DropDownItems.Add(it);
+            }
         }
+        
+        private void ShrineClickSpeed(object sender, EventArgs e)
+        {
+            var it = (ToolStripMenuItem)sender;
+            foreach (ToolStripMenuItem i in speedToolStripMenuItem.DropDownItems)
+            {
+                i.Checked = false;
+            }
+            it.Checked = true;
+            data.shrines.Speed = (int)it.Tag;
+            if (config != null)
+            {
+                config.AppSettings.Settings.Remove("shrineSpeed");
+                config.AppSettings.Settings.Add("shrineSpeed", it.Tag.ToString());
+                config.Save(ConfigurationSaveMode.Modified);
+            }
+        }
+
+    
 
         private void Main_Load(object sender, EventArgs e)
         {
@@ -301,11 +341,29 @@ namespace RuneApp
                 item.Tag = rune;
                 listView2.Items.Add(item);
             }
+
+            if (data.shrines == null)
+                data.shrines = new Stats();
+            
+            if (config != null)
+            {
+                if (config.AppSettings.Settings.AllKeys.Contains("shrineSpeed"))
+                {
+                    int val = 0;
+                    int.TryParse(config.AppSettings.Settings["shrineSpeed"].Value, out val);
+                    data.shrines.Speed = val;
+                    int level = (int)Math.Floor(val / (double)1.5);
+                    ((ToolStripMenuItem)speedToolStripMenuItem.DropDownItems[level]).Checked = true;
+                }
+            }
         }
 
         public void checkLocked()
         {
-            toolStripStatusLabel1.Text = "Locked: " + data.Runes.Where(r => r.Locked == true).Count().ToString();
+            if (data == null)
+                return;
+            if (data.Runes != null)
+                toolStripStatusLabel1.Text = "Locked: " + data.Runes.Where(r => r.Locked == true).Count().ToString();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -468,7 +526,10 @@ namespace RuneApp
         private void filterList(ListView list, Predicate<object> p)
         {
             listView2.Items.Clear();
+            if (data == null)
+                return;
 
+            if (data.Runes != null)
             foreach (Rune rune in data.Runes.Where(x => p.Invoke(x)))
             {
                 ListViewItem item = new ListViewItem(new string[]{
@@ -598,12 +659,13 @@ namespace RuneApp
                 }
 
                 b.GenRunes(data, false, useEquipped, isBatch);
+                b.shrines = data.shrines;
 
                 string nR = "";
 
                 for (int i = 0; i < b.runes.Length; i++)
                 {
-                    if (b.runes[i].Length == 0)
+                    if (b.runes[i] != null && b.runes[i].Length == 0)
                         nR += (i + 1) + " ";
                 }
 
@@ -726,6 +788,8 @@ namespace RuneApp
 
         private void toolStripButton11_Click(object sender, EventArgs e)
         {
+            if (data == null || data.Runes == null)
+                return;
             foreach (Rune r in data.Runes)
             {
                 r.Locked = false;
@@ -758,6 +822,8 @@ namespace RuneApp
 
 		private void toolStripButton12_Click(object sender, EventArgs e)
 		{
+            if (data == null)
+                return;
             if (runTask != null && runTask.Status == TaskStatus.Running)
             {
                 runSource.Cancel();
@@ -795,6 +861,7 @@ namespace RuneApp
             runToken = runSource.Token;
 			runTask = Task.Factory.StartNew(() =>
 			{
+                if (data.Runes != null)
                 foreach (Rune r in data.Runes)
                 {
                     r.ResetStats();
@@ -812,6 +879,8 @@ namespace RuneApp
 
         void GenerateStats()
         {
+            if (data == null || data.Runes == null)
+                return;
             StringBuilder sb = new StringBuilder();
 
             sb.AppendLine("Id,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,FlatCount,FlatPts,SellScore,Action");
@@ -890,12 +959,17 @@ namespace RuneApp
 
         private void toolStripButton15_Click(object sender, EventArgs e)
         {
+            if (data == null)
+                return;
+
+            if (data.Monsters != null)
             foreach (Monster mon in data.Monsters)
             {
                 for (int i = 1; i < 7; i++)
                     mon.Current.RemoveRune(i);
             }
 
+            if (data.Runes != null)
             foreach (Rune r in data.Runes)
             {
                 r.AssignedId = 0;
@@ -972,6 +1046,12 @@ namespace RuneApp
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             useEquipped = ((CheckBox)sender).Checked;
+            if (config != null)
+            {
+                config.AppSettings.Settings.Remove("useEquipped");
+                config.AppSettings.Settings.Add("useEquipped", useEquipped.ToString());
+                config.Save(ConfigurationSaveMode.Modified);
+            }
         }
 
 
