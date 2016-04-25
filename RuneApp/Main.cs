@@ -441,6 +441,7 @@ namespace RuneApp
                     IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
                     IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
                     IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
+                    IRuneMon.Text = rune.AssignedName;
                 }
             }
             
@@ -748,6 +749,7 @@ namespace RuneApp
 
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
+            plsDie = false;
             var lis = listView5.SelectedItems;
             if (lis.Count > 0)
             {

@@ -388,10 +388,12 @@ namespace RuneOptim
                                         test.ApplyRune(r5);
 
                                         if (saveStats)
+                                        {
                                             foreach (Rune r in test.Current.runes)
                                             {
                                                 r.manageStats_LoadGen++;
                                             }
+                                        }
 
                                         var cstats = test.GetStats();
 
@@ -434,14 +436,18 @@ namespace RuneOptim
                                         plus++;
 
                                             if (saveStats)
+                                            {
                                                 foreach (Rune r in test.Current.runes)
                                                 {
                                                     r.manageStats_LoadFilt++;
                                                 }
+                                            }
 
-                                        // if we are to track all good builds, keep it
-                                        if (!dumpBads)
+                                            // if we are to track all good builds, keep it
+                                            if (!dumpBads)
+                                            {
                                                 tests.Add(test);
+                                            }
                                             else
                                             {
                                                 //lock (tests)
@@ -455,7 +461,7 @@ namespace RuneOptim
                                                 }
                                                 else
                                                 {
-                                                    if (Best.GetStats() < test.GetStats())
+                                                    if (sort(Best.GetStats()) < sort(test.GetStats()))
                                                     {
                                                         Best = test;
                                                         tests.Add(test);
@@ -470,8 +476,8 @@ namespace RuneOptim
                                                         tests.Add(test);
                                                     }*/
                                                 }
-                                            //}
-                                        }
+                                                //}
+                                            }
                                         }
 
                                     // every second, give a bit of feedback to those watching
@@ -581,10 +587,12 @@ namespace RuneOptim
             rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set));
 
             if (saveStats)
+            {
                 foreach (Rune r in rsGlobal)
                 {
                     r.manageStats_Set++;
                 }
+            }
 
             int[] slotFakes = new int[6];
             bool[] slotPred = new bool[6];
@@ -791,10 +799,12 @@ namespace RuneOptim
                 runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
 
                 if (saveStats)
+                {
                     foreach (Rune r in runes[i])
                     {
                         r.manageStats_RuneFilt++;
                     }
+                }
 
                 if (i % 2 == 1) // actually evens because off by 1
                 {
@@ -804,11 +814,12 @@ namespace RuneOptim
                 }
 
                 if (saveStats)
+                {
                     foreach (Rune r in runes[i])
                     {
                         r.manageStats_TypeFilt++;
                     }
-
+                }
             }
 
             // Make sure that for each set type, there are enough slots with runes in them

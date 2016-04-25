@@ -223,15 +223,15 @@ namespace RuneOptim
         // Perfectly legit operator overloading to compare builds/minimum
         public static bool operator <(Stats lhs, Stats rhs)
         {
-            return rhs.Greater(lhs);
+            return rhs.GreaterEqual(lhs);
         }
 
         public static bool operator >(Stats lhs, Stats rhs)
         {
-            return lhs.Greater(rhs);
+            return lhs.GreaterEqual(rhs);
         }
 
-        internal bool Greater(Stats rhs)
+        internal bool GreaterEqual(Stats rhs)
         {
             if (this.Accuracy < rhs.Accuracy)
                 return false;

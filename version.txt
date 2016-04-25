@@ -1,8 +1,8 @@
-0.1.0.0
+0.1.0.1
 https://github.com/Skibisky/RuneManager/releases/latest
-Speed totem and Speed Leader options.
-Fixed build ordering bug.
-Maybe speed improvements?
+0.1.0.0 Speed totem and Speed Leader options.
 Decimal sorting support.
-More CSV stats.
-Build timer.
+---
+0.1.0.1 Fixed serious bug when selecting builds.
+Shows equipped monster when selecting rune from Save.
+Allows the single button to work again after cancelling a batch.
