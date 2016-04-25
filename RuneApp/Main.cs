@@ -693,13 +693,19 @@ namespace RuneApp
                 }
 
                 int numchanged = 0;
+                int numnew = 0;
                 int powerup = 0;
                 int upgrades = 0;
                 foreach (Rune r in b.Best.Current.runes)
                 {
                     r.Locked = true;
                     if (r.AssignedName != b.Best.Name)
-                        numchanged++;
+                    {
+                        if (b.mon.Current.runes[r.Slot - 1] == null)
+                            numnew++;
+                        else
+                            numchanged++;
+                    }
                     powerup += Math.Max(0, b.Best.Current.FakeLevel[r.Slot - 1] - r.Level);
                     if (b.Best.Current.FakeLevel[r.Slot -1] != 0)
                     {
@@ -733,7 +739,7 @@ namespace RuneApp
 					nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
 					nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
 					nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
-					nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, numchanged.ToString());
+					nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
 					nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
 					//nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, upgrades.ToString());
 					nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time/(double)1000).ToString("0.##"));
