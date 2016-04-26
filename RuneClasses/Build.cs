@@ -448,12 +448,10 @@ namespace RuneOptim
                                             {
                                                 tests.Add(test);
                                             }
+                                            // if we only want to track really good builds
                                             else
                                             {
-                                                //lock (tests)
-                                                //{
                                                 // if there are currently no good builds, keep it
-
                                                 if (tests.FirstOrDefault() == null)
                                                 {
                                                     tests.Add(test);
@@ -461,22 +459,13 @@ namespace RuneOptim
                                                 }
                                                 else
                                                 {
+                                                    // if this build is better than the best, keep it
                                                     if (sort(Best.GetStats()) < sort(test.GetStats()))
                                                     {
                                                         Best = test;
                                                         tests.Add(test);
                                                     }
-
-                                                    // take a snapshot of the builds (multithread /may/ cause a "collection modified" excepion in next step)
-                                                    /*var tt = tests.ToList();
-                                                    // if this build is better than any other build, keep it
-                                                    // can't just keep a copy of Max becaues of threading
-                                                    if (tt.Max(t => sort(t.GetStats())) < sort(test.GetStats()))
-                                                    {
-                                                        tests.Add(test);
-                                                    }*/
                                                 }
-                                                //}
                                             }
                                         }
 

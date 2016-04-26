@@ -478,19 +478,7 @@ namespace RuneOptim
         public RuneStat HealthPercent = null;
         public RuneStat Resistance = null;
         public RuneStat Speed = null;
-
-        /*public int Accuracy { get { return GetValue(Attr.Accuracy); } }
-        public int AttackFlat { get { return GetValue(Attr.AttackFlat, -1, false); } }
-        public int AttackPercent { get { return GetValue(Attr.AttackPercent, -1, false); } }
-        public int CritDamage { get { return GetValue(Attr.CritDamage, -1, false); } }
-        public int CritRate { get { return GetValue(Attr.CritRate, -1, false); } }
-        public int DefenseFlat { get { return GetValue(Attr.DefenseFlat, -1, false); } }
-        public int DefensePercent { get { return GetValue(Attr.DefensePercent, -1, false); } }
-        public int HealthFlat { get { return GetValue(Attr.HealthFlat, -1, false); } }
-        public int HealthPercent { get { return GetValue(Attr.HealthPercent, -1, false); } }
-        public int Resistance { get { return GetValue(Attr.Resistance, -1, false); } }
-        public int Speed { get { return GetValue(Attr.Speed, -1, false); } }*/
-
+        
         public void ResetStats()
         {
             manageStats_In = false;

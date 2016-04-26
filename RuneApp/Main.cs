@@ -27,12 +27,13 @@ namespace RuneApp
         string filelink = "";
         string whatsNewText = "";
         Build currentBuild = null;
-        Configuration config = null;
+        public static Configuration config = null;
 
         public Main()
         {
             InitializeComponent();
             config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
+            bool dontupdate = false;
             if (config != null)
             {
                 // it's stored as string, what is fasted yescompare?
@@ -41,6 +42,10 @@ namespace RuneApp
                     useRunesCheck.Checked = true;
                     useEquipped = true;
                 }
+                // this?
+                if (Main.config.AppSettings.Settings.AllKeys.Contains("noupdate"))
+                    bool.TryParse(Main.config.AppSettings.Settings["noupdate"].Value, out dontupdate);
+
             }
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
@@ -53,14 +58,26 @@ namespace RuneApp
             sorter.OnColumnClick(0);
             listView5.ListViewItemSorter = sorter;
 
-            Task.Factory.StartNew(() =>
+            if (!dontupdate)
             {
-                using (WebClient client = new WebClient())
+                Task.Factory.StartNew(() =>
                 {
-                    client.DownloadStringCompleted += client_DownloadStringCompleted;
-					client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
-                }
-            });
+                    using (WebClient client = new WebClient())
+                    {
+                        client.DownloadStringCompleted += client_DownloadStringCompleted;
+                        client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
+                    }
+                });
+            }
+            else
+            {
+                updateBox.Show();
+                updateComplain.Text = "Updates Disabled";
+                var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+                string oldvernum = ver.ProductVersion;
+                updateCurrent.Text = "Current: " + oldvernum;
+                updateNew.Text = "";
+            }
 
             for (int i = 0; i < 11; i++)
             {
@@ -739,7 +756,14 @@ namespace RuneApp
 					nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
 					nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
 					nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
-					nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                    nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                    if (Main.config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                    {
+                        bool check = false;
+                        bool.TryParse(Main.config.AppSettings.Settings["splitassign"].Value, out check);
+                        if (check)
+                            nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
+                    }
 					nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
 					//nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, upgrades.ToString());
 					nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time/(double)1000).ToString("0.##"));
@@ -1094,8 +1118,8 @@ namespace RuneApp
 
                     var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
                     string oldvernum = ver.ProductVersion;
-                    updateNew.Text = "New: " + newvernum;
                     updateCurrent.Text = "Current: " + oldvernum;
+                    updateNew.Text = "New: " + newvernum;
                     int newver = VersionCompare(oldvernum, newvernum);
                     if (newver > 0)
                     {
@@ -1159,5 +1183,35 @@ namespace RuneApp
 		{
                 GenerateStats();
 		}
-	}
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var f = new Options())
+            {
+                f.ShowDialog();
+            }
+        }
+
+        private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            updateBox.Show();
+            updateComplain.Text = "Checking...";
+            Task.Factory.StartNew(() =>
+            {
+                using (WebClient client = new WebClient())
+                {
+                    client.DownloadStringCompleted += client_DownloadStringCompleted;
+                    client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
+                }
+            });
+        }
+
+        private void aboutToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
+            string oldvernum = ver.ProductVersion;
+
+            MessageBox.Show("Rune Manager\r\nBy Skibisky\r\nVersion " + oldvernum, "About", MessageBoxButtons.OK);
+        }
+    }
 }
