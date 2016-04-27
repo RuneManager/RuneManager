@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        function messup(eleid)
+        {
+            var ele = document.getElementById(eleid);
+            if (!ele.style.display || ele.style.display == "")
+                ele.style.display = "none";
+            else
+                ele.style.display = "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Options</h1>
+    Here you can personalise how you want the manager to run.<br />
+    <a href="index.html">Rune Manager</a><br />
+    <a href="build.html">Build Creating</a><br />
+    <a href="test.html">Testing Builds</a><br />
+    <br />
+    <h3>Generation</h3>
+    Use locked runes in Test:<br /> If you've run a few manual tests, if to use the locked (given out) runes in test.<br />
+    Turn off if you want a more accurate idea of what will be given to the monster.<br />
+    Turn on to give an idea of how good that monster could be, further up the list.<br />
+    Tests to run (5000):<br /> When generating tests, it will generate this many loadouts which meet the requirements. Or less, but no more.<br />
+    Tests to show (100):<br /> After generating tests, show this many loadouts (based on the current score). With no score, the first lot will be shown.<br />
+    <h3>Display</h3>
+    Split assign/swap:<br /> If to show [runes changed] or [unassigned runes] / [assigned to different monster].<br />
+    Gray tests with locked runes:<br /> When generating tests, if there are locked runes (after some manual builds), grays tests with locked runes.<br />
+    <h3>Other</h3>
+    Disable update check:<br /> Stops the update check on start-up (You can manually check with About &gt; Check for updates)<br />
+</body>
+</html>

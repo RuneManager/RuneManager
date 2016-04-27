@@ -718,7 +718,8 @@ namespace RuneApp
                     r.Locked = true;
                     if (r.AssignedName != b.Best.Name)
                     {
-                        if (b.mon.Current.runes[r.Slot - 1] == null)
+                        //if (b.mon.Current.runes[r.Slot - 1] == null)
+                        if (r.AssignedName == "Unknown name")
                             numnew++;
                         else
                             numchanged++;
@@ -851,8 +852,9 @@ namespace RuneApp
         private CancellationToken runToken;
         private CancellationTokenSource runSource = null;
         bool plsDie = false;
+        public static Help help = null;
 
-		private void toolStripButton12_Click(object sender, EventArgs e)
+        private void toolStripButton12_Click(object sender, EventArgs e)
 		{
             if (data == null)
                 return;
@@ -1212,6 +1214,12 @@ namespace RuneApp
             string oldvernum = ver.ProductVersion;
 
             MessageBox.Show("Rune Manager\r\nBy Skibisky\r\nVersion " + oldvernum, "About", MessageBoxButtons.OK);
+        }
+
+        private void userManualHelpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            help = new Help();
+            help.Show();
         }
     }
 }

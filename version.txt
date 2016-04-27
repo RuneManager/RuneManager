@@ -1,6 +1,6 @@
-0.1.1.0
+0.1.2.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Config options (File > Options) eg.
-- Use locked runes in test (Default true)
-- Tests to run (5000), to show (100)
-- Disable update check :(
+Added About > User Manual / Help
+- Pages for almost every screen
+- Details on how to do stuff
+- Pictures!

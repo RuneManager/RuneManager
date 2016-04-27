@@ -1,0 +1,120 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        function showHide(eleid)
+        {
+            var ele = document.getElementById(eleid);
+            if (!ele.style.display || ele.style.display == "")
+                ele.style.display = "none";
+            else
+                ele.style.display = "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Rune Manager</h1>
+    <br />
+    Here is a quick guide to the things in this program.<br />
+    This version of the Guide was created for 0.1.1.0, so stuff may have changed.<br />
+    <br />
+    <a href="build.html">Build Creating</a><br />
+    <a href="test.html">Build Testing</a><br />
+    <a href="options.html">Options</a><br />
+    <br />
+    If you click some of the headers/titles, you can show/hide the section<br />
+    <h2 onclick="javascript:showHide('updates');">Updates</h2>
+    <div id="updates">
+        Clearly the most important.<br />
+        If you didn't know how to use the program and I released a user guide, how would you know to get it?<br />
+        <img src="images\update.png" /><br />
+        The "What's New" button will give a little info on the latest additions.<br />
+        The "Download" button will direct to a webpage to grab the latest version<br />
+    </div>
+    <h2 onclick="javascript:showHide('monsters');">Monsters</h2>
+    <div id="monsters">
+        The first thing you'll want, is to load up your Monsters and Runes.<br />
+        Currently, you can either manually enter them in through 
+        <a href="https://swarfarm.com/" target="_blank">SWarFarm</a>
+        or grab them by using
+        <a href="https://github.com/kakaroto/SWProxy#summoners-war-monsters--runes-parser" target="_blank">SW Proxy</a>.<br />
+        You'd need to [Name] &gt; Import/Export &gt; Export Optimizer JSON from SWarFarm.<br />
+        Once you've got a nice JSON file (like 12345678-optimizer.json from SWProxy), click the nice 'Load' button like below.<br />
+        <img src="images/menu_load.png" /><br />
+        You will definately want to load this save on start-up.<br />
+        If you've already got a start-up save, it will ask if you want to overwrite it.<br />
+        <br />
+        So this is the list of all the monster that it dug out of save.json<br />
+        <img src="images/save_monsters.png" /><br />
+        Priority is mostly harmless, ID and Name are loaded from the Save for each Monster.<br />
+        Double-clicking an entry will create a <a href="build.html">build</a>.<br />
+        <h3>Buttons</h3>
+        <img src="images/up.png" />Do mostly nothing.<br />
+        <img src="images/down.png" />Do mostly nothing.<br />
+        <img src="images/add.png" />Create a build for the selected Monster.<br />
+        <img src="images/refresh.png" />Reload the entire save (Monsters & Runes).<br />
+        <img src="images/broken.png" />Unequips all the runes from all the Monsters.<br />
+    </div>
+    <h2 onclick="javascript:showHide('builds');">Builds</h2>
+    <div id="builds">
+        First off, this box:<br />
+        <img src="images/equipped.png" /><br />
+        If you want to use currently equipped runes in new builds, check it.<br />
+        If you want to update runes without shuffling them around, uncheck it.<br />
+        <br />
+        This is the list of builds you've made.<br />
+        <img src="images/builds_list.png" /><br />
+        The priority is a nice number to show which order they are generated in (how they appear on the list).<br />
+        ID and Name is the monsters, check the Monster list.<br />
+        Progress is either how far it's through generating builds, or the result (100% or fail!)<br />
+        Double-clicking an entry will allow you to modify the <a href="build.html">build</a>.<br />
+        <h3>Buttons</h3>
+        <img src="images/up.png" />Move a build up in the order.<br />
+        <img src="images/down.png" />Move a build down in the order.<br />
+        <img src="images/subtract.png" />Remove a build from the list.<br />
+        <img src="images/right.png" />Run the selected build.<br />
+        <img src="images/save.png" />Save all builds & changes. Also happens when you close the program.<br />
+        <img src="images/broken.png" />Force unlocks all the runes.<br />
+        <img src="images/go.png" />Removes all loadouts, runs all builds.<br />
+        <img src="images/stats.png" />Regenerates the rune stats csv.<br />
+    </div>
+    <h2 onclick="javascript:showHide('loadouts');">Loadouts</h2>
+    <div id="loadouts">
+        Here's all the fresh builds.<br />
+        <img src="images/loadouts_list.png" /><br />
+        This list contains a loadout that was generated based on the selected criteria in the associated build.<br />
+        ID and Name is for the Monster used in the loadout.<br />
+        Swap is either a number which is the number of runes changed, or two numbers (0/3) which is swapped runes that are [unassigned runes] / [assigned to different monster]<br />
+        Up is the sum of the level-ups required.<br />
+        Time is the number of seconds it took to generate the build, helpful if you leave a lot running and you want to find <a href="javascript:showHide('longones')">the long ones</a>.<br />
+        <div id="longones" style="display: none">
+            <img src="images/sample_run.png" />
+        </div>
+        <br />
+        <h3>Buttons</h3>
+        <img src="images/subtract.png" />Removes loadout, unlocking the runes.<br />
+        <img src="images/refresh.png" />Removes all loadouts, unlocking runes.<br />
+        <br />
+        Looks at these sweet stats.<br />
+        <img src="images/loadout_stats.png" /><br />
+        I've tried to make it look like what you'd see in Summoners War.<br />
+        The problem is, with Leader and Shrines, you'll see less stats. :(<br />
+        Clicking any of the runes will show a box like...<br />
+        <br />
+        This sick rune.<br />
+        <img src="images/rune_loadout.png" /><br />
+        Again, it's styled after Summoners War, but with extra info like it's Rune ID (the number after the stat)<br />
+        Also, the +LEVEL is under the innate and the current location is at the bottom<br />
+        The Find Slot button will show all the runes you have for that slot.<br />
+    </div>
+    <h2 onclick="javascript:showHide('shrines');">Shrines</h2>
+    <div id="shrines">
+        Here you can set what level/effect your shrines have.<br />
+        <img src="images/shrines.png" /><br />
+        More will be added later.<br />
+    </div>
+</body>
+</html>

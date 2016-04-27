@@ -103,5 +103,15 @@ namespace RuneApp
                 Main.config.Save(ConfigurationSaveMode.Modified);
             }
         }
+
+        private void btnHelp_Click(object sender, EventArgs e)
+        {
+            if (Main.help != null)
+                Main.help.Close();
+
+            Main.help = new Help();
+            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\options.html";
+            Main.help.Show();
+        }
     }
 }

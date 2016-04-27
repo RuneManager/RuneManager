@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <script>
+        function messup(eleid)
+        {
+            var ele = document.getElementById(eleid);
+            if (!ele.style.display || ele.style.display == "")
+                ele.style.display = "none";
+            else
+                ele.style.display = "";
+        }
+    </script>
+</head>
+<body>
+    <h1>Test Generation</h1>
+    <br />
+    This is where we can preview some of the loadouts that conform to the builds specifications.<br />
+    May take time to load, change it up in <a href="options.html">options</a>.<br />
+    <a href="index.html">Rune Manager</a><br />
+    <a href="build.html">Build Creating</a><br />
+    <a href="options.html">Options</a><br />
+    <br />
+    <h3>Test Points</h3>
+    Once you've got some numbers in, it'll look like this.<br />
+    <img src="images/test_points.png" /><br />
+    The real fun is over on the right, where you mess up the numbers.<br />
+    <img src="images/test_score.png" /><br />
+    Putting the two together, with HP having a 'score' of 470, you can see that 22928 / 470 is 48.8<br />
+    But what does that mean? How does that do anything?<br />
+    Notice SPD is 3.<br />
+    This literally means that I'd trade 470 HP for 3 SPD (and visa versa).<br />
+    As you type in numbers (even decimals), you'll see the builds jump up and down, sorting live!<br />
+    You can then see what kind of builds are possible, then how to chose the best.<br />
+    <br />
+    The point being, is that if you are defining your 5th or 20th build, the creamiest runes are long gone.<br />
+    You saw some sweet builds, but the runes they used have been given to the monsters further up the list.<br />
+    This scoring is how to chose second/third/nth best without asking you every time.<br />
+    <br />
+    The upside is that aside minor tweaking, you can keep your build files FRR to FRR.<br />
+    Once you've done the initial task of deciding what you value for your monster, just runing the tool will tell you the runes you want.<br />
+</body>
+</html>

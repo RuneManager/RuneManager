@@ -83,6 +83,12 @@
     <Compile Include="Generate.Designer.cs">
       <DependentUpon>Generate.cs</DependentUpon>
     </Compile>
+    <Compile Include="Help.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Help.Designer.cs">
+      <DependentUpon>Help.cs</DependentUpon>
+    </Compile>
     <Compile Include="ListViewSort.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -124,6 +130,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Generate.resx">
       <DependentUpon>Generate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Help.resx">
+      <DependentUpon>Help.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
@@ -309,7 +318,41 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="User Manual\build.html" />
+    <Content Include="User Manual\images\builds_list.png" />
+    <Content Include="User Manual\images\build_leader.png" />
+    <Content Include="User Manual\images\build_runes.png" />
+    <Content Include="User Manual\images\build_sets.png" />
+    <Content Include="User Manual\images\build_stats.png" />
+    <Content Include="User Manual\images\equipped.png" />
+    <Content Include="User Manual\images\loadouts_list.png" />
+    <Content Include="User Manual\images\loadout_stats.png" />
+    <Content Include="User Manual\images\menu_load.png" />
+    <Content Include="User Manual\images\options.png" />
+    <Content Include="User Manual\images\rune_evens.png" />
+    <Content Include="User Manual\images\rune_loadout.png" />
+    <Content Include="User Manual\images\rune_points.png" />
+    <Content Include="User Manual\images\rune_tabs.png" />
+    <Content Include="User Manual\images\sample_run.png" />
+    <Content Include="User Manual\images\save_monsters.png" />
+    <Content Include="User Manual\images\shrines.png" />
+    <Content Include="User Manual\images\test_points.png" />
+    <Content Include="User Manual\images\test_score.png" />
+    <Content Include="User Manual\images\update.png" />
+    <Content Include="User Manual\index.html" />
+    <Content Include="User Manual\options.html" />
+    <Content Include="User Manual\test.html" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
