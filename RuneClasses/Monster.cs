@@ -21,6 +21,21 @@ namespace RuneOptim
 
         public int priority = 0;
 
+        public int SwapCost(Loadout l)
+        {
+            int cost = 0;
+            for (int i = 0; i < 6; i++)
+            {
+                if (l.runes[i].AssignedName != Name)
+                {
+                    if (l.runes[i].AssignedName != "Unknown name")
+                        cost += l.runes[i].UnequipCost;
+                    cost += Current.runes[i].UnequipCost;
+                }
+            }
+            return cost;
+        }
+
         // what is currently equiped for this instance of a monster
         public Loadout Current = new Loadout();
 

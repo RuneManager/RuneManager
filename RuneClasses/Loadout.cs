@@ -23,7 +23,6 @@ namespace RuneOptim
         public int[] FakeLevel = new int[6];
         public bool[] PredictSubs = new bool[6];
 
-
         public Stats shrines = new Stats();
         public Stats leader = new Stats();
         

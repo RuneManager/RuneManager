@@ -35,6 +35,7 @@
             this.MonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -46,6 +47,7 @@
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.userManualHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.statLevel = new System.Windows.Forms.Label();
             this.statID = new System.Windows.Forms.Label();
@@ -177,7 +179,6 @@
             this.updateDownload = new System.Windows.Forms.Button();
             this.updateNew = new System.Windows.Forms.Label();
             this.updateCurrent = new System.Windows.Forms.Label();
-            this.userManualHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -249,7 +250,8 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
+            this.toolStripStatusLabel1,
+            this.toolStripStatusLabel2});
             this.statusStrip1.Location = new System.Drawing.Point(0, 708);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
@@ -262,6 +264,12 @@
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(57, 17);
             this.toolStripStatusLabel1.Text = "Locked: 0";
+            // 
+            // toolStripStatusLabel2
+            // 
+            this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            this.toolStripStatusLabel2.Size = new System.Drawing.Size(64, 17);
+            this.toolStripStatusLabel2.Text = "Unequip: 0";
             // 
             // toolStrip1
             // 
@@ -352,6 +360,13 @@
             this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(176, 22);
             this.aboutToolStripMenuItem1.Text = "About";
             this.aboutToolStripMenuItem1.Click += new System.EventHandler(this.aboutToolStripMenuItem1_Click);
+            // 
+            // userManualHelpToolStripMenuItem
+            // 
+            this.userManualHelpToolStripMenuItem.Name = "userManualHelpToolStripMenuItem";
+            this.userManualHelpToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
+            this.userManualHelpToolStripMenuItem.Text = "User Manual / Help";
+            this.userManualHelpToolStripMenuItem.Click += new System.EventHandler(this.userManualHelpToolStripMenuItem_Click);
             // 
             // groupBox1
             // 
@@ -1870,13 +1885,6 @@
             this.updateCurrent.TabIndex = 0;
             this.updateCurrent.Text = "Current: 0.0.0.0";
             // 
-            // userManualHelpToolStripMenuItem
-            // 
-            this.userManualHelpToolStripMenuItem.Name = "userManualHelpToolStripMenuItem";
-            this.userManualHelpToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
-            this.userManualHelpToolStripMenuItem.Text = "User Manual / Help";
-            this.userManualHelpToolStripMenuItem.Click += new System.EventHandler(this.userManualHelpToolStripMenuItem_Click);
-            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2096,6 +2104,7 @@
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem userManualHelpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel2;
     }
 }
 

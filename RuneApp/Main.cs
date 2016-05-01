@@ -584,6 +584,17 @@ namespace RuneApp
 
                 }
             }
+            int cost = 0;
+            foreach (ListViewItem li in listView3.SelectedItems)
+            {
+                if (li.Tag != null)
+                {
+                    Loadout load = (Loadout)li.Tag;
+                    var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
+                    cost += mon.SwapCost(load);
+                }
+            }
+            toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
         }
 
         private void toolStripButton4_Click(object sender, EventArgs e)

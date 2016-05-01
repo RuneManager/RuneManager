@@ -78,7 +78,7 @@ namespace RuneOptim
         Resistance = 2048,
 
     }
-
+    
     public class Rune
     {
         public Rune()
@@ -122,6 +122,17 @@ namespace RuneOptim
             Sub4Type = rhs.Sub4Type;
             Sub4Value = rhs.Sub4Value;
             Parent = rhs;
+        }
+
+        [JsonIgnore]
+        public static int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
+
+        public int UnequipCost
+        {
+            get
+            {
+                return UnequipCosts[Grade - 1];
+            }
         }
 
         [JsonProperty("id")]
