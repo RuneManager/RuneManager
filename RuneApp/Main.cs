@@ -590,8 +590,12 @@ namespace RuneApp
                 if (li.Tag != null)
                 {
                     Loadout load = (Loadout)li.Tag;
-                    var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
-                    cost += mon.SwapCost(load);
+					if (load != null)
+					{
+						var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
+						if (mon != null)
+							cost += mon.SwapCost(load);
+					}
                 }
             }
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
@@ -909,6 +913,7 @@ namespace RuneApp
                 if (data.Runes != null)
                 foreach (Rune r in data.Runes)
                 {
+						r.Swapped = false;
                     r.ResetStats();
                 }
 

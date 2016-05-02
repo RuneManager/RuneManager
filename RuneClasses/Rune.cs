@@ -109,6 +109,8 @@ namespace RuneOptim
             Locked = rhs.Locked;
             AssignedId = rhs.AssignedId;
             AssignedName = rhs.AssignedName;
+			Assigned = rhs.Assigned;
+			Swapped = rhs.Swapped;
             MainType = rhs.MainType;
             MainValue = rhs.MainValue;
             InnateType = rhs.InnateType;
@@ -439,6 +441,12 @@ namespace RuneOptim
 
         [JsonProperty("monster_n")]
         public string AssignedName;
+
+		[JsonIgnore]
+		public Monster Assigned;
+
+		[JsonIgnore]
+		public bool Swapped = false;
 
         [JsonProperty("m_t")]
         public Attr MainType;

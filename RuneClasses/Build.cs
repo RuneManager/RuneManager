@@ -540,6 +540,11 @@ namespace RuneOptim
                     {
                         r.manageStats_In = true;
                     }
+					for (int i = 0; i < 6; i++)
+					{
+						if (mon.Current.runes[i] != null && mon.Current.runes[i].ID != Best.Current.runes[i].ID)
+							mon.Current.runes[i].Swapped = true;
+					}
                 }
             }
             catch (Exception e)
