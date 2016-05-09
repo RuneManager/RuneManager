@@ -156,6 +156,7 @@
     <EmbeddedResource Include="RuneSelect.resx">
       <DependentUpon>RuneSelect.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="basestats.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -351,7 +352,8 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y
+xcopy "$(ProjectDir)basestats.json" "$(TargetDir)" /D /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

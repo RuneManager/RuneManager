@@ -21,6 +21,9 @@ namespace RuneOptim
 
         public int priority = 0;
 
+		[JsonIgnore]
+		public bool downloaded = false;
+
         public int SwapCost(Loadout l)
         {
             int cost = 0;

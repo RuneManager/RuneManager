@@ -117,6 +117,10 @@ namespace RuneApp
             {
                 LoadBuilds("builds.json");
             }
+			if (File.Exists("basestats.json"))
+			{
+				LoadMons("basestats.json");
+			}
         }
 
         private void listView1_SelectedIndexChanged(object sender, EventArgs e)
@@ -226,6 +230,15 @@ namespace RuneApp
             Console.WriteLine(result); // <-- For debugging use.
 			
         }
+
+		public int LoadMons(string fname)
+		{
+			string text = File.ReadAllText(fname);
+
+			MonsterStat.monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(text);
+
+			return text.Length;
+		}
 
         public int LoadFile(string fname)
         {
@@ -574,13 +587,22 @@ namespace RuneApp
                 var item = listView3.FocusedItem;
                 if (item.Tag != null)
                 {
-                    Loadout build = (Loadout)item.Tag;
+                    Loadout load = (Loadout)item.Tag;
 
-                    var mon = data.GetMonster(int.Parse(item.SubItems[2].Text));
+					var monid = int.Parse(item.SubItems[2].Text);
+					var bid = int.Parse(item.SubItems[0].Text);
 
-                    ShowStats(build.GetStats(mon), mon);
+					var build = builds.Where(b => b.ID == bid).FirstOrDefault();
 
-                    ShowRunes(build.runes);
+					Monster mon = null;
+					if (build == null)
+						mon = data.GetMonster(monid);
+					else
+						mon = build.mon;
+
+                    ShowStats(load.GetStats(mon), mon);
+
+                    ShowRunes(load.runes);
 
                 }
             }
@@ -913,7 +935,7 @@ namespace RuneApp
                 if (data.Runes != null)
                 foreach (Rune r in data.Runes)
                 {
-						r.Swapped = false;
+					r.Swapped = false;
                     r.ResetStats();
                 }
 

@@ -198,6 +198,9 @@ namespace RuneApp
 
             int genX = 0;
 
+			int dlCheckX = 0;
+			int dlBtnX = 0;
+
             foreach (var stat in comb)
             {
                 x = 4; 
@@ -214,6 +217,7 @@ namespace RuneApp
                 label.Name = stat + "Base";
                 label.Size = new Size(50, 20);
                 label.Location = new Point(x, y);
+				dlCheckX = x;
                 x += colWidth;
 
                 label = new Label();
@@ -230,7 +234,10 @@ namespace RuneApp
                 textBox.Location = new Point(x, y);
                 textBox.TextChanged += new System.EventHandler(this.global_TextChanged);
                 textBox.TextChanged += Total_TextChanged;
+				dlBtnX = x;
                 x += colWidth;
+
+
 
                 label = new Label();
                 groupBox1.Controls.Add(label);
@@ -276,8 +283,13 @@ namespace RuneApp
 
             button3.Location = new Point(genX, y);
 
-            // put the grid on all the tabs
-            foreach (var tab in tabNames)
+			btnDL6star.Location = new Point(dlBtnX, y);
+			checkDL6star.Location = new Point(dlCheckX, y + 2);
+			btnDL6star.Width = 40;
+
+
+			// put the grid on all the tabs
+			foreach (var tab in tabNames)
             {
                 TabPage page = tabControl1.TabPages["tab" + tab];
                 page.Tag = tab;
@@ -502,6 +514,7 @@ namespace RuneApp
                 x += colWidth;
 
             }
+
         }
 
         private TabPage GetTab(string tabName)
@@ -580,6 +593,8 @@ namespace RuneApp
 
             build.VERSIONNUM = VERSIONNUM;
 
+			checkDL6star.Checked = build.DownloadStats;
+
             if (build.leader.NonZero())
             {
                 Attr t = build.leader.FirstNonZero();
@@ -642,70 +657,7 @@ namespace RuneApp
 
             }
 
-
-            statName.Text = mon.Name;
-            statID.Text = mon.ID.ToString();
-            statLevel.Text = mon.level.ToString();
-
-            // read a bunch of numbers
-            foreach (var stat in statNames)
-            {
-                var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
-                ctrlBase.Text = mon[stat].ToString();
-
-                var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
-                var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-
-                ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
-
-                var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-                ctrlCurrent.Text = cur[stat].ToString();
-
-                var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                
-                var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
-
-                var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
-
-                if (build.Minimum[stat] > 0)
-                    ctrlTotal.Text = build.Minimum[stat].ToString();
-                if (build.Sort[stat] != 0)
-                    ctrlWorth.Text = build.Sort[stat].ToString();
-                if (build.Maximum[stat] != 0)
-                    ctrlMax.Text = build.Maximum[stat].ToString();
-                if (build.Threshold[stat] != 0)
-                    ctrlThresh.Text = build.Threshold[stat].ToString();
-
-            }
-
-            foreach (var extra in extraNames)
-            {
-                var ctrlBase = (Label)groupBox1.Controls.Find(extra + "Base", true).FirstOrDefault();
-                ctrlBase.Text = mon.ExtraValue(extra).ToString();
-
-                var ctrlBonus = (Label)groupBox1.Controls.Find(extra + "Bonus", true).FirstOrDefault();
-                var ctrlTotal = (TextBox)groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
-
-                ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
-
-                var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
-                ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
-
-                var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-
-                var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
-
-                var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
-
-                if (build.Minimum.ExtraGet(extra) > 0)
-                    ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
-                if (build.Sort.ExtraGet(extra) != 0)
-                    ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
-                if (build.Maximum.ExtraGet(extra) != 0)
-                    ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
-                if (build.Threshold.ExtraGet(extra) != 0)
-                    ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
-            }
+			refreshStats(mon, cur);
 
             // do we allow broken sets?
             ChangeBroken(build.AllowBroken);
@@ -793,8 +745,76 @@ namespace RuneApp
             CalcPerms();
         }
 
-        // switch the cool icon on the button (and the bool in the build)
-        private void ChangeBroken(bool state)
+		private void refreshStats(Monster mon, Stats cur)
+		{
+			statName.Text = mon.Name;
+			statID.Text = mon.ID.ToString();
+			statLevel.Text = mon.level.ToString();
+
+			// read a bunch of numbers
+			foreach (var stat in statNames)
+			{
+				var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
+				ctrlBase.Text = mon[stat].ToString();
+
+				var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
+				var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
+
+				ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+
+				var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
+				ctrlCurrent.Text = cur[stat].ToString();
+
+				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+
+				var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+
+				var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+
+				if (build.Minimum[stat] > 0)
+					ctrlTotal.Text = build.Minimum[stat].ToString();
+				if (build.Sort[stat] != 0)
+					ctrlWorth.Text = build.Sort[stat].ToString();
+				if (build.Maximum[stat] != 0)
+					ctrlMax.Text = build.Maximum[stat].ToString();
+				if (build.Threshold[stat] != 0)
+					ctrlThresh.Text = build.Threshold[stat].ToString();
+
+			}
+
+			foreach (var extra in extraNames)
+			{
+				var ctrlBase = (Label)groupBox1.Controls.Find(extra + "Base", true).FirstOrDefault();
+				ctrlBase.Text = mon.ExtraValue(extra).ToString();
+
+				var ctrlBonus = (Label)groupBox1.Controls.Find(extra + "Bonus", true).FirstOrDefault();
+				var ctrlTotal = (TextBox)groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
+
+				ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+
+				var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
+				ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
+
+				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+
+				var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
+
+				var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
+
+				if (build.Minimum.ExtraGet(extra) > 0)
+					ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
+				if (build.Sort.ExtraGet(extra) != 0)
+					ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
+				if (build.Maximum.ExtraGet(extra) != 0)
+					ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
+				if (build.Threshold.ExtraGet(extra) != 0)
+					ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
+			}
+
+		}
+
+		// switch the cool icon on the button (and the bool in the build)
+		private void ChangeBroken(bool state)
         {
             toolStripButton2.Tag = state;
             if (state)
@@ -1647,6 +1667,25 @@ namespace RuneApp
             Main.help.url = Environment.CurrentDirectory + "\\User Manual\\build.html";
             Main.help.Show();
         }
-    
-    }
+
+		private void button4_Click_1(object sender, EventArgs e)
+		{
+			btnDL6star.Enabled = false;
+			var mref = MonsterStat.FindMon(build.mon);
+			if (mref != null)
+			{
+				var mstat = mref.Download();
+				var newmon = mstat.GetMon(build.mon);
+				build.mon = newmon;
+				refreshStats(newmon, newmon.GetStats());
+			}
+			btnDL6star.Enabled = true;
+		}
+
+		private void checkBox1_CheckedChanged(object sender, EventArgs e)
+		{
+			if (loading) return;
+			build.DownloadStats = checkDL6star.Checked;
+		}
+	}
 }

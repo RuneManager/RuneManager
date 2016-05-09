@@ -42,7 +42,10 @@ namespace RuneOptim
 
         [JsonProperty("new")]
         public bool New;
-        
+
+		[JsonProperty("downloadstats")]
+		public bool DownloadStats;
+		
         // Magical (and probably bad) tree structure for rune slot stat filters
         // tab, stat, FILTER
         [JsonProperty("runeFilters")]
@@ -207,6 +210,17 @@ namespace RuneOptim
         {
             if (runes.Any(r => r == null))
                 return;
+
+			// only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
+			if (mon.level < 40 && DownloadStats && !mon.downloaded)
+			{
+				var mref = MonsterStat.FindMon(mon);
+				if (mref != null)
+				{
+					mon = mref.Download().GetMon(mon);
+				}
+			}
+
             try
             {
 
@@ -574,8 +588,9 @@ namespace RuneOptim
             if (!useEquipped)
                 rsGlobal = rsGlobal.Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == mon.Name));
             // only if the rune isn't currently locked for another purpose
+			// also, include runes which have been unequipped (should only look above)
             if (!useLocked)
-                rsGlobal = rsGlobal.Where(r => r.Locked == false);
+                rsGlobal = rsGlobal.Where(r => r.Locked == false || r.Swapped);
             
             // Only runes which we've included
             rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set));
