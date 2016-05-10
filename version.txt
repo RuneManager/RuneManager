@@ -1,6 +1,6 @@
-0.1.2.0
+0.1.3.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Added About > User Manual / Help
-- Pages for almost every screen
-- Details on how to do stuff
-- Pictures!
+Option to download L40 / Awakened stats.
+Colours mon list by build/storage/meh.
+Can specify x2 runesets (eg. Revenge)
+0.1.2.0: User Manual / Help

@@ -45,10 +45,13 @@ namespace RuneOptim
 
 		[JsonProperty("downloadstats")]
 		public bool DownloadStats;
-		
-        // Magical (and probably bad) tree structure for rune slot stat filters
-        // tab, stat, FILTER
-        [JsonProperty("runeFilters")]
+
+		[JsonProperty("downloadawake")]
+		public bool DownloadAwake;
+
+		// Magical (and probably bad) tree structure for rune slot stat filters
+		// tab, stat, FILTER
+		[JsonProperty("runeFilters")]
         public Dictionary<string, Dictionary<string, RuneFilter>> runeFilters = new Dictionary<string, Dictionary<string, RuneFilter>>();
 
         public bool ShouldSerializeruneFilters()
@@ -211,8 +214,24 @@ namespace RuneOptim
             if (runes.Any(r => r == null))
                 return;
 
+			// if to get awakened
+			if (DownloadAwake && !mon.downloaded)
+			{
+				var mref = MonsterStat.FindMon(mon);
+				if (mref != null)
+				{
+					// download the current (unawakened monster)
+					var mstat = mref.Download();
+					// if the retrieved mon is unawakened, get the awakened
+					if (!mstat.Awakened && mstat.AwakenRef != null)
+					{
+						mon = mstat.AwakenRef.Download().GetMon(mon);
+					}
+				}
+			}
+			// getting awakened also gets level 40, so...
 			// only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
-			if (mon.level < 40 && DownloadStats && !mon.downloaded)
+			else if (mon.level < 40 && DownloadStats && !mon.downloaded)
 			{
 				var mref = MonsterStat.FindMon(mon);
 				if (mref != null)
@@ -223,8 +242,6 @@ namespace RuneOptim
 
             try
             {
-
-
                 Best = null;
                 SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
                 long count = 0;
@@ -298,8 +315,8 @@ namespace RuneOptim
                                 pts -= Math.Max(0, m[stat] - Threshold[stat]) / Sort[stat];
                         }
                     }
-                // look, cool metrics!
-                foreach (string extra in extraNames)
+					// look, cool metrics!
+					foreach (string extra in extraNames)
                     {
                         if (Sort.ExtraGet(extra) != 0)
                         {
@@ -308,7 +325,6 @@ namespace RuneOptim
                                 pts -= Math.Max(0, m.ExtraValue(extra) - Threshold.ExtraGet(extra)) / Sort.ExtraGet(extra);
                         }
                     }
-
                     return pts;
                 };
 
@@ -425,8 +441,8 @@ namespace RuneOptim
                                             }
                                         }
 
-                                    // check if build meets minimum
-                                    if (Minimum != null && !(cstats > Minimum))
+										// check if build meets minimum
+										if (Minimum != null && !(cstats > Minimum))
                                         {
                                             kill++;
                                         }
@@ -434,20 +450,22 @@ namespace RuneOptim
                                         {
                                             kill++;
                                         }
-                                    // if no broken sets, check for broken sets
-                                    else if (!AllowBroken && !test.Current.SetsFull)
+										// if no broken sets, check for broken sets
+										else if (!AllowBroken && !test.Current.SetsFull)
                                         {
                                             kill++;
                                         }
-                                    // if there are required sets, ensure we have them
-                                    else if (RequiredSets != null && RequiredSets.Count > 0 && !RequiredSets.All(s => test.Current.sets.Contains(s)))
+										// if there are required sets, ensure we have them
+										else if (RequiredSets != null && RequiredSets.Count > 0
+										// this Linq adds no overhead compared to GetStats() and ApplyRune()
+											&& !RequiredSets.All(s => test.Current.sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)))
                                         {
-                                            kill++;
+											kill++;
                                         }
                                         else
                                         {
-                                        // we found an okay build!
-                                        plus++;
+											// we found an okay build!
+											plus++;
 
                                             if (saveStats)
                                             {
@@ -483,8 +501,8 @@ namespace RuneOptim
                                             }
                                         }
 
-                                    // every second, give a bit of feedback to those watching
-                                    if (DateTime.Now > timer.AddSeconds(1))
+										// every second, give a bit of feedback to those watching
+										if (DateTime.Now > timer.AddSeconds(1))
                                         {
                                             timer = DateTime.Now;
                                             Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
@@ -503,14 +521,14 @@ namespace RuneOptim
                                             }
                                         }
                                     }
-                                // sum up what work we've done
-                                Interlocked.Add(ref total, -kill);
+									// sum up what work we've done
+									Interlocked.Add(ref total, -kill);
                                     kill = 0;
                                     Interlocked.Add(ref count, plus);
                                     plus = 0;
 
-                                // if we've got enough, stop
-                                if (top > 0 && count >= top)
+									// if we've got enough, stop
+									if (top > 0 && count >= top)
                                     {
                                         isRun = false;
                                         break;

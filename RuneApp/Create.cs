@@ -285,8 +285,9 @@ namespace RuneApp
 
 			btnDL6star.Location = new Point(dlBtnX, y);
 			checkDL6star.Location = new Point(dlCheckX, y + 2);
-			btnDL6star.Width = 40;
 
+			btnDLawake.Location = new Point(dlBtnX, y + rowHeight);
+			checkDLawake.Location = new Point(dlCheckX, y + rowHeight + 2);
 
 			// put the grid on all the tabs
 			foreach (var tab in tabNames)
@@ -594,6 +595,8 @@ namespace RuneApp
             build.VERSIONNUM = VERSIONNUM;
 
 			checkDL6star.Checked = build.DownloadStats;
+			checkDLawake.Checked = build.DownloadAwake;
+			checkDL6star.Enabled = !checkDLawake.Checked;
 
             if (build.leader.NonZero())
             {
@@ -618,6 +621,10 @@ namespace RuneApp
                 ListViewItem li = listView1.Items.Find(s.ToString(), true).FirstOrDefault();
                 if (li != null)
                     li.Group = rsReq;
+				int num = build.RequiredSets.Count(r => r == s);
+				if (num > 1)
+					li.Text = s.ToString() + " x" + num;
+				
             }
 
             // for 2,4,6 - make sure that the Attrs are set up
@@ -996,10 +1003,11 @@ namespace RuneApp
                 var set = (RuneSet)item.Tag;
                 if (build.RequiredSets.Contains(set))
                 {
-                    build.RequiredSets.Remove(set);
+                    build.RequiredSets.RemoveAll(s => s == set);
                     if (!build.BuildSets.Contains(set))
                         build.BuildSets.Add(set);
                     item.Group = rsInc;
+					item.Text = set.ToString();
                 }
                 else
                 {
@@ -1015,12 +1023,16 @@ namespace RuneApp
             if (selGrp.Items.Count > 0)
             {
                 int i = indGrp;
+				int selcount = 0;
                 if (i > 0 && (i == selGrp.Items.Count || !(bool)selGrp.Tag))
                     i -= 1;
                 while (selGrp.Items[i].Selected)
                 {
+					selcount++;
                     i++;
                     i %= selGrp.Items.Count;
+					if (selcount == selGrp.Items.Count)
+						break;
                 }
 
                 ind = selGrp.Items[i].Index;
@@ -1682,10 +1694,72 @@ namespace RuneApp
 			btnDL6star.Enabled = true;
 		}
 
+		private void button5_Click_1(object sender, EventArgs e)
+		{
+			btnDLawake.Enabled = false;
+			var mref = MonsterStat.FindMon(build.mon);
+			if (mref != null)
+			{
+				var mstat = mref.Download();
+				if (!mstat.Awakened && mstat.AwakenRef != null)
+				{
+					mstat = mstat.AwakenRef.Download();
+					var newmon = mstat.GetMon(build.mon);
+					build.mon = newmon;
+					refreshStats(newmon, newmon.GetStats());
+				}
+			}
+			btnDLawake.Enabled = true;
+		}
+
 		private void checkBox1_CheckedChanged(object sender, EventArgs e)
 		{
 			if (loading) return;
 			build.DownloadStats = checkDL6star.Checked;
+		}
+
+		private void checkBox2_CheckedChanged(object sender, EventArgs e)
+		{
+			if (loading) return;
+			build.DownloadAwake = checkDLawake.Checked;
+			checkDL6star.Enabled = !checkDLawake.Checked;
+		}
+
+		private void listView1_MouseClick(object sender, MouseEventArgs e)
+		{
+			if (e.Button == MouseButtons.Right)
+				toolStripButton4_Click(sender, e);
+		}
+
+		private void toolStripButton4_Click(object sender, EventArgs e)
+		{
+			if (listView1.SelectedItems.Count == 1)
+			{
+				var li = listView1.SelectedItems[0];
+				RuneSet set = (RuneSet)li.Tag;
+				// whatever, just add it to required if not
+				if (li.Group != rsReq)
+				{
+					li.Group = rsReq;
+					build.RequiredSets.Add(set);
+					if (!build.BuildSets.Contains(set))
+						build.BuildSets.Add(set);
+				}
+				else
+				{
+					build.RequiredSets.Add(set);
+					int num = build.RequiredSets.Count(s => s == set);
+					if (num > 3)
+					{
+						build.RequiredSets.RemoveAll(s => s == set);
+						build.RequiredSets.Add(set);
+					}
+					if (num > 1)
+						li.Text = set.ToString() + " x" + num;
+					if (num > 3 || num == 1)
+						li.Text = set.ToString();
+				}
+			}
 		}
 	}
 }

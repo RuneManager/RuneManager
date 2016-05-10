@@ -28,18 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup27 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Create));
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.btnDL6star = new System.Windows.Forms.Button();
+			this.checkDL6star = new System.Windows.Forms.CheckBox();
 			this.btnHelp = new System.Windows.Forms.Button();
 			this.leaderAmountBox = new System.Windows.Forms.ComboBox();
 			this.leaderTypeBox = new System.Windows.Forms.ComboBox();
@@ -84,6 +85,7 @@
 			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
+			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabg = new System.Windows.Forms.TabPage();
 			this.tabo = new System.Windows.Forms.TabPage();
@@ -102,9 +104,8 @@
 			this.tab5 = new System.Windows.Forms.TabPage();
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
-			this.checkDL6star = new System.Windows.Forms.CheckBox();
-			this.btnDL6star = new System.Windows.Forms.Button();
-			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+			this.checkDLawake = new System.Windows.Forms.CheckBox();
+			this.btnDLawake = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.groupBox2.SuspendLayout();
@@ -130,6 +131,8 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.btnDLawake);
+			this.groupBox1.Controls.Add(this.checkDLawake);
 			this.groupBox1.Controls.Add(this.btnDL6star);
 			this.groupBox1.Controls.Add(this.checkDL6star);
 			this.groupBox1.Controls.Add(this.btnHelp);
@@ -178,6 +181,27 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Stats";
 			this.groupBox1.Enter += new System.EventHandler(this.groupBox1_Enter);
+			// 
+			// btnDL6star
+			// 
+			this.btnDL6star.Location = new System.Drawing.Point(180, 410);
+			this.btnDL6star.Name = "btnDL6star";
+			this.btnDL6star.Size = new System.Drawing.Size(40, 21);
+			this.btnDL6star.TabIndex = 90;
+			this.btnDL6star.Text = "Go";
+			this.btnDL6star.UseVisualStyleBackColor = true;
+			this.btnDL6star.Click += new System.EventHandler(this.button4_Click_1);
+			// 
+			// checkDL6star
+			// 
+			this.checkDL6star.AutoSize = true;
+			this.checkDL6star.Location = new System.Drawing.Point(66, 414);
+			this.checkDL6star.Name = "checkDL6star";
+			this.checkDL6star.Size = new System.Drawing.Size(79, 17);
+			this.checkDL6star.TabIndex = 89;
+			this.checkDL6star.Text = "Get 6* Max";
+			this.checkDL6star.UseVisualStyleBackColor = true;
+			this.checkDL6star.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
 			// 
 			// btnHelp
 			// 
@@ -658,16 +682,16 @@
 			this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
 			this.listView1.FullRowSelect = true;
-			listViewGroup19.Header = "Required";
-			listViewGroup19.Name = "listViewGroup3";
-			listViewGroup20.Header = "Included";
-			listViewGroup20.Name = "listViewGroup1";
-			listViewGroup21.Header = "Excluded";
-			listViewGroup21.Name = "listViewGroup2";
+			listViewGroup1.Header = "Required";
+			listViewGroup1.Name = "listViewGroup3";
+			listViewGroup2.Header = "Included";
+			listViewGroup2.Name = "listViewGroup1";
+			listViewGroup3.Header = "Excluded";
+			listViewGroup3.Name = "listViewGroup2";
 			this.listView1.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
 			this.listView1.Location = new System.Drawing.Point(6, 44);
 			this.listView1.Name = "listView1";
 			this.listView1.Size = new System.Drawing.Size(111, 644);
@@ -676,6 +700,7 @@
 			this.listView1.View = System.Windows.Forms.View.Details;
 			this.listView1.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
 			this.listView1.DoubleClick += new System.EventHandler(this.toolStripButton1_Click);
+			this.listView1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
 			// 
 			// columnHeader1
 			// 
@@ -737,6 +762,16 @@
 			this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton3.Text = "Make Required";
 			this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
+			// 
+			// toolStripButton4
+			// 
+			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.toolStripButton4.Image = global::RuneApp.App.go;
+			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.toolStripButton4.Name = "toolStripButton4";
+			this.toolStripButton4.Size = new System.Drawing.Size(23, 20);
+			this.toolStripButton4.Text = "Increase Required";
+			this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
 			// 
 			// tabControl1
 			// 
@@ -800,13 +835,13 @@
 			// 
 			this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-			listViewGroup22.Header = "Include";
-			listViewGroup22.Name = "listViewGroup1";
-			listViewGroup23.Header = "Excluded";
-			listViewGroup23.Name = "listViewGroup2";
+			listViewGroup4.Header = "Include";
+			listViewGroup4.Name = "listViewGroup1";
+			listViewGroup5.Header = "Excluded";
+			listViewGroup5.Name = "listViewGroup2";
 			this.listView2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup22,
-            listViewGroup23});
+            listViewGroup4,
+            listViewGroup5});
 			this.listView2.Location = new System.Drawing.Point(3, 241);
 			this.listView2.Name = "listView2";
 			this.listView2.Size = new System.Drawing.Size(123, 256);
@@ -835,13 +870,13 @@
 			// 
 			this.listView4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-			listViewGroup24.Header = "Include";
-			listViewGroup24.Name = "listViewGroup1";
-			listViewGroup25.Header = "Excluded";
-			listViewGroup25.Name = "listViewGroup2";
+			listViewGroup6.Header = "Include";
+			listViewGroup6.Name = "listViewGroup1";
+			listViewGroup7.Header = "Excluded";
+			listViewGroup7.Name = "listViewGroup2";
 			this.listView4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup24,
-            listViewGroup25});
+            listViewGroup6,
+            listViewGroup7});
 			this.listView4.Location = new System.Drawing.Point(3, 241);
 			this.listView4.Name = "listView4";
 			this.listView4.Size = new System.Drawing.Size(123, 256);
@@ -870,13 +905,13 @@
 			// 
 			this.listView6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-			listViewGroup26.Header = "Include";
-			listViewGroup26.Name = "listViewGroup1";
-			listViewGroup27.Header = "Excluded";
-			listViewGroup27.Name = "listViewGroup2";
+			listViewGroup8.Header = "Include";
+			listViewGroup8.Name = "listViewGroup1";
+			listViewGroup9.Header = "Excluded";
+			listViewGroup9.Name = "listViewGroup2";
 			this.listView6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup26,
-            listViewGroup27});
+            listViewGroup8,
+            listViewGroup9});
 			this.listView6.Location = new System.Drawing.Point(3, 241);
 			this.listView6.Name = "listView6";
 			this.listView6.Size = new System.Drawing.Size(123, 256);
@@ -937,35 +972,26 @@
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
-			// checkDL6star
+			// checkDLawake
 			// 
-			this.checkDL6star.AutoSize = true;
-			this.checkDL6star.Location = new System.Drawing.Point(66, 414);
-			this.checkDL6star.Name = "checkDL6star";
-			this.checkDL6star.Size = new System.Drawing.Size(79, 17);
-			this.checkDL6star.TabIndex = 89;
-			this.checkDL6star.Text = "Get 6* Max";
-			this.checkDL6star.UseVisualStyleBackColor = true;
-			this.checkDL6star.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+			this.checkDLawake.AutoSize = true;
+			this.checkDLawake.Location = new System.Drawing.Point(66, 441);
+			this.checkDLawake.Name = "checkDLawake";
+			this.checkDLawake.Size = new System.Drawing.Size(79, 17);
+			this.checkDLawake.TabIndex = 89;
+			this.checkDLawake.Text = "Get Awake";
+			this.checkDLawake.UseVisualStyleBackColor = true;
+			this.checkDLawake.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
 			// 
-			// btnDL6star
+			// btnDLawake
 			// 
-			this.btnDL6star.Location = new System.Drawing.Point(180, 410);
-			this.btnDL6star.Name = "btnDL6star";
-			this.btnDL6star.Size = new System.Drawing.Size(40, 21);
-			this.btnDL6star.TabIndex = 90;
-			this.btnDL6star.Text = "Go";
-			this.btnDL6star.UseVisualStyleBackColor = true;
-			this.btnDL6star.Click += new System.EventHandler(this.button4_Click_1);
-			// 
-			// toolStripButton4
-			// 
-			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton4.Image")));
-			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton4.Name = "toolStripButton4";
-			this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton4.Text = "toolStripButton4";
+			this.btnDLawake.Location = new System.Drawing.Point(180, 437);
+			this.btnDLawake.Name = "btnDLawake";
+			this.btnDLawake.Size = new System.Drawing.Size(40, 21);
+			this.btnDLawake.TabIndex = 90;
+			this.btnDLawake.Text = "Go";
+			this.btnDLawake.UseVisualStyleBackColor = true;
+			this.btnDLawake.Click += new System.EventHandler(this.button5_Click_1);
 			// 
 			// Create
 			// 
@@ -1066,5 +1092,7 @@
 		private System.Windows.Forms.CheckBox checkDL6star;
 		private System.Windows.Forms.Button btnDL6star;
 		private System.Windows.Forms.ToolStripButton toolStripButton4;
+		private System.Windows.Forms.Button btnDLawake;
+		private System.Windows.Forms.CheckBox checkDLawake;
 	}
 }

@@ -127,6 +127,11 @@ namespace RuneApp
 						toolStripProgressBar1.Value = (int)(d * buildsShow);
 					});
 				});
+				if (build.loads == null)
+				{
+					toolStripStatusLabel1.Text = "Error: no builds";
+					return;
+				}
 
                 int num = 0;
                 var takenLoads = build.loads.Take(buildsShow);

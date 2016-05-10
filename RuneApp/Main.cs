@@ -29,7 +29,13 @@ namespace RuneApp
         Build currentBuild = null;
         public static Configuration config = null;
 
-        public Main()
+		private Task runTask = null;
+		private CancellationToken runToken;
+		private CancellationTokenSource runSource = null;
+		bool plsDie = false;
+		public static Help help = null;
+
+		public Main()
         {
             InitializeComponent();
             config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
@@ -104,8 +110,6 @@ namespace RuneApp
                 config.Save(ConfigurationSaveMode.Modified);
             }
         }
-
-    
 
         private void Main_Load(object sender, EventArgs e)
         {
@@ -308,6 +312,13 @@ namespace RuneApp
 				ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "" });
                 li.Tag = b;
                 listView5.Items.Add(li);
+				
+				// ask the enumerable to eat Linq. Unsure why Find(b.mon.Name, false/true) failed here.
+				var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+				if (lv1li != null)
+				{
+					lv1li.ForeColor = Color.Green;
+				}
 
                 // upgrade builds, hopefully
                 while (b.VERSIONNUM < Create.VERSIONNUM)
@@ -333,6 +344,7 @@ namespace RuneApp
             {
                 var equipedRunes = data.Runes.Where(r => r.AssignedId == mon.ID);
 
+				bool wasStored = (mon.Name.IndexOf("In Storage") >= 0);
                 mon.Name = mon.Name.Replace(" (In Storage)", "");
                 
                 foreach (Rune rune in equipedRunes)
@@ -351,11 +363,14 @@ namespace RuneApp
                 if (mon.priority != 0)
                     pri = mon.priority.ToString();
 
-                ListViewItem item = new ListViewItem(new string[]{
-                    mon.Name,
-                    mon.ID.ToString(),
-                    pri,
-                });
+				ListViewItem item = new ListViewItem(new string[]{
+					mon.Name,
+					mon.ID.ToString(),
+					pri,
+				});
+				if (wasStored)
+					item.ForeColor = Color.Gray;
+				
                 item.Tag = mon;
                 listView1.Items.Add(item);
             }
@@ -600,6 +615,8 @@ namespace RuneApp
 					else
 						mon = build.mon;
 
+					ShowMon(mon);
+
                     ShowStats(load.GetStats(mon), mon);
 
                     ShowRunes(load.runes);
@@ -640,7 +657,6 @@ namespace RuneApp
             checkLocked();
         }
 
-
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
             if (listView1.SelectedItems.Count > 0)
@@ -660,8 +676,12 @@ namespace RuneApp
                         li.Tag = ff.build;
                         listView5.Items.Add(li);
                         builds.Add(ff.build);
-                    }
-                }
+
+						var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
+						if (lv1li != null)
+							lv1li.ForeColor = Color.Green;
+					}
+				}
             }
         }
 
@@ -851,8 +871,20 @@ namespace RuneApp
             var lis = listView5.SelectedItems;
             if (lis.Count > 0)
             {
-                foreach (ListViewItem li in lis)
-                    listView5.Items.Remove(li);
+				foreach (ListViewItem li in lis)
+				{
+					listView5.Items.Remove(li);
+					Build b = (Build)li.Tag;
+					if (b != null)
+					{
+						var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+						if (lv1li != null)
+						{
+							lv1li.ForeColor = Color.Black;
+							// can't tell is was in storage, name is mangled on load
+						}
+					}
+				}
             }
         }
 
@@ -884,12 +916,6 @@ namespace RuneApp
             }
             checkLocked();
 		}
-
-        private Task runTask = null;
-        private CancellationToken runToken;
-        private CancellationTokenSource runSource = null;
-        bool plsDie = false;
-        public static Help help = null;
 
         private void toolStripButton12_Click(object sender, EventArgs e)
 		{
@@ -1126,7 +1152,6 @@ namespace RuneApp
             }
         }
 
-
         void client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             Invoke((MethodInvoker)delegate
@@ -1259,5 +1284,5 @@ namespace RuneApp
             help = new Help();
             help.Show();
         }
-    }
+	}
 }

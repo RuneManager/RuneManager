@@ -37,6 +37,12 @@ namespace RuneOptim
 		[JsonProperty("accuracy")]
 		public int Accuracy;
 
+		[JsonProperty("is_awakened")]
+		public bool Awakened;
+
+		[JsonProperty("awakens_to")]
+		public StatReference AwakenRef;
+
 		[JsonIgnore]
 		public static List<MonsterStat> monStats;
 
@@ -105,7 +111,7 @@ namespace RuneOptim
 				level = 40,
 				Resistance = Resistance,
 				Speed = Speed,
-				Name = name,
+				Name = (Awakened ? name : name + " (" + element.ToString() + ")"),
 				downloaded = true
 			};
 		}
@@ -171,7 +177,7 @@ namespace RuneOptim
 
 		[JsonProperty("element")]
 		public Element element;
-
+		
 		public MonsterStat Download()
 		{
 			HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
