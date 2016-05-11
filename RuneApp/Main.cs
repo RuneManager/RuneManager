@@ -671,7 +671,11 @@ namespace RuneApp
                     var res = ff.ShowDialog();
                     if (res == System.Windows.Forms.DialogResult.OK)
                     {
-                        ff.build.priority = builds.Max(b => b.priority) + 1;
+						if (builds.Count > 0)
+							ff.build.priority = builds.Max(b => b.priority) + 1;
+						else
+							ff.build.priority = 1;
+
                         ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"0%"});
                         li.Tag = ff.build;
                         listView5.Items.Add(li);
@@ -680,6 +684,7 @@ namespace RuneApp
 						var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
 						if (lv1li != null)
 							lv1li.ForeColor = Color.Green;
+					
 					}
 				}
             }

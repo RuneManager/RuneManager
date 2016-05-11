@@ -1,6 +1,7 @@
-0.1.3.0
+0.1.4.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Option to download L40 / Awakened stats.
+Fixed a bug which prevented creating builds if you had no builds.
+0.1.3.0: Option to download L40 / Awakened stats.
 Colours mon list by build/storage/meh.
 Can specify x2 runesets (eg. Revenge)
 0.1.2.0: User Manual / Help
