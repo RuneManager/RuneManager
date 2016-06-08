@@ -91,7 +91,7 @@ namespace RuneOptim
                 case "EHP":
                     return (Health / ((1000 / (double)(1000 + Defense * 3))));
                 case "EHPDB":
-                    return (Health / ((1000 / (double)(1000 + Defense * 1.5))));
+                    return (Health / ((1000 / (double)(1000 + Defense * 3 * 0.3))));
                 case "DPS":
                     return (ExtraValue("AvD") * (Speed / (double) 100));
                 case "AvD":
