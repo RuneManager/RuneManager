@@ -350,6 +350,7 @@ namespace RuneApp
                 foreach (Rune rune in equipedRunes)
                 {
                     mon.ApplyRune(rune);
+                    rune.AssignedName = mon.Name;
                 }
 
                 if (mon.priority == 0 && mon.Current.runeCount > 0)
