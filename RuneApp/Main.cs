@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using System.Configuration;
+using OfficeOpenXml;
 
 namespace RuneApp
 {
@@ -92,6 +93,72 @@ namespace RuneApp
                 it.Click += ShrineClickSpeed;
                 speedToolStripMenuItem.DropDownItems.Add(it);
             }
+
+            Label l = new Label();
+            l.Location = new Point(4 + 50, 400 - 18);
+            l.Name = "compBefore";
+            l.Text = "Before";
+            l.Size = new Size(50, 14);
+            groupBox1.Controls.Add(l);
+
+            l = new Label();
+            l.Location = new Point(4 + 100, 400 - 18);
+            l.Name = "compAfter";
+            l.Text = "After";
+            l.Size = new Size(50, 14);
+            groupBox1.Controls.Add(l);
+
+            l = new Label();
+            l.Location = new Point(4 + 150, 400 - 18);
+            l.Name = "compDiff";
+            l.Text = "Difference";
+            l.Size = new Size(60, 14);
+            groupBox1.Controls.Add(l);
+
+            int xx = 0;
+            int yy = 0;
+            foreach (var s in Build.statNames.Concat(Build.extraNames))
+            {
+                l = new Label();
+                l.Location = new Point(4 + xx, 400 + yy);
+                l.Name = s + "compStat";
+                l.Text = s;
+                l.Size = new Size(50, 14);
+                groupBox1.Controls.Add(l);
+                xx += 50;
+
+                l = new Label();
+                l.Location = new Point(4 + xx, 400 + yy);
+                l.Name = s + "compBefore";
+                l.Text = "15000";
+                l.Size = new Size(50, 14);
+                groupBox1.Controls.Add(l);
+                xx += 50;
+
+                l = new Label();
+                l.Location = new Point(4 + xx, 400 + yy);
+                l.Name = s + "compAfter";
+                l.Text = "30000";
+                l.Size = new Size(50, 14);
+                groupBox1.Controls.Add(l);
+                xx += 50;
+
+                l = new Label();
+                l.Location = new Point(4 + xx, 400 + yy);
+                l.Name = s + "compDiff";
+                l.Text = "+15000";
+                l.Size = new Size(50, 14);
+                groupBox1.Controls.Add(l);
+                xx += 50;
+
+                if (s == "SPD")
+                    yy += 4;
+                if (s == "ACC")
+                    yy += 8;
+
+                yy += 16;
+                xx = 0;
+            }
         }
         
         private void ShrineClickSpeed(object sender, EventArgs e)
@@ -167,6 +234,31 @@ namespace RuneApp
                 groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat].ToString() + "%";
                 groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat].ToString() + "%";
                 groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]).ToString();
+            }
+        }
+
+        private void ShowDiff(Stats old, Stats load)
+        {
+            foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" })
+            {
+                groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
+                groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
+                groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = (load[stat] - old[stat]).ToString();
+            }
+
+            foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" })
+            {
+                groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
+                groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
+                groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = (load[stat] - old[stat]).ToString();
+            }
+
+            foreach (string extra in Build.extraNames)
+            {
+                groupBox1.Controls.Find(extra + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString();
+                groupBox1.Controls.Find(extra + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString();
+                groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString();
+
             }
         }
 
@@ -621,7 +713,7 @@ namespace RuneApp
                     ShowStats(load.GetStats(mon), mon);
 
                     ShowRunes(load.runes);
-
+                    ShowDiff(data.GetMonster(monid).GetStats(), load.GetStats(mon));
                 }
             }
             int cost = 0;
@@ -977,9 +1069,159 @@ namespace RuneApp
 				}
 
                 GenerateStats();
+                this.Invoke((MethodInvoker) delegate { GenerateExcel(); });
 
             }, runSource.Token);
 		}
+
+        void GenerateExcel()
+        {
+            if (data == null || data.Runes == null)
+                return;
+
+            FileInfo newFile = new FileInfo(@"runestats.xlsx");
+            int status = 0;
+            while (status != 1)
+            {
+                try
+                {
+                    newFile.Delete();
+                    status = 1;
+                }
+                catch (Exception e)
+                {
+                    if (status == 0)
+                    {
+                        if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can delete it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
+                        {
+                            status = 1;
+                        }
+                    }
+                }
+            }
+
+            ExcelPackage pck = new ExcelPackage(newFile);
+            var ws = pck.Workbook.Worksheets.Add("Runes");
+            int row = 1;
+            int col = 1;
+            foreach (var th in "Id,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,FlatCount,FlatPts,SellScore,Action".Split(','))
+            {
+                ws.Cells[row, col].Value = th; col++;
+            }
+            row++;
+            col = 1;
+
+            foreach (Rune r in data.Runes.OrderByDescending(r => r.ScoringBad))
+            {
+                ws.Cells[row, col].Value = r.ID; col++;
+
+                ws.Cells[row, col].Value = r.Grade; col++;
+
+                ws.Cells[row, col].Value = r.Set; col++;
+                ws.Cells[row, col].Value = r.Slot; col++;
+                ws.Cells[row, col].Value = r.MainType; col++;
+
+                ws.Cells[row, col].Value = r.Level; col++;
+
+                ws.Cells[row, col].Value = r.manageStats_Set; col++;
+                ws.Cells[row, col].Value = r.manageStats_RuneFilt; col++;
+                ws.Cells[row, col].Value = r.manageStats_TypeFilt; col++;
+
+                ws.Cells[row, col].Value = r.manageStats_LoadFilt; col++;
+                ws.Cells[row, col].Value = r.manageStats_LoadGen; col++;
+
+                ws.Cells[row, col].Value = r.Efficiency.ToString("0.####"); col++;
+
+                ws.Cells[row, col].Value = (r.manageStats_In ? "TRUE" : "FALSE"); col++;
+
+                ws.Cells[row, col].Value = r.ScoringBad.ToString(); col++;
+
+                ws.Cells[row, col].Value = r.FlatCount().ToString(); col++;
+                ws.Cells[row, col].Value = r.FlatPoints().ToString("0.####"); col++;
+
+                ws.Cells[row, col].Value = r.ScoringSell.ToString(); col++;
+
+                ws.Cells[row, col].Value = r.ScoringAct; col++;
+                
+                row++;
+                col = 1;
+            }
+            // write rune stats
+
+            foreach (ListViewItem li in listView3.Items)
+            {
+                if (li.Tag != null)
+                {
+                    Loadout load = (Loadout)li.Tag;
+                    if (load != null)
+                    {
+                        var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
+
+                        ws = pck.Workbook.Worksheets.Add(mon.Name);
+                        col = 1;
+                        ws.Cells[1, 2].Value = "Pass";
+                        ws.Cells[1, 3].Value = "Good";
+                        ws.Cells[1, 4].Value = "Std Dev";
+                        ws.Cells[1, 5].Value = "'# This time";
+                        ws.Cells[1, 6].Value = "'# Next time";
+                        ws.Cells[1, 7].Value = "Limit";
+                        row = 2;
+                        for (int i = 0; i < Build.statNames.Length; i++)
+                        {
+                            var stat = Build.statNames[i];
+
+                            if (i <= 3) //SPD
+                            {
+                                ws.Cells[row, col].Value = stat;
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Average(r => r[stat + "flat", 0, false]);
+                                col++;
+                                double av = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Average(r => r[stat + "flat", 0, false]);
+                                ws.Cells[row, col].Value = av;
+                                col++;
+                                double std = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).StandardDeviation(r => r[stat + "flat", 0, false]);
+                                ws.Cells[row, col].Value = std;
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Count();
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] > av - std).Count();
+                                col++;
+                                ws.Cells[row, col].Value = (av - std).ToString("0.##");
+                                
+                                row++;
+                                col = 1;
+                            }
+                            if (i != 3)
+                            {
+                                ws.Cells[row, col].Value = stat + " %";
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Average(r => r[stat + "perc", 0, false]);
+                                col++;
+                                double av = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Average(r => r[stat + "perc", 0, false]);
+                                ws.Cells[row, col].Value = av;
+                                col++;
+                                double std = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).StandardDeviation(r => r[stat + "perc", 0, false]);
+                                ws.Cells[row, col].Value = std;
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Count();
+                                col++;
+                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] > av - std).Count();
+                                col++;
+                                ws.Cells[row, col].Value = (av - std).ToString("0.##");
+
+                                row++;
+                                col = 1;
+                            }
+
+                        }
+
+                    }
+                }
+            }
+
+            pck.Save();
+
+        }
 
         void GenerateStats()
         {
@@ -1252,7 +1494,8 @@ namespace RuneApp
 
 		private void toolStripButton17_Click(object sender, EventArgs e)
 		{
-                GenerateStats();
+            GenerateStats();
+            GenerateExcel();
 		}
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)

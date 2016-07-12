@@ -24,6 +24,17 @@ namespace RuneApp
             Application.Run(new Main());
         }
 
+        public static double StandardDeviation<T>(this IEnumerable<T> src, Func<T, double> selector)
+        {
+            double av = src.Average(selector);
+            List<double> nls = new List<double>();
+            foreach (var o in src.Where(p => selector(p) != 0))
+            {
+                nls.Add((selector(o) - av)*(selector(o) - av));
+            }
+            double avs = nls.Average();
+            return Math.Sqrt(avs);
+        }
 
     }
 }
