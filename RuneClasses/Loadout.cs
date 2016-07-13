@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace RuneOptim
 {
@@ -11,6 +12,12 @@ namespace RuneOptim
         Unknown,
         Worse,
         Better
+    }
+
+    public class RuneUsage
+    {
+        public ConcurrentDictionary<Rune, byte> runesUsed = new ConcurrentDictionary<Rune, byte>();
+        public ConcurrentDictionary<Rune, byte> runesGood = new ConcurrentDictionary<Rune, byte>();
     }
 
     public class Loadout
@@ -25,7 +32,9 @@ namespace RuneOptim
 
         public Stats shrines = new Stats();
         public Stats leader = new Stats();
-        
+
+        public RuneUsage runeUsage = new RuneUsage();
+
         // Debugging niceness
         public override string ToString()
         {
