@@ -16,6 +16,7 @@ using System.Net;
 using System.Reflection;
 using System.Configuration;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace RuneApp
 {
@@ -36,6 +37,21 @@ namespace RuneApp
 		bool plsDie = false;
 		public static Help help = null;
 
+        public static bool makeStats = true;
+        public static bool MakeStats
+        {
+            get
+            {
+                if (config != null && config.AppSettings.Settings.AllKeys.Contains("nostats"))
+                {
+                    bool tstats = false;
+                    if (bool.TryParse(Main.config.AppSettings.Settings["nostats"].Value, out tstats))
+                        makeStats = !tstats;
+                }
+                return makeStats;
+            }
+        }
+
 		public Main()
         {
             InitializeComponent();
@@ -52,6 +68,12 @@ namespace RuneApp
                 // this?
                 if (Main.config.AppSettings.Settings.AllKeys.Contains("noupdate"))
                     bool.TryParse(Main.config.AppSettings.Settings["noupdate"].Value, out dontupdate);
+                if (Main.config.AppSettings.Settings.AllKeys.Contains("nostats"))
+                {
+                    bool tstats = false;
+                    if (bool.TryParse(Main.config.AppSettings.Settings["nostats"].Value, out tstats))
+                        makeStats = !tstats;
+                }
 
             }
 
@@ -130,7 +152,7 @@ namespace RuneApp
                 l = new Label();
                 l.Location = new Point(4 + xx, 400 + yy);
                 l.Name = s + "compBefore";
-                l.Text = "15000";
+                l.Text = "";
                 l.Size = new Size(50, 14);
                 groupBox1.Controls.Add(l);
                 xx += 50;
@@ -138,7 +160,7 @@ namespace RuneApp
                 l = new Label();
                 l.Location = new Point(4 + xx, 400 + yy);
                 l.Name = s + "compAfter";
-                l.Text = "30000";
+                l.Text = "";
                 l.Size = new Size(50, 14);
                 groupBox1.Controls.Add(l);
                 xx += 50;
@@ -146,7 +168,7 @@ namespace RuneApp
                 l = new Label();
                 l.Location = new Point(4 + xx, 400 + yy);
                 l.Name = s + "compDiff";
-                l.Text = "+15000";
+                l.Text = "";
                 l.Size = new Size(50, 14);
                 groupBox1.Controls.Add(l);
                 xx += 50;
@@ -164,17 +186,23 @@ namespace RuneApp
         private void ShrineClickSpeed(object sender, EventArgs e)
         {
             var it = (ToolStripMenuItem)sender;
-            foreach (ToolStripMenuItem i in speedToolStripMenuItem.DropDownItems)
+            if (it != null)
             {
-                i.Checked = false;
-            }
-            it.Checked = true;
-            data.shrines.Speed = (int)it.Tag;
-            if (config != null)
-            {
-                config.AppSettings.Settings.Remove("shrineSpeed");
-                config.AppSettings.Settings.Add("shrineSpeed", it.Tag.ToString());
-                config.Save(ConfigurationSaveMode.Modified);
+                foreach (ToolStripMenuItem i in speedToolStripMenuItem.DropDownItems)
+                {
+                    i.Checked = false;
+                }
+                it.Checked = true;
+                if (data == null)
+                    return;
+
+                data.shrines.Speed = (int)it.Tag;
+                if (config != null)
+                {
+                    config.AppSettings.Settings.Remove("shrineSpeed");
+                    config.AppSettings.Settings.Add("shrineSpeed", it.Tag.ToString());
+                    config.Save(ConfigurationSaveMode.Modified);
+                }
             }
         }
 
@@ -804,7 +832,7 @@ namespace RuneApp
             }
         }
 
-        private void RunBuild(ListViewItem pli, bool isBatch = false)
+        private void RunBuild(ListViewItem pli, bool saveStats = false)
         {
             if (plsDie)
                 return;
@@ -831,7 +859,7 @@ namespace RuneApp
                     }
                 }
 
-                b.GenRunes(data, false, useEquipped, isBatch);
+                b.GenRunes(data, false, useEquipped, saveStats);
                 b.shrines = data.shrines;
 
                 string nR = "";
@@ -857,7 +885,7 @@ namespace RuneApp
                     {
                         pli.SubItems[3].Text = str;
                     });
-                }, null, true, isBatch);
+                }, null, true, saveStats);
 
                 if (b.Best == null)
                 {
@@ -1028,9 +1056,10 @@ namespace RuneApp
                 return;
             }
             plsDie = false;
+            
 
             // unlock and remove all current builds
-			foreach (ListViewItem li in listView3.Items)
+            foreach (ListViewItem li in listView3.Items)
 			{
 				Loadout l = (Loadout)li.Tag;
 
@@ -1065,12 +1094,14 @@ namespace RuneApp
 
 				foreach (ListViewItem li in list5)
 				{
-                    RunBuild(li, true);
+                    RunBuild(li, makeStats);
 				}
 
-                GenerateStats();
-                this.Invoke((MethodInvoker) delegate { GenerateExcel(); });
-
+                if (makeStats)
+                {
+                    GenerateStats();
+                    this.Invoke((MethodInvoker)delegate { GenerateExcel(); });
+                }
             }, runSource.Token);
 		}
 
@@ -1092,7 +1123,7 @@ namespace RuneApp
                 {
                     if (status == 0)
                     {
-                        if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can delete it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
+                        if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
                         {
                             status = 1;
                         }
@@ -1152,75 +1183,186 @@ namespace RuneApp
             {
                 if (li.Tag != null)
                 {
+                    var bbs = listView5.Items.OfType<ListViewItem>().Select(lv => lv.Tag).Cast<Build>();
+                    var build = bbs.Where(b => b.ID == int.Parse(li.Text.ToString())).FirstOrDefault();
+
                     Loadout load = (Loadout)li.Tag;
                     if (load != null)
                     {
                         var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
-
-                        ws = pck.Workbook.Worksheets.Add(mon.Name);
+                        var sstrsuf = "";
+                        if (pck.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count() > 0)
+                            sstrsuf = pck.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count().ToString();
+                        ws = pck.Workbook.Worksheets.Add(mon.Name + sstrsuf);
                         col = 1;
                         ws.Cells[1, 2].Value = "Pass";
                         ws.Cells[1, 3].Value = "Good";
                         ws.Cells[1, 4].Value = "Std Dev";
-                        ws.Cells[1, 5].Value = "'# This time";
-                        ws.Cells[1, 6].Value = "'# Next time";
+                        ws.Cells[1, 5].Value = "# This time";
+                        ws.Cells[1, 6].Value = "# Next time";
                         ws.Cells[1, 7].Value = "Limit";
                         row = 2;
-                        for (int i = 0; i < Build.statNames.Length; i++)
+                        for (int slot = -2; slot < 7; slot++)
                         {
-                            var stat = Build.statNames[i];
+                            string sslot = slot.ToString();
+                            if (slot == -1)
+                                sslot = "o";
+                            else if (slot == -2)
+                                sslot = "e";
+                            else if (slot == 0)
+                                sslot = "g";
 
-                            if (i <= 3) //SPD
+                            int wrote = 0;
+
+                            for (int i = 0; i < Build.statNames.Length; i++)
                             {
-                                ws.Cells[row, col].Value = stat;
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Average(r => r[stat + "flat", 0, false]);
-                                col++;
-                                double av = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Average(r => r[stat + "flat", 0, false]);
-                                ws.Cells[row, col].Value = av;
-                                col++;
-                                double std = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).StandardDeviation(r => r[stat + "flat", 0, false]);
-                                ws.Cells[row, col].Value = std;
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] != 0).Count();
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "flat", 0, false] > av - std).Count();
-                                col++;
-                                ws.Cells[row, col].Value = (av - std).ToString("0.##");
-                                
-                                row++;
-                                col = 1;
+                                var stat = Build.statNames[i];
+
+                                if (i <= 3) //SPD
+                                {
+                                    var qqw = new Dictionary<string, RuneFilter>();
+                                    bool writeIt = false;
+                                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                                    {
+                                        if (qqw.ContainsKey(stat))
+                                        {
+                                            writeIt = qqw[stat].Flat > 0;
+                                        }
+                                    }
+
+                                    if (true)
+                                    {
+                                        WriteRune(ws, ref row, ref col, stat, "", "flat", load, build, slot);
+                                        row++;
+                                        wrote++;
+                                    }
+                                    col = 1;
+                                }
+                                if (i != 3)
+                                {
+                                    var qqw = new Dictionary<string, RuneFilter>();
+                                    bool writeIt = false;
+                                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                                    {
+                                        if (qqw.ContainsKey(stat))
+                                        {
+                                            writeIt = qqw[stat].Percent > 0;
+                                        }
+                                    }
+
+                                    if (true)
+                                    {
+                                        WriteRune(ws, ref row, ref col, stat, " %", "perc", load, build, slot);
+                                        row++;
+                                        wrote++;
+                                    }
+                                    col = 1;
+                                }
                             }
-                            if (i != 3)
+                            if (wrote > 0)
                             {
-                                ws.Cells[row, col].Value = stat + " %";
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Average(r => r[stat + "perc", 0, false]);
-                                col++;
-                                double av = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Average(r => r[stat + "perc", 0, false]);
-                                ws.Cells[row, col].Value = av;
-                                col++;
-                                double std = load.runeUsage.runesGood.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).StandardDeviation(r => r[stat + "perc", 0, false]);
-                                ws.Cells[row, col].Value = std;
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] != 0).Count();
-                                col++;
-                                ws.Cells[row, col].Value = load.runeUsage.runesUsed.Select(r => r.Key).Where(r => r[stat + "perc", 0, false] > av - std).Count();
-                                col++;
-                                ws.Cells[row, col].Value = (av - std).ToString("0.##");
-
-                                row++;
-                                col = 1;
+                                if (slot == 0)
+                                    ws.Cells[row - wrote - 1, col].Value = "Global";
+                                else if (slot == -1)
+                                    ws.Cells[row - wrote - 1, col].Value = "Odds";
+                                else if (slot == -2)
+                                    ws.Cells[row - wrote - 1, col].Value = "Evens";
+                                else
+                                    ws.Cells[row - wrote - 1, col].Value = slot;
                             }
-
+                            row++;
                         }
-
                     }
                 }
             }
 
             pck.Save();
+        }
 
+        void WriteRune(ExcelWorksheet ws, ref int row, ref int col, string stat, string hpref, string ssuff, Loadout load, Build build, int slot)
+        {
+            // slot 0 = global, -1 = odd, -2 even
+            Func<int, bool> aslot = (a) => { return true; };
+            string sslot = "g";
+            if (slot > 0)
+            {
+                aslot = (a) => { return a == slot; };
+                sslot = slot.ToString();
+            }
+            else if (slot == -1)
+            {
+                aslot = (a) => { return a % 2 == 1; };
+                sslot = "o";
+            }
+            else if (slot == -2)
+            {
+                aslot = (a) => { return a % 2 == 0; };
+                sslot = "e";
+            }
+
+            ws.Cells[row, col].Value = stat + hpref;
+            col++;
+
+            int pred = build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key : 0;
+
+            var used = load.runeUsage.runesUsed.Select(r => r.Key);
+            var usedSlot = used.Where(r => aslot(r.Slot));
+            var usedFilt = usedSlot.Where(r => r[stat + ssuff, pred, false] != 0);
+
+            var good = load.runeUsage.runesGood.Select(r => r.Key);
+            var goodSlot = good.Where(r => aslot(r.Slot));
+            var goodFilt = goodSlot.Where(r => r[stat + ssuff, pred, false] != 0);
+
+            if (usedFilt.Count() > 0)
+                ws.Cells[row, col].Value = usedFilt.Average(r => r[stat + ssuff, pred, false]);
+            col++;
+
+            double av = 0;
+            if (goodFilt.Count() > 0)
+                av = goodFilt.Average(r => r[stat + ssuff, pred, false]);
+            ws.Cells[row, col].Value = av;
+            col++;
+
+            double std = 0;
+            if (goodFilt.Count() > 0)
+                std = goodFilt.StandardDeviation(r => r[stat + ssuff, pred, false]);
+            ws.Cells[row, col].Value = std;
+            col++;
+
+            ws.Cells[row, col].Value = usedFilt.Count();
+            col++;
+
+            ws.Cells[row, col].Value = usedFilt.Where(r => r[stat + ssuff, pred, false] >= av - std).Count();
+            col++;
+
+            ws.Cells[row, col].Value = (av - std).ToString("0.##");
+            col++;
+
+            //col++;
+            foreach (var r in usedSlot)
+            {
+                col++;
+                var rval = r[stat + ssuff, pred, false];
+
+                if (rval > 0)
+                {
+                    ws.Cells[row, col].Value = rval;
+                    if (load.runeUsage.runesGood.ContainsKey(r))
+                    {
+                        ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                        if (rval < av - std)
+                            ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
+
+                    }
+                    else if (rval < av - std)
+                    {
+                        ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    }
+                }
+            }
+            
         }
 
         void GenerateStats()

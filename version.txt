@@ -1,7 +1,7 @@
-0.1.4.0
+0.1.4.1
 https://github.com/Skibisky/RuneManager/releases/latest
-Fixed a bug which prevented creating builds if you had no builds.
+BEFORE vs AFTER stats preview (doesn't count shrine/lead?)
+EHPDB updated: 50% > 70% per ingame help.
+Generating Runestats is optional (default off).
+Runestats is now an XLSX and gives a page per mon.
 0.1.3.0: Option to download L40 / Awakened stats.
-Colours mon list by build/storage/meh.
-Can specify x2 runesets (eg. Revenge)
-0.1.2.0: User Manual / Help

@@ -390,15 +390,15 @@ namespace RuneOptim
         {
             {Attr.HealthFlat, new int[] { 20, 90, 160, 222, 279, 365 } },
             {Attr.AttackFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
-            {Attr.DefenseFlat, new int[] { 3,4,6, 9, 15, 23 } },
-            {Attr.Speed, new int[] { 1,2,3,4, 5, 6} },
+            {Attr.DefenseFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
+            {Attr.Speed, new int[] { 1, 2, 3, 4, 5, 6} },
 
             {Attr.HealthPercent, new int[] { 3, 4, 5, 6, 7, 8} },
             {Attr.AttackPercent, new int[] { 3, 4, 5, 6, 7, 8} },
             {Attr.DefensePercent, new int[] { 3, 4, 5, 6, 7, 8 } },
 
-            { Attr.CritRate, new int[] { 1,2,3,4, 5, 6 } },
-            { Attr.CritDamage, new int[] { 2,3,4,5, 6, 7 } },
+            { Attr.CritRate, new int[] { 1, 2, 3, 4, 5, 6 } },
+            { Attr.CritDamage, new int[] { 2, 3, 4, 5, 6, 7 } },
 
             {Attr.Resistance, new int[] { 3, 4, 5, 6, 7, 8 } },
             {Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },

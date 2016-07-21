@@ -37,6 +37,7 @@ namespace RuneApp
             AddCheck("locktest", cGenLockTest);
             AddCheck("splitassign", cDisplaySplit);
             AddCheck("noupdate", cOtherUpdate);
+            AddCheck("nostats", cOtherStats);
             AddCheck("testgray", cDisplayGray);
 
             AddNum("testGen", gTestRun);

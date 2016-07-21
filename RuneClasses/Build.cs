@@ -424,7 +424,7 @@ namespace RuneOptim
                                             foreach (Rune r in test.Current.runes)
                                             {
                                                 r.manageStats_LoadGen++;
-                                                usage.runeUsage.runesUsed.AddOrUpdate(r, 1, (key, ov) => 1);
+                                                usage.runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                             }
                                         }
 
@@ -475,7 +475,7 @@ namespace RuneOptim
                                                 foreach (Rune r in test.Current.runes)
                                                 {
                                                     r.manageStats_LoadFilt++;
-                                                    usage.runeUsage.runesGood.AddOrUpdate(r, 1, (key, ov) => 1);
+                                                    usage.runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                                 }
                                             }
 

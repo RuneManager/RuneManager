@@ -26,7 +26,7 @@ namespace RuneApp
 
         public static double StandardDeviation<T>(this IEnumerable<T> src, Func<T, double> selector)
         {
-            double av = src.Average(selector);
+            double av = src.Where(p => selector(p) != 0).Average(selector);
             List<double> nls = new List<double>();
             foreach (var o in src.Where(p => selector(p) != 0))
             {

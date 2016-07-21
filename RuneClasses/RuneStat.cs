@@ -32,5 +32,9 @@ namespace RuneOptim
             return rhs.Value;
         }
 
+        public override string ToString()
+        {
+            return stat + " " + Value;
+        }
     }
 }

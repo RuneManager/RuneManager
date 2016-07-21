@@ -43,12 +43,14 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.button1 = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
+            this.cOtherStats = new System.Windows.Forms.CheckBox();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.cOtherStats);
             this.tabPage1.Controls.Add(this.label5);
             this.tabPage1.Controls.Add(this.gTestShow);
             this.tabPage1.Controls.Add(this.label4);
@@ -209,6 +211,17 @@
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
+            // cOtherStats
+            // 
+            this.cOtherStats.AutoSize = true;
+            this.cOtherStats.Location = new System.Drawing.Point(465, 42);
+            this.cOtherStats.Name = "cOtherStats";
+            this.cOtherStats.Size = new System.Drawing.Size(160, 17);
+            this.cOtherStats.TabIndex = 6;
+            this.cOtherStats.Text = "Disable runestats generation";
+            this.cOtherStats.UseVisualStyleBackColor = true;
+            this.cOtherStats.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+            // 
             // Options
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -243,5 +256,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox gTestShow;
         private System.Windows.Forms.Button btnHelp;
+        private System.Windows.Forms.CheckBox cOtherStats;
     }
 }
