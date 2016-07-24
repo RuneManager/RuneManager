@@ -74,7 +74,6 @@ namespace RuneApp
                     if (bool.TryParse(Main.config.AppSettings.Settings["nostats"].Value, out tstats))
                         makeStats = !tstats;
                 }
-
             }
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };

@@ -100,5 +100,10 @@ namespace RuneOptim
 
             return EquipCompare.Better;
         }
+
+        public override string ToString()
+        {
+            return ID + " " + Name + " lvl. " + level;
+        }
     }
 }
