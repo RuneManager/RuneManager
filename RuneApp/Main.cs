@@ -983,7 +983,8 @@ namespace RuneApp
             foreach (ListViewItem li in lbs)
             {
                 var bb = (Build)li.Tag;
-                bb.MonName = bb.mon.Name;
+				if (bb.mon.Name != "Missingno")
+					bb.MonName = bb.mon.Name;
                 builds.Add(bb);
             }
 
@@ -1436,7 +1437,8 @@ namespace RuneApp
 			foreach (ListViewItem li in lbs)
 			{
 				var bb = (Build)li.Tag;
-				bb.MonName = bb.mon.Name;
+				if (bb.mon.Name != "Missingno")
+					bb.MonName = bb.mon.Name;
 				builds.Add(bb);
 			}
 

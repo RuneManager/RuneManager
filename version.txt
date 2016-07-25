@@ -1,5 +1,7 @@
-0.1.4.1
+0.1.4.2
 https://github.com/Skibisky/RuneManager/releases/latest
+Slight fix to keep builds safer.
+0.1.4.1:
 BEFORE vs AFTER stats preview (doesn't count shrine/lead?)
 EHPDB updated: 50% > 70% per ingame help.
 Generating Runestats is optional (default off).
