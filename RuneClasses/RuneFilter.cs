@@ -11,9 +11,9 @@ namespace RuneOptim
     // Per-stat filter
     public class RuneFilter
     {
-        public int Flat = 0; // div flat by
-        public int Percent = 0; // div percent by
-        public int Test = 0; // sum both >= test
+        public double Flat = 0; // div flat by
+        public double Percent = 0; // div percent by
+        public double Test = 0; // sum both >= test
 
         // for debugging niceness
         public override string ToString()
@@ -34,7 +34,7 @@ namespace RuneOptim
         }
 
         // Returns the smaller int that's not zero
-        private static int MinNZero(int a, int b)
+        private static double MinNZero(double a, double b)
         {
             if (a != 0)
             {
@@ -49,7 +49,7 @@ namespace RuneOptim
         }
 
         // speedy iterating
-        public int this[string stat]
+        public double this[string stat]
         {
             get
             {

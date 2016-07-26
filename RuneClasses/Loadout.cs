@@ -252,15 +252,18 @@ namespace RuneOptim
         }
 
         // Removes the rune from slot
-        public void RemoveRune(int slot)
+        public Rune RemoveRune(int slot)
         {
             // don't bother if there was none
             if (runes[slot - 1] == null)
-                return;
+                return null;
+
+            var r = runes[slot - 1];
 
             runes[slot - 1] = null;
             runeCount--;
             CheckSets();
+            return r;
         }
 
         // Check what sets are completed in this build

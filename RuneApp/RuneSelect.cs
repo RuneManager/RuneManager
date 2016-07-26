@@ -74,7 +74,7 @@ namespace RuneApp
                         fr.AddRange(build.runes[5]);
                         break;
                     default:
-                        int slotn = int.Parse(slot);
+                        int slotn = int.Parse(slot)-1;
                         fr.AddRange(build.runes[slotn]);
                         break;
                 }

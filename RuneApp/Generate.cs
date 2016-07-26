@@ -24,6 +24,8 @@ namespace RuneApp
         // the build to use
 		public Build build = null;
 
+        private RuneControl lastclicked = null;
+
         // if making builds
 		bool building = false;
 
@@ -47,11 +49,13 @@ namespace RuneApp
 			Label label = null;
             TextBox textBox = null;
 
+            runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
+
             // cool clicky thing
             var sorter = new ListViewSort();
             // sort decending on POINTS
             sorter.OnColumnClick(0, false);
-            listView1.ListViewItemSorter = sorter;
+            loadoutList.ListViewItemSorter = sorter;
             
             // place controls in a nice grid-like manner
 			int x, y;
@@ -79,7 +83,7 @@ namespace RuneApp
 
 				y += 22;
 
-                listView1.Columns.Add(stat).Width = 80;
+                loadoutList.Columns.Add(stat).Width = 80;
 			}
             foreach (string extra in extraNames)
             {
@@ -103,7 +107,7 @@ namespace RuneApp
 
                 y += 22;
 
-                listView1.Columns.Add(extra).Width = 80;
+                loadoutList.Columns.Add(extra).Width = 80;
             }
 
 			toolStripStatusLabel1.Text = "Generating...";
@@ -154,7 +158,7 @@ namespace RuneApp
 					Invoke((MethodInvoker)delegate
 					{
                         // put the thing in on the main thread and bump the progress bar
-						listView1.Items.Add(li);
+						loadoutList.Items.Add(li);
                         num++;
 						toolStripProgressBar1.Value = buildsShow + (int)(buildsShow * num / (double)tbuilds);
 					});
@@ -162,7 +166,7 @@ namespace RuneApp
 
 				Invoke((MethodInvoker)delegate
 				{
-					toolStripStatusLabel1.Text = "Generated " + listView1.Items.Count + " builds";
+					toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
 					building = false;
 				});
 
@@ -191,11 +195,11 @@ namespace RuneApp
                 build.Sort.ExtraSet(extra, val);
             }
             // "sort" as in, recalculate the whole number
-            foreach (ListViewItem li in listView1.Items)
+            foreach (ListViewItem li in loadoutList.Items)
             {
                 ListItemSort(li);
             }
-            var lv = (ListView)listView1;
+            var lv = (ListView)loadoutList;
             var lvs = (ListViewSort)(lv).ListViewItemSorter;
             lvs.OnColumnClick(0, false, true);
             // actually sort the list, on points
@@ -267,6 +271,7 @@ namespace RuneApp
             DialogResult = System.Windows.Forms.DialogResult.OK;
             Close();
         }
+
         private void button2_Click(object sender, EventArgs e)
         {
             // things were :(
@@ -276,10 +281,10 @@ namespace RuneApp
 
         private void listView1_DoubleClick(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count > 0)
+            if (loadoutList.SelectedItems.Count > 0)
             {
-                ListViewItem lit = listView1.Items[0];
-                ListViewItem lis = listView1.SelectedItems[0];
+                ListViewItem lit = loadoutList.Items[0];
+                ListViewItem lis = loadoutList.SelectedItems[0];
 
                 if (lit == lis)
                     return;
@@ -353,5 +358,116 @@ namespace RuneApp
             Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
             Main.help.Show();
         }
+
+        private void rune_Click(object sender, EventArgs e)
+        {
+            foreach (RuneControl t in runes)
+            {
+                t.Gamma = 1;
+                t.Refresh();
+            }
+
+            RuneControl tc = ((RuneControl)sender);
+            lastclicked = tc;
+            if (tc.Tag != null)
+            {
+                tc.Gamma = 1.4f;
+                tc.Refresh();
+                rune_Stats((Rune)tc.Tag);
+                runeBuild.Show();
+                runeShown.SetRune((Rune)tc.Tag);
+            }
+            else
+            {
+                tc.Hide();
+                runeBuild.Hide();
+            }
+        }
+
+        private void rune_Stats(Rune rune)
+        {
+            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue) + " " + rune.ID;
+            SRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
+            SRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
+            SRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
+            SRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
+            SRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
+            SRuneLevel.Text = rune.Level.ToString();
+            SRuneMon.Text = rune.AssignedName;
+        }
+
+        private void hideRuneBox(object sender, EventArgs e)
+        {
+            runeBuild.Hide();
+            foreach (RuneControl r in runes)
+            {
+                r.Gamma = 1;
+                r.Refresh();
+            }
+            lastclicked = null;
+        }
+
+        private void loadoutList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (loadoutList.FocusedItem != null)
+            {
+                var item = loadoutList.FocusedItem;
+                if (item.Tag != null)
+                {
+                    Monster mon = (Monster)item.Tag;
+                    
+                    ShowRunes(mon.Current.runes);
+                    ShowSets(mon.Current);
+                    if (lastclicked != null)
+                        rune_Click(lastclicked, null);
+                }
+            }
+        }
+        
+        private void ShowSets(Loadout load)
+        {
+            if (load.sets != null)
+            {
+                if (load.sets.Length > 0)
+                    Set1Label.Text = load.sets[0] == RuneSet.Null ? "" : load.sets[0].ToString();
+                if (load.sets.Length > 1)
+                    Set2Label.Text = load.sets[1] == RuneSet.Null ? "" : load.sets[1].ToString();
+                if (load.sets.Length > 2)
+                    Set3Label.Text = load.sets[2] == RuneSet.Null ? "" : load.sets[2].ToString();
+
+                if (!load.SetsFull)
+                {
+                    if (load.sets[0] == RuneSet.Null)
+                        Set1Label.Text = "Broken";
+                    else if (load.sets[1] == RuneSet.Null)
+                        Set2Label.Text = "Broken";
+                    else if (load.sets[2] == RuneSet.Null)
+                        Set3Label.Text = "Broken";
+                }
+            }
+        }
+        
+        private void ShowRunes(Rune[] rune)
+        {
+            runeControl1.SetRune(rune[0]);
+            runeControl2.SetRune(rune[1]);
+            runeControl3.SetRune(rune[2]);
+            runeControl4.SetRune(rune[3]);
+            runeControl5.SetRune(rune[4]);
+            runeControl6.SetRune(rune[5]);
+
+            foreach (RuneControl tc in runes)
+            {
+                if (tc.Tag != null)
+                {
+                    tc.Show();
+                }
+                else
+                {
+                    tc.Hide();
+                }
+            }
+        }
+
     }
 }

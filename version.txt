@@ -1,6 +1,9 @@
-0.1.4.2
+0.1.4.3
 https://github.com/Skibisky/RuneManager/releases/latest
-Slight fix to keep builds safer.
+Decimals in the rune filter.
+Tooltips for less 'No builds', maybe.
+Shows runes in test builds. Shows set names properly (including broken).
+Less breaky. Cleaned some names.
 0.1.4.1:
 BEFORE vs AFTER stats preview (doesn't count shrine/lead?)
 EHPDB updated: 50% > 70% per ingame help.

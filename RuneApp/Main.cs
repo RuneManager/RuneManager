@@ -79,12 +79,12 @@ namespace RuneApp
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
             var sorter = new ListViewSort();
             sorter.OnColumnClick(MonPriority.Index);
-            listView1.ListViewItemSorter = sorter;
-            listView2.ListViewItemSorter = new ListViewSort();
+            dataMonsterList.ListViewItemSorter = sorter;
+            dataRuneList.ListViewItemSorter = new ListViewSort();
 
             sorter = new ListViewSort();
             sorter.OnColumnClick(0);
-            listView5.ListViewItemSorter = sorter;
+            buildList.ListViewItemSorter = sorter;
 
             if (!dontupdate)
             {
@@ -221,11 +221,11 @@ namespace RuneApp
 			}
         }
 
-        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
+        private void monstertab_list_select(object sender, EventArgs e)
         {
-            if (listView1.FocusedItem != null)
+            if (dataMonsterList.FocusedItem != null)
             {
-                var item = listView1.FocusedItem;
+                var item = dataMonsterList.FocusedItem;
                 if (item.Tag != null)
                 {
                     Monster mon = (Monster)item.Tag;
@@ -245,6 +245,30 @@ namespace RuneApp
 
             ShowStats(cur, mon);
             ShowRunes(mon.Current.runes);
+            ShowSets(mon.Current);
+        }
+
+        private void ShowSets(Loadout load)
+        {
+            if (load.sets != null)
+            {
+                if (load.sets.Length > 0)
+                    Set1Label.Text = load.sets[0] == RuneSet.Null ? "" : load.sets[0].ToString();
+                if (load.sets.Length > 1)
+                    Set2Label.Text = load.sets[1] == RuneSet.Null ? "" : load.sets[1].ToString();
+                if (load.sets.Length > 2)
+                    Set3Label.Text = load.sets[2] == RuneSet.Null ? "" : load.sets[2].ToString();
+
+                if (!load.SetsFull)
+                {
+                    if (load.sets[0] == RuneSet.Null)
+                        Set1Label.Text = "Broken";
+                    else if (load.sets[1] == RuneSet.Null)
+                        Set2Label.Text = "Broken";
+                    else if (load.sets[2] == RuneSet.Null)
+                        Set3Label.Text = "Broken";
+                }
+            }
         }
 
         private void ShowStats(Stats cur, Stats mon)
@@ -311,7 +335,7 @@ namespace RuneApp
             }
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void loadSaveDialogue(object sender, EventArgs e)
         {
             int size = -1;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -366,8 +390,8 @@ namespace RuneApp
         public int LoadFile(string fname)
         {
             string text = File.ReadAllText(fname);
-            listView1.Items.Clear();
-            listView2.Items.Clear();
+            dataMonsterList.Items.Clear();
+            dataRuneList.Items.Clear();
             listView4.Items.Clear();
 
             LoadJSON(text);
@@ -400,7 +424,7 @@ namespace RuneApp
                 File.Copy("builds.json", destFile);
                 if (MessageBox.Show("Couldn't locate save.json loading builds.json.\r\nManually locate file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
-                    button1_Click(null, new EventArgs());
+                    loadSaveDialogue(null, new EventArgs());
                 }
                 else
                 {
@@ -421,19 +445,19 @@ namespace RuneApp
 				int id = b.ID;
 				if (b.ID == 0)
 				{
-					id = listView5.Items.Count + 1;
+					id = buildList.Items.Count + 1;
 					b.ID = id;
 				}
                 if (b.priority == 0)
                 {
-                    b.priority = listView5.Items.Count + 1;
+                    b.priority = buildList.Items.Count + 1;
                 }
 				ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "" });
                 li.Tag = b;
-                listView5.Items.Add(li);
+                buildList.Items.Add(li);
 				
 				// ask the enumerable to eat Linq. Unsure why Find(b.mon.Name, false/true) failed here.
-				var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
 				if (lv1li != null)
 				{
 					lv1li.ForeColor = Color.Green;
@@ -492,7 +516,7 @@ namespace RuneApp
 					item.ForeColor = Color.Gray;
 				
                 item.Tag = mon;
-                listView1.Items.Add(item);
+                dataMonsterList.Items.Add(item);
             }
             foreach (Rune rune in data.Runes)
             {
@@ -504,7 +528,9 @@ namespace RuneApp
                     rune.MainValue.ToString()
                 });
                 item.Tag = rune;
-                listView2.Items.Add(item);
+                if (rune.Locked)
+                    item.BackColor = Color.Red;
+                dataRuneList.Items.Add(item);
             }
 
             if (data.shrines == null)
@@ -529,6 +555,16 @@ namespace RuneApp
                 return;
             if (data.Runes != null)
                 toolStripStatusLabel1.Text = "Locked: " + data.Runes.Where(r => r.Locked == true).Count().ToString();
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                foreach (ListViewItem li in dataRuneList.Items)
+                {
+                    var rune = li.Tag as Rune;
+                    if (rune != null)
+                        li.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+                }
+            });
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -551,13 +587,13 @@ namespace RuneApp
                 tc.Gamma = 1.4f;
                 tc.Refresh();
                 rune_Stats((Rune)tc.Tag);
-                runeBox.Show();
+                runeBuild.Show();
                 runeShown.SetRune((Rune)tc.Tag);
             }
             else
             {
                 tc.Hide();
-                runeBox.Hide();
+                runeBuild.Hide();
             }
         }
 
@@ -575,7 +611,7 @@ namespace RuneApp
 
         private void label8_Click(object sender, EventArgs e)
         {
-            runeBox.Hide();
+            runeBuild.Hide();
             foreach (RuneControl r in runes)
             {
                 r.Gamma = 1;
@@ -585,19 +621,19 @@ namespace RuneApp
 
         private void label8_Click_1(object sender, EventArgs e)
         {
-            runeBox2.Hide();
+            runeBox.Hide();
         }
 
-        private void listView2_SelectedIndexChanged(object sender, EventArgs e)
+        private void runetab_list_select(object sender, EventArgs e)
         {
-            if (listView2.FocusedItem != null)
+            if (dataRuneList.FocusedItem != null)
             {
-                var item = listView2.FocusedItem;
+                var item = dataRuneList.FocusedItem;
                 if (item.Tag != null)
                 {
                     Rune rune = (Rune)item.Tag;
 
-                    runeBox2.Show();
+                    runeBox.Show();
                     runeInventory.SetRune(rune);
 
                     IRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
@@ -621,16 +657,16 @@ namespace RuneApp
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
-            if (listView1.FocusedItem != null)
+            if (dataMonsterList.FocusedItem != null)
             {
-                if (listView1.FocusedItem.Tag != null)
+                if (dataMonsterList.FocusedItem.Tag != null)
                 {
-                    Monster mon = (Monster)listView1.FocusedItem.Tag;
+                    Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
                     int maxPri = (int)data.Monsters.Max(x => x.priority);
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
-                        listView1.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
+                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
                     }
                     else if (mon.priority != 1)
                     {
@@ -638,31 +674,31 @@ namespace RuneApp
                         Monster mon2 = data.Monsters.Where(x => x.priority == pri - 1).FirstOrDefault();
                         if (mon2 != null)
                         {
-                            var items = listView1.Items;
-                            ListViewItem listMon = listView1.FindItemWithText(mon2.Name);
+                            var items = dataMonsterList.Items;
+                            ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
                             mon2.priority += 1;
                             listMon.SubItems[MonPriority.Index].Text = mon2.priority.ToString();
                         }
                         mon.priority -= 1;
-                        listView1.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();                        
+                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();                        
                     }
-                    listView1.Sort();
+                    dataMonsterList.Sort();
                 }
             }
         }
 
         private void toolStripButton2_Click(object sender, EventArgs e)
         {
-            if (listView1.FocusedItem != null)
+            if (dataMonsterList.FocusedItem != null)
             {
-                if (listView1.FocusedItem.Tag != null)
+                if (dataMonsterList.FocusedItem.Tag != null)
                 {
-                    Monster mon = (Monster)listView1.FocusedItem.Tag;
+                    Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
                     int maxPri = (int)data.Monsters.Max(x => x.priority);
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
-                        listView1.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
+                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
                     }
                     else if (mon.priority != maxPri)
                     {
@@ -670,15 +706,15 @@ namespace RuneApp
                         Monster mon2 = data.Monsters.Where(x => x.priority == pri + 1).FirstOrDefault();
                         if (mon2 != null)
                         {
-                            var items = listView1.Items;
-                            ListViewItem listMon = listView1.FindItemWithText(mon2.Name);
+                            var items = dataMonsterList.Items;
+                            ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
                             mon2.priority -= 1;
                             listMon.SubItems[MonPriority.Index].Text = mon2.priority.ToString();
                         }
                         mon.priority += 1;
-                        listView1.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();
+                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();
                     }
-                    listView1.Sort();
+                    dataMonsterList.Sort();
                 }
             }
         }
@@ -686,40 +722,43 @@ namespace RuneApp
         private void button2_Click(object sender, EventArgs e)
         {
             tabControl1.SelectTab(tabRunes.Name);
-            filterList(listView2, x => ((Rune)x).Slot == ((Rune)runeShown.Tag).Slot);
+            filterList(dataRuneList, x => ((Rune)x).Slot == ((Rune)runeShown.Tag).Slot);
         }
 
         private void filterList(ListView list, Predicate<object> p)
         {
-            listView2.Items.Clear();
+            dataRuneList.Items.Clear();
             if (data == null)
                 return;
 
             if (data.Runes != null)
-            foreach (Rune rune in data.Runes.Where(x => p.Invoke(x)))
             {
-                ListViewItem item = new ListViewItem(new string[]{
-                    rune.Set.ToString(),
-                    rune.ID.ToString(),
-                    rune.Grade.ToString(),
-                    Rune.StringIt(rune.MainType, true),
-                    rune.MainValue.ToString()
-                });
-                item.Tag = rune;
-                listView2.Items.Add(item);
+                foreach (Rune rune in data.Runes.Where(x => p.Invoke(x)))
+                {
+                    ListViewItem item = new ListViewItem(new string[]{
+                        rune.Set.ToString(),
+                        rune.ID.ToString(),
+                        rune.Grade.ToString(),
+                        Rune.StringIt(rune.MainType, true),
+                        rune.MainValue.ToString()
+                    });
+                    item.Tag = rune;
+                    item.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+                    dataRuneList.Items.Add(item);
+                }
             }
         }
 
-        private void toolStripButton3_Click(object sender, EventArgs e)
+        private void runetab_clearfilter(object sender, EventArgs e)
         {
-            filterList(listView2, x => true);
+            filterList(dataRuneList, x => true);
         }
         
-        private void listView3_SelectedIndexChanged(object sender, EventArgs e)
+        private void loadout_list_select(object sender, EventArgs e)
         {
-            if (listView3.FocusedItem != null)
+            if (loadoutList.FocusedItem != null)
             {
-                var item = listView3.FocusedItem;
+                var item = loadoutList.FocusedItem;
                 if (item.Tag != null)
                 {
                     Loadout load = (Loadout)item.Tag;
@@ -741,10 +780,11 @@ namespace RuneApp
 
                     ShowRunes(load.runes);
                     ShowDiff(data.GetMonster(monid).GetStats(), load.GetStats(mon));
+                    ShowSets(load);
                 }
             }
             int cost = 0;
-            foreach (ListViewItem li in listView3.SelectedItems)
+            foreach (ListViewItem li in loadoutList.SelectedItems)
             {
                 if (li.Tag != null)
                 {
@@ -762,7 +802,7 @@ namespace RuneApp
 
         private void toolStripButton4_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem li in listView3.Items)
+            foreach (ListViewItem li in loadoutList.Items)
             {
                 Loadout l = (Loadout)li.Tag;
 
@@ -771,7 +811,7 @@ namespace RuneApp
                     r.Locked = false;
                 }
 
-                listView3.Items.Remove(li);
+                loadoutList.Items.Remove(li);
             }
             //builds.Clear();
             checkLocked();
@@ -779,14 +819,14 @@ namespace RuneApp
 
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
-            if (listView1.SelectedItems.Count > 0)
+            if (dataMonsterList.SelectedItems.Count > 0)
             {
                 using (var ff = new Create())
                 {
                     var bb = new Build();
                     bb.New = true;
-                    bb.mon = (Monster)listView1.SelectedItems[0].Tag;
-					bb.ID = listView5.Items.Count + 1;
+                    bb.mon = (Monster)dataMonsterList.SelectedItems[0].Tag;
+					bb.ID = buildList.Items.Count + 1;
                     ff.Tag = bb;
                     var res = ff.ShowDialog();
                     if (res == System.Windows.Forms.DialogResult.OK)
@@ -798,10 +838,10 @@ namespace RuneApp
 
                         ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"0%"});
                         li.Tag = ff.build;
-                        listView5.Items.Add(li);
+                        buildList.Items.Add(li);
                         builds.Add(ff.build);
 
-						var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
+						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
 						if (lv1li != null)
 							lv1li.ForeColor = Color.Green;
 					
@@ -812,7 +852,7 @@ namespace RuneApp
 
         private void listView5_DoubleClick(object sender, EventArgs e)
         {
-            var items = listView5.SelectedItems;
+            var items = buildList.SelectedItems;
             if (items.Count > 0)
             {
                 var item = items[0];
@@ -846,7 +886,7 @@ namespace RuneApp
                 currentBuild = b;
 
                 ListViewItem[] olvs = null;
-                Invoke((MethodInvoker)delegate { olvs = listView3.Items.Find(b.ID.ToString(), false); });
+                Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
 
                 if (olvs.Length > 0)
                 {
@@ -924,7 +964,7 @@ namespace RuneApp
 
 					ListViewItem nli;
 
-                    var lvs = listView3.Items.Find(b.ID.ToString(), false);
+                    var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
 
 					if (lvs.Length == 0)
                         nli = new ListViewItem();
@@ -952,7 +992,7 @@ namespace RuneApp
 					nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time/(double)1000).ToString("0.##"));
 
 					if (lvs.Length == 0)
-						listView3.Items.Add(nli);
+						loadoutList.Items.Add(nli);
 
 				});
 
@@ -963,7 +1003,7 @@ namespace RuneApp
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
             plsDie = false;
-            var lis = listView5.SelectedItems;
+            var lis = buildList.SelectedItems;
             if (lis.Count > 0)
             {
                 var li = lis[0];
@@ -978,7 +1018,7 @@ namespace RuneApp
         {
             builds.Clear();
 
-            var lbs = listView5.Items;
+            var lbs = buildList.Items;
 
             foreach (ListViewItem li in lbs)
             {
@@ -994,16 +1034,19 @@ namespace RuneApp
 
         private void toolStripButton10_Click(object sender, EventArgs e)
         {
-            var lis = listView5.SelectedItems;
+            if (MessageBox.Show("This will delete a build (not a loadout)." + Environment.NewLine + "How many minutes of work will be undone?", "Delete Build?", MessageBoxButtons.OKCancel) == DialogResult.Cancel)
+                return;
+
+            var lis = buildList.SelectedItems;
             if (lis.Count > 0)
             {
 				foreach (ListViewItem li in lis)
 				{
-					listView5.Items.Remove(li);
+					buildList.Items.Remove(li);
 					Build b = (Build)li.Tag;
 					if (b != null)
 					{
-						var lv1li = listView1.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
 						if (lv1li != null)
 						{
 							lv1li.ForeColor = Color.Black;
@@ -1022,11 +1065,12 @@ namespace RuneApp
             {
                 r.Locked = false;
             }
+            checkLocked();
         }
 
         private void toolStripButton13_Click(object sender, EventArgs e)
         {
-            var lis = listView3.SelectedItems;
+            var lis = loadoutList.SelectedItems;
             if (lis.Count > 0)
             {
                 var li = lis[0];
@@ -1038,7 +1082,7 @@ namespace RuneApp
                     r.Locked = false;
                 }
 
-                listView3.Items.Remove(li);
+                loadoutList.Items.Remove(li);
             }
             checkLocked();
 		}
@@ -1059,7 +1103,7 @@ namespace RuneApp
             
 
             // unlock and remove all current builds
-            foreach (ListViewItem li in listView3.Items)
+            foreach (ListViewItem li in loadoutList.Items)
 			{
 				Loadout l = (Loadout)li.Tag;
 
@@ -1067,14 +1111,15 @@ namespace RuneApp
 				{
 					r.Locked = false;
 				}
+                checkLocked();
 
-				listView3.Items.Remove(li);
+				loadoutList.Items.Remove(li);
 			}
             builds.Clear();
 
             // collect the builds
 			List<ListViewItem> list5 = new List<ListViewItem>();
-			foreach (ListViewItem li in listView5.Items)
+			foreach (ListViewItem li in buildList.Items)
 			{
 				list5.Add(li);
 
@@ -1102,6 +1147,7 @@ namespace RuneApp
                     GenerateStats();
                     this.Invoke((MethodInvoker)delegate { GenerateExcel(); });
                 }
+                checkLocked();
             }, runSource.Token);
 		}
 
@@ -1179,11 +1225,11 @@ namespace RuneApp
             }
             // write rune stats
 
-            foreach (ListViewItem li in listView3.Items)
+            foreach (ListViewItem li in loadoutList.Items)
             {
                 if (li.Tag != null)
                 {
-                    var bbs = listView5.Items.OfType<ListViewItem>().Select(lv => lv.Tag).Cast<Build>();
+                    var bbs = buildList.Items.OfType<ListViewItem>().Select(lv => lv.Tag).Cast<Build>();
                     var build = bbs.Where(b => b.ID == int.Parse(li.Text.ToString())).FirstOrDefault();
 
                     Loadout load = (Loadout)li.Tag;
@@ -1432,7 +1478,7 @@ namespace RuneApp
 		{
 			builds.Clear();
 
-			var lbs = listView5.Items;
+			var lbs = buildList.Items;
 
 			foreach (ListViewItem li in lbs)
 			{
@@ -1476,11 +1522,11 @@ namespace RuneApp
 
         private void toolStripButton8_Click(object sender, EventArgs e)
         {
-            if (listView5.FocusedItem != null)
+            if (buildList.FocusedItem != null)
             {
-                if (listView5.FocusedItem.Tag != null)
+                if (buildList.FocusedItem.Tag != null)
                 {
-                    Build build = (Build)listView5.FocusedItem.Tag;
+                    Build build = (Build)buildList.FocusedItem.Tag;
 
                     var bb = builds.OrderBy(b => b.priority).ToList();
                     var bi = bb.FindIndex(b => b == build);
@@ -1492,12 +1538,12 @@ namespace RuneApp
                         build.priority = b2.priority;
                         b2.priority = sid;
 
-                        listView5.FocusedItem.SubItems[0].Text = build.priority.ToString();
+                        buildList.FocusedItem.SubItems[0].Text = build.priority.ToString();
 
-                        ListViewItem listmon = listView5.FindItemWithText(b2.mon.Name);
+                        ListViewItem listmon = buildList.FindItemWithText(b2.mon.Name);
                         listmon.SubItems[0].Text = b2.priority.ToString();
 
-                        listView5.Sort();
+                        buildList.Sort();
                     }
                 }
             }
@@ -1505,11 +1551,11 @@ namespace RuneApp
 
         private void toolStripButton16_Click(object sender, EventArgs e)
         {
-            if (listView5.FocusedItem != null)
+            if (buildList.FocusedItem != null)
             {
-                if (listView5.FocusedItem.Tag != null)
+                if (buildList.FocusedItem.Tag != null)
                 {
-                    Build build = (Build)listView5.FocusedItem.Tag;
+                    Build build = (Build)buildList.FocusedItem.Tag;
 
                     var bb = builds.OrderBy(b => b.priority).ToList();
                     var bi = bb.FindIndex(b => b == build);
@@ -1521,12 +1567,12 @@ namespace RuneApp
                         build.priority = b2.priority;
                         b2.priority = sid;
 
-                        listView5.FocusedItem.SubItems[0].Text = build.priority.ToString();
+                        buildList.FocusedItem.SubItems[0].Text = build.priority.ToString();
 
-                        ListViewItem listmon = listView5.FindItemWithText(b2.mon.Name);
+                        ListViewItem listmon = buildList.FindItemWithText(b2.mon.Name);
                         listmon.SubItems[0].Text = b2.priority.ToString();
 
-                        listView5.Sort();
+                        buildList.Sort();
                     }
                 }
             }
@@ -1676,5 +1722,78 @@ namespace RuneApp
             help = new Help();
             help.Show();
         }
-	}
+
+        private void runelistSwapLocked(object sender, EventArgs e)
+        {
+            // swap the selected runes locked state
+            foreach (ListViewItem li in dataRuneList.SelectedItems)
+            {
+                var rune = li.Tag as Rune;
+                if (rune != null)
+                {
+                    if (rune.Locked)
+                    {
+                        rune.Locked = false;
+                        li.BackColor = Color.Transparent;
+                    }
+                    else
+                    {
+                        rune.Locked = true;
+                        li.BackColor = Color.Red;
+                    }
+                }
+            }
+        }
+
+        private void runetab_savebutton_click(object sender, EventArgs e)
+        {
+            // only prompt and backup if the save is str8 outta proxy
+            if (!data.isModified && MessageBox.Show("Changes saved will be lost if you import a new save from the proxy.\n\n", "Save save?", MessageBoxButtons.OKCancel) == DialogResult.OK)
+            {
+                data.isModified = true;
+
+                if (File.Exists("save.json"))
+                {
+                    // backup, just in case
+                    string destFile = Path.Combine("", string.Format("{0}.backup{1}", "save", ".json"));
+                    int num = 2;
+                    while (File.Exists(destFile))
+                    {
+                        destFile = Path.Combine("", string.Format("{0}.backup{1}{2}", "save", num, ".json"));
+                        num++;
+                    }
+
+                    File.Copy("save.json", destFile);
+                }
+            }
+            var str = JsonConvert.SerializeObject(data);
+            File.WriteAllText("save.json", str);
+        }
+        
+        private void unequipMonsterButton_Click(object sender, EventArgs e)
+        {
+            if (data == null)
+                return;
+
+            if (data.Monsters != null)
+            {
+                foreach (ListViewItem li in dataMonsterList.Items)
+                {
+                    Monster mon = li.Tag as Monster;
+                    if (mon != null)
+                    {
+                        for (int i = 1; i < 7; i++)
+                        {
+                            var r = mon.Current.RemoveRune(i);
+                            if (r != null)
+                            {
+                                r.AssignedId = 0;
+                                r.AssignedName = "Unknown name";
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -271,12 +271,6 @@
     <None Include="Resources\refresh.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\down1.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\down11.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\right.png" />
   </ItemGroup>
   <ItemGroup>
@@ -325,6 +319,16 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <Content Include="Resources\boxToMon.png" />
+    <Content Include="Resources\fromMon.png" />
+    <Content Include="Resources\locked.png" />
+    <Content Include="Resources\lockedNo.png" />
+    <Content Include="Resources\mon.png" />
+    <Content Include="Resources\monToBox.png" />
+    <Content Include="Resources\runedial.png" />
+    <Content Include="Resources\toMon.png" />
+    <Content Include="Resources\unlocked.png" />
+    <Content Include="Resources\unlockedYes.png" />
     <Content Include="User Manual\build.html" />
     <Content Include="User Manual\images\builds_list.png" />
     <Content Include="User Manual\images\build_leader.png" />

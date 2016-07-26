@@ -31,7 +31,9 @@ namespace RuneOptim
         Revenge,
         Despair,
         Vampire,
-        Destroy
+        Destroy,
+
+        Broken
     }
 
     // Allows me to steal the JSON values into Enum

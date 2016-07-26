@@ -80,15 +80,15 @@ namespace RuneOptim
         // Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value
         // tab, TYPE, test
         [JsonProperty("runeScoring")]
-        public Dictionary<string, KeyValuePair<int, int>> runeScoring = new Dictionary<string, KeyValuePair<int, int>>();
+        public Dictionary<string, KeyValuePair<int, double>> runeScoring = new Dictionary<string, KeyValuePair<int, double>>();
 
         public bool ShouldSerializeruneScoring()
         {
-            Dictionary<string, KeyValuePair<int, int>> nscore = new Dictionary<string, KeyValuePair<int, int>>();
+            Dictionary<string, KeyValuePair<int, double>> nscore = new Dictionary<string, KeyValuePair<int, double>>();
             foreach (var tabPair in runeScoring)
             {
                 if (tabPair.Value.Key != 0 || tabPair.Value.Value != 0)
-                    nscore.Add(tabPair.Key, new KeyValuePair<int, int>(tabPair.Value.Key, tabPair.Value.Value));
+                    nscore.Add(tabPair.Key, new KeyValuePair<int, double>(tabPair.Value.Key, tabPair.Value.Value));
             }
             runeScoring = nscore;
 
@@ -676,7 +676,7 @@ namespace RuneOptim
                 // which tab we pulled the filter from
                 string gotScore = "";
                 // the value to test SUM against
-                int testVal = 0;
+                double testVal = 0;
 
                 // TODO: check what inheriting SUM (eg. Odd and 3) does
                 // TODO: check what inheriting AND/OR then SUM (or visa versa)

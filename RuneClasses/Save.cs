@@ -47,6 +47,7 @@ namespace RuneOptim
 
         [JsonIgnore]
         public Stats shrines;
-        
+
+        public bool isModified = false;
     }
 }
