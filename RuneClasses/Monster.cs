@@ -34,11 +34,11 @@ namespace RuneOptim
 					// unequip current rune
 					if (Current.runes[i] != null)
 	                    cost += Current.runes[i].UnequipCost;
-					// unequip new rune from host
-					if (l.runes[i].AssignedName != "Unknown name" && l.runes[i].Swapped != true)
-					{
-						cost += l.runes[i].UnequipCost;
-					}
+                    // unequip new rune from host
+                    if ((l.runes[i].AssignedName != "Unknown name" || l.runes[i].AssignedName == "Inventory") && l.runes[i].Swapped != true)
+                    {
+                        cost += l.runes[i].UnequipCost;
+                    }
                 }
             }
             return cost;

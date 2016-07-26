@@ -941,7 +941,7 @@ namespace RuneApp
                     if (r.AssignedName != b.Best.Name)
                     {
                         //if (b.mon.Current.runes[r.Slot - 1] == null)
-                        if (r.AssignedName == "Unknown name")
+                        if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
                             numnew++;
                         else
                             numchanged++;
@@ -1508,7 +1508,7 @@ namespace RuneApp
             foreach (Rune r in data.Runes)
             {
                 r.AssignedId = 0;
-                r.AssignedName = "Unknown name";
+                r.AssignedName = "Inventory";
             }
         }
 
@@ -1788,7 +1788,7 @@ namespace RuneApp
                             if (r != null)
                             {
                                 r.AssignedId = 0;
-                                r.AssignedName = "Unknown name";
+                                r.AssignedName = "Inventory";
                             }
                         }
                     }
