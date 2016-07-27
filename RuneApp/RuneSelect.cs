@@ -43,7 +43,7 @@ namespace RuneApp
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
-                if ((rune.AssignedName != "Unknown name" || returnedRune.AssignedName == "Inventory") && !Main.useEquipped)
+                if ((rune.AssignedName != "Unknown name" || rune.AssignedName == "Inventory") && !Main.useEquipped)
                     item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
