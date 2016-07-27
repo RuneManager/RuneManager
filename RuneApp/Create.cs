@@ -1073,7 +1073,7 @@ namespace RuneApp
             using (RuneSelect rs = new RuneSelect())
             {
                 rs.build = build;
-                rs.slot = ((int)tc.Tag-1).ToString();
+                rs.slot = ((int)tc.Tag).ToString();
                 rs.runes = build.runes[(int)tc.Tag-1];
                 rs.ShowDialog();
             }
