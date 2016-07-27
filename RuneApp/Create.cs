@@ -1490,6 +1490,7 @@ namespace RuneApp
 
         private void button2_Click(object sender, EventArgs e)
         {
+            if (AnnoyUser()) return;
             DialogResult = System.Windows.Forms.DialogResult.OK;
             Close();
         }
@@ -1504,17 +1505,8 @@ namespace RuneApp
             UpdateGlobal();
         }
 
-        private void global_CheckChanged(object sender, EventArgs e)
+        private bool AnnoyUser()
         {
-            CheckBox check = (CheckBox)sender;
-            
-            UpdateGlobal();
-        }
-
-        private void testBuildClick(object sender, EventArgs e)
-        {
-            if (build == null)
-                return;
 
             if (build.runeFilters == null)
             {
@@ -1523,7 +1515,7 @@ namespace RuneApp
                 tooltipBadRuneFilter.IsBalloon = true;
                 tooltipBadRuneFilter.Show(string.Empty, ctrl);
                 tooltipBadRuneFilter.Show("Filters are nice", ctrl);
-                return;
+                return true;
             }
 
             foreach (var tbf in build.runeFilters)
@@ -1551,7 +1543,7 @@ namespace RuneApp
                                         tooltipBadRuneFilter.IsBalloon = true;
                                         tooltipBadRuneFilter.Show(string.Empty, ctrl);
                                         tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
-                                        return;
+                                        return true;
                                     }
                                 }
                             }
@@ -1565,7 +1557,7 @@ namespace RuneApp
                                     tooltipBadRuneFilter.IsBalloon = true;
                                     tooltipBadRuneFilter.Show(string.Empty, ctrl);
                                     tooltipBadRuneFilter.Show("Counts for what?", ctrl, 0);
-                                    return;
+                                    return true;
                                 }
                             }
                         }
@@ -1580,7 +1572,7 @@ namespace RuneApp
                             tooltipBadRuneFilter.IsBalloon = true;
                             tooltipBadRuneFilter.Show(string.Empty, ctrl);
                             tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
-                            return;
+                            return true;
                         }
                     }
                 }
@@ -1594,7 +1586,7 @@ namespace RuneApp
                     tooltipNoSorting.IsBalloon = true;
                     tooltipNoSorting.Show(string.Empty, ctrl);
                     tooltipNoSorting.Show("Enter a value somewhere, please.\nLike 1 or 3.14", ctrl, 0);
-                    return;
+                    return true;
                 }
             }
 
@@ -1603,7 +1595,7 @@ namespace RuneApp
                 tooltipSets.IsBalloon = true;
                 tooltipSets.Show(string.Empty, setList);
                 tooltipSets.Show("No sets", setList, 0);
-                return;
+                return true;
             }
             else
             {
@@ -1612,7 +1604,7 @@ namespace RuneApp
                     tooltipSets.IsBalloon = true;
                     tooltipSets.Show(string.Empty, setList);
                     tooltipSets.Show("No sets", setList, 0);
-                    return;
+                    return true;
                 }
                 if (!build.AllowBroken)
                 {
@@ -1630,7 +1622,7 @@ namespace RuneApp
                         tooltipSets.IsBalloon = true;
                         tooltipSets.Show(string.Empty, setList);
                         tooltipSets.Show("Need 2 and 4 set for non-broken", setList, 0);
-                        return;
+                        return true;
                     }
                 }
             }
@@ -1640,9 +1632,24 @@ namespace RuneApp
                 tooltipBadRuneFilter.IsBalloon = true;
                 tooltipBadRuneFilter.Show(string.Empty, runeNums);
                 tooltipBadRuneFilter.Show("No builds\nAdd more sets, lax your rune filters, or unlock runes.", runeNums, 0);
-                return;
+                return true;
             }
+            return false;
+        }
+
+        private void global_CheckChanged(object sender, EventArgs e)
+        {
+            CheckBox check = (CheckBox)sender;
             
+            UpdateGlobal();
+        }
+
+        private void testBuildClick(object sender, EventArgs e)
+        {
+            if (build == null)
+                return;
+
+            if (AnnoyUser()) return;
 
             if (MessageBox.Show("This will generate builds", "Continue?", MessageBoxButtons.OKCancel) == System.Windows.Forms.DialogResult.OK)
             {

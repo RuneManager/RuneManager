@@ -38,6 +38,7 @@ namespace RuneApp
 		public static Help help = null;
 
         public static bool makeStats = true;
+
         public static bool MakeStats
         {
             get
@@ -779,7 +780,18 @@ namespace RuneApp
                     ShowStats(load.GetStats(mon), mon);
 
                     ShowRunes(load.runes);
-                    ShowDiff(data.GetMonster(monid).GetStats(), load.GetStats(mon));
+
+                    var dmon = data.GetMonster(monid);
+                    var dmonld = dmon.Current.leader;
+                    var dmonsh = dmon.Current.shrines;
+                    dmon.Current.leader = load.leader;
+                    dmon.Current.shrines = load.shrines;
+
+                    ShowDiff(dmon.GetStats(), load.GetStats(mon));
+
+                    dmon.Current.leader = dmonld;
+                    dmon.Current.shrines = dmonsh;
+
                     ShowSets(load);
                 }
             }

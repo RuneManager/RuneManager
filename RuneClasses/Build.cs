@@ -371,7 +371,7 @@ namespace RuneOptim
                 isRun = true;
 
                 Loadout usage = new Loadout();
-
+                
                 // Parallel the outer loop
                 var loopRes = Parallel.ForEach<Rune>(runes[0], (r0, loopState) =>
                 {

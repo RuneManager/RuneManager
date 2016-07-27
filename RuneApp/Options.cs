@@ -34,6 +34,8 @@ namespace RuneApp
         {
             InitializeComponent();
 
+            FormClosing += Options_FormClosing;
+
             AddCheck("locktest", cGenLockTest);
             AddCheck("splitassign", cDisplaySplit);
             AddCheck("noupdate", cOtherUpdate);
@@ -66,6 +68,11 @@ namespace RuneApp
                 }
             }
             loading = false;
+        }
+
+        private void Options_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            var s = Main.MakeStats;
         }
 
         private void button1_Click(object sender, EventArgs e)
