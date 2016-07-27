@@ -1777,7 +1777,7 @@ namespace RuneApp
 
             if (data.Monsters != null)
             {
-                foreach (ListViewItem li in dataMonsterList.Items)
+                foreach (ListViewItem li in dataMonsterList.SelectedItems)
                 {
                     Monster mon = li.Tag as Monster;
                     if (mon != null)
