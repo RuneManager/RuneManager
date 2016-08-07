@@ -20,6 +20,13 @@ namespace RuneOptim
         public ConcurrentDictionary<Rune, byte> runesGood = new ConcurrentDictionary<Rune, byte>();
     }
 
+    public class BuildUsage
+    {
+        public int failed = 0;
+        public int passed = 0;
+        public List<Monster> loads;
+    }
+
     public class Loadout
     {
         public Rune[] runes = new Rune[6];
@@ -30,10 +37,38 @@ namespace RuneOptim
         public int[] FakeLevel = new int[6];
         public bool[] PredictSubs = new bool[6];
 
-        public Stats shrines = new Stats();
-        public Stats leader = new Stats();
+        public Stats Shrines
+        {
+            get
+            {
+                return shrines;
+            }
+            set
+            {
+                shrines = value;
+                changed = true;
+            }
+        }
+        public Stats Leader
+        {
+            get
+            {
+                return leader;
+            }
+            set
+            {
+                leader = value;
+                changed = true;
+            }
+        }
 
+        private Stats shrines = new Stats();
+        private Stats leader = new Stats();
+
+        public BuildUsage buildUsage = new BuildUsage();
         public RuneUsage runeUsage = new RuneUsage();
+
+        public bool changed = false;
 
         // Debugging niceness
         public override string ToString()
@@ -243,6 +278,8 @@ namespace RuneOptim
             if (rune == null)
                 return;
 
+            changed = true;
+
             if (runes[rune.Slot - 1] == null)
                 runeCount++;
 
@@ -257,6 +294,8 @@ namespace RuneOptim
             // don't bother if there was none
             if (runes[slot - 1] == null)
                 return null;
+
+            changed = true;
 
             var r = runes[slot - 1];
 

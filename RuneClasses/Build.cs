@@ -201,6 +201,35 @@ namespace RuneOptim
             return leader.NonZero();
         }
 
+        public static double sort (Build build, Stats m)
+        {
+            double pts = 0;
+
+            foreach (string stat in statNames)
+            {
+                // if this stat is used for sorting
+                if (build.Sort[stat] != 0)
+                {
+                    // sum points for the stat
+                    pts += m[stat] / build.Sort[stat];
+                    // if exceeding max, subtracted the gained points and then some
+                    if (build.Threshold[stat] != 0)
+                        pts -= Math.Max(0, m[stat] - build.Threshold[stat]) / build.Sort[stat];
+                }
+            }
+            // look, cool metrics!
+            foreach (string extra in extraNames)
+            {
+                if (build.Sort.ExtraGet(extra) != 0)
+                {
+                    pts += m.ExtraValue(extra) / build.Sort.ExtraGet(extra);
+                    if (build.Threshold.ExtraGet(extra) != 0)
+                        pts -= Math.Max(0, m.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
+                }
+            }
+            return pts;
+        }
+
         /// <summary>
         /// Generates builds based on the instances variables.
         /// </summary>
@@ -406,8 +435,8 @@ namespace RuneOptim
                                             break;
 
                                         Monster test = new Monster(mon);
-                                        test.Current.shrines = shrines;
-                                        test.Current.leader = leader;
+                                        test.Current.Shrines = shrines;
+                                        test.Current.Leader = leader;
 
                                         test.Current.FakeLevel = slotFakes;
                                         test.Current.PredictSubs = slotPred;
@@ -501,6 +530,11 @@ namespace RuneOptim
                                                         Best = test;
                                                         tests.Add(test);
                                                     }
+                                                    // keep it for spreadsheeting
+                                                    else if (saveStats)
+                                                    {
+                                                        tests.Add(test);
+                                                    }
                                                 }
                                             }
                                         }
@@ -524,11 +558,21 @@ namespace RuneOptim
                                                 }
                                             }
                                         }
+
+                                        if (tests.Count > 500000)
+                                        {
+                                            isRun = false;
+                                            if (printTo != null)
+                                                printTo.Invoke("Too many");
+                                            break;
+                                        }
                                     }
                                     // sum up what work we've done
                                     Interlocked.Add(ref total, -kill);
+                                    Interlocked.Add(ref usage.buildUsage.failed, kill);
                                     kill = 0;
                                     Interlocked.Add(ref count, plus);
+                                    Interlocked.Add(ref usage.buildUsage.passed, plus);
                                     plus = 0;
 
                                     // if we've got enough, stop
@@ -551,8 +595,10 @@ namespace RuneOptim
                     progTo.Invoke(1);
 
                 // sort *all* the builds
-                loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1));
+                loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();
 
+                usage.buildUsage.loads = tests.ToList();
+                
                 // dump everything to console, if nothing to print to
                 if (printTo == null)
                     foreach (var l in loads)
@@ -573,6 +619,7 @@ namespace RuneOptim
                     // remember the good one
                     Best = loads.First();
                     Best.Current.runeUsage = usage.runeUsage;
+                    Best.Current.buildUsage = usage.buildUsage;
                     foreach (Rune r in Best.Current.runes)
                     {
                         r.manageStats_In = true;
@@ -583,6 +630,10 @@ namespace RuneOptim
                             mon.Current.runes[i].Swapped = true;
                     }
                 }
+
+                //loads = null;
+                tests.Clear();
+                tests = null;
             }
             catch (Exception e)
             {
@@ -800,9 +851,12 @@ namespace RuneOptim
                     if (rf.NonZero)
                     {
                         // put the most relevant divisor in?
-                        rFlat[stat] = rf.Flat;
-                        rPerc[stat] = rf.Percent;
-                        rTest[stat] = rf.Test;
+                        if (rf.Flat.HasValue)
+                            rFlat[stat] = rf.Flat.Value;
+                        if (rf.Percent.HasValue)
+                            rPerc[stat] = rf.Percent.Value;
+                        if (rf.Test.HasValue)
+                            rTest[stat] = rf.Test.Value;
                         blank = false;
                     }
                 }

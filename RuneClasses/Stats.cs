@@ -63,7 +63,7 @@ namespace RuneOptim
 
         [JsonProperty("fake_mxd")]
         public double MaxDamage = 0;
-
+        
         // Gets the Extra stat manually stored (for scoring)
         public double ExtraGet(string extra)
         {
@@ -252,6 +252,42 @@ namespace RuneOptim
 
 
             return true;
+        }
+
+        public static Stats operator+(Stats lhs, Stats rhs)
+        {
+            lhs.Health += rhs.Health;
+            lhs.Attack += rhs.Attack;
+            lhs.Defense += rhs.Defense;
+            lhs.Speed += rhs.Speed;
+            lhs.CritRate += rhs.CritRate;
+            lhs.CritDamage += rhs.CritDamage;
+            lhs.Resistance += rhs.Resistance;
+            lhs.Accuracy += rhs.Accuracy;
+            lhs.EffectiveHP += rhs.EffectiveHP;
+            lhs.EffectiveHPDefenseBreak += rhs.EffectiveHPDefenseBreak;
+            lhs.DamagePerSpeed += rhs.DamagePerSpeed;
+            lhs.AverageDamage += rhs.AverageDamage;
+            lhs.MaxDamage += rhs.MaxDamage;
+            return lhs;
+        }
+
+        public static Stats operator/(Stats lhs, int rhs)
+        {
+            lhs.Health /= rhs;
+            lhs.Attack /= rhs;
+            lhs.Defense /= rhs;
+            lhs.Speed /= rhs;
+            lhs.CritRate /= rhs;
+            lhs.CritDamage /= rhs;
+            lhs.Resistance /= rhs;
+            lhs.Accuracy /= rhs;
+            lhs.EffectiveHP /= rhs;
+            lhs.EffectiveHPDefenseBreak /= rhs;
+            lhs.DamagePerSpeed /= rhs;
+            lhs.AverageDamage /= rhs;
+            lhs.MaxDamage /= rhs;
+            return lhs;
         }
 
         public bool NonZero()

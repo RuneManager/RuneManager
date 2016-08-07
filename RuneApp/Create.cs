@@ -692,10 +692,10 @@ namespace RuneApp
                         var ctrl = ctab.Controls.Find(tab + stat + type, true).FirstOrDefault();
                         if (ctrl != null)
                         {
-                            double val = f.Value[type];
+                            double? val = f.Value[type];
                             // unless it's zero, I don't want zeros
-                            if (val != 0)
-                                ctrl.Text = val.ToString("#.##");
+                            if (val != null)
+                                ctrl.Text = val.Value.ToString("#.##");
                             else
                                 ctrl.Text = "";
                         }
@@ -1256,8 +1256,12 @@ namespace RuneApp
         {
             TabPage ctab = GetTab(tab);
             var ctest = ctab.Controls.Find(tab + stat + "test", true).First();
-            double test = 0;
-            double.TryParse(ctest.Text, out test);
+            double tt;
+            double? test = 0;
+            double.TryParse(ctest.Text, out tt);
+            test = tt;
+            if (ctest.Text.Length == 0)
+                test = null;
 
             if (!build.runeFilters.ContainsKey(tab))
             {
@@ -1319,6 +1323,12 @@ namespace RuneApp
                 }
                 
                 fi[type] = t;
+                
+                if (ctab.Controls.Find(tab + stat + type, true).First().Text.Length == 0)
+                {
+                    fi[type] = null;
+                }
+
             }
 
             fi.Test = test;
@@ -1527,8 +1537,10 @@ namespace RuneApp
 
                     foreach (var rbf in tbf.Value)
                     {
-                        sum += rbf.Value.Flat;
-                        sum += rbf.Value.Percent;
+                        if (rbf.Value.Flat.HasValue)
+                            sum += rbf.Value.Flat.Value;
+                        if (rbf.Value.Percent.HasValue)
+                            sum += rbf.Value.Percent.Value;
                         if (and != 2)
                         {
                             if (rbf.Value.Test == 0)
@@ -1764,9 +1776,9 @@ namespace RuneApp
             // arbitrary colours for goodness/badness
             if (perms < 500000) // 500k
                 ctrl.ForeColor = Color.Green;
-            if (perms > 5000000) // 5m
+            if (perms > 7000000) // 7m
                 ctrl.ForeColor = Color.Orange;
-            if (perms > 20000000 || perms == 0) // 20m
+            if (perms > 21000000 || perms == 0) // 21m
                 ctrl.ForeColor = Color.Red;
 
             btnPerms.Enabled = false;

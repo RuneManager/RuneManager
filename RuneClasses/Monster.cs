@@ -24,6 +24,15 @@ namespace RuneOptim
 		[JsonIgnore]
 		public bool downloaded = false;
 
+        [JsonIgnore]
+        public double score = 0;
+
+        [JsonIgnore]
+        private Stats curStats = null;
+
+        [JsonIgnore]
+        private bool chaStats = true;
+        
         public int SwapCost(Loadout l)
         {
             int cost = 0;
@@ -63,13 +72,21 @@ namespace RuneOptim
         public void ApplyRune(Rune rune)
         {
             Current.AddRune(rune);
+            chaStats = true;
         }
 
         // get the stats of the current build.
         // NOTE: the monster will contain it's base stats
         public Stats GetStats()
         {
-            return Current.GetStats(this);
+            if (chaStats || Current.changed)
+            {
+                curStats = Current.GetStats(this);
+                chaStats = false;
+                Current.changed = false;
+            }
+
+            return curStats;
         }
 
         // NYI comparison
