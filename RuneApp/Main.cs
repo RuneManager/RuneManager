@@ -980,9 +980,12 @@ namespace RuneApp
 
                     if (saveStats)
                     {
-                        StatsExcelBuild(b, b.mon, b.Best.Current);
-                        excelPack.Save();
-                        StatsExcelBind();
+                        if (StatsExcelBind(true))
+                        {
+                            StatsExcelBuild(b, b.mon, b.Best.Current);
+                            excelPack.Save();
+                        }
+                        StatsExcelBind(true);
                     }
                     if (b.Best.Current.buildUsage != null)
                         b.Best.Current.buildUsage.loads.Clear();
@@ -1046,7 +1049,7 @@ namespace RuneApp
                 var li = lis[0];
                 Task.Factory.StartNew(() =>
                 {
-                    RunBuild(li);
+                    RunBuild(li, makeStats);
                 });
             }
         }
@@ -1176,8 +1179,11 @@ namespace RuneApp
                 li.SubItems[3].Text = "";
 			}
 
-            StatsExcelClear();
-            StatsExcelBind();
+            if (makeStats)
+            {
+                //StatsExcelClear();
+                StatsExcelBind();
+            }
 
             runSource = new CancellationTokenSource();
             runToken = runSource.Token;
@@ -1205,7 +1211,9 @@ namespace RuneApp
                         {
                             excelPack.Save();
                         }
-                        catch (Exception ex) { }
+                        catch (Exception ex) {
+                        Console.WriteLine(ex);
+                        }
                     });
                 }
                 checkLocked();
@@ -1236,15 +1244,17 @@ namespace RuneApp
                             status = 1;
                         }
                     }
+                    else
+                        Console.WriteLine(e);
                 }
             }
 
         }
 
-        void StatsExcelBind()
+        bool StatsExcelBind(bool passive = false)
         {
             if (data == null || data.Runes == null)
-                return;
+                return false;
 
             int status = 0;
             while (status != 1)
@@ -1257,13 +1267,20 @@ namespace RuneApp
                 }
                 catch (Exception e)
                 {
+                    // don't care if no bind
+                    if (passive)
+                        return false;
                     if (status == 0)
                     {
                         if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
                         {
                             status = 1;
+                            return false;
                         }
                     }
+                    else
+                        Console.WriteLine(e);
+
                 }
             }
 
@@ -1279,7 +1296,7 @@ namespace RuneApp
             row++;
             col = 1;
 
-            return;
+            return true;
         }
 
         public void StatsExcelRunes()
@@ -1334,10 +1351,21 @@ namespace RuneApp
         {
             if (load != null)
             {
-                var sstrsuf = "";
-                if (excelPack.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count() > 0)
-                    sstrsuf = excelPack.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count().ToString();
-                var ws = excelPack.Workbook.Worksheets.Add(mon.Name + sstrsuf);
+                //var sstrsuf = "";
+
+                // TODO
+                Console.WriteLine("TODO: better # build monster detection per sheet. Eg 2 Lushens");
+
+                //if (excelPack.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count() > 0)
+                //    sstrsuf = excelPack.Workbook.Worksheets.Where(w => w.Name.Contains(mon.Name)).Count().ToString();
+                //var ws = excelPack.Workbook.Worksheets.Add(mon.Name + sstrsuf);
+
+                var ws = excelPack.Workbook.Worksheets.Where(w => w.Name == mon.Name).FirstOrDefault();
+                if (ws != null)
+                    ws.DeleteRow(1, 150);
+                else
+                    ws = excelPack.Workbook.Worksheets.Add(mon.Name);
+
                 int row = 1;
                 int col = 1;
 
@@ -1345,6 +1373,9 @@ namespace RuneApp
                 ws.Cells[row, 1].Value = "Builds";
                 ws.Cells[row, 2].Value = "Bad";
                 ws.Cells[row, 3].Value = "Good";
+
+                ws.Cells[row, 6].Value = DateTime.Now;
+                ws.Cells[row, 6].Style.Numberformat.Format = "dd-MM-yy";
 
                 row++;
 
@@ -1562,6 +1593,9 @@ namespace RuneApp
                             status = 1;
                         }
                     }
+                    else
+                        Console.WriteLine(e);
+
                 }
             }
 
@@ -1952,6 +1986,9 @@ namespace RuneApp
                             status = 1;
                         }
                     }
+                    else
+                        Console.WriteLine(e);
+
                 }
             }
         }
@@ -2137,6 +2174,7 @@ namespace RuneApp
                 {
                     updateComplain.Text = e.Error.ToString();
                     updateComplain.Visible = false;
+                    Console.WriteLine(ex);
                 }
             });
         }
@@ -2298,6 +2336,170 @@ namespace RuneApp
                 }
                 checkLocked();
             }
+        }
+
+        private void build_btn_upto_Click(object sender, EventArgs e)
+        {
+            if (data == null)
+                return;
+            if (runTask != null && runTask.Status == TaskStatus.Running)
+            {
+                runSource.Cancel();
+                if (currentBuild != null)
+                    currentBuild.isRun = false;
+                plsDie = true;
+                return;
+            }
+            plsDie = false;
+
+
+            // unlock and remove all current builds
+            foreach (ListViewItem li in loadoutList.Items)
+            {
+                Loadout l = (Loadout)li.Tag;
+
+                foreach (Rune r in l.runes)
+                {
+                    r.Locked = false;
+                }
+                checkLocked();
+
+                loadoutList.Items.Remove(li);
+            }
+            builds.Clear();
+
+            // collect the builds
+            List<ListViewItem> list5 = new List<ListViewItem>();
+            foreach (ListViewItem li in buildList.Items)
+            {
+                if (buildList.SelectedItems.Contains(li))
+                    break;
+
+                list5.Add(li);
+
+                li.SubItems[3].Text = "";
+            }
+
+            if (makeStats)
+            {
+                //StatsExcelClear();
+                StatsExcelBind();
+            }
+
+            runSource = new CancellationTokenSource();
+            runToken = runSource.Token;
+            runTask = Task.Factory.StartNew(() =>
+            {
+                if (data.Runes != null)
+                    foreach (Rune r in data.Runes)
+                    {
+                        r.Swapped = false;
+                        r.ResetStats();
+                    }
+
+                foreach (ListViewItem li in list5)
+                {
+                    RunBuild(li, makeStats);
+                }
+
+                if (makeStats)
+                {
+                    GenerateStats();
+                    this.Invoke((MethodInvoker)delegate {
+                        StatsExcelRunes();
+                        //GenerateExcel(); 
+                        try
+                        {
+                            excelPack.Save();
+                        }
+                        catch (Exception ex) {
+                        Console.WriteLine(ex);
+                        }
+                    });
+                }
+                checkLocked();
+            }, runSource.Token);
+
+        }
+
+        private void build_btn_resume_Click(object sender, EventArgs e)
+        {
+            if (data == null)
+                return;
+            if (runTask != null && runTask.Status == TaskStatus.Running)
+            {
+                runSource.Cancel();
+                if (currentBuild != null)
+                    currentBuild.isRun = false;
+                plsDie = true;
+                return;
+            }
+            plsDie = false;
+
+            List<int> loady = new List<int>();
+
+            // collect loadouts
+            foreach (ListViewItem li in loadoutList.Items)
+            {
+                Loadout load = li.Tag as Loadout;
+
+                var monid = int.Parse(li.SubItems[2].Text);
+                var bid = int.Parse(li.SubItems[0].Text);
+
+                if (load != null)
+                    loady.Add(bid);
+            }
+
+
+            // collect the builds
+            List<ListViewItem> list5 = new List<ListViewItem>();
+            foreach (ListViewItem li in buildList.Items)
+            {
+                if (loady.Contains((li.Tag as Build).ID))
+                    continue;
+
+                list5.Add(li);
+
+                li.SubItems[3].Text = "";
+            }
+
+            if (makeStats)
+                StatsExcelBind();
+
+            runSource = new CancellationTokenSource();
+            runToken = runSource.Token;
+            runTask = Task.Factory.StartNew(() =>
+            {
+                if (data.Runes != null)
+                    foreach (Rune r in data.Runes)
+                    {
+                        r.Swapped = false;
+                        r.ResetStats();
+                    }
+
+                foreach (ListViewItem li in list5)
+                {
+                    RunBuild(li, makeStats);
+                }
+
+                if (makeStats)
+                {
+                    GenerateStats();
+                    this.Invoke((MethodInvoker)delegate {
+                        StatsExcelRunes();
+                        //GenerateExcel(); 
+                        try
+                        {
+                            excelPack.Save();
+                        }
+                        catch (Exception ex) {
+                        Console.WriteLine(ex);
+                        }
+                    });
+                }
+                checkLocked();
+            }, runSource.Token);
+
         }
     }
 }

@@ -325,10 +325,12 @@
     <Content Include="Resources\lockedNo.png" />
     <Content Include="Resources\mon.png" />
     <Content Include="Resources\monToBox.png" />
+    <Content Include="Resources\resume.png" />
     <Content Include="Resources\runedial.png" />
     <Content Include="Resources\toMon.png" />
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />
+    <Content Include="Resources\upto.png" />
     <Content Include="User Manual\build.html" />
     <Content Include="User Manual\images\builds_list.png" />
     <Content Include="User Manual\images\build_leader.png" />

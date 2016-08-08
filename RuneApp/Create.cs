@@ -1310,7 +1310,7 @@ namespace RuneApp
                 if (ip)
                 {
                     if (tp)
-                        c.Text = Math.Min(i, t).ToString();
+                        c.Text = t.ToString();//Math.Min(i, t).ToString();
                     else
                         c.Text = i.ToString();
                 }

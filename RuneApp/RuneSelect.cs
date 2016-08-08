@@ -34,6 +34,15 @@ namespace RuneApp
             // dump out the rune details
             foreach (Rune rune in runes.OrderBy(r => r.ID))
             {
+                if (build != null && rune.Slot % 2 == 0)
+                {
+                    if (build.slotStats[rune.Slot-1].Count > 0)
+                    {
+                        if (!build.slotStats[rune.Slot-1].Contains(rune.MainType.ToForms()))
+                            continue;
+                    }
+                }
+
                 ListViewItem item = new ListViewItem(new string[]{
                     rune.Set.ToString(),
                     rune.ID.ToString(),
@@ -47,6 +56,8 @@ namespace RuneApp
                     item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
+                
+
                 listView2.Items.Add(item);
             }
             if (build != null)
@@ -76,6 +87,7 @@ namespace RuneApp
                     default:
                         int slotn = int.Parse(slot)-1;
                         fr.AddRange(build.runes[slotn]);
+                        
                         break;
                 }
                 // find the chosen runes in the list and colour them in

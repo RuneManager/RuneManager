@@ -828,10 +828,10 @@ namespace RuneOptim
                     {
                         rf = rfS[stat];
                         if (rfM.ContainsKey(stat))
-                            rf = RuneFilter.Min(rf, rfM[stat]);
+                            rf = RuneFilter.Dominant(rf, rfM[stat]);
 
                         if (rfG.ContainsKey(stat))
-                            rf = RuneFilter.Min(rf, rfG[stat]);
+                            rf = RuneFilter.Dominant(rf, rfG[stat]);
 
                     }
                     else
@@ -840,7 +840,7 @@ namespace RuneOptim
                         {
                             rf = rfM[stat];
                             if (rfG.ContainsKey(stat))
-                                rf = RuneFilter.Min(rf, rfG[stat]);
+                                rf = RuneFilter.Dominant(rf, rfG[stat]);
                         }
                         else
                         {

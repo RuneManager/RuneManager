@@ -168,7 +168,8 @@
             this.toolStripButton9 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton11 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton12 = new System.Windows.Forms.ToolStripButton();
-            this.toolStripButton17 = new System.Windows.Forms.ToolStripButton();
+            this.build_btn_upto = new System.Windows.Forms.ToolStripButton();
+            this.build_btn_resume = new System.Windows.Forms.ToolStripButton();
             this.buildList = new System.Windows.Forms.ListView();
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -1679,7 +1680,8 @@
             this.toolStripButton9,
             this.toolStripButton11,
             this.toolStripButton12,
-            this.toolStripButton17});
+            this.build_btn_upto,
+            this.build_btn_resume});
             this.toolStrip6.Location = new System.Drawing.Point(2, 15);
             this.toolStrip6.Name = "toolStrip6";
             this.toolStrip6.Size = new System.Drawing.Size(272, 25);
@@ -1766,15 +1768,25 @@
             this.toolStripButton12.Text = "Run All";
             this.toolStripButton12.Click += new System.EventHandler(this.toolStripButton12_Click);
             // 
-            // toolStripButton17
+            // build_btn_upto
             // 
-            this.toolStripButton17.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton17.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton17.Image")));
-            this.toolStripButton17.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripButton17.Name = "toolStripButton17";
-            this.toolStripButton17.Size = new System.Drawing.Size(23, 22);
-            this.toolStripButton17.Text = "toolStripButton17";
-            this.toolStripButton17.Click += new System.EventHandler(this.toolStripButton17_Click);
+            this.build_btn_upto.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.build_btn_upto.Image = global::RuneApp.App.upto;
+            this.build_btn_upto.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.build_btn_upto.Name = "build_btn_upto";
+            this.build_btn_upto.Size = new System.Drawing.Size(23, 22);
+            this.build_btn_upto.Text = "Run upto";
+            this.build_btn_upto.Click += new System.EventHandler(this.build_btn_upto_Click);
+            // 
+            // build_btn_resume
+            // 
+            this.build_btn_resume.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.build_btn_resume.Image = global::RuneApp.App.resume;
+            this.build_btn_resume.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.build_btn_resume.Name = "build_btn_resume";
+            this.build_btn_resume.Size = new System.Drawing.Size(23, 22);
+            this.build_btn_resume.Text = "Resume";
+            this.build_btn_resume.Click += new System.EventHandler(this.build_btn_resume_Click);
             // 
             // buildList
             // 
@@ -2143,7 +2155,6 @@
         private System.Windows.Forms.ColumnHeader buildSwapCol;
         private System.Windows.Forms.ColumnHeader buildMonIDCol;
         private System.Windows.Forms.ColumnHeader buildPowerCol;
-		private System.Windows.Forms.ToolStripButton toolStripButton17;
 		private System.Windows.Forms.ColumnHeader buildTimeCol;
         private System.Windows.Forms.ToolStripMenuItem shrinesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem speedToolStripMenuItem;
@@ -2158,6 +2169,8 @@
         private System.Windows.Forms.ToolStripButton RuneTab_SaveButton;
         private System.Windows.Forms.ToolStripButton unequipMonsterButton;
         private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton build_btn_resume;
+        private System.Windows.Forms.ToolStripButton build_btn_upto;
     }
 }
 

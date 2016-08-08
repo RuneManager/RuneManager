@@ -21,6 +21,17 @@ namespace RuneOptim
             return "/" + Flat + " + /" + Percent + "% >= " + Test;
         }
         
+        public static RuneFilter Dominant(RuneFilter child, RuneFilter parent)
+        {
+            RuneFilter m = new RuneFilter();
+
+            m.Flat = child.Flat ?? parent.Flat;
+            m.Percent = child.Percent ?? parent.Percent;
+            m.Test = child.Test ?? parent.Test;
+
+            return m;
+        }
+        
         // Gets the minimum divisor from A and B per type
         public static RuneFilter Min(RuneFilter a, RuneFilter b)
         {
