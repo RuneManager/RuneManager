@@ -1608,18 +1608,29 @@ namespace RuneApp
             var usedSlot = used.Where(r => aslot(r.Slot));
             var good = load.runeUsage.runesGood.Select(r => r.Key);
             var goodSlot = good.Where(r => aslot(r.Slot));
+
+            foreach (var r in usedSlot)
+            {
+                r.buildScoreTemp = build.ScoreRune(r, build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key : 0, false);
+            }
+
             col = 5;
             ws.Cells[row, 1].Value = "Set";
             ws.Cells[row + 1, 1].Value = "Primary";
-            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)))
+            row--;
+            //ws.Cells[row, 2].Value = "Filter";
+            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.buildScoreTemp))
             {
+                ws.Cells[row, col].Value = r.buildScoreTemp;
+                row++;
                 ws.Cells[row, col].Value = r.Set.ToString();
                 row++;
                 ws.Cells[row, col].Value = r.MainType.ToGameString();
                 row--;
+                row--;
                 col++;
             }
-            row += 2;
+            row += 3;
             col = 1;
 
 
@@ -2018,17 +2029,24 @@ namespace RuneApp
             //col++;
 
             //col++;
-            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)))
+            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.buildScoreTemp))
             {
                 var rval = r[stat + ssuff, pred, false];
 
                 if (rval > 0)
                 {
                     ws.Cells[row, col].Value = rval;
-                    if (load.runeUsage.runesGood.ContainsKey(r))
+                    if (load.runes.Contains(r))
                     {
                         ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Green);
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
+                        if (rval < av - std)
+                            ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
+                    }
+                    else if (load.runeUsage.runesGood.ContainsKey(r))
+                    {
+                        ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
                         if (rval < av - std)
                             ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
 

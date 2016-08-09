@@ -643,12 +643,27 @@ namespace RuneOptim
             }
         }
 
-        public bool RunFilters(Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, out Stats rFlat, out Stats rPerc, out Stats rTest)
+        //Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, 
+        public bool RunFilters(int slot, out Stats rFlat, out Stats rPerc, out Stats rTest)
         {
+            int i = slot;
             bool blank = true;
             rFlat = new Stats();
             rPerc = new Stats();
             rTest = new Stats();
+
+            // pull the filters (flat, perc, test) for all the tabs and stats
+            Dictionary<string, RuneFilter> rfG = new Dictionary<string, RuneFilter>();
+            if (runeFilters.ContainsKey("g"))
+                rfG = runeFilters["g"];
+
+            Dictionary<string, RuneFilter> rfM = new Dictionary<string, RuneFilter>();
+            if (runeFilters.ContainsKey((i % 2 == 1 ? "e" : "o")))
+                rfM = runeFilters[(i % 2 == 1 ? "e" : "o")];
+
+            Dictionary<string, RuneFilter> rfS = new Dictionary<string, RuneFilter>();
+            if (runeFilters.ContainsKey((i + 1).ToString()))
+                rfS = runeFilters[(i + 1).ToString()];
 
             foreach (string stat in statNames)
             {
@@ -693,24 +708,43 @@ namespace RuneOptim
             return blank;
         }
 
-        /*public double ScoreRune(Rune r)
+        public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false)
         {
+            int slot = r.Slot;
+            double testVal;
+            Stats rFlat, rPerc, rTest;
 
-        }*/
+            // if there where no filters with data
+            bool blank = RunFilters(slot, out rFlat, out rPerc, out rTest);//true;
+            int and = LoadFilters(slot, out testVal);
+            double ret = 0;
+            if (!blank)
+            {
+                if (and == 0)
+                {
+                    if (r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs))
+                        ret = 1;
+                }
+                else if (and == 1)
+                {
+                    if (r.And(rFlat, rPerc, rTest, raiseTo, predictSubs))
+                        ret = 1;
+                }
+                else if (and == 2)
+                {
+                    ret = r.Test(rFlat, rPerc, raiseTo, predictSubs);
+                }
+            }
+            return ret;
+        }
 
-        public Predicate<Rune> RuneScoring(int slot, int raiseTo = 0, bool predictSubs = false)
+        public int LoadFilters(int slot, out double testVal)
         {
             int i = slot;
-
-            // default fail OR
-            Predicate<Rune> slotTest = r => false;
-            int and = 0;
-            // this means that runes won't get in unless they meet at least 1 criteria
-
             // which tab we pulled the filter from
             string gotScore = "";
-            // the value to test SUM against
-            double testVal = 0;
+            testVal = 0;
+            int and = 0;
 
             // TODO: check what inheriting SUM (eg. Odd and 3) does
             // TODO: check what inheriting AND/OR then SUM (or visa versa)
@@ -721,11 +755,7 @@ namespace RuneOptim
                 var kv = runeScoring["g"];
                 gotScore = "g";
                 and = kv.Key;
-                if (kv.Key == 1)
-                {
-                    slotTest = r => true;
-                }
-                else if (kv.Key == 2)
+                if (kv.Key == 2)
                 {
                     testVal = kv.Value;
                 }
@@ -737,11 +767,7 @@ namespace RuneOptim
                 var kv = runeScoring[tmk];
                 gotScore = tmk;
                 and = kv.Key;
-                if (kv.Key == 1)
-                {
-                    slotTest = r => true;
-                }
-                else if (kv.Key == 2)
+                if (kv.Key == 2)
                 {
                     testVal = kv.Value;
                 }
@@ -753,54 +779,46 @@ namespace RuneOptim
                 var kv = runeScoring[tmk];
                 gotScore = tmk;
                 and = kv.Key;
-                if (kv.Key == 1)
-                {
-                    slotTest = r => true;
-                }
-                else if (kv.Key == 2)
+                if (kv.Key == 2)
                 {
                     testVal = kv.Value;
                 }
             }
 
+            return and;
+        }
 
+        public Predicate<Rune> RuneScoring(int slot, int raiseTo = 0, bool predictSubs = false)
+        {
+            int i = slot;
+
+            // default fail OR
+            Predicate<Rune> slotTest = r => false;
+
+            // the value to test SUM against
+            double testVal;
+
+            int and = LoadFilters(slot, out testVal);
+
+            // this means that runes won't get in unless they meet at least 1 criteria
+            
             // if an operand was found, ensure the tab contains filter data
-            if (gotScore != "")
+            /*if (gotScore != "")
             {
                 if (runeFilters.ContainsKey(gotScore))
                 {
                     // if all the filters for the tab are zero
                     if (runeFilters[gotScore].All(r => !r.Value.NonZero))
                     {
-                        // set to OR TRUE
-                        slotTest = r => true;
                         and = 0;
                     }
                 }
-            }
-            else
-            {
-                // if there wasn't any relevant data for how to pick runes, just take 'em all!
-                slotTest = r => true;
-            }
-
-            // pull the filters (flat, perc, test) for all the tabs and stats
-            Dictionary<string, RuneFilter> rfG = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey("g"))
-                rfG = runeFilters["g"];
-
-            Dictionary<string, RuneFilter> rfM = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey((i % 2 == 1 ? "e" : "o")))
-                rfM = runeFilters[(i % 2 == 1 ? "e" : "o")];
-
-            Dictionary<string, RuneFilter> rfS = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey((i + 1).ToString()))
-                rfS = runeFilters[(i + 1).ToString()];
+            }*/
 
             Stats rFlat, rPerc, rTest;
 
             // if there where no filters with data
-            bool blank = RunFilters(rfS, rfM, rfG, out rFlat, out rPerc, out rTest);//true;
+            bool blank = RunFilters(slot, out rFlat, out rPerc, out rTest);//true;
             
             // no filter data = use all
             if (blank)

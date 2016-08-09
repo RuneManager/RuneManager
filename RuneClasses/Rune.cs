@@ -184,6 +184,10 @@ namespace RuneOptim
         // is in a build
         public bool manageStats_In = false;
 
+
+        [JsonIgnore]
+        public double buildScoreTemp = 0;
+
         [JsonIgnore]
         public double Efficiency
         {
