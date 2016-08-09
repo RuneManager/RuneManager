@@ -1283,13 +1283,13 @@ namespace RuneApp
 
                 }
             }
-
-            var ws = excelPack.Workbook.Worksheets.Where(w => w.Name == "Runes").FirstOrDefault();
+            var wss = excelPack.Workbook.Worksheets;
+            var ws = wss.Where(w => w.Name == "Runes").FirstOrDefault();
             if (ws == null)
-                ws = excelPack.Workbook.Worksheets.Add("Runes");
+                ws = wss.Add("Runes");
             int row = 1;
             int col = 1;
-            foreach (var th in "Id,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,FlatCount,FlatPts,SellScore,Action".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,MType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,Flats,FlatPts,Sell,Action, ,Main,Innate,1,2,3,4,HPpts,ATKpts,Pts".Split(','))
             {
                 ws.Cells[row, col].Value = th; col++;
             }
@@ -1307,42 +1307,102 @@ namespace RuneApp
             var ws = excelPack.Workbook.Worksheets.Where(w => w.Name == "Runes").FirstOrDefault();
             int row = 2;
             int col = 1;
-
+            int cmax = 1;
+            
             foreach (Rune r in data.Runes.OrderByDescending(r => r.ScoringBad))
             {
                 ws.Cells[row, col].Value = r.ID; col++;
 
                 ws.Cells[row, col].Value = r.Grade; col++;
 
+                if (r.Rarity > 0)
+                {
+                    Color color = Color.FromArgb(255, 146, 208, 80);
+                    if (r.Rarity == 4) color = Color.FromArgb(255, 255, 153, 0);
+                    else if (r.Rarity == 3) color = Color.FromArgb(255, 204, 0, 153);
+                    else if (r.Rarity == 2) color = Color.FromArgb(255, 102, 205, 255);
+
+                    ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(color);
+                }
                 ws.Cells[row, col].Value = r.Set; col++;
+
                 ws.Cells[row, col].Value = r.Slot; col++;
-                ws.Cells[row, col].Value = r.MainType; col++;
+                ws.Cells[row, col].Value = r.MainType.ToGameString(); col++;
 
                 ws.Cells[row, col].Value = r.Level; col++;
 
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
                 ws.Cells[row, col].Value = r.manageStats_Set; col++;
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
                 ws.Cells[row, col].Value = r.manageStats_RuneFilt; col++;
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
                 ws.Cells[row, col].Value = r.manageStats_TypeFilt; col++;
 
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
                 ws.Cells[row, col].Value = r.manageStats_LoadFilt; col++;
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
                 ws.Cells[row, col].Value = r.manageStats_LoadGen; col++;
 
-                ws.Cells[row, col].Value = r.Efficiency.ToString("0.####"); col++;
+                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                ws.Cells[row, col].Value = r.Efficiency; col++;
 
                 ws.Cells[row, col].Value = (r.manageStats_In ? "TRUE" : "FALSE"); col++;
 
-                ws.Cells[row, col].Value = r.ScoringBad.ToString(); col++;
+                ws.Cells[row, col].Value = r.ScoringBad; col++;
 
-                ws.Cells[row, col].Value = r.FlatCount().ToString(); col++;
-                ws.Cells[row, col].Value = r.FlatPoints().ToString("0.####"); col++;
+                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                ws.Cells[row, col].Value = r.FlatCount(); col++;
+                ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                ws.Cells[row, col].Value = r.FlatPoints(); col++;
 
-                ws.Cells[row, col].Value = r.ScoringSell.ToString(); col++;
+                ws.Cells[row, col].Value = r.ScoringSell; col++;
 
                 ws.Cells[row, col].Value = r.ScoringAct; col++;
 
+                col++;
+
+                ws.Cells[row, col].Value = r.MainValue.ToString() + " " + r.MainType.ToGameString(); col++;
+                if (r.InnateType != Attr.Null)
+                    ws.Cells[row, col].Value = r.InnateValue.ToString() + " " + r.InnateType.ToGameString(); col++;
+                if (r.Sub1Type != Attr.Null)
+                    ws.Cells[row, col].Value = r.Sub1Value.ToString() + " " + r.Sub1Type.ToGameString(); col++;
+                if (r.Sub2Type != Attr.Null)
+                    ws.Cells[row, col].Value = r.Sub2Value.ToString() + " " + r.Sub2Type.ToGameString(); col++;
+                if (r.Sub3Type != Attr.Null)
+                    ws.Cells[row, col].Value = r.Sub3Value.ToString() + " " + r.Sub3Type.ToGameString(); col++;
+                if (r.Sub4Type != Attr.Null)
+                    ws.Cells[row, col].Value = r.Sub4Value.ToString() + " " + r.Sub4Type.ToGameString(); col++;
+
+                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                ws.Cells[row, col].Value = r.ScoringHP; col++;
+                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                ws.Cells[row, col].Value = r.ScoringATK; col++;
+                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                ws.Cells[row, col].Value = r.ScoringRune; col++;
+
                 row++;
+                cmax = col;
                 col = 1;
             }
+
+            var table = ws.Tables.Where(t => t.Name == "RuneTable").FirstOrDefault();
+            if (table == null)
+                table = ws.Tables.Add(ws.Cells[1, 1, row - 1, cmax - 1], "RuneTable");
+
+            if (table.Address.Columns != cmax - 1 || table.Address.Rows != row - 1)
+            {
+                var start = table.Address.Start;
+                var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(1,1,row-1, cmax-1));
+
+                var tableElement = table.TableXml.DocumentElement;
+                tableElement.Attributes["ref"].Value = newRange;
+                tableElement["autoFilter"].Attributes["ref"].Value = newRange;
+
+            }
+
+            table.ShowHeader = true;
+            table.StyleName = "TableStyleMedium2";
             // write rune stats
 
         }
@@ -1360,9 +1420,17 @@ namespace RuneApp
                 //    sstrsuf = excelPack.Workbook.Worksheets.Where(w => w.Name.Contains(mon.Name)).Count().ToString();
                 //var ws = excelPack.Workbook.Worksheets.Add(mon.Name + sstrsuf);
 
-                var ws = excelPack.Workbook.Worksheets.Where(w => w.Name == mon.Name).FirstOrDefault();
+                var wss = excelPack.Workbook.Worksheets;
+
+                var ws = wss.Where(w => w.Name == mon.Name).FirstOrDefault();
                 if (ws != null)
-                    ws.DeleteRow(1, 150);
+                {
+                    //ws.DeleteRow(1, 150);
+                    var ind = ws.Index;
+                    wss.Delete(mon.Name);
+                    ws = excelPack.Workbook.Worksheets.Add(mon.Name);
+                    wss.MoveBefore(ws.Index, ind);
+                }
                 else
                     ws = excelPack.Workbook.Worksheets.Add(mon.Name);
 
@@ -1492,84 +1560,128 @@ namespace RuneApp
                 ws.Cells[row, 2].Value = "Bad Av";
                 ws.Cells[row, 3].Value = "Good Av";
                 ws.Cells[row, 4].Value = "Good Mult";
-                ws.Cells[row, 5].Value = "Canidate";
+                //ws.Cells[row, 5].Value = "Candidate";
                 //ws.Cells[row, 5].Value = "# This time";
                 //ws.Cells[row, 6].Value = "# Next time";
                 //ws.Cells[row, 7].Value = "Limit";
                 row++;
-                for (int slot = -2; slot < 7; slot++)
+                StatsExcelRune(ws, ref row, ref col, 0, build, load);
+                row++;
+                StatsExcelRune(ws, ref row, ref col, -1, build, load);
+                row++;
+                StatsExcelRune(ws, ref row, ref col, -2, build, load);
+                row++;
+                for (int slot = 1; slot < 7; slot++)
                 {
-                    string sslot = slot.ToString();
-                    if (slot == -1)
-                        sslot = "o";
-                    else if (slot == -2)
-                        sslot = "e";
-                    else if (slot == 0)
-                        sslot = "g";
-
-                    int wrote = 0;
-
-                    for (int i = 0; i < Build.statNames.Length; i++)
-                    {
-                        var stat = Build.statNames[i];
-
-                        if (i <= 3) //SPD
-                        {
-                            var qqw = new Dictionary<string, RuneFilter>();
-                            bool writeIt = false;
-                            if (build.runeFilters.TryGetValue(sslot, out qqw))
-                            {
-                                if (qqw.ContainsKey(stat))
-                                {
-                                    writeIt = qqw[stat].Flat > 0;
-                                }
-                            }
-
-                            if (true)
-                            {
-                                WriteRune(ws, ref row, ref col, stat, "", "flat", load, build, slot);
-                                row++;
-                                wrote++;
-                            }
-                            col = 1;
-                        }
-                        if (i != 3)
-                        {
-                            var qqw = new Dictionary<string, RuneFilter>();
-                            bool writeIt = false;
-                            if (build.runeFilters.TryGetValue(sslot, out qqw))
-                            {
-                                if (qqw.ContainsKey(stat))
-                                {
-                                    writeIt = qqw[stat].Percent > 0;
-                                }
-                            }
-
-                            if (true)
-                            {
-                                WriteRune(ws, ref row, ref col, stat, " %", "perc", load, build, slot);
-                                row++;
-                                wrote++;
-                            }
-                            col = 1;
-                        }
-                    }
-                    if (wrote > 0)
-                    {
-                        if (slot == 0)
-                            ws.Cells[row - wrote - 1, col].Value = "Global";
-                        else if (slot == -1)
-                            ws.Cells[row - wrote - 1, col].Value = "Odds";
-                        else if (slot == -2)
-                            ws.Cells[row - wrote - 1, col].Value = "Evens";
-                        else
-                            ws.Cells[row - wrote - 1, col].Value = slot;
-                    }
+                    StatsExcelRune(ws, ref row, ref col, slot, build, load);
                     row++;
                 }
             }
         }
 
+        void StatsExcelRune(ExcelWorksheet ws, ref int row, ref int col, int slot, Build build, Loadout load)
+        {
+            string sslot = slot.ToString();
+            if (slot == -1)
+                sslot = "o";
+            else if (slot == -2)
+                sslot = "e";
+            else if (slot == 0)
+                sslot = "g";
+
+            int wrote = 0;
+
+            Func<int, bool> aslot = (a) => { return true; };
+            if (slot > 0)
+            {
+                aslot = (a) => { return a == slot; };
+            }
+            else if (slot == -1)
+            {
+                aslot = (a) => { return a % 2 == 1; };
+            }
+            else if (slot == -2)
+            {
+                aslot = (a) => { return a % 2 == 0; };
+            }
+            var used = load.runeUsage.runesUsed.Select(r => r.Key);
+            var usedSlot = used.Where(r => aslot(r.Slot));
+            var good = load.runeUsage.runesGood.Select(r => r.Key);
+            var goodSlot = good.Where(r => aslot(r.Slot));
+            col = 5;
+            ws.Cells[row, 1].Value = "Set";
+            ws.Cells[row + 1, 1].Value = "Primary";
+            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)))
+            {
+                ws.Cells[row, col].Value = r.Set.ToString();
+                row++;
+                ws.Cells[row, col].Value = r.MainType.ToGameString();
+                row--;
+                col++;
+            }
+            row += 2;
+            col = 1;
+
+
+            for (int i = 0; i < Build.statNames.Length; i++)
+            {
+                var stat = Build.statNames[i];
+
+                if (i <= 3) //SPD
+                {
+                    var qqw = new Dictionary<string, RuneFilter>();
+                    bool writeIt = false;
+                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                    {
+                        if (qqw.ContainsKey(stat))
+                        {
+                            writeIt = qqw[stat].Flat > 0;
+                        }
+                    }
+
+                    if (true)
+                    {
+                        WriteRune(ws, ref row, ref col, stat, "", "flat", load, build, slot);
+                        row++;
+                        wrote++;
+                    }
+                    col = 1;
+                }
+                if (i != 3)
+                {
+                    var qqw = new Dictionary<string, RuneFilter>();
+                    bool writeIt = false;
+                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                    {
+                        if (qqw.ContainsKey(stat))
+                        {
+                            writeIt = qqw[stat].Percent > 0;
+                        }
+                    }
+
+                    if (true)
+                    {
+                        WriteRune(ws, ref row, ref col, stat, " %", "perc", load, build, slot);
+                        row++;
+                        wrote++;
+                    }
+                    col = 1;
+                }
+            }
+            if (wrote > 0)
+            {
+                if (slot == 0)
+                    ws.Cells[row - wrote - 3, col].Value = "Global";
+                else if (slot == -1)
+                    ws.Cells[row - wrote - 3, col].Value = "Odds";
+                else if (slot == -2)
+                    ws.Cells[row - wrote - 3, col].Value = "Evens";
+                else
+                    ws.Cells[row - wrote - 3, col].Value = slot;
+            }
+        }
+
+        /*
         void GenerateExcel()
         {
             if (data == null || data.Runes == null)
@@ -1758,7 +1870,7 @@ namespace RuneApp
                                 sslot = "g";
 
                             int wrote = 0;
-
+                            
                             for (int i = 0; i < Build.statNames.Length; i++)
                             {
                                 var stat = Build.statNames[i];
@@ -1823,6 +1935,7 @@ namespace RuneApp
 
             pck.Save();
         }
+        */
 
         void WriteRune(ExcelWorksheet ws, ref int row, ref int col, string stat, string hpref, string ssuff, Loadout load, Build build, int slot)
         {
@@ -1888,9 +2001,13 @@ namespace RuneApp
             }
 
             if (mul >= 2)
-                ws.Cells[row, col].Value = "Yes";
-            col++;
-
+            {
+                //    ws.Cells[row, col].Value = "Yes";
+                ws.Cells[row, 4].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
+                ws.Cells[row, 4].Style.Fill.BackgroundColor.SetColor(Color.LawnGreen);
+            }
+            //col++;
+            
             //ws.Cells[row, col].Value = usedFilt.Count();
             //col++;
 
@@ -1903,7 +2020,6 @@ namespace RuneApp
             //col++;
             foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)))
             {
-                col++;
                 var rval = r[stat + ssuff, pred, false];
 
                 if (rval > 0)
@@ -1923,8 +2039,9 @@ namespace RuneApp
                         ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Red);
                     }
                 }
+                col++;
             }
-            
+
         }
 
         void GenerateStats()
@@ -2212,7 +2329,7 @@ namespace RuneApp
 		private void toolStripButton17_Click(object sender, EventArgs e)
 		{
             GenerateStats();
-            GenerateExcel();
+            //GenerateExcel();
 		}
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)

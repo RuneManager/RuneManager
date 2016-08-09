@@ -388,23 +388,82 @@ namespace RuneOptim
 		}
 
         [JsonIgnore]
-        private Dictionary<Attr, int[]> subUpgrades = new Dictionary<Attr, int[]>()
+        public double ScoringHP
         {
-            {Attr.HealthFlat, new int[] { 20, 90, 160, 222, 279, 365 } },
-            {Attr.AttackFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
-            {Attr.DefenseFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
-            {Attr.Speed, new int[] { 1, 2, 3, 4, 5, 6} },
+            get
+            {
+                double v = 0;
 
-            {Attr.HealthPercent, new int[] { 3, 4, 5, 6, 7, 8} },
-            {Attr.AttackPercent, new int[] { 3, 4, 5, 6, 7, 8} },
-            {Attr.DefensePercent, new int[] { 3, 4, 5, 6, 7, 8 } },
+                v += HealthPercent.Value / (double)subMaxes[Attr.HealthPercent];
+                v += DefensePercent.Value / (double)subMaxes[Attr.DefensePercent];
+                v += Resistance.Value / (double)subMaxes[Attr.Resistance];
+                v += 0.5 * HealthFlat.Value / (double)subMaxes[Attr.HealthFlat];
+                v += 0.5 * DefenseFlat.Value / (double)subMaxes[Attr.DefenseFlat];
 
-            { Attr.CritRate, new int[] { 1, 2, 3, 4, 5, 6 } },
-            { Attr.CritDamage, new int[] { 2, 3, 4, 5, 6, 7 } },
+                if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
+                    v -= MainValue / (double)subMaxes[MainType];
+                else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
+                    v -= 0.5 * MainValue / (double)subMaxes[MainType];
 
-            {Attr.Resistance, new int[] { 3, 4, 5, 6, 7, 8 } },
-            {Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },
-        };
+                double d = 0.5;
+
+                d += 0.2 * (Rarity - (Rarity - Math.Floor(Level / (double)3)) * (v - InnateValue ?? 0 / (double)subMaxes[InnateType]));
+
+                return v/d;
+            }
+        }
+
+        [JsonIgnore]
+        public double ScoringATK
+        {
+            get
+            {
+                double v = 0;
+
+                v += AttackPercent.Value / (double)subMaxes[Attr.AttackPercent];
+                v += CritRate.Value / (double)subMaxes[Attr.CritRate];
+                v += CritDamage.Value / (double)subMaxes[Attr.CritDamage];
+                v += 0.5 * AttackFlat.Value / (double)subMaxes[Attr.AttackFlat];
+
+                if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
+                    v -= MainValue / (double)subMaxes[MainType];
+                else if (MainType == Attr.AttackFlat)
+                    v -= 0.5 * MainValue / (double)subMaxes[MainType];
+
+                double d = 0.6;
+
+                d += 0.2 * (Rarity - (Rarity - Math.Floor(Level / (double)3)) * (v - InnateValue ?? 0 / (double)subMaxes[InnateType]));
+
+                return v/d;
+            }
+        }
+
+        [JsonIgnore]
+        public double ScoringRune
+        {
+            get
+            {
+                double v = 0;
+
+                if (InnateValue.HasValue && InnateValue.Value > 0)
+                    v += InnateValue.Value / (double)subMaxes[InnateType];
+                if (Sub1Value.HasValue && Sub1Value.Value > 0)
+                    v += Sub1Value.Value / (double)subMaxes[Sub1Type];
+                if (Sub2Value.HasValue && Sub2Value.Value > 0)
+                    v += Sub2Value.Value / (double)subMaxes[Sub2Type];
+                if (Sub3Value.HasValue && Sub3Value.Value > 0)
+                    v += Sub3Value.Value / (double)subMaxes[Sub3Type];
+                if (Sub4Value.HasValue && Sub4Value.Value > 0)
+                    v += Sub4Value.Value / (double)subMaxes[Sub4Type];
+
+                v += Grade / (double)6;
+
+                double d = 2;
+                d += 0.2 * Math.Min(4, Math.Floor(Level / (double)3));
+
+                return v/d;
+            }
+        }
 
         public double GetEfficiency(Attr a, int val)
         {
@@ -776,6 +835,44 @@ namespace RuneOptim
         }
 
         #region stats
+
+        private static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
+        {
+            {Attr.Null, 1 },
+            {Attr.HealthFlat, 1875 },
+            {Attr.AttackFlat, 100 },
+            {Attr.DefenseFlat, 100 },
+            {Attr.Speed, 30 },
+
+            {Attr.HealthPercent, 40 },
+            {Attr.AttackPercent, 40 },
+            {Attr.DefensePercent, 40 },
+
+            { Attr.CritRate, 30 },
+            { Attr.CritDamage, 35 },
+
+            {Attr.Resistance, 40 },
+            {Attr.Accuracy, 40 },
+        };
+
+
+        private static Dictionary<Attr, int[]> subUpgrades = new Dictionary<Attr, int[]>()
+        {
+            {Attr.HealthFlat, new int[] { 20, 90, 160, 222, 279, 365 } },
+            {Attr.AttackFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
+            {Attr.DefenseFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
+            {Attr.Speed, new int[] { 1, 2, 3, 4, 5, 6} },
+
+            {Attr.HealthPercent, new int[] { 3, 4, 5, 6, 7, 8} },
+            {Attr.AttackPercent, new int[] { 3, 4, 5, 6, 7, 8} },
+            {Attr.DefensePercent, new int[] { 3, 4, 5, 6, 7, 8 } },
+
+            { Attr.CritRate, new int[] { 1, 2, 3, 4, 5, 6 } },
+            { Attr.CritDamage, new int[] { 2, 3, 4, 5, 6, 7 } },
+
+            {Attr.Resistance, new int[] { 3, 4, 5, 6, 7, 8 } },
+            {Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },
+        };
 
         public static int[][] MainValues_Speed = new int[][] {
             new int[]{3,4,5,6,8,9,10,12,13,14,16,17,18,19,21,25},

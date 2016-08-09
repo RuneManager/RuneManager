@@ -42,5 +42,39 @@ namespace RuneOptim
 
             return "null";
         }
+
+        // Enable casting Attr enums to a string
+        public static string ToGameString(this Attr attr)
+        {
+            switch (attr)
+            {
+                case Attr.Accuracy:
+                    return "ACC%";
+                case Attr.AttackFlat:
+                    return "ATK";
+                case Attr.AttackPercent:
+                    return "ATK%";
+                case Attr.CritDamage:
+                    return "CD%";
+                case Attr.CritRate:
+                    return "CR%";
+                case Attr.DefenseFlat:
+                    return "DEF";
+                case Attr.DefensePercent:
+                    return "DEF%";
+                case Attr.HealthFlat:
+                    return "HP";
+                case Attr.HealthPercent:
+                    return "HP%";
+                case Attr.Resistance:
+                    return "RES%";
+                case Attr.Speed:
+                    return "SPD";
+                case Attr.SpeedPercent:
+                    return "SPD%";
+            }
+
+            return "null";
+        }
     }
 }
