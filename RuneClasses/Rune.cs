@@ -391,7 +391,10 @@ namespace RuneOptim
 			}
 		}
 
-        [JsonIgnore]
+		[JsonIgnore]
+		private Attr[] hpStats = new Attr[] { Attr.HealthPercent, Attr.DefensePercent, Attr.Resistance, Attr.HealthFlat, Attr.DefenseFlat };
+
+		[JsonIgnore]
         public double ScoringHP
         {
             get
@@ -404,18 +407,45 @@ namespace RuneOptim
                 v += 0.5 * HealthFlat.Value / (double)subMaxes[Attr.HealthFlat];
                 v += 0.5 * DefenseFlat.Value / (double)subMaxes[Attr.DefenseFlat];
 
-                if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
-                    v -= MainValue / (double)subMaxes[MainType];
-                else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
-                    v -= 0.5 * MainValue / (double)subMaxes[MainType];
+				if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
+				{
+					v -= MainValue / (double)subMaxes[MainType];
+					if (Slot % 2 == 0)
+						v += Grade /(double) 6;
+				}
+				else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
+				{
+					v -= 0.5 * MainValue / (double)subMaxes[MainType];
+					if (Slot % 2 == 0)
+						v += Grade / (double) 6;
+				}
 
-                double d = 0.5;
+				double d = 0.5;
+				if (Slot == 3 || Slot == 5)
+					d += 0.2;
 
-                d += 0.2 * (Rarity - (Rarity - Math.Floor(Level / (double)3)) * (v - InnateValue ?? 0 / (double)subMaxes[InnateType]));
+				if (Slot % 2 == 0)
+					d += 1;
+				
+				d += 0.2 * (
+					Rarity
+					- (
+						Rarity
+						- Math.Floor(Level / (double)3)
+					) * (
+						hpStats.Contains(Sub1Type) ? 1 :
+						hpStats.Contains(Sub2Type) ? 1 :
+						hpStats.Contains(Sub3Type) ? 1 :
+						hpStats.Contains(Sub4Type) ? 1 : 0
+					)
+				);
 
-                return v/d;
+				return v/d;
             }
         }
+
+		[JsonIgnore]
+		private Attr[] atkStats = new Attr[] { Attr.AttackFlat, Attr.AttackPercent, Attr.CritRate, Attr.CritDamage };
 
         [JsonIgnore]
         public double ScoringATK
@@ -429,14 +459,39 @@ namespace RuneOptim
                 v += CritDamage.Value / (double)subMaxes[Attr.CritDamage];
                 v += 0.5 * AttackFlat.Value / (double)subMaxes[Attr.AttackFlat];
 
-                if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
-                    v -= MainValue / (double)subMaxes[MainType];
-                else if (MainType == Attr.AttackFlat)
-                    v -= 0.5 * MainValue / (double)subMaxes[MainType];
+				if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
+				{
+					v -= MainValue / (double)subMaxes[MainType];
+					if (Slot % 2 == 0)
+						v += Grade / (double)6;
+				}
+				else if (MainType == Attr.AttackFlat)
+				{
+					v -= 0.5 * MainValue / (double)subMaxes[MainType];
+					if (Slot % 2 == 0)
+						v += Grade / (double)6;
+				}
 
-                double d = 0.6;
+                double d = 0.4;
 
-                d += 0.2 * (Rarity - (Rarity - Math.Floor(Level / (double)3)) * (v - InnateValue ?? 0 / (double)subMaxes[InnateType]));
+				if (Slot == 1)
+					d += 0.2;
+
+				if (Slot % 2 == 0)
+					d += 1.1;
+
+				d += 0.2 * (
+					Rarity
+					- (
+						Rarity
+						- Math.Floor(Level / (double)3)
+					) * (
+						atkStats.Contains(Sub1Type) ? 1 :
+						atkStats.Contains(Sub2Type) ? 1 :
+						atkStats.Contains(Sub3Type) ? 1 :
+						atkStats.Contains(Sub4Type) ? 1 : 0
+					)
+				);
 
                 return v/d;
             }
@@ -448,17 +503,46 @@ namespace RuneOptim
             get
             {
                 double v = 0;
+				
+				if (InnateValue.HasValue && InnateValue.Value > 0)
+				{
+					if (InnateType == Attr.AttackFlat || InnateType == Attr.HealthFlat || InnateType == Attr.DefenseFlat)
+						v += 0.5 * InnateValue.Value / (double)subMaxes[InnateType];
+					else
+						v += InnateValue.Value / (double)subMaxes[InnateType];
+				}
 
-                if (InnateValue.HasValue && InnateValue.Value > 0)
-                    v += InnateValue.Value / (double)subMaxes[InnateType];
-                if (Sub1Value.HasValue && Sub1Value.Value > 0)
-                    v += Sub1Value.Value / (double)subMaxes[Sub1Type];
-                if (Sub2Value.HasValue && Sub2Value.Value > 0)
-                    v += Sub2Value.Value / (double)subMaxes[Sub2Type];
-                if (Sub3Value.HasValue && Sub3Value.Value > 0)
-                    v += Sub3Value.Value / (double)subMaxes[Sub3Type];
-                if (Sub4Value.HasValue && Sub4Value.Value > 0)
-                    v += Sub4Value.Value / (double)subMaxes[Sub4Type];
+				if (Sub1Value.HasValue && Sub1Value.Value > 0)
+				{
+					if (Sub1Type == Attr.AttackFlat || Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat)
+						v += 0.5 * Sub1Value.Value / (double)subMaxes[Sub1Type];
+					else
+						v += Sub1Value.Value / (double)subMaxes[Sub1Type];
+				}
+
+				if (Sub2Value.HasValue && Sub2Value.Value > 0)
+				{
+					if (Sub2Type == Attr.AttackFlat || Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat)
+						v += 0.5 * Sub2Value.Value / (double)subMaxes[Sub2Type];
+					else
+						v += Sub2Value.Value / (double)subMaxes[Sub2Type];
+				}
+
+				if (Sub3Value.HasValue && Sub3Value.Value > 0)
+				{
+					if (Sub3Type == Attr.AttackFlat || Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat)
+						v += 0.5 * Sub3Value.Value / (double)subMaxes[Sub3Type];
+					else
+						v += Sub3Value.Value / (double)subMaxes[Sub3Type];
+				}
+
+				if (Sub4Value.HasValue && Sub4Value.Value > 0)
+				{
+					if (Sub4Type == Attr.AttackFlat || Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat)
+						v += 0.5 * Sub4Value.Value / (double)subMaxes[Sub4Type];
+					else
+						v += Sub4Value.Value / (double)subMaxes[Sub4Type];
+				}
 
                 v += Grade / (double)6;
 

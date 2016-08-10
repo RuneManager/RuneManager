@@ -1287,13 +1287,21 @@ namespace RuneApp
             var ws = wss.Where(w => w.Name == "Runes").FirstOrDefault();
             if (ws == null)
                 ws = wss.Add("Runes");
+			else
+			{
+				var ind = ws.Index;
+				wss.Delete("Runes");
+				ws = excelPack.Workbook.Worksheets.Add("Runes");
+				wss.MoveBefore(ws.Index, ind);
+			}
+
             int row = 1;
             int col = 1;
             foreach (var th in "Id,Grade,Set,Slot,MType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,Flats,FlatPts,Sell,Action, ,Main,Innate,1,2,3,4,HPpts,ATKpts,Pts".Split(','))
             {
                 ws.Cells[row, col].Value = th; col++;
-            }
-            row++;
+			}
+			row++;
             col = 1;
 
             return true;
