@@ -438,7 +438,11 @@ namespace RuneApp
             foreach (Build b in builds)
             {
                 if (data != null)
-                    b.mon = data.GetMonster(b.MonName);
+                {
+                    var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
+                    // if there is a build with this monname, maybe I have 2 mons with that name?!
+                    b.mon = data.GetMonster(b.MonName, bnum + 1);
+                }
                 else
                 {
                     b.mon = new Monster();
@@ -455,12 +459,12 @@ namespace RuneApp
                 {
                     b.priority = buildList.Items.Count + 1;
                 }
-				ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "" });
+				ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "", b.mon.ID.ToString() });
                 li.Tag = b;
                 buildList.Items.Add(li);
 				
 				// ask the enumerable to eat Linq. Unsure why Find(b.mon.Name, false/true) failed here.
-				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.ID.ToString()).Count() > 0).FirstOrDefault();
 				if (lv1li != null)
 				{
 					lv1li.ForeColor = Color.Green;
@@ -602,14 +606,14 @@ namespace RuneApp
 
         private void rune_Stats(Rune rune)
         {
-            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue) + " " + rune.ID;
+            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
             SRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
             SRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
             SRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
             SRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
             SRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
             SRuneLevel.Text = rune.Level.ToString();
-            SRuneMon.Text = rune.AssignedName;
+            SRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
         }
 
         private void label8_Click(object sender, EventArgs e)
@@ -645,7 +649,8 @@ namespace RuneApp
                     IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
                     IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
                     IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
-                    IRuneMon.Text = rune.AssignedName;
+                    IRuneLevel.Text = rune.Level.ToString();
+                    IRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
                 }
             }
             
@@ -852,7 +857,7 @@ namespace RuneApp
 						else
 							ff.build.priority = 1;
 
-                        ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"0%"});
+                        ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"", ff.build.mon.ID.ToString() });
                         li.Tag = ff.build;
                         buildList.Items.Add(li);
                         builds.Add(ff.build);
@@ -1627,7 +1632,12 @@ namespace RuneApp
 
             foreach (var r in usedSlot)
             {
-                r.buildScoreTemp = build.ScoreRune(r, build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key : 0, false);
+                int pred = build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key :
+                       build.runePrediction.ContainsKey(slot % 2 == 0 ? "e" : "o") ? build.runePrediction[slot % 2 == 0 ? "e" : "o"].Key :
+                       build.runePrediction.ContainsKey("g") ? build.runePrediction["g"].Key : 0;
+
+
+                r.buildScoreTemp = build.ScoreRune(r, pred, false);
             }
 
             col = 5;
@@ -1707,263 +1717,7 @@ namespace RuneApp
                     ws.Cells[row - wrote - 3, col].Value = slot;
             }
         }
-
-        /*
-        void GenerateExcel()
-        {
-            if (data == null || data.Runes == null)
-                return;
-
-            FileInfo newFile = new FileInfo(@"runestats.xlsx");
-            int status = 0;
-            while (status != 1)
-            {
-                try
-                {
-                    newFile.Delete();
-                    status = 1;
-                }
-                catch (Exception e)
-                {
-                    if (status == 0)
-                    {
-                        if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
-                        {
-                            status = 1;
-                        }
-                    }
-                    else
-                        Console.WriteLine(e);
-
-                }
-            }
-
-            ExcelPackage pck = new ExcelPackage(newFile);
-            var ws = pck.Workbook.Worksheets.Add("Runes");
-            int row = 1;
-            int col = 1;
-            foreach (var th in "Id,Grade,Set,Slot,MainType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,FlatCount,FlatPts,SellScore,Action".Split(','))
-            {
-                ws.Cells[row, col].Value = th; col++;
-            }
-            row++;
-            col = 1;
-
-            foreach (Rune r in data.Runes.OrderByDescending(r => r.ScoringBad))
-            {
-                ws.Cells[row, col].Value = r.ID; col++;
-
-                ws.Cells[row, col].Value = r.Grade; col++;
-
-                ws.Cells[row, col].Value = r.Set; col++;
-                ws.Cells[row, col].Value = r.Slot; col++;
-                ws.Cells[row, col].Value = r.MainType; col++;
-
-                ws.Cells[row, col].Value = r.Level; col++;
-
-                ws.Cells[row, col].Value = r.manageStats_Set; col++;
-                ws.Cells[row, col].Value = r.manageStats_RuneFilt; col++;
-                ws.Cells[row, col].Value = r.manageStats_TypeFilt; col++;
-
-                ws.Cells[row, col].Value = r.manageStats_LoadFilt; col++;
-                ws.Cells[row, col].Value = r.manageStats_LoadGen; col++;
-
-                ws.Cells[row, col].Value = r.Efficiency.ToString("0.####"); col++;
-
-                ws.Cells[row, col].Value = (r.manageStats_In ? "TRUE" : "FALSE"); col++;
-
-                ws.Cells[row, col].Value = r.ScoringBad.ToString(); col++;
-
-                ws.Cells[row, col].Value = r.FlatCount().ToString(); col++;
-                ws.Cells[row, col].Value = r.FlatPoints().ToString("0.####"); col++;
-
-                ws.Cells[row, col].Value = r.ScoringSell.ToString(); col++;
-
-                ws.Cells[row, col].Value = r.ScoringAct; col++;
-                
-                row++;
-                col = 1;
-            }
-            // write rune stats
-
-            foreach (ListViewItem li in loadoutList.Items)
-            {
-                if (li.Tag != null)
-                {
-                    var bbs = buildList.Items.OfType<ListViewItem>().Select(lv => lv.Tag).Cast<Build>();
-                    var build = bbs.Where(b => b.ID == int.Parse(li.Text.ToString())).FirstOrDefault();
-
-                    Loadout load = (Loadout)li.Tag;
-                    if (load != null)
-                    {
-                        var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
-                        var sstrsuf = "";
-                        if (pck.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count() > 0)
-                            sstrsuf = pck.Workbook.Worksheets.Where(w => w.Name == mon.Name).Count().ToString();
-                        ws = pck.Workbook.Worksheets.Add(mon.Name + sstrsuf);
-                        row = 1;
-                        col = 1;
-
-                        // number of good builds?
-                        ws.Cells[row, 1].Value = "Builds";
-                        ws.Cells[row, 2].Value = "Bad";
-                        ws.Cells[row, 3].Value = "Good";
-
-                        row++;
-
-                        ws.Cells[row, 2].Value = load.buildUsage.failed;
-                        ws.Cells[row, 3].Value = load.buildUsage.passed;
-
-                        load.buildUsage.loads = load.buildUsage.loads.OrderByDescending(m => Build.sort(build, m.GetStats())).ToList();
-
-                        double scoreav = 0;
-                        int c = 0;
-                        foreach (var b in load.buildUsage.loads)
-                        {
-                            double sc = Build.sort(build, b.GetStats());
-                            b.score = sc;
-                            scoreav += sc;
-                            c++;
-                        }
-                        scoreav /= (double)c;
-
-                        ws.Cells[row - 1, 4].Value = scoreav;
-
-                        c = 0;
-                        Stats minav = new Stats();
-                        foreach (var b in load.buildUsage.loads.Where(m => m.score < scoreav))
-                        {
-                            minav += b.GetStats();
-                            c++;
-                        }
-                        minav /= c;
-
-                        ws.Cells[row, 4].Value = load.buildUsage.loads.Where(m => minav < m.GetStats()).Count();
-
-                        var trow = row;
-                        row++;
-
-                        foreach (var stat in Build.statNames)
-                        {
-                            ws.Cells[row, 1].Value = stat;
-                            if (build.Minimum[stat] > 0 || build.Sort[stat] != 0)
-                            {
-                                ws.Cells[row, 2].Value = build.Minimum[stat];
-                                ws.Cells[row, 3].Value = build.Sort[stat];
-                                ws.Cells[row, 4].Value = minav[stat];
-                            }
-                            row++;
-                        }
-
-                        col = 5;
-                        row = trow;
-
-                        foreach (var b in load.buildUsage.loads.Take(1000))
-                        {
-                            row = trow;
-                            ws.Cells[row, col].Value = b.score;// Build.sort(build, b.GetStats());
-                            if (b.score < scoreav)
-                            {
-                                ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                                ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightPink);
-                            }
-                            row++;
-                            foreach (var stat in Build.statNames)
-                            {
-                                ws.Cells[row, col].Value = b.GetStats()[stat];
-                                row++;
-                            }
-                            col++;
-                        }
-
-                        row++;
-
-
-                        ws.Cells[row, 2].Value = "Pass";
-                        ws.Cells[row, 3].Value = "Good";
-                        ws.Cells[row, 4].Value = "Std Dev";
-                        ws.Cells[row, 5].Value = "# This time";
-                        ws.Cells[row, 6].Value = "# Next time";
-                        ws.Cells[row, 7].Value = "Limit";
-                        row++;
-                        for (int slot = -2; slot < 7; slot++)
-                        {
-                            string sslot = slot.ToString();
-                            if (slot == -1)
-                                sslot = "o";
-                            else if (slot == -2)
-                                sslot = "e";
-                            else if (slot == 0)
-                                sslot = "g";
-
-                            int wrote = 0;
-                            
-                            for (int i = 0; i < Build.statNames.Length; i++)
-                            {
-                                var stat = Build.statNames[i];
-
-                                if (i <= 3) //SPD
-                                {
-                                    var qqw = new Dictionary<string, RuneFilter>();
-                                    bool writeIt = false;
-                                    if (build.runeFilters.TryGetValue(sslot, out qqw))
-                                    {
-                                        if (qqw.ContainsKey(stat))
-                                        {
-                                            writeIt = qqw[stat].Flat > 0;
-                                        }
-                                    }
-
-                                    if (true)
-                                    {
-                                        WriteRune(ws, ref row, ref col, stat, "", "flat", load, build, slot);
-                                        row++;
-                                        wrote++;
-                                    }
-                                    col = 1;
-                                }
-                                if (i != 3)
-                                {
-                                    var qqw = new Dictionary<string, RuneFilter>();
-                                    bool writeIt = false;
-                                    if (build.runeFilters.TryGetValue(sslot, out qqw))
-                                    {
-                                        if (qqw.ContainsKey(stat))
-                                        {
-                                            writeIt = qqw[stat].Percent > 0;
-                                        }
-                                    }
-
-                                    if (true)
-                                    {
-                                        WriteRune(ws, ref row, ref col, stat, " %", "perc", load, build, slot);
-                                        row++;
-                                        wrote++;
-                                    }
-                                    col = 1;
-                                }
-                            }
-                            if (wrote > 0)
-                            {
-                                if (slot == 0)
-                                    ws.Cells[row - wrote - 1, col].Value = "Global";
-                                else if (slot == -1)
-                                    ws.Cells[row - wrote - 1, col].Value = "Odds";
-                                else if (slot == -2)
-                                    ws.Cells[row - wrote - 1, col].Value = "Evens";
-                                else
-                                    ws.Cells[row - wrote - 1, col].Value = slot;
-                            }
-                            row++;
-                        }
-                    }
-                }
-            }
-
-            pck.Save();
-        }
-        */
-
+        
         void WriteRune(ExcelWorksheet ws, ref int row, ref int col, string stat, string hpref, string ssuff, Loadout load, Build build, int slot)
         {
             // slot 0 = global, -1 = odd, -2 even
@@ -1988,7 +1742,9 @@ namespace RuneApp
             ws.Cells[row, col].Value = stat + hpref;
             col++;
 
-            int pred = build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key : 0;
+            int pred = build.runePrediction.ContainsKey(sslot) ? build.runePrediction[sslot].Key : 
+                       build.runePrediction.ContainsKey(slot % 2 == 0 ? "e" : "o") ? build.runePrediction[slot % 2 == 0 ? "e" : "o"].Key :
+                       build.runePrediction.ContainsKey("g") ? build.runePrediction["g"].Key : 0;
 
             var used = load.runeUsage.runesUsed.Select(r => r.Key);
             var usedSlot = used.Where(r => aslot(r.Slot));

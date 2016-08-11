@@ -126,10 +126,17 @@ namespace RuneApp
                 // generate 5000 builds
 				build.GenBuilds(buildsGen, 0, (s) => { }, (d) =>
 				{
-					Invoke((MethodInvoker)delegate
-					{
-						toolStripProgressBar1.Value = (int)(d * buildsShow);
-					});
+                    if (!IsDisposed && IsHandleCreated)
+                    {
+                        Invoke((MethodInvoker)delegate
+                        {
+                            toolStripProgressBar1.Value = (int)(d * buildsShow);
+                        });
+                    }
+                    else
+                    {
+                        build.isRun = false;
+                    }
 				});
 				if (build.loads == null)
 				{
@@ -155,21 +162,26 @@ namespace RuneApp
                     if (grayLocked && b.Current.runes.Any(r => r.Locked))
                         li.ForeColor = Color.Gray;
 
-					Invoke((MethodInvoker)delegate
-					{
-                        // put the thing in on the main thread and bump the progress bar
-						loadoutList.Items.Add(li);
-                        num++;
-						toolStripProgressBar1.Value = buildsShow + (int)(buildsShow * num / (double)tbuilds);
-					});
+                    if (!IsDisposed && IsHandleCreated)
+                    {
+                        Invoke((MethodInvoker)delegate
+                        {
+                            // put the thing in on the main thread and bump the progress bar
+                            loadoutList.Items.Add(li);
+                            num++;
+                            toolStripProgressBar1.Value = buildsShow + (int)(buildsShow * num / (double)tbuilds);
+                        });
+                    }
 				}
 
-				Invoke((MethodInvoker)delegate
-				{
-					toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
-					building = false;
-				});
-
+                if (!IsDisposed && IsHandleCreated)
+                {
+                    Invoke((MethodInvoker)delegate
+                    {
+                        toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
+                        building = false;
+                    });
+                }
 			});
         }
 
@@ -386,14 +398,14 @@ namespace RuneApp
 
         private void rune_Stats(Rune rune)
         {
-            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue) + " " + rune.ID;
+            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
             SRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
             SRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
             SRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
             SRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
             SRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
             SRuneLevel.Text = rune.Level.ToString();
-            SRuneMon.Text = rune.AssignedName;
+            SRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
         }
 
         private void hideRuneBox(object sender, EventArgs e)

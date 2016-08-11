@@ -27,6 +27,8 @@ namespace RuneOptim
         private Monster getMonster(string name, int num)
         {
             Monster mon = Monsters.Where(m => m.Name == name).Skip(num - 1).FirstOrDefault();
+            if (mon == null)
+                mon = Monsters.Where(m => m.Name == name).FirstOrDefault();
             if (mon != null)
                 return mon;
             return new Monster();
