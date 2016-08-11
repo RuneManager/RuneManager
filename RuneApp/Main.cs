@@ -113,7 +113,7 @@ namespace RuneApp
             for (int i = 0; i < 11; i++)
             {
                 ToolStripItem it = new ToolStripMenuItem(i.ToString() + (i > 0 ? " (" + Math.Ceiling(i * 1.5).ToString() + "%)" : ""));
-                it.Tag = (int)Math.Floor(i * 1.5);
+                it.Tag = (int)Math.Ceiling(i * 1.5);
                 it.Click += ShrineClickSpeed;
                 speedToolStripMenuItem.DropDownItems.Add(it);
             }
@@ -784,16 +784,18 @@ namespace RuneApp
                     ShowRunes(load.runes);
 
                     var dmon = data.GetMonster(monid);
-                    var dmonld = dmon.Current.Leader;
-                    var dmonsh = dmon.Current.Shrines;
-                    dmon.Current.Leader = load.Leader;
-                    dmon.Current.Shrines = load.Shrines;
+					if (dmon != null)
+					{
+						var dmonld = dmon.Current.Leader;
+						var dmonsh = dmon.Current.Shrines;
+						dmon.Current.Leader = load.Leader;
+						dmon.Current.Shrines = load.Shrines;
 
-                    ShowDiff(dmon.GetStats(), load.GetStats(mon));
+						ShowDiff(dmon.GetStats(), load.GetStats(mon));
 
-                    dmon.Current.Leader = dmonld;
-                    dmon.Current.Shrines = dmonsh;
-
+						dmon.Current.Leader = dmonld;
+						dmon.Current.Shrines = dmonsh;
+					}
                     ShowSets(load);
                 }
             }
