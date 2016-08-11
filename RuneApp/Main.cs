@@ -1056,7 +1056,7 @@ namespace RuneApp
             }
         }
 
-        private void toolStripButton9_Click(object sender, EventArgs e)
+        private void SaveBuilds(string fname = "builds.json")
         {
             builds.Clear();
 
@@ -1079,7 +1079,13 @@ namespace RuneApp
             }
 
             var str = JsonConvert.SerializeObject(builds);
-            File.WriteAllText("builds.json", str);
+            File.WriteAllText(fname, str);
+        }
+
+
+        private void toolStripButton9_Click(object sender, EventArgs e)
+        {
+            SaveBuilds();
         }
 
         private void toolStripButton10_Click(object sender, EventArgs e)
@@ -2140,20 +2146,7 @@ namespace RuneApp
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			builds.Clear();
-
-			var lbs = buildList.Items;
-
-			foreach (ListViewItem li in lbs)
-			{
-				var bb = (Build)li.Tag;
-				if (bb.mon.Name != "Missingno")
-					bb.MonName = bb.mon.Name;
-				builds.Add(bb);
-			}
-
-			var str = JsonConvert.SerializeObject(builds);
-			File.WriteAllText("builds.json", str);
+            SaveBuilds();
         }
 
         private void toolStripButton15_Click(object sender, EventArgs e)
