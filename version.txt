@@ -1,12 +1,7 @@
-0.1.4.3
+0.2.0.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Decimals in the rune filter.
-Tooltips for less 'No builds', maybe.
-Shows runes in test builds. Shows set names properly (including broken).
-Less breaky. Cleaned some names.
-0.1.4.1:
-BEFORE vs AFTER stats preview (doesn't count shrine/lead?)
-EHPDB updated: 50% > 70% per ingame help.
-Generating Runestats is optional (default off).
-Runestats is now an XLSX and gives a page per mon.
-0.1.3.0: Option to download L40 / Awakened stats.
+BACKUP your builds.
+Runestats.xlsx is now helpful, still defaults off.
+Added a little to the manual.
+Can now change build targets by click the monster name in the top-left.
+Testing builds times out at 20 seconds.

@@ -124,7 +124,7 @@ namespace RuneApp
                 build.GenRunes(Main.data, noLocked, Main.useEquipped);
 
                 // generate 5000 builds
-				build.GenBuilds(buildsGen, 0, (s) => { }, (d) =>
+				build.GenBuilds(buildsGen, 20, (s) => { }, (d) =>
 				{
                     if (!IsDisposed && IsHandleCreated)
                     {

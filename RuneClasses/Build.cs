@@ -5,9 +5,26 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace RuneOptim
 {
+
+    public class RuneUsage
+    {
+        public ConcurrentDictionary<Rune, byte> runesUsed = new ConcurrentDictionary<Rune, byte>();
+        public ConcurrentDictionary<Rune, byte> runesGood = new ConcurrentDictionary<Rune, byte>();
+    }
+
+    public class BuildUsage
+    {
+        public int failed = 0;
+        public int passed = 0;
+        public List<Monster> loads;
+    }
+
+
     // The heavy lifter
     // Contains most of the data needed to outline build requirements
     public class Build
@@ -162,6 +179,14 @@ namespace RuneOptim
         [JsonProperty("BuildSets")]
         public List<RuneSet> BuildSets = new List<RuneSet>();
 
+
+        [JsonIgnore]
+        public BuildUsage buildUsage;
+
+        [JsonIgnore]
+        public RuneUsage runeUsage;
+
+
         /// ---------------
 
         // These should be generated at runtime, do not store externally
@@ -242,6 +267,9 @@ namespace RuneOptim
         {
             if (runes.Any(r => r == null))
                 return;
+
+            runeUsage = new RuneUsage();
+            buildUsage = new BuildUsage();
 
             // if to get awakened
             if (DownloadAwake && !mon.downloaded)
@@ -399,7 +427,7 @@ namespace RuneOptim
                 // set to running
                 isRun = true;
 
-                Loadout usage = new Loadout();
+                //Loadout usage = new Loadout();
                 
                 // Parallel the outer loop
                 var loopRes = Parallel.ForEach<Rune>(runes[0], (r0, loopState) =>
@@ -453,7 +481,7 @@ namespace RuneOptim
                                             foreach (Rune r in test.Current.runes)
                                             {
                                                 r.manageStats_LoadGen++;
-                                                usage.runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                                runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                             }
                                         }
 
@@ -504,14 +532,24 @@ namespace RuneOptim
                                                 foreach (Rune r in test.Current.runes)
                                                 {
                                                     r.manageStats_LoadFilt++;
-                                                    usage.runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                                    runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                                 }
                                             }
 
                                             // if we are to track all good builds, keep it
                                             if (!dumpBads)
                                             {
-                                                tests.Add(test);
+                                                if (tests.Count < 500000)
+                                                    tests.Add(test);
+                                                if (Best == null)
+                                                    Best = test;
+                                                else
+                                                {
+                                                    if (sort(Best.GetStats()) < sort(test.GetStats()))
+                                                    {
+                                                        Best = test;
+                                                    }
+                                                }
                                             }
                                             // if we only want to track really good builds
                                             else
@@ -519,7 +557,8 @@ namespace RuneOptim
                                                 // if there are currently no good builds, keep it
                                                 if (tests.FirstOrDefault() == null)
                                                 {
-                                                    tests.Add(test);
+                                                    if (tests.Count < 500000)
+                                                        tests.Add(test);
                                                     Best = test;
                                                 }
                                                 else
@@ -528,12 +567,14 @@ namespace RuneOptim
                                                     if (sort(Best.GetStats()) < sort(test.GetStats()))
                                                     {
                                                         Best = test;
-                                                        tests.Add(test);
+                                                        if (tests.Count < 500000)
+                                                            tests.Add(test);
                                                     }
                                                     // keep it for spreadsheeting
                                                     else if (saveStats)
                                                     {
-                                                        tests.Add(test);
+                                                        if (tests.Count < 500000)
+                                                            tests.Add(test);
                                                     }
                                                 }
                                             }
@@ -553,26 +594,32 @@ namespace RuneOptim
                                             {
                                                 if (DateTime.Now > begin.AddSeconds(time))
                                                 {
+                                                    Console.WriteLine("Timeout");
+                                                    if (printTo != null)
+                                                        printTo.Invoke("Timeout");
+                                                    if (progTo != null)
+                                                        progTo.Invoke(1);
+
                                                     isRun = false;
                                                     break;
                                                 }
                                             }
                                         }
-
+                                        /*
                                         if (tests.Count > 500000)
                                         {
                                             isRun = false;
                                             if (printTo != null)
                                                 printTo.Invoke("Too many");
                                             break;
-                                        }
+                                        }*/
                                     }
                                     // sum up what work we've done
                                     Interlocked.Add(ref total, -kill);
-                                    Interlocked.Add(ref usage.buildUsage.failed, kill);
+                                    Interlocked.Add(ref buildUsage.failed, kill);
                                     kill = 0;
                                     Interlocked.Add(ref count, plus);
-                                    Interlocked.Add(ref usage.buildUsage.passed, plus);
+                                    Interlocked.Add(ref buildUsage.passed, plus);
                                     plus = 0;
 
                                     // if we've got enough, stop
@@ -597,7 +644,7 @@ namespace RuneOptim
                 // sort *all* the builds
                 loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();
 
-                usage.buildUsage.loads = tests.ToList();
+                buildUsage.loads = tests.ToList();
                 
                 // dump everything to console, if nothing to print to
                 if (printTo == null)
@@ -618,8 +665,8 @@ namespace RuneOptim
                 {
                     // remember the good one
                     Best = loads.First();
-                    Best.Current.runeUsage = usage.runeUsage;
-                    Best.Current.buildUsage = usage.buildUsage;
+                    //Best.Current.runeUsage = usage.runeUsage;
+                    //Best.Current.buildUsage = usage.buildUsage;
                     foreach (Rune r in Best.Current.runes)
                     {
                         r.manageStats_In = true;
@@ -646,7 +693,6 @@ namespace RuneOptim
         //Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, 
         public bool RunFilters(int slot, out Stats rFlat, out Stats rPerc, out Stats rTest)
         {
-            int i = slot;
             bool blank = true;
             rFlat = new Stats();
             rPerc = new Stats();
@@ -658,12 +704,12 @@ namespace RuneOptim
                 rfG = runeFilters["g"];
 
             Dictionary<string, RuneFilter> rfM = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey((i % 2 == 1 ? "e" : "o")))
-                rfM = runeFilters[(i % 2 == 1 ? "e" : "o")];
+            if (runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
+                rfM = runeFilters[(slot % 2 == 0 ? "e" : "o")];
 
             Dictionary<string, RuneFilter> rfS = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey((i + 1).ToString()))
-                rfS = runeFilters[(i + 1).ToString()];
+            if (runeFilters.ContainsKey(slot.ToString()))
+                rfS = runeFilters[slot.ToString()];
 
             foreach (string stat in statNames)
             {
@@ -676,7 +722,6 @@ namespace RuneOptim
 
                     if (rfG.ContainsKey(stat))
                         rf = RuneFilter.Dominant(rf, rfG[stat]);
-
                 }
                 else
                 {
@@ -706,6 +751,21 @@ namespace RuneOptim
             }
 
             return blank;
+        }
+
+        public int GetPredict(Rune r)
+        {
+            int pred = runePrediction.ContainsKey("g") ? runePrediction["g"].Key : 0;
+
+            if (r.Slot > 0 && runePrediction.ContainsKey(r.Slot % 2 == 0 ? "e" : "o") && runePrediction[r.Slot % 2 == 0 ? "e" : "o"].Key >= 0)
+                pred = runePrediction[r.Slot % 2 == 0 ? "e" : "o"].Key;
+            if (runePrediction.ContainsKey(r.Slot.ToString()) && runePrediction[r.Slot.ToString()].Key >= 0)
+                pred = runePrediction[r.Slot.ToString()].Key;
+            
+            if (pred == -1)
+                pred = 0;
+
+            return pred;
         }
 
         public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false)
@@ -740,7 +800,6 @@ namespace RuneOptim
 
         public int LoadFilters(int slot, out double testVal)
         {
-            int i = slot;
             // which tab we pulled the filter from
             string gotScore = "";
             testVal = 0;
@@ -761,7 +820,7 @@ namespace RuneOptim
                 }
             }
             // is it and odd or even slot?
-            string tmk = (i % 2 == 1 ? "e" : "o");
+            string tmk = (slot % 2 == 0 ? "e" : "o");
             if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk) && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
@@ -773,7 +832,7 @@ namespace RuneOptim
                 }
             }
             // turn the 0-5 to a 1-6
-            tmk = (i + 1).ToString();
+            tmk = slot.ToString();
             if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk) && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
@@ -790,8 +849,6 @@ namespace RuneOptim
 
         public Predicate<Rune> RuneScoring(int slot, int raiseTo = 0, bool predictSubs = false)
         {
-            int i = slot;
-
             // default fail OR
             Predicate<Rune> slotTest = r => false;
 
@@ -919,7 +976,7 @@ namespace RuneOptim
 
 
                 // default fail OR
-                Predicate<Rune> slotTest = RuneScoring(i, raiseTo, predictSubs);
+                Predicate<Rune> slotTest = RuneScoring(i + 1, raiseTo, predictSubs);
 
                 runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
 

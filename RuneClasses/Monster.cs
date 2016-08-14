@@ -32,6 +32,9 @@ namespace RuneOptim
 
         [JsonIgnore]
         private bool chaStats = true;
+
+        [JsonIgnore]
+        public bool inStorage = false;
         
         public int SwapCost(Loadout l)
         {

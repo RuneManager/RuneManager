@@ -125,6 +125,7 @@
             this.monLabel.Size = new System.Drawing.Size(53, 13);
             this.monLabel.TabIndex = 0;
             this.monLabel.Text = "monLabel";
+            this.monLabel.Click += new System.EventHandler(this.monLabel_Click);
             // 
             // groupBox1
             // 

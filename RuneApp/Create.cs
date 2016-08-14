@@ -1111,7 +1111,8 @@ namespace RuneApp
                 }
                 TextBox tb = (TextBox)this.Controls.Find(tab + "raise", true).FirstOrDefault();
                 int raiseLevel = 0;
-                int.TryParse(tb.Text, out raiseLevel);
+                if (!int.TryParse(tb.Text, out raiseLevel))
+                    raiseLevel = -1;
                 CheckBox cb = (CheckBox)this.Controls.Find(tab + "bonus", true).FirstOrDefault();
                 /*if (!build.runePrediction.ContainsKey(tab))
                 {
@@ -1120,6 +1121,11 @@ namespace RuneApp
                 if (build.runePrediction.ContainsKey(tab))
                 {
                     var kv = build.runePrediction[tab];*/
+                    if (raiseLevel == -1 && !cb.Checked)
+                {
+                    build.runePrediction.Remove(tab);
+                }
+                    else
                     build.runePrediction[tab] = new KeyValuePair<int, bool>(raiseLevel, cb.Checked);
                 //}
                 if (build.runePrediction.ContainsKey(tab))
@@ -1912,5 +1918,18 @@ namespace RuneApp
 				}
 			}
 		}
-	}
+
+        private void monLabel_Click(object sender, EventArgs e)
+        {
+            using (MonSelect ms = new MonSelect(build.mon))
+            {
+                if (ms.ShowDialog() == DialogResult.OK)
+                {
+                    build.mon = ms.retMon;
+                    monLabel.Text = "Build for " + build.mon.Name + " (" + build.mon.ID + ")";
+                    refreshStats(build.mon, build.mon.GetStats());
+                }
+            }
+        }
+    }
 }
