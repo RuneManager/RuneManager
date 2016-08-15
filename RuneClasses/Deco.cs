@@ -1,0 +1,97 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+
+namespace RuneOptim
+{
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Shrine
+    {
+        [EnumMember(Value = "Unknown")]
+        Unknown = -1,
+        [EnumMember(Value = "")]
+        Null = 0,
+
+        [EnumMember(Value = "DEF")]
+        DEF = 4,
+        [EnumMember(Value = "SPD")]
+        SPD = 6,
+        [EnumMember(Value = "HP")]
+        HP = 8,
+        [EnumMember(Value = "ATK")]
+        ATK = 9,
+
+        [EnumMember(Value = "FireATK")]
+        FireATK = 15,
+        [EnumMember(Value = "WaterATK")]
+        WaterATK = 16,
+        [EnumMember(Value = "WindATK")]
+        WindATK = 17,
+        [EnumMember(Value = "LightATK")]
+        LightATK = 18,
+        [EnumMember(Value = "DarkATK")]
+        DarkATK = 19,
+
+        [EnumMember(Value = "CD")]
+        CD = 31,
+
+    }
+
+    public class Deco
+    {
+        [JsonProperty("pos_x")]
+        public int X = 0;
+
+        [JsonProperty("pos_y")]
+        public int Y = 0;
+
+        [JsonProperty("deco_id")]
+        public int ID;
+
+        [JsonProperty("level")]
+        public int Level;
+
+        [JsonProperty("wizard_id")]
+        public int Owner;
+
+        [JsonProperty("island_id")]
+        public int Island;
+
+        [JsonProperty("master_id")]
+        public int MasterID;
+
+        [JsonIgnore]
+        public Shrine Shrine
+        {
+            get
+            {
+                switch (MasterID)
+                {
+                    case 4:
+                    case 6:
+                    case 8:
+                    case 9:
+                    case 15:
+                    case 16:
+                    case 17:
+                    case 18:
+                    case 19:
+                    case 31:
+                        return (Shrine)MasterID;
+                    default:
+                        return Shrine.Unknown;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            return "Lvl. " + Level + " " + Shrine;
+        }
+    }
+}

@@ -13,6 +13,12 @@ namespace RuneOptim
         [JsonProperty("mons")]
         public IList<Monster> Monsters;
 
+        [JsonProperty("deco_list")]
+        public IList<Deco> Decorations;
+        
+        [JsonProperty("crafts")]
+        public IList<Craft> Crafts;
+
         // Ask for monsters nicely
         public Monster GetMonster(string name)
         {

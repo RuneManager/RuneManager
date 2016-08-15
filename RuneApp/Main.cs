@@ -31,7 +31,11 @@ namespace RuneApp
         Build currentBuild = null;
         public static Configuration config = null;
 
-		private Task runTask = null;
+        private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
+        string[] shrineStats = new string[] { "SPD", "DEF" , "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
+        double[] shrineLevel = new double[] { 1.5, 2 , 2, 2, 2, 2, 2, 2, 2, 2.5};
+
+        private Task runTask = null;
 		private CancellationToken runToken;
 		private CancellationTokenSource runSource = null;
 		bool plsDie = false;
@@ -62,6 +66,8 @@ namespace RuneApp
 		public Main()
         {
             InitializeComponent();
+
+            #region Config
             config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
             bool dontupdate = false;
             if (config != null)
@@ -82,8 +88,11 @@ namespace RuneApp
                         makeStats = !tstats;
                 }
             }
+            #endregion
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
+
+            # region Sorter
             var sorter = new ListViewSort();
             sorter.OnColumnClick(MonPriority.Index);
             dataMonsterList.ListViewItemSorter = sorter;
@@ -92,6 +101,9 @@ namespace RuneApp
             sorter = new ListViewSort();
             sorter.OnColumnClick(0);
             buildList.ListViewItemSorter = sorter;
+            #endregion
+
+            #region Update
 
             if (!dontupdate)
             {
@@ -114,13 +126,28 @@ namespace RuneApp
                 updateNew.Text = "";
             }
 
+            #endregion
+
+            #region Shrines
+
+            ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
+            waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
             for (int i = 0; i < 11; i++)
             {
-                ToolStripItem it = new ToolStripMenuItem(i.ToString() + (i > 0 ? " (" + Math.Ceiling(i * 1.5).ToString() + "%)" : ""));
-                it.Tag = (int)Math.Ceiling(i * 1.5);
-                it.Click += ShrineClickSpeed;
-                speedToolStripMenuItem.DropDownItems.Add(it);
+                for (int j = 0; j < shrineStats.Length; j++)
+                {
+                    if (j < 4)
+                        AddShrine(shrineStats[j], i, (int)Math.Ceiling(i * shrineLevel[j]), shrineMenu[j]);
+                    else if (j < 9)
+                        AddShrine(shrineStats[j], i, (int)Math.Ceiling(1 + i * shrineLevel[j]), shrineMenu[j]);
+                    else
+                        AddShrine(shrineStats[j], i, (int)Math.Floor(i * shrineLevel[j]), shrineMenu[j]);
+                }
             }
+
+            #endregion
+
+            #region Labels
 
             Label l = new Label();
             l.Location = new Point(4 + 50, 400 - 18);
@@ -187,26 +214,47 @@ namespace RuneApp
                 yy += 16;
                 xx = 0;
             }
+
+            #endregion
         }
-        
-        private void ShrineClickSpeed(object sender, EventArgs e)
+
+        private void AddShrine(string stat, int num, int value, ToolStripMenuItem owner)
+        {
+            ToolStripMenuItem it = new ToolStripMenuItem(num.ToString() + (num > 0 ? " (" + value + "%)" : ""));
+            it.Tag = new KeyValuePair<string, int>(stat, value);
+            it.Click += ShrineClick;
+            owner.DropDownItems.Add(it);
+            if (!shrineMap.ContainsKey(stat))
+                shrineMap.Add(stat, new List<ToolStripMenuItem>());
+            shrineMap[stat].Add(it);
+
+        }
+
+        private void ShrineClick(object sender, EventArgs e)
         {
             var it = (ToolStripMenuItem)sender;
             if (it != null)
             {
-                foreach (ToolStripMenuItem i in speedToolStripMenuItem.DropDownItems)
+                var tag = (KeyValuePair<string, int>) it.Tag;
+                var stat = tag.Key;
+
+                foreach (ToolStripMenuItem i in shrineMap[stat])
                 {
                     i.Checked = false;
                 }
                 it.Checked = true;
                 if (data == null)
                     return;
+                
+                if (string.IsNullOrWhiteSpace(stat))
+                    return;
 
-                data.shrines.Speed = (int)it.Tag;
+                data.shrines[stat] = tag.Value;
                 if (config != null)
                 {
-                    config.AppSettings.Settings.Remove("shrineSpeed");
-                    config.AppSettings.Settings.Add("shrineSpeed", it.Tag.ToString());
+                    config.AppSettings.Settings.Remove("shrine" + stat);
+                    if (tag.Value > 0)
+                       config.AppSettings.Settings.Add("shrine" + stat, tag.Value.ToString());
                     config.Save(ConfigurationSaveMode.Modified);
                 }
             }
@@ -1296,13 +1344,29 @@ namespace RuneApp
 
             if (config != null)
             {
-                if (config.AppSettings.Settings.AllKeys.Contains("shrineSpeed"))
+                
+                for (int i = 0; i < shrineStats.Length; i++)
                 {
-                    int val = 0;
-                    int.TryParse(config.AppSettings.Settings["shrineSpeed"].Value, out val);
-                    data.shrines.Speed = val;
-                    int level = (int)Math.Floor(val / (double)1.5);
-                    ((ToolStripMenuItem)speedToolStripMenuItem.DropDownItems[level]).Checked = true;
+                    var stat = shrineStats[i];
+
+
+                    if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
+                    {
+                        int val = 0;
+                        int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
+                        data.shrines[stat] = val;
+                        int level = (int)Math.Floor(val / shrineLevel[i]);
+                        shrineMap[stat][level].Checked = true;
+                    }
+                    else
+                    {
+                        var shrine = data.Decorations.Where(d => d.Shrine.ToString() == stat).FirstOrDefault();
+                        if (shrine != null)
+                        {
+                            data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
+                            shrineMap[stat][shrine.Level].Checked = true;
+                        }
+                    }
                 }
             }
         }
@@ -1471,6 +1535,8 @@ namespace RuneApp
                     nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
                     nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
                     nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                    if (numnew > 0 && b.mon.Current.runeCount < 6)
+                        nli.SubItems[3].ForeColor = Color.Green;
                     if (Main.config.AppSettings.Settings.AllKeys.Contains("splitassign"))
                     {
                         bool check = false;
@@ -1481,11 +1547,12 @@ namespace RuneApp
                     nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
                     //nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, upgrades.ToString());
                     nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
-                    if (b.Time / (double)1000 > 20)
-                        nli.SubItems[5].ForeColor = Color.Orange;
-                    else if (b.Time / (double)1000 > 60)
-                        nli.SubItems[5].ForeColor = Color.Red;
-
+                    nli.UseItemStyleForSubItems = false;
+                    if (b.Time / (double)1000 > 60)
+                        nli.SubItems[5].BackColor = Color.Red;
+                    else if(b.Time / (double)1000 > 20)
+                        nli.SubItems[5].BackColor = Color.Orange;
+                    
                     if (lvs.Length == 0)
                         loadoutList.Items.Add(nli);
 

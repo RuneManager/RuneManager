@@ -44,6 +44,15 @@
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.shrinesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.speedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.attackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.healthToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.defenseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.criticalDamageToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.waterAttackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.fireAttackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.windAttackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.lightAttackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.darkAttackToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkForUpdatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
@@ -333,7 +342,16 @@
             // shrinesToolStripMenuItem
             // 
             this.shrinesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.speedToolStripMenuItem});
+            this.speedToolStripMenuItem,
+            this.attackToolStripMenuItem,
+            this.healthToolStripMenuItem,
+            this.defenseToolStripMenuItem,
+            this.criticalDamageToolStripMenuItem,
+            this.waterAttackToolStripMenuItem,
+            this.fireAttackToolStripMenuItem,
+            this.windAttackToolStripMenuItem,
+            this.lightAttackToolStripMenuItem,
+            this.darkAttackToolStripMenuItem});
             this.shrinesToolStripMenuItem.Name = "shrinesToolStripMenuItem";
             this.shrinesToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
             this.shrinesToolStripMenuItem.Text = "Shrines";
@@ -341,8 +359,62 @@
             // speedToolStripMenuItem
             // 
             this.speedToolStripMenuItem.Name = "speedToolStripMenuItem";
-            this.speedToolStripMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.speedToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
             this.speedToolStripMenuItem.Text = "Speed";
+            // 
+            // attackToolStripMenuItem
+            // 
+            this.attackToolStripMenuItem.Name = "attackToolStripMenuItem";
+            this.attackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.attackToolStripMenuItem.Text = "Attack";
+            // 
+            // healthToolStripMenuItem
+            // 
+            this.healthToolStripMenuItem.Name = "healthToolStripMenuItem";
+            this.healthToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.healthToolStripMenuItem.Text = "Health";
+            // 
+            // defenseToolStripMenuItem
+            // 
+            this.defenseToolStripMenuItem.Name = "defenseToolStripMenuItem";
+            this.defenseToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.defenseToolStripMenuItem.Text = "Defense";
+            // 
+            // criticalDamageToolStripMenuItem
+            // 
+            this.criticalDamageToolStripMenuItem.Name = "criticalDamageToolStripMenuItem";
+            this.criticalDamageToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.criticalDamageToolStripMenuItem.Text = "Critical Damage";
+            // 
+            // waterAttackToolStripMenuItem
+            // 
+            this.waterAttackToolStripMenuItem.Name = "waterAttackToolStripMenuItem";
+            this.waterAttackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.waterAttackToolStripMenuItem.Text = "Water Attack";
+            // 
+            // fireAttackToolStripMenuItem
+            // 
+            this.fireAttackToolStripMenuItem.Name = "fireAttackToolStripMenuItem";
+            this.fireAttackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.fireAttackToolStripMenuItem.Text = "Fire Attack";
+            // 
+            // windAttackToolStripMenuItem
+            // 
+            this.windAttackToolStripMenuItem.Name = "windAttackToolStripMenuItem";
+            this.windAttackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.windAttackToolStripMenuItem.Text = "Wind Attack";
+            // 
+            // lightAttackToolStripMenuItem
+            // 
+            this.lightAttackToolStripMenuItem.Name = "lightAttackToolStripMenuItem";
+            this.lightAttackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.lightAttackToolStripMenuItem.Text = "Light Attack";
+            // 
+            // darkAttackToolStripMenuItem
+            // 
+            this.darkAttackToolStripMenuItem.Name = "darkAttackToolStripMenuItem";
+            this.darkAttackToolStripMenuItem.Size = new System.Drawing.Size(158, 22);
+            this.darkAttackToolStripMenuItem.Text = "Dark Attack";
             // 
             // aboutToolStripMenuItem
             // 
@@ -2196,6 +2268,15 @@
         private System.Windows.Forms.ToolStripButton build_btn_upto;
         private System.Windows.Forms.Label IRuneLevel;
         private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ToolStripMenuItem attackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem healthToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem defenseToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem criticalDamageToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem waterAttackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem fireAttackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem windAttackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem lightAttackToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem darkAttackToolStripMenuItem;
     }
 }
 
