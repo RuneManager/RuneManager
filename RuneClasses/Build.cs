@@ -1007,22 +1007,25 @@ namespace RuneOptim
             // Make sure that for each set type, there are enough slots with runes in them
             // Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4
             // for each included set
-            foreach (RuneSet s in BuildSets)
+            if (!AllowBroken)
             {
-                // find how many slots have acceptable runes for it
-                int slots = 0;
-                for (int i = 0; i < 6; i++)
+                foreach (RuneSet s in BuildSets)
                 {
-                    if (runes[i].Any(r => r.Set == s))
-                        slots += 1;
-                }
-                // if there isn't enough slots
-                if (slots < Rune.SetRequired(s))
-                {
-                    // remove that set
+                    // find how many slots have acceptable runes for it
+                    int slots = 0;
                     for (int i = 0; i < 6; i++)
                     {
-                        runes[i] = runes[i].Where(r => r.Set != s).ToArray();
+                        if (runes[i].Any(r => r.Set == s))
+                            slots += 1;
+                    }
+                    // if there isn't enough slots
+                    if (slots < Rune.SetRequired(s))
+                    {
+                        // remove that set
+                        for (int i = 0; i < 6; i++)
+                        {
+                            runes[i] = runes[i].Where(r => r.Set != s).ToArray();
+                        }
                     }
                 }
             }
