@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
+using System.Collections.Concurrent;
 
 namespace RuneOptim
 {
@@ -83,6 +84,136 @@ namespace RuneOptim
     
     public class Rune
     {
+        #region JSON Props
+
+        [JsonProperty("id")]
+        public int ID;
+
+        [JsonProperty("set")]
+        public RuneSet Set;
+
+        [JsonProperty("grade")]
+        public int Grade;
+
+        [JsonProperty("slot")]
+        public int Slot;
+
+        [JsonProperty("level")]
+        public int Level;
+
+        [JsonProperty("locked")]
+        public bool Locked;
+
+        [JsonProperty("monster")]
+        public int AssignedId;
+
+        [JsonProperty("monster_n")]
+        public string AssignedName;
+
+        [JsonProperty("m_t")]
+        public Attr MainType;
+
+        [JsonProperty("m_v")]
+        public int MainValue;
+
+        [JsonProperty("i_t")]
+        public Attr InnateType;
+
+        [JsonProperty("i_v")]
+        public int? InnateValue;
+
+        [JsonProperty("s1_t")]
+        public Attr Sub1Type;
+
+        [JsonProperty("s1_v")]
+        public int? Sub1Value;
+
+        [JsonProperty("s2_t")]
+        public Attr Sub2Type;
+
+        [JsonProperty("s2_v")]
+        public int? Sub2Value;
+
+        [JsonProperty("s3_t")]
+        public Attr Sub3Type;
+
+        [JsonProperty("s3_v")]
+        public int? Sub3Value;
+
+        [JsonProperty("s4_t")]
+        public Attr Sub4Type;
+
+        [JsonProperty("s4_v")]
+        public int? Sub4Value;
+
+        #endregion
+
+        #region Nicer getters for stats by type
+
+        [JsonIgnore]
+        public RuneStat Accuracy = null;
+
+        [JsonIgnore]
+        public RuneStat AttackFlat = null;
+
+        [JsonIgnore]
+        public RuneStat AttackPercent = null;
+
+        [JsonIgnore]
+        public RuneStat CritDamage = null;
+
+        [JsonIgnore]
+        public RuneStat CritRate = null;
+
+        [JsonIgnore]
+        public RuneStat DefenseFlat = null;
+
+        [JsonIgnore]
+        public RuneStat DefensePercent = null;
+
+        [JsonIgnore]
+        public RuneStat HealthFlat = null;
+
+        [JsonIgnore]
+        public RuneStat HealthPercent = null;
+
+        [JsonIgnore]
+        public RuneStat Resistance = null;
+
+        [JsonIgnore]
+        public RuneStat Speed = null;
+
+        #endregion
+        
+        [JsonIgnore]
+        public Monster Assigned;
+        
+        [JsonIgnore]
+        public bool Swapped = false;
+
+        [JsonIgnore]
+        public static int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
+
+        public int UnequipCost
+        {
+            get
+            {
+                return UnequipCosts[Grade - 1];
+            }
+        }
+
+        public int Rarity
+        {
+            get
+            {
+                if (Sub1Type == Attr.Null) return 0; // Normal
+                if (Sub2Type == Attr.Null) return 1; // Magic
+                if (Sub3Type == Attr.Null) return 2; // Rare
+                if (Sub4Type == Attr.Null) return 3; // Hero
+                return 4; // Legend
+            }
+        }
+
         public Rune()
         {
             Accuracy = new RuneStat(this, Attr.Accuracy);
@@ -111,8 +242,8 @@ namespace RuneOptim
             Locked = rhs.Locked;
             AssignedId = rhs.AssignedId;
             AssignedName = rhs.AssignedName;
-			Assigned = rhs.Assigned;
-			Swapped = rhs.Swapped;
+            Assigned = rhs.Assigned;
+            Swapped = rhs.Swapped;
             MainType = rhs.MainType;
             MainValue = rhs.MainValue;
             InnateType = rhs.InnateType;
@@ -125,34 +256,41 @@ namespace RuneOptim
             Sub3Value = rhs.Sub3Value;
             Sub4Type = rhs.Sub4Type;
             Sub4Value = rhs.Sub4Value;
-            Parent = rhs;
         }
 
-        [JsonIgnore]
-        public static int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
-
-        public int UnequipCost
+        // fast iterate over rune stat types
+        public int this[string stat, int fake, bool pred]
         {
             get
             {
-                return UnequipCosts[Grade - 1];
+                switch (stat)
+                {
+                    case "HPflat":
+                        return HealthFlat[fake, pred];
+                    case "HPperc":
+                        return HealthPercent[fake, pred];
+                    case "ATKflat":
+                        return AttackFlat[fake, pred];
+                    case "ATKperc":
+                        return AttackPercent[fake, pred];
+                    case "DEFflat":
+                        return DefenseFlat[fake, pred];
+                    case "DEFperc":
+                        return DefensePercent[fake, pred];
+                    case "SPDflat":
+                        return Speed[fake, pred];
+                    case "CDperc":
+                        return CritDamage[fake, pred];
+                    case "CRperc":
+                        return CritRate[fake, pred];
+                    case "ACCperc":
+                        return Accuracy[fake, pred];
+                    case "RESperc":
+                        return Resistance[fake, pred];
+                }
+                return 0;
             }
         }
-
-        [JsonProperty("id")]
-        public int ID;
-
-        [JsonProperty("set")]
-        public RuneSet Set;
-
-        [JsonProperty("grade")]
-        public int Grade;
-
-        [JsonProperty("slot")]
-        public int Slot;
-
-        [JsonProperty("level")]
-        public int Level;
 
         //[JsonIgnore]
         //public int FakeLevel = 0;
@@ -160,6 +298,42 @@ namespace RuneOptim
         //[JsonIgnore]
         //public bool PredictSubs = false;
 
+        [JsonIgnore]
+        public double Efficiency
+        {
+            get
+            {
+                double num = 0;
+                num += GetEfficiency(InnateType, InnateValue ?? 0);
+                num += GetEfficiency(Sub1Type, Sub1Value ?? 0);
+                num += GetEfficiency(Sub2Type, Sub2Value ?? 0);
+                num += GetEfficiency(Sub3Type, Sub3Value ?? 0);
+                num += GetEfficiency(Sub4Type, Sub4Value ?? 0);
+
+                num /= 1.8;
+                return num;
+            }
+        }
+
+        public int FlatCount()
+        {
+            int count = 0;
+            if (Sub1Type == Attr.Null) return count;
+            count += (Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat || Sub1Type == Attr.AttackFlat) ? 1 : 0;
+            if (Sub2Type == Attr.Null) return count;
+            count += (Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat || Sub2Type == Attr.AttackFlat) ? 1 : 0;
+            if (Sub3Type == Attr.Null) return count;
+            count += (Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat || Sub3Type == Attr.AttackFlat) ? 1 : 0;
+            if (Sub4Type == Attr.Null) return count;
+            count += (Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat || Sub4Type == Attr.AttackFlat) ? 1 : 0;
+
+            return count;
+        }
+
+        [JsonIgnore]
+        public ConcurrentDictionary<string, double> manageStats = new ConcurrentDictionary<string, double>();
+
+        /*
         [JsonIgnore]
         // set was picked in this many builds
         public int manageStats_Set = 0;
@@ -188,23 +362,6 @@ namespace RuneOptim
         [JsonIgnore]
         public double buildScoreTemp = 0;
 
-        [JsonIgnore]
-        public double Efficiency
-        {
-            get
-            {
-                double num = 0;
-                num += GetEfficiency(InnateType, InnateValue ?? 0);
-                num += GetEfficiency(Sub1Type, Sub1Value ?? 0);
-                num += GetEfficiency(Sub2Type, Sub2Value ?? 0);
-                num += GetEfficiency(Sub3Type, Sub3Value ?? 0);
-                num += GetEfficiency(Sub4Type, Sub4Value ?? 0);
-                
-                num /= 1.8;
-                return num;
-            }
-        }
-
 		[JsonIgnore]
 		public int ScoringBad
 		{
@@ -229,8 +386,14 @@ namespace RuneOptim
 		{
 			get
 			{
-				if (manageStats_In)
-					return "Keep";
+                if (manageStats_In)
+                {
+                    if (Level < 15 && Slot % 2 == 0)
+                        return "To 15";
+                    if (Level < 12 && Slot % 2 == 1)
+                        return "To 12";
+                    return "Keep";
+                }
 				if (Grade < 4)
 				{
 					if (Efficiency > 0.6)
@@ -333,21 +496,6 @@ namespace RuneOptim
 			}
 		}
 
-		public int FlatCount()
-		{
-			int count = 0;
-			if (Sub1Type == Attr.Null) return count;
-			count += (Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat || Sub1Type == Attr.AttackFlat) ? 1 : 0;
-			if (Sub2Type == Attr.Null) return count;
-			count += (Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat || Sub2Type == Attr.AttackFlat) ? 1 : 0;
-			if (Sub3Type == Attr.Null) return count;
-			count += (Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat || Sub3Type == Attr.AttackFlat) ? 1 : 0;
-			if (Sub4Type == Attr.Null) return count;
-			count += (Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat || Sub4Type == Attr.AttackFlat) ? 1 : 0;
-
-			return count;
-		}
-
 		public double FlatPoints()
 		{
 			double pts = 0;
@@ -390,8 +538,9 @@ namespace RuneOptim
 				return val;
 			}
 		}
+        */
 
-		[JsonIgnore]
+        [JsonIgnore]
 		private Attr[] hpStats = new Attr[] { Attr.HealthPercent, Attr.DefensePercent, Attr.Resistance, Attr.HealthFlat, Attr.DefenseFlat };
 
 		[JsonIgnore]
@@ -563,109 +712,15 @@ namespace RuneOptim
             return val / (double) (5 * subUpgrades[a][Grade - 1]);
         }
 
-        [JsonIgnore]
-        public Rune Parent = null;
-
-        [JsonProperty("locked")]
-        private bool locked;
-
-        [JsonIgnore]
-        public bool Locked
-        {
-            get
-            {
-                if (Parent != null && Parent.locked) return true;
-                return locked;
-            }
-            set
-            {
-                locked = value;
-                if (Parent != null)
-                    Parent.Locked = value;
-            }
-        }
-
-        [JsonProperty("monster")]
-        public int AssignedId;
-
-        [JsonProperty("monster_n")]
-        public string AssignedName;
-
-		[JsonIgnore]
-		public Monster Assigned;
-
-		[JsonIgnore]
-		public bool Swapped = false;
-
-        [JsonProperty("m_t")]
-        public Attr MainType;
-
-        [JsonProperty("m_v")]
-        public int MainValue;
-
-        [JsonProperty("i_t")]
-        public Attr InnateType;
-
-        [JsonProperty("i_v")]
-        public int? InnateValue;
-
-        [JsonProperty("s1_t")]
-        public Attr Sub1Type;
-
-        [JsonProperty("s1_v")]
-        public int? Sub1Value;
-
-        [JsonProperty("s2_t")]
-        public Attr Sub2Type;
-
-        [JsonProperty("s2_v")]
-        public int? Sub2Value;
-
-        [JsonProperty("s3_t")]
-        public Attr Sub3Type;
-
-        [JsonProperty("s3_v")]
-        public int? Sub3Value;
-
-        [JsonProperty("s4_t")]
-        public Attr Sub4Type;
-
-        [JsonProperty("s4_v")]
-        public int? Sub4Value;
-
-        // Nicer getters for stats by type
-
-        public RuneStat Accuracy = null;
-        public RuneStat AttackFlat = null;
-        public RuneStat AttackPercent = null;
-        public RuneStat CritDamage = null;
-        public RuneStat CritRate = null;
-        public RuneStat DefenseFlat = null;
-        public RuneStat DefensePercent = null;
-        public RuneStat HealthFlat = null;
-        public RuneStat HealthPercent = null;
-        public RuneStat Resistance = null;
-        public RuneStat Speed = null;
-        
         public void ResetStats()
         {
+            manageStats.Clear();
+            /*
             manageStats_In = false;
             manageStats_Set = 0;
             manageStats_TypeFilt = 0;
             manageStats_RuneFilt = 0;
-            manageStats_LoadFilt = 0;
-        }
-
-        public int Rarity
-        {
-            get
-            {
-                if (Sub1Type == Attr.Null) return 0; // Normal
-                if (Sub2Type == Attr.Null) return 1; // Magic
-                if (Sub3Type == Attr.Null) return 2; // Rare
-                if (Sub4Type == Attr.Null) return 3; // Hero
-                return 4; // Legend
-            }
+            manageStats_LoadFilt = 0;*/
         }
 
         // Number of sets
@@ -886,40 +941,6 @@ namespace RuneOptim
                 return EquipCompare.Worse;
 
             return EquipCompare.Better;
-        }
-
-        // fast iterate over rune stat types
-        public int this[string stat, int fake, bool pred] 
-        {
-            get
-            {
-                switch (stat)
-                {
-                    case "HPflat":
-                        return HealthFlat[fake, pred];
-                    case "HPperc":
-                        return HealthPercent[fake, pred];
-                    case "ATKflat":
-                        return AttackFlat[fake, pred];
-                    case "ATKperc":
-                        return AttackPercent[fake, pred];
-                    case "DEFflat":
-                        return DefenseFlat[fake, pred];
-                    case "DEFperc":
-                        return DefensePercent[fake, pred];
-                    case "SPDflat":
-                        return Speed[fake, pred];
-                    case "CDperc":
-                        return CritDamage[fake, pred];
-                    case "CRperc":
-                        return CritRate[fake, pred];
-                    case "ACCperc":
-                        return Accuracy[fake, pred];
-                    case "RESperc":
-                        return Resistance[fake, pred];
-                }
-                return 0;
-            }
         }
 
         #region stats

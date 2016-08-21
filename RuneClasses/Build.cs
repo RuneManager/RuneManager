@@ -480,7 +480,8 @@ namespace RuneOptim
                                         {
                                             foreach (Rune r in test.Current.runes)
                                             {
-                                                r.manageStats_LoadGen++;
+                                                if (!r.manageStats.ContainsKey("LoadGen")) { r.manageStats.AddOrUpdate("LoadGen", 0, (s,d)=> { return d; }); }
+                                                r.manageStats["LoadGen"]++;
                                                 runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                             }
                                         }
@@ -531,7 +532,8 @@ namespace RuneOptim
                                             {
                                                 foreach (Rune r in test.Current.runes)
                                                 {
-                                                    r.manageStats_LoadFilt++;
+                                                    if (!r.manageStats.ContainsKey("LoadFilt")) { r.manageStats.AddOrUpdate("LoadFilt", 0, (s,d)=> { return d; }); }
+                                                    r.manageStats["LoadFilt"]++;
                                                     runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                                 }
                                             }
@@ -669,7 +671,7 @@ namespace RuneOptim
                     //Best.Current.buildUsage = usage.buildUsage;
                     foreach (Rune r in Best.Current.runes)
                     {
-                        r.manageStats_In = true;
+                        r.manageStats["In"] = 1;
                     }
                     for (int i = 0; i < 6; i++)
                     {
@@ -914,13 +916,17 @@ namespace RuneOptim
 
             IEnumerable<Rune> rsGlobal = save.Runes;
 
-            // Only using 'inventory' or runes on mon
-            // also, include runes which have been unequipped (should only look above)
-            if (!useEquipped)
-                rsGlobal = rsGlobal.Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped);
-            // only if the rune isn't currently locked for another purpose
-            if (!useLocked)
-                rsGlobal = rsGlobal.Where(r => r.Locked == false);
+            // if not saving stats, cull unusable here
+            if (!saveStats)
+            {
+                // Only using 'inventory' or runes on mon
+                // also, include runes which have been unequipped (should only look above)
+                if (!useEquipped)
+                    rsGlobal = rsGlobal.Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped);
+                // only if the rune isn't currently locked for another purpose
+                if (!useLocked)
+                    rsGlobal = rsGlobal.Where(r => r.Locked == false);
+            }
 
             // Only runes which we've included
             rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set));
@@ -929,7 +935,8 @@ namespace RuneOptim
             {
                 foreach (Rune r in rsGlobal)
                 {
-                    r.manageStats_Set++;
+                    if (!r.manageStats.ContainsKey("Set")) { r.manageStats.AddOrUpdate("Set", 0, (s,d)=> { return d; }); }
+                    r.manageStats["Set"]++;
                 }
             }
 
@@ -984,8 +991,10 @@ namespace RuneOptim
                 {
                     foreach (Rune r in runes[i])
                     {
-                        r.manageStats_RuneFilt++;
+                        if (!r.manageStats.ContainsKey("RuneFilt")) { r.manageStats.AddOrUpdate("RuneFilt", 0, (s,d)=> { return d; }); }
+                        r.manageStats["RuneFilt"]++;
                     }
+                    
                 }
 
                 if (i % 2 == 1) // actually evens because off by 1
@@ -999,8 +1008,14 @@ namespace RuneOptim
                 {
                     foreach (Rune r in runes[i])
                     {
-                        r.manageStats_TypeFilt++;
+                        if (!r.manageStats.ContainsKey("TypeFilt")) { r.manageStats.AddOrUpdate("TypeFilt", 0, (s,d)=> { return d; }); }
+                        r.manageStats["TypeFilt"]++;
                     }
+                    // cull here instead
+                    if (!useEquipped)
+                        runes[i] = runes[i].Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped).ToArray();
+                    if (!useLocked)
+                        runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
                 }
             }
 

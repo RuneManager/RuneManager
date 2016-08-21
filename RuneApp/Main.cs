@@ -913,7 +913,7 @@ namespace RuneApp
 
 		private void toolStripButton17_Click(object sender, EventArgs e)
 		{
-            GenerateStats();
+           // GenerateStats();
             //GenerateExcel();
 		}
 
@@ -1682,7 +1682,7 @@ namespace RuneApp
 
                 if (makeStats)
                 {
-                    GenerateStats();
+                    //GenerateStats();
                     this.Invoke((MethodInvoker)delegate {
                         if (!skipLoaded)
                             StatsExcelRunes();
@@ -2045,8 +2045,13 @@ namespace RuneApp
 
             int row = 1;
             int col = 1;
-            foreach (var th in "Id,Grade,Set,Slot,MType,Level,Select,Rune,Type,Load,Gen,Eff,Used,Points,Flats,FlatPts,Sell,Action, ,Main,Innate,1,2,3,4,HPpts,ATKpts,Pts".Split(','))
+
+            List<string> colHead = new List<string>();
+
+            // ,MType,Points,Flats,FlatPts
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Mon,Keep,Action, ,HPpts,ATKpts,Pts".Split(','))
             {
+                colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
             }
             //linkCol = col + 1;
@@ -2055,82 +2060,237 @@ namespace RuneApp
 
             int cmax = 1;
 
-            foreach (Rune r in data.Runes.OrderByDescending(r => r.ScoringBad))
+            // calculate the stats
+            foreach (Rune r in data.Runes)
             {
-                ws.Cells[row, col].Value = r.ID; col++;
+                double keep = 0;
+                keep += Math.Pow(r.Level, 0.7);
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+                keep += Math.Pow(r.Grade, 1.4);
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 
-                ws.Cells[row, col].Value = r.Grade; col++;
+                r.manageStats["Action"] = -1;
+                if (!r.manageStats.ContainsKey("In"))
+                    r.manageStats["In"] = 0;
 
-                if (r.Rarity > 0)
+                r.manageStats.GetOrAdd("Mon", -1);
+                if (r.manageStats["In"] > 0)
                 {
-                    Color color = Color.FromArgb(255, 146, 208, 80);
-                    if (r.Rarity == 4) color = Color.FromArgb(255, 255, 153, 0);
-                    else if (r.Rarity == 3) color = Color.FromArgb(255, 204, 0, 153);
-                    else if (r.Rarity == 2) color = Color.FromArgb(255, 102, 205, 255);
-
-                    ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(color);
+                    var b = builds.Where(bu => bu.Best != null && bu.Best.Current.runes.Contains(r)).FirstOrDefault();
+                    if (b == null)
+                    {
+                        r.manageStats["Priority"] = 2;
+                        if (r.Slot % 2 == 0 && r.Level < 15)
+                            r.manageStats["Action"] = 15;
+                        if (r.Slot % 2 == 1 && r.Level < 12)
+                            r.manageStats["Action"] = 12;
+                    }
+                    else
+                    {
+                        r.manageStats["Mon"] = b.mon.ID;
+                        r.manageStats["Priority"] = b.priority / builds.Max(bu => bu.priority);
+                        int p = b.GetPredict(r);
+                        if (r.Level < p)
+                            r.manageStats["Action"] = p;
+                    }
+                    keep += 10;
                 }
-                ws.Cells[row, col].Value = r.Set; col++;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 
-                ws.Cells[row, col].Value = r.Slot; col++;
-                ws.Cells[row, col].Value = r.MainType.ToGameString(); col++;
+                if (r.Grade > Math.Floor(r.Level / (double)3))
+                {
+                    keep += Math.Pow(r.Rarity - Math.Max(4, Math.Floor(r.Level / (double)3)), 1.1) * 6;
+                    if (r.Rarity > Math.Floor(r.Level / (double)3) + 1)
+                        r.manageStats["Action"] = r.Rarity * 3;
+                }
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 
-                ws.Cells[row, col].Value = r.Level; col++;
+                keep -= r.FlatCount();
+                keep += r.Efficiency * 5;
+                keep += r.ScoringRune * Math.Max(r.ScoringHP, r.ScoringATK) * 20;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.manageStats_Set; col++;
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.manageStats_RuneFilt; col++;
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.manageStats_TypeFilt; col++;
+                keep += r.Speed;
+                keep += r.HealthPercent * 0.3;
+                keep += r.Accuracy * 0.4;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.manageStats_LoadFilt; col++;
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.manageStats_LoadGen; col++;
+                //keep += (Math.Pow(1.04, r.manageStats["Set"])-1)*10;
+                keep += (Math.Pow(1.04, r.manageStats.GetOrAdd("Set",0)) - 1)*10;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+                //keep += (Math.Pow(1.07, r.manageStats["RuneFilt"])-1)*10;
+                keep += (Math.Pow(1.07, r.manageStats.GetOrAdd("RuneFilt", 0))-1)*10;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+                //keep += (Math.Pow(1.1, r.manageStats["TypeFilt"])-1)*10;
+                keep += (Math.Pow(1.1, r.manageStats.GetOrAdd("TypeFilt",0))-1)*10;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+                //r.manageStats.AddOrUpdate("LoadGen", 0, (s,d)=> { return d; });
+                //r.manageStats.AddOrUpdate("LoadFilt", 0, (s,d)=> { return d; });
+                if (r.manageStats.GetOrAdd("LoadGen",0) > 0)
+                    keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt",0) / r.manageStats["LoadGen"], 2) * 10;
 
-                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-                ws.Cells[row, col].Value = r.Efficiency; col++;
-
-                ws.Cells[row, col].Value = (r.manageStats_In ? "TRUE" : "FALSE"); col++;
-
-                ws.Cells[row, col].Value = r.ScoringBad; col++;
-
-                //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
-                ws.Cells[row, col].Value = r.FlatCount(); col++;
-                ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.00;";
-                ws.Cells[row, col].Value = r.FlatPoints(); col++;
-
-                ws.Cells[row, col].Value = r.ScoringSell; col++;
-
-                ws.Cells[row, col].Value = r.ScoringAct; col++;
-
-                col++;
-
-                ws.Cells[row, col].Value = r.MainValue.ToString() + " " + r.MainType.ToGameString(); col++;
-                if (r.InnateType != Attr.Null)
-                    ws.Cells[row, col].Value = r.InnateValue.ToString() + " " + r.InnateType.ToGameString(); col++;
-                if (r.Sub1Type != Attr.Null)
-                    ws.Cells[row, col].Value = r.Sub1Value.ToString() + " " + r.Sub1Type.ToGameString(); col++;
-                if (r.Sub2Type != Attr.Null)
-                    ws.Cells[row, col].Value = r.Sub2Value.ToString() + " " + r.Sub2Type.ToGameString(); col++;
-                if (r.Sub3Type != Attr.Null)
-                    ws.Cells[row, col].Value = r.Sub3Value.ToString() + " " + r.Sub3Type.ToGameString(); col++;
-                if (r.Sub4Type != Attr.Null)
-                    ws.Cells[row, col].Value = r.Sub4Value.ToString() + " " + r.Sub4Type.ToGameString(); col++;
-
-                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-                ws.Cells[row, col].Value = r.ScoringHP; col++;
-                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-                ws.Cells[row, col].Value = r.ScoringATK; col++;
-                ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-                ws.Cells[row, col].Value = r.ScoringRune; col++;
-
-                row++;
-                cmax = col;
-                col = 1;
+                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             }
+
+            int rr = 0;
+            foreach (Rune r in data.Runes.Where(r => r.manageStats["In"] == 0).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
+            {
+                rr++;
+                if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.25)
+                {
+                    if (r.manageStats["Action"] == -1)
+                        r.manageStats["Action"] = -2;
+                }
+                else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.75)
+                {
+                    if (r.manageStats["Action"] == -1)
+                        r.manageStats["Action"] = -3;
+                }
+                else
+                {
+                    if (r.Level < 6)
+                        r.manageStats["Action"] = 6;
+                    else if (r.Level < 9)
+                        r.manageStats["Action"] = 9;
+                    else if (r.Level < 12)
+                        r.manageStats["Action"] = 9;
+                }
+            }
+
+            foreach (Rune r in data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep",0)))
+            {
+                for (col = 1; col <= colHead.Count; col++)
+                {
+                    switch (colHead[col - 1])
+                    {
+                        case "Id":
+                            ws.Cells[row, col].Value = r.ID;
+                            break;
+                        case "Grade":
+                            ws.Cells[row, col].Value = r.Grade;
+                            break;
+                        case "Set":
+                            if (r.Rarity > 0)
+                            {
+                                Color color = Color.FromArgb(255, 146, 208, 80);
+                                if (r.Rarity == 4) color = Color.FromArgb(255, 255, 153, 0);
+                                else if (r.Rarity == 3) color = Color.FromArgb(255, 204, 0, 153);
+                                else if (r.Rarity == 2) color = Color.FromArgb(255, 102, 205, 255);
+
+                                ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                                ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(color);
+                            }
+                            ws.Cells[row, col].Value = r.Set;
+                            break;
+                        case "Slot":
+                            ws.Cells[row, col].Value = r.Slot;
+                            break;
+                        case "MType":
+                            ws.Cells[row, col].Value = r.MainType.ToGameString();
+                            break;
+                        case "Level":
+                            ws.Cells[row, col].Value = r.Level;
+                            break;
+                        case "Select":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("Set", 0);
+                            break;
+                        case "Rune":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("RuneFilt", 0);
+                            break;
+                        case "Type":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("TypeFilt", 0);
+                            break;
+                        case "Load":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("LoadFilt", 0);
+                            break;
+                        case "Gen":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("LoadGen", 0);
+                            break;
+                        case "Eff":
+                            ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                            ws.Cells[row, col].Value = r.Efficiency;
+                            break;
+                        case "Used":
+                            ws.Cells[row, col].Value = (r.manageStats.GetOrAdd("In", 0) > 0 ? "TRUE" : "FALSE");
+                            break;
+                        case "Points":
+                            //ws.Cells[row, col].Value = r.ScoringBad;
+                            break;
+                        case "Mon":
+                            if (r.manageStats.GetOrAdd("Mon", -1) != -1)
+                            {
+                                ws.Cells[row, col].Value = data.GetMonster((int)r.manageStats["Mon"]).Name;
+                            }
+                            break;
+                        case "Flats":
+                            //ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.##;";
+                            ws.Cells[row, col].Value = r.FlatCount();
+                            break;
+                        case "FlatPts":
+                            ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.00;";
+                            //ws.Cells[row, col].Value = r.FlatPoints();
+                            break;
+                        case "Keep":
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("Keep", 0);
+                            break;
+                        case "Action":
+                            if (r.manageStats.GetOrAdd("Action", 0) >= 0)
+                                ws.Cells[row, col].Value = "To " + r.manageStats.GetOrAdd("Action", 0);
+                            else if (r.manageStats.GetOrAdd("Action", 0) == -1)
+                                ws.Cells[row, col].Value = "Keep";
+                            else if (r.manageStats.GetOrAdd("Action", 0) == -2)
+                                ws.Cells[row, col].Value = "Sell";
+                            else if (r.manageStats.GetOrAdd("Action", 0) == -3)
+                                ws.Cells[row, col].Value = "Consider";
+                            break;
+                        case "Main":
+                            ws.Cells[row, col].Value = r.MainValue.ToString() + " " + r.MainType.ToGameString();
+                            break;
+                        case "Innate":
+                            if (r.InnateType != Attr.Null)
+                                ws.Cells[row, col].Value = r.InnateValue.ToString() + " " + r.InnateType.ToGameString();
+                            break;
+                        case "1":
+                            if (r.Sub1Type != Attr.Null)
+                                ws.Cells[row, col].Value = r.Sub1Value.ToString() + " " + r.Sub1Type.ToGameString();
+                            break;
+                        case "2":
+                            if (r.Sub2Type != Attr.Null)
+                                ws.Cells[row, col].Value = r.Sub2Value.ToString() + " " + r.Sub2Type.ToGameString();
+                            break;
+                        case "3":
+                            if (r.Sub3Type != Attr.Null)
+                                ws.Cells[row, col].Value = r.Sub3Value.ToString() + " " + r.Sub3Type.ToGameString();
+                            break;
+                        case "4":
+                            if (r.Sub4Type != Attr.Null)
+                                ws.Cells[row, col].Value = r.Sub4Value.ToString() + " " + r.Sub4Type.ToGameString();
+                            break;
+                        case "HPpts":
+                            ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                            ws.Cells[row, col].Value = r.ScoringHP;
+                            break;
+                        case "ATKpts":
+                            ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                            ws.Cells[row, col].Value = r.ScoringATK;
+                            break;
+                        case "Pts":
+                            ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                            ws.Cells[row, col].Value = r.ScoringRune;
+                            break;
+
+                    }
+                }
+                row++;
+                //col = 1;
+            }
+
+            cmax = colHead.Count + 1;
 
             var table = ws.Tables.Where(t => t.Name == "RuneTable").FirstOrDefault();
             if (table == null)
@@ -2192,7 +2352,8 @@ namespace RuneApp
                 else if (r.Slot > 0 && build.runePrediction.ContainsKey(r.Slot % 2 == 0 ? "e" : "o"))
                     pred = build.runePrediction[r.Slot % 2 == 0 ? "e" : "o"].Key;*/
 
-                r.buildScoreTemp = build.ScoreRune(r, build.GetPredict(r), false);
+                //r.buildScoreTemp = build.ScoreRune(r, build.GetPredict(r), false);
+                r.manageStats["buildScore"] = build.ScoreRune(r, build.GetPredict(r), false);
             }
 
             col = 5;
@@ -2200,9 +2361,10 @@ namespace RuneApp
             ws.Cells[row + 1, 1].Value = "Primary";
             row--;
             //ws.Cells[row, 2].Value = "Filter";
-            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.buildScoreTemp))
+            //foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.buildScoreTemp))
+            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.manageStats["buildScore"]))
             {
-                ws.Cells[row, col].Value = r.buildScoreTemp;
+                ws.Cells[row, col].Value = r.manageStats["buildScore"];
                 row++;
                 ws.Cells[row, col].Value = r.Set.ToString();
                 row++;
@@ -2353,7 +2515,7 @@ namespace RuneApp
             //col++;
 
             //col++;
-            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.buildScoreTemp))
+            foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.manageStats["buildScore"]))
             {
                 /*
                 int pred = build.runePrediction.ContainsKey("g") ? build.runePrediction["g"].Key : 0;
@@ -2394,7 +2556,7 @@ namespace RuneApp
             }
 
         }
-
+        /*
         void GenerateStats()
         {
             if (data == null || data.Runes == null)
@@ -2460,5 +2622,6 @@ namespace RuneApp
                 }
             }
         }
+        */
     }
 }
