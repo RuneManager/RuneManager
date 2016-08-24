@@ -44,12 +44,17 @@ namespace RuneApp
 			if (val2sp != -1)
 				val2i = val2.Substring(0, val2sp);
 
-            int comp;
-			int val, valc;
-            if (int.TryParse(val1i, out val))
+			// Upgraded to doubles because that's what's scoring.
+			// Problem: still have to return an int (that is slightly representative of the level of difference)
+			// Single value: Return -1 or lower
+			// Double values: Return the sign of the comparison unless the abs is > 1
+
+			double comp;
+			double val, valc;
+            if (double.TryParse(val1i, out val))
             {
-                if (val2 == "" || !int.TryParse(val2i, out valc))
-                    return -val;
+                if (val2 == "" || !double.TryParse(val2i, out valc))
+                    return -(int)Math.Max(1, val);
                 comp = val - valc;
             }
             else
@@ -57,7 +62,7 @@ namespace RuneApp
                 comp = val1.CompareTo(val2);
             }
             if (comp != 0)
-                return comp * (orderPrimary ? 1 : -1);
+                return Math.Sign(comp) * (int)Math.Max(1, Math.Abs(comp)) * (orderPrimary ? 1 : -1);
 
             if (sortSecondary == -1)
                 return 0;
@@ -75,10 +80,10 @@ namespace RuneApp
 			if (val4sp != -1)
 				val4i = val2.Substring(0, val4sp);
 
-            if (int.TryParse(val3, out val))
+            if (double.TryParse(val3, out val))
             {
-                if (val4 == "" || !int.TryParse(val4i, out valc))
-                    return -val;
+                if (val4 == "" || !double.TryParse(val4i, out valc))
+                    return -(int)Math.Max(1, val);
                 comp = val - valc;
             }
             else
@@ -86,7 +91,7 @@ namespace RuneApp
                 comp = val3.CompareTo(val4);
             }
 
-            return comp * (orderSecondary ? 1 : -1);
+            return Math.Sign(comp) * (int)Math.Max(1, Math.Abs( comp)) * (orderSecondary ? 1 : -1);
         }
 
         // When the lists column is clicked
