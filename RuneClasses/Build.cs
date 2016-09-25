@@ -300,6 +300,7 @@ namespace RuneOptim
             try
             {
                 Best = null;
+                Stats bstats = null;
                 SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
                 long count = 0;
                 long total = runes[0].Count();
@@ -309,6 +310,9 @@ namespace RuneOptim
                 total *= runes[4].Count();
                 total *= runes[5].Count();
                 long complete = total;
+
+                if (printTo != null)
+                    printTo.Invoke("...");
 
                 if (total == 0)
                 {
@@ -359,6 +363,8 @@ namespace RuneOptim
                 Func<Stats, double> sort = (m) =>
                 {
                     double pts = 0;
+                    if (m == null)
+                        return pts;
 
                     foreach (string stat in statNames)
                     {
@@ -427,8 +433,8 @@ namespace RuneOptim
                 // set to running
                 isRun = true;
 
-                //Loadout usage = new Loadout();
                 
+
                 // Parallel the outer loop
                 var loopRes = Parallel.ForEach<Rune>(runes[0], (r0, loopState) =>
                 {
@@ -461,7 +467,6 @@ namespace RuneOptim
                                     {
                                         if (!isRun)
                                             break;
-
                                         Monster test = new Monster(mon);
                                         test.Current.Shrines = shrines;
                                         test.Current.Leader = leader;
@@ -475,17 +480,7 @@ namespace RuneOptim
                                         test.ApplyRune(r3);
                                         test.ApplyRune(r4);
                                         test.ApplyRune(r5);
-
-                                        if (saveStats)
-                                        {
-                                            foreach (Rune r in test.Current.runes)
-                                            {
-                                                if (!r.manageStats.ContainsKey("LoadGen")) { r.manageStats.AddOrUpdate("LoadGen", 0, (s,d)=> { return d; }); }
-                                                r.manageStats["LoadGen"]++;
-                                                runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                                            }
-                                        }
-
+                                        
                                         var cstats = test.GetStats();
 
                                         bool maxdead = false;
@@ -519,7 +514,7 @@ namespace RuneOptim
                                         // if there are required sets, ensure we have them
                                         else if (RequiredSets != null && RequiredSets.Count > 0
                                             // this Linq adds no overhead compared to GetStats() and ApplyRune()
-                                            && !RequiredSets.All(s => test.Current.sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)))
+                                            && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)))
                                         {
                                             kill++;
                                         }
@@ -530,10 +525,9 @@ namespace RuneOptim
 
                                             if (saveStats)
                                             {
-                                                foreach (Rune r in test.Current.runes)
+                                                foreach (Rune r in test.Current.Runes)
                                                 {
-                                                    if (!r.manageStats.ContainsKey("LoadFilt")) { r.manageStats.AddOrUpdate("LoadFilt", 0, (s,d)=> { return d; }); }
-                                                    r.manageStats["LoadFilt"]++;
+                                                    r.manageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
                                                     runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                                                 }
                                             }
@@ -544,12 +538,16 @@ namespace RuneOptim
                                                 if (tests.Count < 500000)
                                                     tests.Add(test);
                                                 if (Best == null)
+                                                {
                                                     Best = test;
+                                                    bstats = Best.GetStats();
+                                                }
                                                 else
                                                 {
-                                                    if (sort(Best.GetStats()) < sort(test.GetStats()))
+                                                    if (sort(bstats) < sort(cstats))
                                                     {
                                                         Best = test;
+                                                        bstats = Best.GetStats();
                                                     }
                                                 }
                                             }
@@ -562,13 +560,15 @@ namespace RuneOptim
                                                     if (tests.Count < 500000)
                                                         tests.Add(test);
                                                     Best = test;
+                                                    bstats = Best.GetStats();
                                                 }
                                                 else
                                                 {
                                                     // if this build is better than the best, keep it
-                                                    if (sort(Best.GetStats()) < sort(test.GetStats()))
+                                                    if (sort(bstats) < sort(cstats))
                                                     {
                                                         Best = test;
+                                                        bstats = Best.GetStats();
                                                         if (tests.Count < 500000)
                                                             tests.Add(test);
                                                     }
@@ -607,14 +607,6 @@ namespace RuneOptim
                                                 }
                                             }
                                         }
-                                        /*
-                                        if (tests.Count > 500000)
-                                        {
-                                            isRun = false;
-                                            if (printTo != null)
-                                                printTo.Invoke("Too many");
-                                            break;
-                                        }*/
                                     }
                                     // sum up what work we've done
                                     Interlocked.Add(ref total, -kill);
@@ -635,6 +627,18 @@ namespace RuneOptim
                         }
                     }
                 });
+
+                if (saveStats)
+                {
+                    foreach (var ra in runes)
+                    {
+                        foreach (var r in ra)
+                        {
+                            runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                            r.manageStats.AddOrUpdate("LoadGen", total, (s, d) => { return d + total; });
+                        }
+                    }
+                }
 
                 // write out completion
                 Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
@@ -669,14 +673,14 @@ namespace RuneOptim
                     Best = loads.First();
                     //Best.Current.runeUsage = usage.runeUsage;
                     //Best.Current.buildUsage = usage.buildUsage;
-                    foreach (Rune r in Best.Current.runes)
+                    foreach (Rune r in Best.Current.Runes)
                     {
                         r.manageStats["In"] = 1;
                     }
                     for (int i = 0; i < 6; i++)
                     {
-                        if (mon.Current.runes[i] != null && mon.Current.runes[i].ID != Best.Current.runes[i].ID)
-                            mon.Current.runes[i].Swapped = true;
+                        if (mon.Current.Runes[i] != null && mon.Current.Runes[i].ID != Best.Current.Runes[i].ID)
+                            mon.Current.Runes[i].Swapped = true;
                     }
                 }
 
@@ -935,14 +939,13 @@ namespace RuneOptim
             {
                 foreach (Rune r in rsGlobal)
                 {
-                    if (!r.manageStats.ContainsKey("Set")) { r.manageStats.AddOrUpdate("Set", 0, (s,d)=> { return d; }); }
-                    r.manageStats["Set"]++;
+                    r.manageStats.AddOrUpdate("Set", 1, (s,d)=> { return d + 1; });
                 }
             }
 
             int[] slotFakes = new int[6];
             bool[] slotPred = new bool[6];
-
+            
             // For each runeslot
             for (int i = 0; i < 6; i++)
             {
@@ -991,8 +994,7 @@ namespace RuneOptim
                 {
                     foreach (Rune r in runes[i])
                     {
-                        if (!r.manageStats.ContainsKey("RuneFilt")) { r.manageStats.AddOrUpdate("RuneFilt", 0, (s,d)=> { return d; }); }
-                        r.manageStats["RuneFilt"]++;
+                        r.manageStats.AddOrUpdate("RuneFilt", 1, (s,d)=> { return d + 1; }); 
                     }
                     
                 }
@@ -1008,8 +1010,7 @@ namespace RuneOptim
                 {
                     foreach (Rune r in runes[i])
                     {
-                        if (!r.manageStats.ContainsKey("TypeFilt")) { r.manageStats.AddOrUpdate("TypeFilt", 0, (s,d)=> { return d; }); }
-                        r.manageStats["TypeFilt"]++;
+                        r.manageStats.AddOrUpdate("TypeFilt", 1, (s,d)=> { return d + 1; }); 
                     }
                     // cull here instead
                     if (!useEquipped)

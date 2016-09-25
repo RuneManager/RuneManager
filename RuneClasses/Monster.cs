@@ -21,6 +21,9 @@ namespace RuneOptim
 
         public int priority = 0;
 
+        // TODO: use this instead of ID for saves/build matching
+        public long unit_id = -1;
+
 		[JsonIgnore]
 		public bool downloaded = false;
 
@@ -41,15 +44,15 @@ namespace RuneOptim
             int cost = 0;
             for (int i = 0; i < 6; i++)
             {
-                if (l.runes[i].AssignedName != Name)
+                if (l.Runes[i].AssignedName != Name)
                 {
 					// unequip current rune
-					if (Current.runes[i] != null)
-	                    cost += Current.runes[i].UnequipCost;
+					if (Current.Runes[i] != null)
+	                    cost += Current.Runes[i].UnequipCost;
                     // unequip new rune from host
-                    if ((l.runes[i].AssignedName != "Unknown name" || l.runes[i].AssignedName == "Inventory") && l.runes[i].Swapped != true)
+                    if ((l.Runes[i].AssignedName != "Unknown name" || l.Runes[i].AssignedName == "Inventory") && l.Runes[i].Swapped != true)
                     {
-                        cost += l.runes[i].UnequipCost;
+                        cost += l.Runes[i].UnequipCost;
                     }
                 }
             }
@@ -82,11 +85,10 @@ namespace RuneOptim
         // NOTE: the monster will contain it's base stats
         public Stats GetStats()
         {
-            if (chaStats || Current.changed)
+            if (chaStats || Current.Changed)
             {
                 curStats = Current.GetStats(this);
                 chaStats = false;
-                Current.changed = false;
             }
 
             return curStats;
@@ -95,7 +97,7 @@ namespace RuneOptim
         // NYI comparison
         public EquipCompare CompareTo(Monster rhs)
         {
-            if (Loadout.CompareSets(Current.sets, rhs.Current.sets) == 0)
+            if (Loadout.CompareSets(Current.Sets, rhs.Current.Sets) == 0)
                 return EquipCompare.Unknown;
 
             Stats a = GetStats();

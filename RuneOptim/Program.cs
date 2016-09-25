@@ -484,21 +484,16 @@ namespace RuneOptim
 
                                     if (minimum != null && !minimum.Invoke(test.GetStats()))
                                     {
-                                        //total--;
                                         kill++;
-                                        //Interlocked.Decrement(ref total);
                                     }
-                                    else if (reqsets != null && !reqsets.Invoke(test.Current.sets))
+                                    else if (reqsets != null && !reqsets.Invoke(test.Current.Sets))
                                     {
                                         kill++;
-                                        //Interlocked.Decrement(ref total);
                                     }
                                     else
                                     {
                                         plus++;
                                         tests.Add(test);
-                                        //Interlocked.Increment(ref count);
-                                        //count++;
                                     }
 
 
@@ -534,7 +529,7 @@ namespace RuneOptim
 
             var best = desc.First().Current;
 
-            foreach (Rune r in best.runes)
+            foreach (Rune r in best.Runes)
             {
                 r.Locked = true;
             }

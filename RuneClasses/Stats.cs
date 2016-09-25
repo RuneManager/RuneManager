@@ -231,7 +231,7 @@ namespace RuneOptim
             return lhs.GreaterEqual(rhs);
         }
 
-        internal bool GreaterEqual(Stats rhs)
+        public bool GreaterEqual(Stats rhs, bool extraGet = false)
         {
             if (this.Accuracy < rhs.Accuracy)
                 return false;
@@ -250,6 +250,20 @@ namespace RuneOptim
             if (this.Speed < rhs.Speed)
                 return false;
 
+            if (extraGet)
+            {
+                if (this.EffectiveHP < rhs.EffectiveHP)
+                    return false;
+                if (this.EffectiveHPDefenseBreak < rhs.EffectiveHPDefenseBreak)
+                    return false;
+                if (this.DamagePerSpeed < rhs.DamagePerSpeed)
+                    return false;
+                if (this.AverageDamage < rhs.AverageDamage)
+                    return false;
+                if (this.MaxDamage < rhs.MaxDamage)
+                    return false;
+
+            }
 
             return true;
         }

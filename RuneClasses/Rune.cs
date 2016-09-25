@@ -14,7 +14,12 @@ namespace RuneOptim
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RuneSet
     {
+        [EnumMember(Value = "")]
         Null, // No set
+
+        [EnumMember(Value = "???")]
+        Unknown, // SW Proxy say what?
+
         Energy, // Health
         Fatal, // Attack
         Blade, // CRate
@@ -23,6 +28,13 @@ namespace RuneOptim
         Focus, // Acc
         Guard, // Def
         Endure, // Res
+
+        // Ally sets
+        Fight,
+        Determination,
+        Enhance,
+        Accuracy,
+        Tolerance,
 
         // Here be magic
         Violent,
@@ -332,214 +344,7 @@ namespace RuneOptim
 
         [JsonIgnore]
         public ConcurrentDictionary<string, double> manageStats = new ConcurrentDictionary<string, double>();
-
-        /*
-        [JsonIgnore]
-        // set was picked in this many builds
-        public int manageStats_Set = 0;
-
-        [JsonIgnore]
-        // passed per-rune stat filter
-        public int manageStats_RuneFilt = 0;
-
-        [JsonIgnore]
-        // made the cut in builds
-        public int manageStats_LoadFilt = 0;
-
-        [JsonIgnore]
-        // used in builds
-        public int manageStats_LoadGen = 0;
-
-        [JsonIgnore]
-        // made the cut in builds
-        public int manageStats_TypeFilt = 0;
-
-        [JsonIgnore]
-        // is in a build
-        public bool manageStats_In = false;
-
-
-        [JsonIgnore]
-        public double buildScoreTemp = 0;
-
-		[JsonIgnore]
-		public int ScoringBad
-		{
-			get
-			{
-				int val = 0;
-				val += 6 - Grade;
-				val += 15 - Level / 3;
-				val += (int)(10 * (1 - manageStats_RuneFilt / (double)(manageStats_Set + 2)));
-				val += (int)(20 * (1 - manageStats_TypeFilt / (double)(manageStats_Set + 2)));
-				val += (int)(15 * (1 - manageStats_LoadFilt / (double)(manageStats_LoadGen + 2)));
-				val += Level / 3 - Rarity;
-				val += (int)(15 * (1 - Efficiency));
-				//if (manageStats_In)
-				//    pts /= 3;
-				return val;
-			}
-		}
-
-		[JsonIgnore]
-		public string ScoringAct
-		{
-			get
-			{
-                if (manageStats_In)
-                {
-                    if (Level < 15 && Slot % 2 == 0)
-                        return "To 15";
-                    if (Level < 12 && Slot % 2 == 1)
-                        return "To 12";
-                    return "Keep";
-                }
-				if (Grade < 4)
-				{
-					if (Efficiency > 0.6)
-						return "Keep";
-					if (Efficiency > 0.4)
-						return "Consider";
-					if (HealthPercent > 5 || Speed > 3)
-						return "Consider";
-					return "Sell";
-				}
-				else
-				{
-					
-					if (FlatCount() > 0)
-					{
-						if (Rarity < 2)
-							return "Sell";
-					}
-					if (Level < 6)
-						return "To 6";
-					if (Efficiency > 0.7)
-						return "Keep";
-					if (FlatPoints() > 2.5)
-						return "Sell";
-
-					if (Grade < 5)
-					{
-						if (Efficiency < 0.3)
-						{
-							if (FlatCount() > 0)
-								return "Sell";
-							if (Level < 6)
-								return "To 6";
-							return "Sell";
-						}
-						else
-						{
-							if (Level < 9)
-								return "To 9";
-							if (Efficiency > 0.6)
-								return "Keep";
-							if (Efficiency > 0.45)
-								return "Consider";
-							if (FlatCount() > 1)
-								return "Sell";
-						}
-					}
-					else
-					{
-						
-						if (FlatCount() < 2 && Efficiency > 0.5)
-							return "Keep";
-						if (Grade > 5)
-						{
-							if (FlatCount() < 3 && Efficiency > 0.6)
-								return "Keep";
-							if (ScoringBad < 50)
-								return "Keep";
-							if (ScoringBad < 60)
-								return "Consider";
-						}
-						if (Efficiency > 0.5)
-						{
-							if (Level < 12)
-								return "To 12";
-							if (Efficiency > 0.7)
-								return "Keep";
-
-							return "Consider";
-						}
-						else
-						{
-							if (Level < 9)
-								return "To 9";
-							if (Efficiency < 0.35)
-							{
-								if (Slot == 2 && MainType == Attr.Speed)
-									return "Consider";
-								if (Slot == 4 && (MainType == Attr.CritDamage || MainType == Attr.CritRate))
-									return "Consider";
-								if (Slot == 6 && (MainType == Attr.Accuracy || MainType == Attr.HealthPercent))
-									return "Consider";
-								return "Sell";
-							}
-
-							return "Consider";
-						}
-						
-					}
-				}
-				if (HealthPercent > 6 || Speed > 4)
-					return "Consider";
-				if (Slot == 2 && MainType == Attr.Speed)
-					return "Consider";
-				if (Slot == 4 && (MainType == Attr.CritDamage || MainType == Attr.CritRate))
-					return "Consider";
-				if (Slot == 6 && (MainType == Attr.Accuracy || MainType == Attr.HealthPercent))
-					return "Consider";
-				return "Sell";
-			}
-		}
-
-		public double FlatPoints()
-		{
-			double pts = 0;
-			
-			if (Slot != 1)
-				pts += AttackFlat / (double)subUpgrades[Attr.AttackFlat][Grade - 1];
-			if (Slot != 3)
-				pts += DefenseFlat / (double)subUpgrades[Attr.DefenseFlat][Grade - 1];
-			if (Slot != 5)
-				pts += HealthFlat / (double)subUpgrades[Attr.HealthFlat][Grade - 1];
-
-			return pts;
-		}
-
-		[JsonIgnore]
-		public int ScoringSell
-		{
-			get
-			{
-				int val = 0;
-
-				val += 6 - Grade;
-				val += 15 - Level / 3;
-
-				val += (int)(20 - 20 * Efficiency);
-
-				val += FlatCount() * 2;
-				val += (int)(FlatPoints() * 5);
-
-				if (manageStats_In)
-					val = (int)Math.Max(0, val - 10);
-
-				if (Level < 6 && Rarity > 1)
-					val /= 2;
-
-
-				
-				val = (int)(val*(100 - 100 * Efficiency))/10;
-
-				return val;
-			}
-		}
-        */
-
+        
         [JsonIgnore]
 		private Attr[] hpStats = new Attr[] { Attr.HealthPercent, Attr.DefensePercent, Attr.Resistance, Attr.HealthFlat, Attr.DefenseFlat };
 
@@ -730,7 +535,8 @@ namespace RuneOptim
         public static int SetRequired(RuneSet set)
         {
             if (set == RuneSet.Energy || set == RuneSet.Blade || set == RuneSet.Focus || set == RuneSet.Guard || set == RuneSet.Shield
-               || set == RuneSet.Revenge || set == RuneSet.Nemesis || set == RuneSet.Will || set == RuneSet.Endure || set == RuneSet.Destroy)
+               || set == RuneSet.Revenge || set == RuneSet.Nemesis || set == RuneSet.Will || set == RuneSet.Endure || set == RuneSet.Destroy
+               || set == RuneSet.Fight || set == RuneSet.Determination || set == RuneSet.Enhance || set == RuneSet.Accuracy || set == RuneSet.Tolerance)
                 return 2;
             if (set == RuneSet.Swift || set == RuneSet.Fatal || set == RuneSet.Violent || set == RuneSet.Vampire || set == RuneSet.Despair || set == RuneSet.Rage)
                 return 4;

@@ -159,7 +159,7 @@ namespace RuneApp
                     // put the sum points into the first item
 					li.SubItems[0].Text = pts.ToString("0.##");
 					li.Tag = b;
-                    if (grayLocked && b.Current.runes.Any(r => r.Locked))
+                    if (grayLocked && b.Current.Runes.Any(r => r.Locked))
                         li.ForeColor = Color.Gray;
 
                     if (!IsDisposed && IsHandleCreated)
@@ -428,7 +428,7 @@ namespace RuneApp
                 {
                     Monster mon = (Monster)item.Tag;
                     
-                    ShowRunes(mon.Current.runes);
+                    ShowRunes(mon.Current.Runes);
                     ShowSets(mon.Current);
                     if (lastclicked != null)
                         rune_Click(lastclicked, null);
@@ -438,22 +438,22 @@ namespace RuneApp
         
         private void ShowSets(Loadout load)
         {
-            if (load.sets != null)
+            if (load.Sets != null)
             {
-                if (load.sets.Length > 0)
-                    Set1Label.Text = load.sets[0] == RuneSet.Null ? "" : load.sets[0].ToString();
-                if (load.sets.Length > 1)
-                    Set2Label.Text = load.sets[1] == RuneSet.Null ? "" : load.sets[1].ToString();
-                if (load.sets.Length > 2)
-                    Set3Label.Text = load.sets[2] == RuneSet.Null ? "" : load.sets[2].ToString();
+                if (load.Sets.Length > 0)
+                    Set1Label.Text = load.Sets[0] == RuneSet.Null ? "" : load.Sets[0].ToString();
+                if (load.Sets.Length > 1)
+                    Set2Label.Text = load.Sets[1] == RuneSet.Null ? "" : load.Sets[1].ToString();
+                if (load.Sets.Length > 2)
+                    Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
 
                 if (!load.SetsFull)
                 {
-                    if (load.sets[0] == RuneSet.Null)
+                    if (load.Sets[0] == RuneSet.Null)
                         Set1Label.Text = "Broken";
-                    else if (load.sets[1] == RuneSet.Null)
+                    else if (load.Sets[1] == RuneSet.Null)
                         Set2Label.Text = "Broken";
-                    else if (load.sets[2] == RuneSet.Null)
+                    else if (load.Sets[2] == RuneSet.Null)
                         Set3Label.Text = "Broken";
                 }
             }
