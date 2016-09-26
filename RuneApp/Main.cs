@@ -49,6 +49,12 @@ namespace RuneApp
         private bool gotExcelPack = false;
         ExcelWorksheets excelSheets = null;
 
+        bool teamChecking = false;
+        Build teamBuild = null;
+        Dictionary<string, List<string>> toolmap = null;
+        List<string> knownTeams = new List<string>();
+        List<string> extraTeams = new List<string>();
+
         public static bool MakeStats
         {
             get
@@ -274,6 +280,101 @@ namespace RuneApp
 			{
 				LoadMons("basestats.json");
 			}
+
+            buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
+
+            foreach (ToolStripItem ii in menu_buildlist.Items)
+            {
+                if (ii.Text == "Team")
+                {
+                    /*{ "Farmer", "Dungeon", "Giant", "Dragon", "Necro", "Secret",
+                        "Elemental", "Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D",
+                        "ToA", "ToAN", "ToAH", "Raid", "Normal", "Light R", "Dark R", "Fire R", "Water R", "Wind R",
+                        "PvP", "AO", "AD", "GWO", "GWD", "World Boss"}*/
+
+                    toolmap = new Dictionary<string, List<string>>()
+                    {
+                        { "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
+                        { "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
+                        { "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
+                        { "PvP", new List<string> { "AO", "AD", "GWO", "GWD" } },
+
+                        { "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
+                        { "ToA", new List<string> { "ToAN", "ToAH" } }
+                    };
+
+                    ToolStripMenuItem tsmi = ii as ToolStripMenuItem;
+
+                    tsTeamAdd(tsmi, "PvE");
+                    tsTeamAdd(tsmi, "Dungeon");
+                    tsTeamAdd(tsmi, "Raid");
+                    tsTeamAdd(tsmi, "PvP");
+
+                    var tsnone = new ToolStripMenuItem("(Clear)");
+                    tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
+                    tsnone.Click += tsTeamHandler;
+
+                    tsmi.DropDownItems.Add(tsnone);
+                }
+            }
+        }
+
+        private void tsTeamAdd(ToolStripMenuItem parent, string item)
+        {
+            knownTeams.Add(item);
+            ToolStripMenuItem n = new ToolStripMenuItem(item);
+            parent.DropDownItems.Add(n);
+            n.CheckedChanged += tsTeamHandler;
+            n.CheckOnClick = true;
+
+            if (toolmap[item] != null)
+            {
+                foreach (var smi in toolmap[item])
+                {
+                    if (toolmap.ContainsKey(smi))
+                    {
+                        tsTeamAdd(n, smi);
+                    }
+                    else
+                    {
+                        ToolStripMenuItem s = new ToolStripMenuItem(smi);
+                        s.CheckedChanged += tsTeamHandler;
+                        s.CheckOnClick = true;
+                        n.DropDownItems.Add(s);
+                    }
+                }
+            }
+        }
+
+        private void tsTeamHandler(object sender, EventArgs e)
+        {
+            if (teamChecking || teamBuild == null)
+                return;
+
+            ToolStripMenuItem tsmi = sender as ToolStripMenuItem;
+            if (tsmi.Text == "(Clear)")
+            {
+                teamBuild.Teams.Clear();
+            }
+            else
+            {
+                if (tsmi.Checked)
+                {
+                    if (!teamBuild.Teams.Contains(tsmi.Text))
+                        teamBuild.Teams.Add(tsmi.Text);
+                }
+                else
+                {
+                    teamBuild.Teams.Remove(tsmi.Text);
+                }
+            }
+            var teamstr = (teamBuild.Teams == null || teamBuild.Teams.Count == 0) ? "" : (teamBuild.Teams.Count > 2 ? teamBuild.Teams.Count.ToString() : teamBuild.Teams[0] + (teamBuild.Teams.Count == 2 ? ", " + teamBuild.Teams[1] : ""));
+            var bli = buildList.Items.Cast<ListViewItem>().Where(it => it.Tag == teamBuild).FirstOrDefault();
+            if (bli != null)
+            {
+                bli.SubItems[5].Text = teamstr;
+            }
+            menu_buildlist.Close();
         }
 
         private void monstertab_list_select(object sender, EventArgs e)
@@ -1264,13 +1365,9 @@ namespace RuneApp
                     id = buildList.Items.Count + 1;
                     b.ID = id;
                 }
-                /*
-                if (b.priority == 0)
-                {
-                    b.priority = buildList.Items.Count + 1;
-                }*/
                 b.priority = current_pri++;
-                ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "", b.mon.ID.ToString() });
+                var teamstr = (b.Teams == null || b.Teams.Count == 0) ? "" : (b.Teams.Count > 2 ? b.Teams.Count.ToString() : b.Teams[0] + (b.Teams.Count == 2 ? ", " + b.Teams[1] : ""));
+                ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "", b.mon.ID.ToString(), teamstr });
                 li.Tag = b;
                 buildList.Items.Add(li);
 
@@ -1601,9 +1698,22 @@ namespace RuneApp
                 }
                 builds.Add(bb);
             }
-
-            var str = JsonConvert.SerializeObject(builds);
-            File.WriteAllText(fname, str);
+            
+            // only write if there are builds, may save some files
+            if (builds.Count > 0)
+            {
+                try
+                {
+                    // keep a single recent backup
+                    File.Copy(fname, fname + ".backup", true);
+                    var str = JsonConvert.SerializeObject(builds);
+                    File.WriteAllText(fname, str);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString());
+                }
+            }
         }
 
         private void ClearLoadouts()
@@ -2700,6 +2810,139 @@ namespace RuneApp
                 col++;
             }
 
+        }
+
+        private void buildList_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                teamBuild = null;
+                if (buildList.FocusedItem.Bounds.Contains(e.Location))
+                {
+                    if (buildList.FocusedItem.Tag == null)
+                        return;
+
+                    teamBuild = buildList.FocusedItem.Tag as Build;
+
+                    teamChecking = true;
+
+                    foreach (ToolStripMenuItem tsmi in teamToolStripMenuItem.DropDownItems)
+                    {
+                        tsmi.Image = null;
+                        if (tsTeamCheck(tsmi))
+                            tsmi.Image = global::RuneApp.App.add;
+                    }
+                    teamChecking = false;
+
+                    menu_buildlist.Show(Cursor.Position);
+                }
+            }
+        }
+
+        private bool tsTeamCheck(ToolStripMenuItem t)
+        {
+            bool ret = false;
+            t.Checked = false;
+            t.Image = null;
+            if (teamBuild.Teams.Contains(t.Text))
+            {
+                t.Checked = true;
+                ret = true;
+            }
+            foreach (ToolStripMenuItem smi in t.DropDownItems)
+            {
+                if (tsTeamCheck(smi))
+                {
+                    t.Image = global::RuneApp.App.add;
+                    ret = true;
+                }
+            }
+            return ret;
+        }
+
+        int GetRel(string first, string second)
+        {
+            if (first == second)
+                return 0;
+
+            string p1 = null;
+            string p2 = null;
+
+            if (toolmap.Keys.Contains(first) && toolmap.Keys.Contains(second))
+                return 1;
+            
+            foreach (var k in toolmap)
+            {
+                if (k.Value.Contains(first) && k.Value.Contains(second))
+                    return 1;
+                if (k.Value.Contains(first))
+                    p1 = k.Key;
+                if (k.Value.Contains(second))
+                    p2 = k.Key;
+            }
+
+            if (toolmap.Keys.Contains(first) && toolmap[first].Contains(second))
+                return 1;
+            if (toolmap.Keys.Contains(second) && toolmap[second].Contains(first))
+                return 1;
+
+            if (p2 != null && toolmap[p2].Contains(p1))
+                return 2;
+            if (p1 != null && toolmap[p1].Contains(p2))
+                return 2;
+
+            if (p2 != null && toolmap[p2].Contains(first))
+                return 3;
+            if (p1 != null && toolmap[p1].Contains(second))
+                return 3;
+
+            return -1;
+        }
+
+        private void buildList_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            bool check = false;
+            if (Main.config.AppSettings.Settings.AllKeys.Contains("colorteams"))
+            {
+                bool.TryParse(Main.config.AppSettings.Settings["colorteams"].Value, out check);
+            }
+
+            bool doColor = buildList.SelectedItems.Count == 1;
+            var b1 = doColor ? buildList.SelectedItems[0].Tag as Build : null;
+
+            foreach (ListViewItem li in buildList.Items)
+            {
+                li.BackColor = Color.White;
+                if (check && b1 != null && b1.Teams.Count > 0)
+                {
+                    var b2 = li.Tag as Build;
+                    if (b2 != null && b2.Teams.Count > 0)
+                    {
+                        int close = -1;
+                        foreach (var t1 in b1.Teams)
+                        {
+                            foreach (var t2 in b2.Teams)
+                            {
+                                var c = GetRel(t1, t2);
+                                if (c != -1)
+                                    close = close == -1 ? c : (c < close ? c : close);
+                                if (close == 0)
+                                    break;
+                            }
+                            if (close == 0)
+                                break;
+                        }
+                        if (close == 0)
+                            li.BackColor = Color.Lime;
+                        else if (close == 1)
+                            li.BackColor = Color.LightGreen;
+                        else if (close == 2)
+                            li.BackColor = Color.DimGray;
+                        else if (close == 3)
+                            li.BackColor = Color.LightGray;
+                    }
+                }
+            }
         }
     }
 }

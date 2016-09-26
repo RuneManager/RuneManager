@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.cOtherStats = new System.Windows.Forms.CheckBox();
             this.label5 = new System.Windows.Forms.Label();
             this.gTestShow = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -43,7 +44,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.button1 = new System.Windows.Forms.Button();
             this.btnHelp = new System.Windows.Forms.Button();
-            this.cOtherStats = new System.Windows.Forms.CheckBox();
+            this.cColorTeams = new System.Windows.Forms.CheckBox();
             this.tabPage1.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.SuspendLayout();
@@ -57,6 +58,7 @@
             this.tabPage1.Controls.Add(this.gTestRun);
             this.tabPage1.Controls.Add(this.cOtherUpdate);
             this.tabPage1.Controls.Add(this.label3);
+            this.tabPage1.Controls.Add(this.cColorTeams);
             this.tabPage1.Controls.Add(this.cDisplayGray);
             this.tabPage1.Controls.Add(this.cDisplaySplit);
             this.tabPage1.Controls.Add(this.cGenLockTest);
@@ -69,6 +71,17 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "General";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // cOtherStats
+            // 
+            this.cOtherStats.AutoSize = true;
+            this.cOtherStats.Location = new System.Drawing.Point(465, 42);
+            this.cOtherStats.Name = "cOtherStats";
+            this.cOtherStats.Size = new System.Drawing.Size(160, 17);
+            this.cOtherStats.TabIndex = 6;
+            this.cOtherStats.Text = "Disable runestats generation";
+            this.cOtherStats.UseVisualStyleBackColor = true;
+            this.cOtherStats.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
             // 
             // label5
             // 
@@ -211,16 +224,16 @@
             this.btnHelp.UseVisualStyleBackColor = true;
             this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
             // 
-            // cOtherStats
+            // cColorTeams
             // 
-            this.cOtherStats.AutoSize = true;
-            this.cOtherStats.Location = new System.Drawing.Point(465, 42);
-            this.cOtherStats.Name = "cOtherStats";
-            this.cOtherStats.Size = new System.Drawing.Size(160, 17);
-            this.cOtherStats.TabIndex = 6;
-            this.cOtherStats.Text = "Disable runestats generation";
-            this.cOtherStats.UseVisualStyleBackColor = true;
-            this.cOtherStats.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+            this.cColorTeams.AutoSize = true;
+            this.cColorTeams.Location = new System.Drawing.Point(246, 65);
+            this.cColorTeams.Name = "cColorTeams";
+            this.cColorTeams.Size = new System.Drawing.Size(127, 17);
+            this.cColorTeams.TabIndex = 1;
+            this.cColorTeams.Text = "Color Team Relations";
+            this.cColorTeams.UseVisualStyleBackColor = true;
+            this.cColorTeams.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
             // 
             // Options
             // 
@@ -257,5 +270,6 @@
         private System.Windows.Forms.TextBox gTestShow;
         private System.Windows.Forms.Button btnHelp;
         private System.Windows.Forms.CheckBox cOtherStats;
+        private System.Windows.Forms.CheckBox cColorTeams;
     }
 }

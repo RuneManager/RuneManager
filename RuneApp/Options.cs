@@ -41,6 +41,7 @@ namespace RuneApp
             AddCheck("noupdate", cOtherUpdate);
             AddCheck("nostats", cOtherStats);
             AddCheck("testgray", cDisplayGray);
+            AddCheck("colorteams", cColorTeams);
 
             AddNum("testGen", gTestRun);
             AddNum("testShow", gTestShow);

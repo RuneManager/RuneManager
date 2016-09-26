@@ -171,6 +171,13 @@ namespace RuneOptim
             return Threshold.NonZero();
         }
 
+        [JsonProperty]
+        public List<string> Teams = new List<string>();
+        public bool ShouldSerializeTeams()
+        {
+            return Teams.Count > 0;
+        }
+
         // Which primary stat types are allowed per slot (should be 2,4,6 only)
         [JsonProperty("slotStats")]
         public List<string>[] slotStats = new List<string>[6];
