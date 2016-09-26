@@ -754,15 +754,15 @@ namespace RuneApp
 
         private void toolStripButton8_Click(object sender, EventArgs e)
         {
-            if (buildList.FocusedItem != null)
+            if (buildList.SelectedItems.Count > 0)
             {
-                if (buildList.FocusedItem.Tag != null)
+                foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderBy(l => (l.Tag as Build).priority))
                 {
-                    Build build = (Build)buildList.FocusedItem.Tag;
+                    Build build = (Build)sli.Tag;
 
                     var bb = builds.OrderBy(b => b.priority).ToList();
                     var bi = bb.FindIndex(b => b == build);
-                    
+
                     if (bi != 0)
                     {
                         var b2 = bb[bi - 1];
@@ -770,7 +770,7 @@ namespace RuneApp
                         build.priority = b2.priority;
                         b2.priority = sid;
 
-                        buildList.FocusedItem.SubItems[0].Text = build.priority.ToString();
+                        sli.SubItems[0].Text = build.priority.ToString();
 
                         var monname = b2.MonName;
                         if (monname == null || monname == "Missingno")
@@ -780,8 +780,9 @@ namespace RuneApp
                             monname = b2.mon.Name;
                         }
 
-                        ListViewItem listmon = buildList.FindItemWithText(b2.mon.Name);
-                        listmon.SubItems[0].Text = b2.priority.ToString();
+                        ListViewItem listmon = buildList.Items.Cast<ListViewItem>().Where(li => li.Tag != null && (li.Tag as Build) == b2).FirstOrDefault();
+                        if (listmon != null)
+                            listmon.SubItems[0].Text = b2.priority.ToString();
 
                         buildList.Sort();
                     }
@@ -791,26 +792,27 @@ namespace RuneApp
 
         private void toolStripButton16_Click(object sender, EventArgs e)
         {
-            if (buildList.FocusedItem != null)
+            if (buildList.SelectedItems.Count > 0)
             {
-                if (buildList.FocusedItem.Tag != null)
+                foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderByDescending(l => (l.Tag as Build).priority))
                 {
-                    Build build = (Build)buildList.FocusedItem.Tag;
+                    Build build = (Build)sli.Tag;
 
                     var bb = builds.OrderBy(b => b.priority).ToList();
                     var bi = bb.FindIndex(b => b == build);
 
-                    if (bi != builds.Max(b => b.priority) && bi+1 < bb.Count)
+                    if (bi != builds.Max(b => b.priority) && bi + 1 < bb.Count)
                     {
                         var b2 = bb[bi + 1];
                         var sid = build.priority;
                         build.priority = b2.priority;
                         b2.priority = sid;
 
-                        buildList.FocusedItem.SubItems[0].Text = build.priority.ToString();
+                        sli.SubItems[0].Text = build.priority.ToString();
 
-                        ListViewItem listmon = buildList.FindItemWithText(b2.MonName);
-                        listmon.SubItems[0].Text = b2.priority.ToString();
+                        ListViewItem listmon = buildList.Items.Cast<ListViewItem>().Where(li => li.Tag != null && (li.Tag as Build) == b2).FirstOrDefault();
+                        if (listmon != null)
+                            listmon.SubItems[0].Text = b2.priority.ToString();
 
                         buildList.Sort();
                     }
@@ -1241,7 +1243,8 @@ namespace RuneApp
                 }
             }
 
-            foreach (Build b in builds)
+            int current_pri = 1;
+            foreach (Build b in builds.OrderBy(bu => bu.priority))
             {
                 if (data != null)
                 {
@@ -1261,10 +1264,12 @@ namespace RuneApp
                     id = buildList.Items.Count + 1;
                     b.ID = id;
                 }
+                /*
                 if (b.priority == 0)
                 {
                     b.priority = buildList.Items.Count + 1;
-                }
+                }*/
+                b.priority = current_pri++;
                 ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), id.ToString(), b.mon.Name, "", b.mon.ID.ToString() });
                 li.Tag = b;
                 buildList.Items.Add(li);

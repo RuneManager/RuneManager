@@ -597,7 +597,10 @@ namespace RuneApp
             build = (Build)Tag;
             Monster mon = (Monster)build.mon;
             Stats cur = mon.GetStats();
-            monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
+            if (mon.ID != -1)
+                monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
+            else
+                monLabel.Text = "Build for " + build.MonName + " (" + mon.ID + ")";
 
             build.VERSIONNUM = VERSIONNUM;
 
