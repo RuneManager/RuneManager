@@ -372,6 +372,7 @@ namespace RuneApp
             var bli = buildList.Items.Cast<ListViewItem>().Where(it => it.Tag == teamBuild).FirstOrDefault();
             if (bli != null)
             {
+                while (bli.SubItems.Count < 6) bli.SubItems.Add("");
                 bli.SubItems[5].Text = teamstr;
             }
             menu_buildlist.Close();
@@ -695,7 +696,7 @@ namespace RuneApp
 						else
 							ff.build.priority = 1;
 
-                        ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"", ff.build.mon.ID.ToString() });
+                        ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"", ff.build.mon.ID.ToString(), "" });
                         li.Tag = ff.build;
                         buildList.Items.Add(li);
                         builds.Add(ff.build);
