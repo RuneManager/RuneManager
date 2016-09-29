@@ -2046,7 +2046,7 @@ namespace RuneApp
             ws.Cells[row - 1, 4].Value = scoreav;
 
             Stats lowQ = new Stats();
-            foreach (var s in Build.statNames)
+            foreach (var s in Build.statEnums)
             {
                 c = 0;
                 foreach (var b in build.buildUsage.loads)

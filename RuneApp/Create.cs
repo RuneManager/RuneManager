@@ -35,8 +35,9 @@ namespace RuneApp
 
         private LeaderType[] leadTypes = {
             new LeaderType(Attr.Null),
-            new LeaderType(Attr.SpeedPercent).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 })
-        };
+            new LeaderType(Attr.SpeedPercent).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 }),
+            new LeaderType(Attr.HealthPercent).AddRange(new int[] { 0, 18, 21, 30, 33, 44, 50 })
+		};
 
         private static string[] tabNames = new string[] { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
         private static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
@@ -1827,8 +1828,12 @@ namespace RuneApp
                 case Attr.SpeedPercent:
                     build.leader.Speed = lv.value; 
                     break;
-            }
-        }
+				case Attr.HealthPercent:
+					build.leader.Health = lv.value;
+					break;
+
+			}
+		}
 
         private void btnHelp_Click(object sender, EventArgs e)
         {
@@ -1934,5 +1939,5 @@ namespace RuneApp
                 }
             }
         }
-    }
+	}
 }

@@ -160,11 +160,14 @@ namespace RuneOptim
                 + MaxDamage;
         }
 
+		
+
         // Allows speedy iteration through the entity
         public double this[string stat]
         {
             get
             {
+				// TODO: switch from using [string] to [Attr]
                 switch (stat)
                 {
                     case "HP":
@@ -220,8 +223,75 @@ namespace RuneOptim
 
         }
 
-        // Perfectly legit operator overloading to compare builds/minimum
-        public static bool operator <(Stats lhs, Stats rhs)
+		public double this[Attr stat]
+		{
+			get
+			{
+				switch (stat)
+				{
+					case Attr.HealthFlat:
+					case Attr.HealthPercent:
+						return Health;
+					case Attr.AttackFlat:
+					case Attr.AttackPercent:
+						return Attack;
+					case Attr.DefenseFlat:
+					case Attr.DefensePercent:
+						return Defense;
+					case Attr.Speed:
+					case Attr.SpeedPercent:
+						return Speed;
+					case Attr.CritDamage:
+						return CritDamage;
+					case Attr.CritRate:
+						return CritRate;
+					case Attr.Accuracy:
+						return Accuracy;
+					case Attr.Resistance:
+						return Resistance;
+				}
+				return 0;
+			}
+
+			set
+			{
+				switch (stat)
+				{
+					case Attr.HealthFlat:
+					case Attr.HealthPercent:
+						Health = value;
+						break;
+					case Attr.AttackFlat:
+					case Attr.AttackPercent:
+						Attack = value;
+						break;
+					case Attr.DefenseFlat:
+					case Attr.DefensePercent:
+						Defense = value;
+						break;
+					case Attr.Speed:
+					case Attr.SpeedPercent:
+						Speed = value;
+						break;
+					case Attr.CritDamage:
+						CritDamage = value;
+						break;
+					case Attr.CritRate:
+						CritRate = value;
+						break;
+					case Attr.Accuracy:
+						Accuracy = value;
+						break;
+					case Attr.Resistance:
+						Resistance = value;
+						break;
+				}
+			}
+
+		}
+
+		// Perfectly legit operator overloading to compare builds/minimum
+		public static bool operator <(Stats lhs, Stats rhs)
         {
             return rhs.GreaterEqual(lhs);
         }

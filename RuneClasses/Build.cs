@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using System.Collections.Concurrent;
 
 namespace RuneOptim
@@ -29,8 +28,10 @@ namespace RuneOptim
     // Contains most of the data needed to outline build requirements
     public class Build
     {
-        // allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
-        public static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
+		// allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
+		[Obsolete]
+		public static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
+		public static Attr[] statEnums = new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
         public static string[] extraNames = new string[] { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
 
         public Build()
@@ -217,6 +218,7 @@ namespace RuneOptim
         public Func<Stats, int> sortFunc;
 
         // if currently running
+		[JsonIgnore]
         public bool isRun = false;
 
         [JsonIgnore]
@@ -237,7 +239,7 @@ namespace RuneOptim
         {
             double pts = 0;
 
-            foreach (string stat in statNames)
+            foreach (Attr stat in statEnums)
             {
                 // if this stat is used for sorting
                 if (build.Sort[stat] != 0)
@@ -337,7 +339,7 @@ namespace RuneOptim
                 }
 
                 bool hasSort = false;
-                foreach (string stat in statNames)
+                foreach (Attr stat in statEnums)
                 {
                     if (Sort[stat] != 0)
                     {
@@ -373,7 +375,7 @@ namespace RuneOptim
                     if (m == null)
                         return pts;
 
-                    foreach (string stat in statNames)
+                    foreach (Attr stat in statEnums)
                     {
                         // if this stat is used for sorting
                         if (Sort[stat] != 0)
@@ -494,7 +496,7 @@ namespace RuneOptim
 
                                         if (Maximum != null)
                                         {
-                                            foreach (var stat in statNames)
+                                            foreach (var stat in statEnums)
                                             {
                                                 if (Maximum[stat] > 0 && cstats[stat] > Maximum[stat])
                                                 {
