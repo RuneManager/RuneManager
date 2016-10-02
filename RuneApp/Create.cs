@@ -912,7 +912,7 @@ namespace RuneApp
                 toolStripButton1.Image = global::RuneApp.App.subtract;
                 toolStripButton1.Text = "Exclude selected set";
             }
-            btnPerms.Enabled = true;
+            updatePerms();
         }
 
         // flip the icon for the REQUIRED set button
@@ -929,7 +929,7 @@ namespace RuneApp
                 toolStripButton3.Image = global::RuneApp.App.down;
                 toolStripButton3.Text = "Option selected set";
             }
-            btnPerms.Enabled = true;
+            updatePerms();
 
         }
 
@@ -1090,8 +1090,8 @@ namespace RuneApp
             if (loading)
                 return;
 
-            btnPerms.Enabled = true;
-            
+            updatePerms();
+
             foreach (string tab in tabNames)
             {
                 foreach (string stat in statNames)
@@ -1747,6 +1747,14 @@ namespace RuneApp
         private void button4_Click(object sender, EventArgs e)
         {
             CalcPerms();
+        }
+
+        private void updatePerms()
+        {
+            if (btnPerms.Visible)
+                btnPerms.Enabled = true;
+            else
+                CalcPerms();
         }
 
         private long CalcPerms()

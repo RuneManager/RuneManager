@@ -29,13 +29,6 @@ namespace RuneOptim
         Guard, // Def
         Endure, // Res
 
-        // Ally sets
-        Fight,
-        Determination,
-        Enhance,
-        Accuracy,
-        Tolerance,
-
         // Here be magic
         Violent,
         Will,
@@ -45,6 +38,13 @@ namespace RuneOptim
         Despair,
         Vampire,
         Destroy,
+
+        // Ally sets
+        Fight,
+        Determination,
+        Enhance,
+        Accuracy,
+        Tolerance,
 
         Broken
     }
