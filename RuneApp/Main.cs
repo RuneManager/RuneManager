@@ -100,8 +100,9 @@ namespace RuneApp
 
             # region Sorter
             var sorter = new ListViewSort();
-            sorter.OnColumnClick(MonPriority.Index);
             dataMonsterList.ListViewItemSorter = sorter;
+            sorter.OnColumnClick(ColMonID.Index);
+            sorter.OnColumnClick(ColMonPriority.Index);
             dataRuneList.ListViewItemSorter = new ListViewSort();
 
             sorter = new ListViewSort();
@@ -520,7 +521,7 @@ namespace RuneApp
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
-                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
+                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
                     }
                     else if (mon.priority != 1)
                     {
@@ -531,10 +532,10 @@ namespace RuneApp
                             var items = dataMonsterList.Items;
                             ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
                             mon2.priority += 1;
-                            listMon.SubItems[MonPriority.Index].Text = mon2.priority.ToString();
+                            listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
                         }
                         mon.priority -= 1;
-                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();                        
+                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();                        
                     }
                     dataMonsterList.Sort();
                 }
@@ -552,7 +553,7 @@ namespace RuneApp
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
-                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (maxPri + 1).ToString();
+                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
                     }
                     else if (mon.priority != maxPri)
                     {
@@ -563,10 +564,10 @@ namespace RuneApp
                             var items = dataMonsterList.Items;
                             ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
                             mon2.priority -= 1;
-                            listMon.SubItems[MonPriority.Index].Text = mon2.priority.ToString();
+                            listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
                         }
                         mon.priority += 1;
-                        dataMonsterList.FocusedItem.SubItems[MonPriority.Index].Text = (mon.priority).ToString();
+                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
                     }
                     dataMonsterList.Sort();
                 }

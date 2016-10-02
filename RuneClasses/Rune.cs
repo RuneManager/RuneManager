@@ -534,15 +534,16 @@ namespace RuneOptim
         // Number of runes required for set to be complete
         public static int SetRequired(RuneSet set)
         {
-            if (set == RuneSet.Energy || set == RuneSet.Blade || set == RuneSet.Focus || set == RuneSet.Guard || set == RuneSet.Shield
-               || set == RuneSet.Revenge || set == RuneSet.Nemesis || set == RuneSet.Will || set == RuneSet.Endure || set == RuneSet.Destroy
-               || set == RuneSet.Fight || set == RuneSet.Determination || set == RuneSet.Enhance || set == RuneSet.Accuracy || set == RuneSet.Tolerance)
-                return 2;
             if (set == RuneSet.Swift || set == RuneSet.Fatal || set == RuneSet.Violent || set == RuneSet.Vampire || set == RuneSet.Despair || set == RuneSet.Rage)
                 return 4;
-
+            // Not a 4 set => is a 2 set
+            /*if (set == RuneSet.Energy || set == RuneSet.Blade || set == RuneSet.Focus || set == RuneSet.Guard || set == RuneSet.Shield
+               || set == RuneSet.Revenge || set == RuneSet.Nemesis || set == RuneSet.Will || set == RuneSet.Endure || set == RuneSet.Destroy
+               || set == RuneSet.Fight || set == RuneSet.Determination || set == RuneSet.Enhance || set == RuneSet.Accuracy || set == RuneSet.Tolerance)*/
+                return 2;
+            
             // Unknown set will never be complete!
-            return 7;
+            //return 7;
         }
 
         // Format rune values okayish

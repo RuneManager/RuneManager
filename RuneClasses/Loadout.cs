@@ -306,7 +306,11 @@ namespace RuneOptim
                 return;
 
             // can only have 3 sets max (eg. energy / energy / blade)
-            sets = new RuneSet[3];
+            //if (sets == null)
+            //    sets = new RuneSet[3];
+            sets[0] = 0;
+            sets[1] = 0;
+            sets[2] = 0;
 
             // which set we are looking for
             int setInd = 0;

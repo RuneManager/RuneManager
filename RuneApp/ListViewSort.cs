@@ -44,6 +44,11 @@ namespace RuneApp
 			if (val2sp != -1)
 				val2i = val2.Substring(0, val2sp);
 
+            if (val1 == "" && val2 != "")
+                return 1;
+            else if (val1 != "" && val2 == "")
+                return -1;
+
 			// Upgraded to doubles because that's what's scoring.
 			// Problem: still have to return an int (that is slightly representative of the level of difference)
 			// Single value: Return -1 or lower
