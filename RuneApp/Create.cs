@@ -699,7 +699,7 @@ namespace RuneApp
                             double? val = f.Value[type];
                             // unless it's zero, I don't want zeros
                             if (val != null)
-                                ctrl.Text = val.Value.ToString("#.##");
+                                ctrl.Text = val.Value.ToString("0.##");
                             else
                                 ctrl.Text = "";
                         }
@@ -1090,8 +1090,6 @@ namespace RuneApp
             if (loading)
                 return;
 
-            updatePerms();
-
             foreach (string tab in tabNames)
             {
                 foreach (string stat in statNames)
@@ -1260,9 +1258,11 @@ namespace RuneApp
             }
 
             TestRune(runeTest);
-        }
 
-        private void UpdateStat(string tab, string stat)
+			updatePerms();
+		}
+
+		private void UpdateStat(string tab, string stat)
         {
             TabPage ctab = GetTab(tab);
             var ctest = ctab.Controls.Find(tab + stat + "test", true).First();

@@ -1477,7 +1477,7 @@ namespace RuneApp
                         int level = (int)Math.Floor(val / shrineLevel[i]);
                         shrineMap[stat][level].Checked = true;
                     }
-                    else
+                    else if (data.Decorations != null)
                     {
                         var shrine = data.Decorations.Where(d => d.Shrine.ToString() == stat).FirstOrDefault();
                         if (shrine != null)
@@ -2241,7 +2241,7 @@ namespace RuneApp
             List<string> colHead = new List<string>();
 
             // ,MType,Points,FlatPts
-            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Mon,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,CurMon,Mon,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
             {
                 colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
@@ -2254,7 +2254,7 @@ namespace RuneApp
             // calculate the stats
             foreach (Rune r in data.Runes)
             {
-                double keep = 0;
+				double keep = StatsKeepRune(r, colHead);/* 0;
                 keep += Math.Pow(r.Level, 0.7);
                 r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
                 keep += Math.Pow(r.Grade, 1.4);
@@ -2314,7 +2314,7 @@ namespace RuneApp
                 r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
                 if (r.manageStats.GetOrAdd("LoadGen",0) > 0)
                     keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt",0) / r.manageStats["LoadGen"], 2) * 10;
-
+					*/
                 r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             }
 
@@ -2404,7 +2404,11 @@ namespace RuneApp
                             break;
                         case "Points":
                             break;
-                        case "Mon":
+						case "CurMon":
+							if (r.AssignedName != "Unknown name" && r.AssignedName != "Inventory")
+								ws.Cells[row, col].Value = r.AssignedName;
+							break;
+						case "Mon":
                             if (r.manageStats.GetOrAdd("Mon", -1) != -1)
                             {
                                 ws.Cells[row, col].Value = data.GetMonster((int)r.manageStats["Mon"]).Name;
