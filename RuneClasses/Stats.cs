@@ -340,41 +340,116 @@ namespace RuneOptim
 
         public static Stats operator+(Stats lhs, Stats rhs)
         {
-            lhs.Health += rhs.Health;
-            lhs.Attack += rhs.Attack;
-            lhs.Defense += rhs.Defense;
-            lhs.Speed += rhs.Speed;
-            lhs.CritRate += rhs.CritRate;
-            lhs.CritDamage += rhs.CritDamage;
-            lhs.Resistance += rhs.Resistance;
-            lhs.Accuracy += rhs.Accuracy;
-            lhs.EffectiveHP += rhs.EffectiveHP;
-            lhs.EffectiveHPDefenseBreak += rhs.EffectiveHPDefenseBreak;
-            lhs.DamagePerSpeed += rhs.DamagePerSpeed;
-            lhs.AverageDamage += rhs.AverageDamage;
-            lhs.MaxDamage += rhs.MaxDamage;
-            return lhs;
+			Stats ret = new Stats(lhs);
+			ret.Health += rhs.Health;
+			ret.Attack += rhs.Attack;
+			ret.Defense += rhs.Defense;
+			ret.Speed += rhs.Speed;
+			ret.CritRate += rhs.CritRate;
+			ret.CritDamage += rhs.CritDamage;
+			ret.Resistance += rhs.Resistance;
+			ret.Accuracy += rhs.Accuracy;
+			ret.EffectiveHP += rhs.EffectiveHP;
+			ret.EffectiveHPDefenseBreak += rhs.EffectiveHPDefenseBreak;
+			ret.DamagePerSpeed += rhs.DamagePerSpeed;
+			ret.AverageDamage += rhs.AverageDamage;
+			ret.MaxDamage += rhs.MaxDamage;
+            return ret;
         }
 
-        public static Stats operator/(Stats lhs, int rhs)
+		public static Stats operator -(Stats lhs, Stats rhs)
+		{
+			Stats ret = new Stats(lhs);
+			ret.Health -= rhs.Health;
+			ret.Attack -= rhs.Attack;
+			ret.Defense -= rhs.Defense;
+			ret.Speed -= rhs.Speed;
+			ret.CritRate -= rhs.CritRate;
+			ret.CritDamage -= rhs.CritDamage;
+			ret.Resistance -= rhs.Resistance;
+			ret.Accuracy -= rhs.Accuracy;
+			ret.EffectiveHP -= rhs.EffectiveHP;
+			ret.EffectiveHPDefenseBreak -= rhs.EffectiveHPDefenseBreak;
+			ret.DamagePerSpeed -= rhs.DamagePerSpeed;
+			ret.AverageDamage -= rhs.AverageDamage;
+			ret.MaxDamage -= rhs.MaxDamage;
+			return ret;
+		}
+
+		public static Stats operator/(Stats lhs, int rhs)
         {
-            lhs.Health /= rhs;
-            lhs.Attack /= rhs;
-            lhs.Defense /= rhs;
-            lhs.Speed /= rhs;
-            lhs.CritRate /= rhs;
-            lhs.CritDamage /= rhs;
-            lhs.Resistance /= rhs;
-            lhs.Accuracy /= rhs;
-            lhs.EffectiveHP /= rhs;
-            lhs.EffectiveHPDefenseBreak /= rhs;
-            lhs.DamagePerSpeed /= rhs;
-            lhs.AverageDamage /= rhs;
-            lhs.MaxDamage /= rhs;
-            return lhs;
+			Stats ret = new Stats(lhs);
+			ret.Health /= rhs;
+			ret.Attack /= rhs;
+			ret.Defense /= rhs;
+			ret.Speed /= rhs;
+			ret.CritRate /= rhs;
+			ret.CritDamage /= rhs;
+			ret.Resistance /= rhs;
+			ret.Accuracy /= rhs;
+			ret.EffectiveHP /= rhs;
+			ret.EffectiveHPDefenseBreak /= rhs;
+			ret.DamagePerSpeed /= rhs;
+			ret.AverageDamage /= rhs;
+			ret.MaxDamage /= rhs;
+            return ret;
         }
 
-        public bool NonZero()
+		public static Stats operator /(Stats lhs, Stats rhs)
+		{
+			Stats ret = new Stats(lhs);
+			ret.Health /= rhs.Health;
+			ret.Attack /= rhs.Attack;
+			ret.Defense /= rhs.Defense;
+			ret.Speed /= rhs.Speed;
+			ret.CritRate /= rhs.CritRate;
+			ret.CritDamage /= rhs.CritDamage;
+			ret.Resistance /= rhs.Resistance;
+			ret.Accuracy /= rhs.Accuracy;
+			ret.EffectiveHP /= rhs.EffectiveHP;
+			ret.EffectiveHPDefenseBreak /= rhs.EffectiveHPDefenseBreak;
+			ret.DamagePerSpeed /= rhs.DamagePerSpeed;
+			ret.AverageDamage /= rhs.AverageDamage;
+			ret.MaxDamage /= rhs.MaxDamage;
+			return ret;
+		}
+
+		// how much % of the 3 pris RHS needs to get to this
+		public Stats Of(Stats rhs)
+		{
+			Stats ret = new Stats(this);
+
+			if (rhs.Health > 0)
+				ret.Health /= rhs.Health;
+			if (rhs.Attack > 0)
+				ret.Attack /= rhs.Attack;
+			if (rhs.Defense > 0)
+				ret.Defense /= rhs.Defense;
+
+
+			return ret;
+		}
+
+		// boots this by RHS
+		// assumes A/D/H/S are 100.00 instead of 1.00 (leader/shrine)
+		public Stats Boost(Stats rhs)
+		{
+			Stats ret = new Stats(this);
+
+			ret.Attack *= 1 + rhs.Attack / 100;
+			ret.Defense *= 1 + rhs.Defense / 100;
+			ret.Health *= 1 + rhs.Health / 100;
+			ret.Speed *= 1 + rhs.Speed / 100;
+
+			ret.CritRate += rhs.CritRate;
+			ret.CritDamage += rhs.CritDamage;
+			ret.Accuracy += rhs.Accuracy;
+			ret.Resistance += rhs.Resistance;
+
+			return ret;
+		}
+
+		public bool NonZero()
         {
             if (Accuracy != 0)
                 return true;

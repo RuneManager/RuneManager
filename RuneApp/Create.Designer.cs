@@ -106,6 +106,7 @@
 			this.tab5 = new System.Windows.Forms.TabPage();
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
+			this.check_magic = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.groupBox2.SuspendLayout();
@@ -132,6 +133,7 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.check_magic);
 			this.groupBox1.Controls.Add(this.btnDLawake);
 			this.groupBox1.Controls.Add(this.checkDLawake);
 			this.groupBox1.Controls.Add(this.btnDL6star);
@@ -994,6 +996,17 @@
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
 			// 
+			// check_magic
+			// 
+			this.check_magic.AutoSize = true;
+			this.check_magic.Location = new System.Drawing.Point(244, 629);
+			this.check_magic.Name = "check_magic";
+			this.check_magic.Size = new System.Drawing.Size(77, 17);
+			this.check_magic.TabIndex = 91;
+			this.check_magic.Text = "Use Magic";
+			this.check_magic.UseVisualStyleBackColor = true;
+			this.check_magic.CheckedChanged += new System.EventHandler(this.check_magic_CheckedChanged);
+			// 
 			// Create
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1095,5 +1108,6 @@
 		private System.Windows.Forms.Button btnDLawake;
 		private System.Windows.Forms.CheckBox checkDLawake;
         private System.Windows.Forms.ListView priStat2;
-    }
+		private System.Windows.Forms.CheckBox check_magic;
+	}
 }

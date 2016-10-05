@@ -609,6 +609,8 @@ namespace RuneApp
 			checkDLawake.Checked = build.DownloadAwake;
 			checkDL6star.Enabled = !checkDLawake.Checked;
 
+			check_magic.Checked = build.autoAdjust;
+
             if (build.leader.NonZero())
             {
                 Attr t = build.leader.FirstNonZero();
@@ -1947,5 +1949,12 @@ namespace RuneApp
                 }
             }
         }
+
+		private void check_magic_CheckedChanged(object sender, EventArgs e)
+		{
+			btnPerms.Visible = check_magic.Checked;
+			btnPerms.Enabled = check_magic.Checked;
+			build.autoAdjust = check_magic.Checked;
+		}
 	}
 }
