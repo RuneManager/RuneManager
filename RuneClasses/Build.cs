@@ -1101,77 +1101,154 @@ namespace RuneOptim
 
 				slotFakes[i] = raiseTo;
 				slotPred[i] = predictSubs;
+
+
+				if (i % 2 == 1) // actually evens because off by 1
+				{
+					// makes sure that the primary stat type is in the selection
+					if (slotStats[i].Count > 0)
+						runes[i] = runes[i].Where(r => slotStats[i].Contains(r.MainType.ToForms())).ToArray();
+				}
+
+				if (saveStats)
+				{
+					foreach (Rune r in runes[i])
+					{
+						r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
+					}
+					// cull here instead
+					if (!useEquipped)
+						runes[i] = runes[i].Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped).ToArray();
+					if (!useLocked)
+						runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
+				}
 			}
+			CleanBroken();
 
 			if (autoAdjust)
 			{
-				var qq = NeededForMin(slotFakes, slotPred);
+				var needed = NeededForMin(slotFakes, slotPred);
+				var needRune = new Stats(needed) / 6;
+
+				// reduce number of runes to 10-15
+
+				// odds first, then evens
+				foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 })
+				{
+					if (runes[i].Length > 15)
+					{
+						// if >3 of one stat average
+						// or >2 of two stat averages
+						// or >1 of three stat averages
+						runes[i] = runes[i].OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, this.Sort)).Take(15).ToArray();
+					}
+				}
+
+				CleanBroken();
 			}
-			
-			// Filter each runeslot
-			for (int i = 0; i < 6; i++)
-			{ 
-				// default fail OR
-				Predicate<Rune> slotTest = RuneScoring(i + 1, slotFakes[i], slotPred[i]);
+			else
+			{
+				// Filter each runeslot
+				for (int i = 0; i < 6; i++)
+				{
+					// default fail OR
+					Predicate<Rune> slotTest = RuneScoring(i + 1, slotFakes[i], slotPred[i]);
 
-                runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
+					runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
 
-                if (saveStats)
-                {
-                    foreach (Rune r in runes[i])
-                    {
-                        r.manageStats.AddOrUpdate("RuneFilt", 1, (s,d)=> { return d + 1; }); 
-                    }
-                    
-                }
+					if (saveStats)
+					{
+						foreach (Rune r in runes[i])
+						{
+							r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => { return d + 1; });
+						}
 
-                if (i % 2 == 1) // actually evens because off by 1
-                {
-                    // makes sure that the primary stat type is in the selection
-                    if (slotStats[i].Count > 0)
-                        runes[i] = runes[i].Where(r => slotStats[i].Contains(r.MainType.ToForms())).ToArray();
-                }
-
-                if (saveStats)
-                {
-                    foreach (Rune r in runes[i])
-                    {
-                        r.manageStats.AddOrUpdate("TypeFilt", 1, (s,d)=> { return d + 1; }); 
-                    }
-                    // cull here instead
-                    if (!useEquipped)
-                        runes[i] = runes[i].Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped).ToArray();
-                    if (!useLocked)
-                        runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
-                }
-            }
-
-            // Make sure that for each set type, there are enough slots with runes in them
-            // Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4
-            // for each included set
-            if (!AllowBroken)
-            {
-                foreach (RuneSet s in BuildSets)
-                {
-                    // find how many slots have acceptable runes for it
-                    int slots = 0;
-                    for (int i = 0; i < 6; i++)
-                    {
-                        if (runes[i].Any(r => r.Set == s))
-                            slots += 1;
-                    }
-                    // if there isn't enough slots
-                    if (slots < Rune.SetRequired(s))
-                    {
-                        // remove that set
-                        for (int i = 0; i < 6; i++)
-                        {
-                            runes[i] = runes[i].Where(r => r.Set != s).ToArray();
-                        }
-                    }
-                }
-            }
+					}
+				}
+			}
         }
-    }
+
+		// Make sure that for each set type, there are enough slots with runes in them
+		// Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4
+		// for each included set
+		private void CleanBroken()
+		{
+			if (!AllowBroken)
+			{
+				foreach (RuneSet s in BuildSets)
+				{
+					// find how many slots have acceptable runes for it
+					int slots = 0;
+					for (int i = 0; i < 6; i++)
+					{
+						if (runes[i].Any(r => r.Set == s))
+							slots += 1;
+					}
+					// if there isn't enough slots
+					if (slots < Rune.SetRequired(s))
+					{
+						// remove that set
+						for (int i = 0; i < 6; i++)
+						{
+							runes[i] = runes[i].Where(r => r.Set != s).ToArray();
+						}
+					}
+				}
+			}
+		}
+
+		// assumes Stat A/D/H are percent
+		private int RuneHasStats(Rune r, Stats s)
+		{
+			int ret = 0;
+
+			if (r.HealthPercent >= s.Health)
+				ret++;
+			if (r.AttackPercent >= s.Attack)
+				ret++;
+			if (r.DefensePercent >= s.Defense)
+				ret++;
+			if (r.Speed >= s.Speed)
+				ret++;
+
+			if (r.CritDamage >= s.CritDamage)
+				ret++;
+			if (r.CritRate >= s.CritRate)
+				ret++;
+			if (r.Accuracy >= s.Accuracy)
+				ret++;
+			if (r.Resistance >= s.Resistance)
+				ret++;
+
+			return ret;
+		}
+
+		// assumes Stat A/D/H are percent
+		private double RuneVsStats(Rune r, Stats s)
+		{
+			double ret = 0;
+
+			if (s.Health > 0)
+				ret += r.HealthPercent / s.Health;
+			if (s.Attack > 0)
+				ret += r.AttackPercent / s.Attack;
+			if (s.Defense > 0)
+				ret += r.DefensePercent / s.Defense;
+			if (s.Speed > 0)
+				ret += r.Speed / s.Speed;
+
+			if (s.CritDamage > 0)
+				ret += r.CritDamage / s.CritDamage;
+			if (s.CritRate > 0)
+				ret += r.CritRate / s.CritRate;
+			if (s.Accuracy > 0)
+				ret += r.Accuracy / s.Accuracy;
+			if (s.Resistance > 0)
+				ret += r.Resistance / s.Resistance;
+			
+			return ret;
+		}
+
+	}
 
 }
