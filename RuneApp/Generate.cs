@@ -123,8 +123,14 @@ namespace RuneApp
                 // Disregard locked, but honor equippedness checking
                 build.GenRunes(Main.data, noLocked, Main.useEquipped);
 
-                // generate 5000 builds
-				build.GenBuilds(buildsGen, 20, (s) => { }, (d) =>
+				int timeout = 20;
+				if (Main.config.AppSettings.Settings.AllKeys.Contains("testTime"))
+				{
+					int.TryParse(Main.config.AppSettings.Settings["testTime"].Value, out timeout);
+				}
+
+				// generate 5000 builds
+				build.GenBuilds(buildsGen, timeout, (s) => { }, (d) =>
 				{
                     if (!IsDisposed && IsHandleCreated)
                     {

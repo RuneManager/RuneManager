@@ -45,8 +45,9 @@ namespace RuneApp
 
             AddNum("testGen", gTestRun);
             AddNum("testShow", gTestShow);
+            AddNum("testTime", gTestTime);
 
-            if (Main.config != null)
+			if (Main.config != null)
             {
                 bool check = false;
                 int val = 0;
@@ -122,5 +123,5 @@ namespace RuneApp
             Main.help.url = Environment.CurrentDirectory + "\\User Manual\\options.html";
             Main.help.Show();
         }
-    }
+	}
 }
