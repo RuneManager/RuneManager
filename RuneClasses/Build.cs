@@ -194,9 +194,10 @@ namespace RuneOptim
         [JsonIgnore]
         public RuneUsage runeUsage;
 
-		// magically make the build goodish enough
-		[JsonIgnore]
-		[Obsolete("TODO: Enable saving autoAdjust")]
+		// magically find good runes to use in the build
+		public bool autoRuneSelect = false;
+
+		// magically scale Minimum with Sort while the build is running
 		public bool autoAdjust = false;
 
 
@@ -1125,7 +1126,7 @@ namespace RuneOptim
 			}
 			CleanBroken();
 
-			if (autoAdjust)
+			if (autoRuneSelect)
 			{
 				var needed = NeededForMin(slotFakes, slotPred);
 				var needRune = new Stats(needed) / 6;

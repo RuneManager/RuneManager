@@ -2319,21 +2319,29 @@ namespace RuneApp
             }
 
             int rr = 0;
+			// from keepscore 1 to 100
             foreach (Rune r in data.Runes.Where(r => r.manageStats["In"] == 0).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
             {
                 rr++;
                 if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.25)
                 {
-                    if (r.manageStats["Action"] == -1)
+                    //if (r.manageStats["Action"] == -2)
+					if (!r.manageStats.ContainsKey("Action"))
                         r.manageStats["Action"] = -2;
                 }
+				else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.5)
+				{
+					if (r.manageStats["Action"] == -2)
+						r.manageStats["Action"] = -3;
+				}
                 else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.75)
                 {
-                    if (r.manageStats["Action"] == -1)
-                        r.manageStats["Action"] = -3;
+                    if (r.manageStats["Action"] == -2)
+                        r.manageStats["Action"] = -1;
                 }
                 else
                 {
+                    r.manageStats["Action"] = -1;
                     if (r.Level < 6)
                         r.manageStats["Action"] = 6;
                     else if (r.Level < 9)
@@ -2528,7 +2536,7 @@ namespace RuneApp
             keep += Math.Pow(r.Grade, 1.4);
             formula += "+power(" + (heads.Contains("Grade") ? "RuneTable[[#This Row],[Grade]]" : r.Grade.ToString()) + ",1.4)";
 
-            r.manageStats["Action"] = -1;
+            r.manageStats["Action"] = -2;
             if (!r.manageStats.ContainsKey("In"))
                 r.manageStats["In"] = 0;
 
@@ -2536,6 +2544,7 @@ namespace RuneApp
             if (r.manageStats["In"] > 0)
             {
                 var b = builds.Where(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r)).FirstOrDefault();
+				r.manageStats["Action"] = -1;
                 if (b == null)
                 {
                     r.manageStats["Priority"] = 2;
@@ -2555,6 +2564,8 @@ namespace RuneApp
                 keep += 10;
             }
             formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]],10,0)" : ((r.manageStats["In"] > 0) ? "+10" : "");
+
+			// TODO: skip upgrading if rune is trash
 
             if (r.Rarity > Math.Floor(r.Level / (double)3))
             {
