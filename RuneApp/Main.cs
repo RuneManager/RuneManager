@@ -1707,7 +1707,8 @@ namespace RuneApp
                 try
                 {
                     // keep a single recent backup
-                    File.Copy(fname, fname + ".backup", true);
+					if (File.Exists(fname))
+	                    File.Copy(fname, fname + ".backup", true);
                     var str = JsonConvert.SerializeObject(builds);
                     File.WriteAllText(fname, str);
                 }
