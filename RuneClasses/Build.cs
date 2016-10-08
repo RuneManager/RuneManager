@@ -336,7 +336,7 @@ namespace RuneOptim
                     Console.WriteLine("Zero permuations");
                     return;
                 }
-                if (!AllowBroken && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
+                if (!AllowBroken && !autoRuneSelect && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
                 {
                     if (printTo != null)
                         printTo.Invoke("Bad sets");
@@ -1051,8 +1051,16 @@ namespace RuneOptim
                     rsGlobal = rsGlobal.Where(r => r.Locked == false);
             }
 
-            // Only runes which we've included
-            rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set));
+            if (BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4))
+            {
+                // if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
+                rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
+            }
+            else
+            {
+                rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
+                // Only runes which we've included
+            }
 
             if (saveStats)
             {
@@ -1136,16 +1144,18 @@ namespace RuneOptim
 				// odds first, then evens
 				foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 })
 				{
-					if (runes[i].Length > 15)
-					{
-						// if >3 of one stat average
-						// or >2 of two stat averages
-						// or >1 of three stat averages
-						runes[i] = runes[i].OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, this.Sort)).Take(15).ToArray();
-					}
-				}
+                    Rune[] rr = new Rune[0];
+                    foreach (var rs in RequiredSets)
+                    {
+                        rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, this.Sort)).Take(7).ToArray()).ToArray();
+                    }
+                    if (rr.Length < 15)
+                        rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, this.Sort)).Take(15 - rr.Length).ToArray()).Distinct().ToArray();
 
-				CleanBroken();
+                    runes[i] = rr;
+                }
+
+                CleanBroken();
 			}
 			else
 			{
@@ -1176,7 +1186,9 @@ namespace RuneOptim
 		{
 			if (!AllowBroken)
 			{
-				foreach (RuneSet s in BuildSets)
+                var used = runes[0].Concat(runes[1]).Concat(runes[2]).Concat(runes[3]).Concat(runes[4]).Concat(runes[5]).Select(r => r.Set).Distinct();
+                
+				foreach (RuneSet s in used)
 				{
 					// find how many slots have acceptable runes for it
 					int slots = 0;

@@ -1,7 +1,8 @@
-0.2.1.0
+0.2.2.0
 https://github.com/Skibisky/RuneManager/releases/latest
-BACKUP your builds.
-Runestats.xlsx is now more helpful, still defaults off.
-Crashes less when loading bad JSON, can handle new runes.
-RUN LATEST SWPROXY to get latest runes.
-Faster by calling the slowest function 2/5 times.
+NEW: AutoSelectRunes - use magic to pick the best ~15 runes per slot.
+IMPROVED: Faster comparion in slow functions.
+Max/Avg Damage calculate correctly.
+Test timeout is configurable (0 = off, default = 20)
+Runestats.xlsx is having a hard time selling runes, defaults off.
+Can tag builds with teams for fun.

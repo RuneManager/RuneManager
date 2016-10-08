@@ -609,7 +609,7 @@ namespace RuneApp
 			checkDLawake.Checked = build.DownloadAwake;
 			checkDL6star.Enabled = !checkDLawake.Checked;
 
-			check_magic.Checked = build.autoRuneSelect;
+			check_autoRunes.Checked = build.autoRuneSelect;
 
             if (build.leader.NonZero())
             {
@@ -1641,7 +1641,8 @@ namespace RuneApp
                         else if (Rune.SetRequired(s) == 4)
                             has4 = true;
                     }
-                    if (!has2 && has4)
+                    // never annoy because only 4 will include all 2
+                    if (false && !has2 && has4 && !build.autoRuneSelect)
                     {
                         tooltipSets.IsBalloon = true;
                         tooltipSets.Show(string.Empty, setList);
@@ -1952,9 +1953,15 @@ namespace RuneApp
 
 		private void check_magic_CheckedChanged(object sender, EventArgs e)
 		{
-			btnPerms.Visible = check_magic.Checked;
-			build.autoRuneSelect = check_magic.Checked;
+			btnPerms.Visible = check_autoRunes.Checked;
+			build.autoRuneSelect = check_autoRunes.Checked;
 			updatePerms();
 		}
-	}
+
+        private void check_autoBuild_CheckedChanged(object sender, EventArgs e)
+        {
+            MessageBox.Show("NYI");
+           // sampletext
+        }
+    }
 }
