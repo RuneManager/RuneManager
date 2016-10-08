@@ -1562,7 +1562,7 @@ namespace RuneApp
                                     if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key))
                                     {
                                         var tab = tabControl1.TabPages["tab" + tbf.Key];
-                                        tab.Select();
+                                        tabControl1.SelectTab(tab);
                                         var ctrl = tab.Controls.Find(tbf.Key + rbf.Key + "test", false).FirstOrDefault();
                                         tooltipBadRuneFilter.IsBalloon = true;
                                         tooltipBadRuneFilter.Show(string.Empty, ctrl);
@@ -1576,7 +1576,7 @@ namespace RuneApp
                                 if (rbf.Value.Flat + rbf.Value.Percent == 0)
                                 {
                                     var tab = tabControl1.TabPages["tab" + tbf.Key];
-                                    tab.Select();
+                                    tabControl1.SelectTab(tab);
                                     var ctrl = tab.Controls.Find(tbf.Key + rbf.Key, false).FirstOrDefault();
                                     tooltipBadRuneFilter.IsBalloon = true;
                                     tooltipBadRuneFilter.Show(string.Empty, ctrl);
@@ -1591,7 +1591,7 @@ namespace RuneApp
                         if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key))
                         {
                             var tab = tabControl1.TabPages["tab" + tbf.Key];
-                            tab.Select();
+                            tabControl1.SelectTab(tab);
                             var ctrl = tab.Controls.Find(tbf.Key + "test", false).FirstOrDefault();
                             tooltipBadRuneFilter.IsBalloon = true;
                             tooltipBadRuneFilter.Show(string.Empty, ctrl);
