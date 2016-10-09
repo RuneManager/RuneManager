@@ -32,14 +32,14 @@ namespace RuneApp
         public static Configuration config = null;
 
         private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
-        string[] shrineStats = new string[] { "SPD", "DEF" , "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
-        double[] shrineLevel = new double[] { 1.5, 2 , 2, 2, 2, 2, 2, 2, 2, 2.5};
+        string[] shrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
+        double[] shrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
 
         private Task runTask = null;
-		private CancellationToken runToken;
-		private CancellationTokenSource runSource = null;
-		bool plsDie = false;
-		public static Help help = null;
+        private CancellationToken runToken;
+        private CancellationTokenSource runSource = null;
+        bool plsDie = false;
+        public static Help help = null;
 
         public static bool makeStats = true;
         private int linkCol = 1;
@@ -69,7 +69,7 @@ namespace RuneApp
             }
         }
 
-		public Main()
+        public Main()
         {
             InitializeComponent();
 
@@ -242,7 +242,7 @@ namespace RuneApp
             var it = (ToolStripMenuItem)sender;
             if (it != null)
             {
-                var tag = (KeyValuePair<string, int>) it.Tag;
+                var tag = (KeyValuePair<string, int>)it.Tag;
                 var stat = tag.Key;
 
                 foreach (ToolStripMenuItem i in shrineMap[stat])
@@ -252,7 +252,7 @@ namespace RuneApp
                 it.Checked = true;
                 if (data == null)
                     return;
-                
+
                 if (string.IsNullOrWhiteSpace(stat))
                     return;
 
@@ -261,7 +261,7 @@ namespace RuneApp
                 {
                     config.AppSettings.Settings.Remove("shrine" + stat);
                     if (tag.Value > 0)
-                       config.AppSettings.Settings.Add("shrine" + stat, tag.Value.ToString());
+                        config.AppSettings.Settings.Add("shrine" + stat, tag.Value.ToString());
                     config.Save(ConfigurationSaveMode.Modified);
                 }
             }
@@ -277,10 +277,10 @@ namespace RuneApp
             {
                 LoadBuilds("builds.json");
             }
-			if (File.Exists("basestats.json"))
-			{
-				LoadMons("basestats.json");
-			}
+            if (File.Exists("basestats.json"))
+            {
+                LoadMons("basestats.json");
+            }
 
             buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
@@ -411,7 +411,7 @@ namespace RuneApp
                         {
                             if (File.Exists("save.json"))
                             {
-                                if (MessageBox.Show("Do you want to override the existing startup save?", "Load Save" , MessageBoxButtons.YesNo) == DialogResult.Yes)
+                                if (MessageBox.Show("Do you want to override the existing startup save?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
                                 {
                                     File.Copy(file, "save.json", true);
                                 }
@@ -500,7 +500,7 @@ namespace RuneApp
                     IRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
                 }
             }
-            
+
         }
 
         private void listView2_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -535,7 +535,7 @@ namespace RuneApp
                             listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
                         }
                         mon.priority -= 1;
-                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();                        
+                        dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
                     }
                     dataMonsterList.Sort();
                 }
@@ -608,7 +608,7 @@ namespace RuneApp
         {
             filterList(dataRuneList, x => true);
         }
-        
+
         private void loadout_list_select(object sender, EventArgs e)
         {
             if (loadoutList.FocusedItem != null)
@@ -618,36 +618,36 @@ namespace RuneApp
                 {
                     Loadout load = (Loadout)item.Tag;
 
-					var monid = int.Parse(item.SubItems[2].Text);
-					var bid = int.Parse(item.SubItems[0].Text);
+                    var monid = int.Parse(item.SubItems[2].Text);
+                    var bid = int.Parse(item.SubItems[0].Text);
 
-					var build = builds.Where(b => b.ID == bid).FirstOrDefault();
+                    var build = builds.Where(b => b.ID == bid).FirstOrDefault();
 
-					Monster mon = null;
-					if (build == null)
-						mon = data.GetMonster(monid);
-					else
-						mon = build.mon;
+                    Monster mon = null;
+                    if (build == null)
+                        mon = data.GetMonster(monid);
+                    else
+                        mon = build.mon;
 
-					ShowMon(mon);
+                    ShowMon(mon);
 
                     ShowStats(load.GetStats(mon), mon);
 
                     ShowRunes(load.Runes);
 
                     var dmon = data.GetMonster(monid);
-					if (dmon != null)
-					{
-						var dmonld = dmon.Current.Leader;
-						var dmonsh = dmon.Current.Shrines;
-						dmon.Current.Leader = load.Leader;
-						dmon.Current.Shrines = load.Shrines;
+                    if (dmon != null)
+                    {
+                        var dmonld = dmon.Current.Leader;
+                        var dmonsh = dmon.Current.Shrines;
+                        dmon.Current.Leader = load.Leader;
+                        dmon.Current.Shrines = load.Shrines;
 
-						ShowDiff(dmon.GetStats(), load.GetStats(mon));
+                        ShowDiff(dmon.GetStats(), load.GetStats(mon));
 
-						dmon.Current.Leader = dmonld;
-						dmon.Current.Shrines = dmonsh;
-					}
+                        dmon.Current.Leader = dmonld;
+                        dmon.Current.Shrines = dmonsh;
+                    }
                     ShowSets(load);
                 }
             }
@@ -657,12 +657,12 @@ namespace RuneApp
                 if (li.Tag != null)
                 {
                     Loadout load = (Loadout)li.Tag;
-					if (load != null)
-					{
-						var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
-						if (mon != null)
-							cost += mon.SwapCost(load);
-					}
+                    if (load != null)
+                    {
+                        var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
+                        if (mon != null)
+                            cost += mon.SwapCost(load);
+                    }
                 }
             }
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
@@ -682,7 +682,7 @@ namespace RuneApp
                     var bb = new Build();
                     bb.New = true;
                     bb.mon = (Monster)dataMonsterList.SelectedItems[0].Tag;
-					bb.ID = buildList.Items.Count + 1;
+                    bb.ID = buildList.Items.Count + 1;
                     while (builds.Any(b => b.ID == bb.ID))
                     {
                         bb.ID++;
@@ -692,22 +692,22 @@ namespace RuneApp
                     var res = ff.ShowDialog();
                     if (res == System.Windows.Forms.DialogResult.OK)
                     {
-						if (builds.Count > 0)
-							ff.build.priority = builds.Max(b => b.priority) + 1;
-						else
-							ff.build.priority = 1;
+                        if (builds.Count > 0)
+                            ff.build.priority = builds.Max(b => b.priority) + 1;
+                        else
+                            ff.build.priority = 1;
 
-                        ListViewItem li = new ListViewItem(new string[]{ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name,"", ff.build.mon.ID.ToString(), "" });
+                        ListViewItem li = new ListViewItem(new string[] { ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name, "", ff.build.mon.ID.ToString(), "" });
                         li.Tag = ff.build;
                         buildList.Items.Add(li);
                         builds.Add(ff.build);
 
-						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
-						if (lv1li != null)
-							lv1li.ForeColor = Color.Green;
-					
-					}
-				}
+                        var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
+                        if (lv1li != null)
+                            lv1li.ForeColor = Color.Green;
+
+                    }
+                }
             }
         }
 
@@ -773,20 +773,20 @@ namespace RuneApp
             var lis = buildList.SelectedItems;
             if (lis.Count > 0)
             {
-				foreach (ListViewItem li in lis)
-				{
-					buildList.Items.Remove(li);
-					Build b = (Build)li.Tag;
-					if (b != null)
-					{
-						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
-						if (lv1li != null)
-						{
-							lv1li.ForeColor = Color.Black;
-							// can't tell is was in storage, name is mangled on load
-						}
-					}
-				}
+                foreach (ListViewItem li in lis)
+                {
+                    buildList.Items.Remove(li);
+                    Build b = (Build)li.Tag;
+                    if (b != null)
+                    {
+                        var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+                        if (lv1li != null)
+                        {
+                            lv1li.ForeColor = Color.Black;
+                            // can't tell is was in storage, name is mangled on load
+                        }
+                    }
+                }
             }
         }
 
@@ -804,7 +804,7 @@ namespace RuneApp
         private void toolStripButton13_Click(object sender, EventArgs e)
         {
             foreach (ListViewItem li in loadoutList.SelectedItems)
-            { 
+            {
                 Loadout l = (Loadout)li.Tag;
 
                 foreach (Rune r in l.Runes)
@@ -815,15 +815,15 @@ namespace RuneApp
                 loadoutList.Items.Remove(li);
             }
             checkLocked();
-		}
+        }
 
         private void toolStripButton12_Click(object sender, EventArgs e)
-		{
+        {
             RunBuilds(false);
-		}
+        }
 
-		private void Main_FormClosing(object sender, FormClosingEventArgs e)
-		{
+        private void Main_FormClosing(object sender, FormClosingEventArgs e)
+        {
             SaveBuilds();
         }
 
@@ -833,18 +833,18 @@ namespace RuneApp
                 return;
 
             if (data.Monsters != null)
-            foreach (Monster mon in data.Monsters)
-            {
-                for (int i = 1; i < 7; i++)
-                    mon.Current.RemoveRune(i);
-            }
+                foreach (Monster mon in data.Monsters)
+                {
+                    for (int i = 1; i < 7; i++)
+                        mon.Current.RemoveRune(i);
+                }
 
             if (data.Runes != null)
-            foreach (Rune r in data.Runes)
-            {
-                r.AssignedId = 0;
-                r.AssignedName = "Inventory";
-            }
+                foreach (Rune r in data.Runes)
+                {
+                    r.AssignedId = 0;
+                    r.AssignedName = "Inventory";
+                }
         }
 
         private void toolStripButton14_Click(object sender, EventArgs e)
@@ -939,7 +939,8 @@ namespace RuneApp
             Invoke((MethodInvoker)delegate
             {
                 updateBox.Visible = true;
-                try {
+                try
+                {
                     string result = e.Result.Replace("\r\n", "\n");
                     int firstline = result.IndexOf('\n');
 
@@ -987,7 +988,7 @@ namespace RuneApp
                         updateComplain.Visible = false;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     updateComplain.Text = e.Error.ToString();
                     updateComplain.Visible = false;
@@ -1012,8 +1013,8 @@ namespace RuneApp
             }
         }
 
-		private void toolStripButton17_Click(object sender, EventArgs e)
-		{
+        private void toolStripButton17_Click(object sender, EventArgs e)
+        {
             if (StatsExcelBind(true))
             {
                 StatsExcelRunes();
@@ -1104,7 +1105,7 @@ namespace RuneApp
             var str = JsonConvert.SerializeObject(data);
             File.WriteAllText("save.json", str);
         }
-        
+
         private void unequipMonsterButton_Click(object sender, EventArgs e)
         {
             if (data == null)
@@ -1144,7 +1145,7 @@ namespace RuneApp
                 checkLocked();
             }
         }
-        
+
         private void build_btn_resume_Click(object sender, EventArgs e)
         {
             RunBuilds(true);
@@ -1463,7 +1464,7 @@ namespace RuneApp
 
             if (config != null)
             {
-                
+
                 for (int i = 0; i < shrineStats.Length; i++)
                 {
                     var stat = shrineStats[i];
@@ -1583,6 +1584,7 @@ namespace RuneApp
                     return;
                 }
 
+                b.Best.Current.BuildID = b.ID;
                 builds.Add(b);
 
                 int numchanged = 0;
@@ -1644,6 +1646,8 @@ namespace RuneApp
                     else
                         nli = lvs.First();
 
+                    b.Best.Current.Time = b.Time;
+
                     nli.Tag = b.Best.Current;
                     nli.Text = b.ID.ToString();
                     nli.Name = b.ID.ToString();
@@ -1667,9 +1671,9 @@ namespace RuneApp
                     nli.UseItemStyleForSubItems = false;
                     if (b.Time / (double)1000 > 60)
                         nli.SubItems[5].BackColor = Color.Red;
-                    else if(b.Time / (double)1000 > 20)
+                    else if (b.Time / (double)1000 > 20)
                         nli.SubItems[5].BackColor = Color.Orange;
-                    
+
                     if (lvs.Length == 0)
                         loadoutList.Items.Add(nli);
 
@@ -1700,15 +1704,15 @@ namespace RuneApp
                 }
                 builds.Add(bb);
             }
-            
+
             // only write if there are builds, may save some files
             if (builds.Count > 0)
             {
                 try
                 {
                     // keep a single recent backup
-					if (File.Exists(fname))
-	                    File.Copy(fname, fname + ".backup", true);
+                    if (File.Exists(fname))
+                        File.Copy(fname, fname + ".backup", true);
                     var str = JsonConvert.SerializeObject(builds);
                     File.WriteAllText(fname, str);
                 }
@@ -1798,12 +1802,14 @@ namespace RuneApp
             runToken = runSource.Token;
             runTask = Task.Factory.StartNew(() =>
             {
-                if (data.Runes != null)
+                if (data.Runes != null && !skipLoaded)
+                {
                     foreach (Rune r in data.Runes)
                     {
                         r.Swapped = false;
                         r.ResetStats();
                     }
+                }
 
                 foreach (ListViewItem li in list5)
                 {
@@ -1812,7 +1818,8 @@ namespace RuneApp
 
                 if (makeStats)
                 {
-                    this.Invoke((MethodInvoker)delegate {
+                    this.Invoke((MethodInvoker)delegate
+                    {
                         if (!skipLoaded)
                             StatsExcelRunes();
                         try
@@ -1925,7 +1932,7 @@ namespace RuneApp
         {
             // TODO
             Console.WriteLine("Writing build");
-            
+
             ExcelWorksheet ws = null;
 
             int ptries = 0;
@@ -1999,7 +2006,7 @@ namespace RuneApp
             ws.Cells[row, 8].Hyperlink = new ExcelHyperLink("Home!A1", "Home");
             ws.Cells[row, 8].Style.Font.UnderLine = true;
             ws.Cells[row, 8].Style.Font.Color.SetColor(Color.Blue);
-            
+
             ws.Cells[1, 9].Value = mon.ID;
 
             var runeSheet = excelSheets.Where(w => w.Name == "Home").FirstOrDefault();
@@ -2014,6 +2021,27 @@ namespace RuneApp
 
                 runeSheet.Cells[build.priority + 1, linkCol + 1].Value = build.Time / (double)1000;
                 runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Numberformat.Format = "0.00";
+                if (build.Time / 1000 < 2)
+                {
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
+                }
+                else if (build.Time / 1000 < 15)
+                {
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
+                }
+                else if (build.Time / 1000 < 60)
+                {
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+                }
+                else
+                {
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                }
+
             }
             else
             {
@@ -2255,89 +2283,29 @@ namespace RuneApp
             // calculate the stats
             foreach (Rune r in data.Runes)
             {
-				double keep = StatsKeepRune(r, colHead);/* 0;
-                keep += Math.Pow(r.Level, 0.7);
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-                keep += Math.Pow(r.Grade, 1.4);
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-
-                r.manageStats["Action"] = -1;
-                if (!r.manageStats.ContainsKey("In"))
-                    r.manageStats["In"] = 0;
-
-                r.manageStats.GetOrAdd("Mon", -1);
-                if (r.manageStats["In"] > 0)
-                {
-                    var b = builds.Where(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r)).FirstOrDefault();
-                    if (b == null)
-                    {
-                        r.manageStats["Priority"] = 2;
-                        if (r.Slot % 2 == 0 && r.Level < 15)
-                            r.manageStats["Action"] = 15;
-                        if (r.Slot % 2 == 1 && r.Level < 12)
-                            r.manageStats["Action"] = 12;
-                    }
-                    else
-                    {
-                        r.manageStats["Mon"] = b.mon.ID;
-                        r.manageStats["Priority"] = b.priority / builds.Max(bu => bu.priority);
-                        int p = b.GetPredict(r);
-                        if (r.Level < p)
-                            r.manageStats["Action"] = p;
-                    }
-                    keep += 10;
-                }
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-
-                if (r.Rarity > Math.Floor(r.Level / (double)3))
-                {
-                    keep += Math.Pow(r.Rarity - Math.Min(4, Math.Floor(r.Level / (double)3)), 1.1) * 6;
-                    if (r.Rarity > Math.Floor(r.Level / (double)3) + 1)
-                        r.manageStats["Action"] = r.Rarity * 3;
-                }
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-
-                keep -= r.FlatCount();
-                keep += r.Efficiency * 5;
-                keep += r.ScoringRune * Math.Max(r.ScoringHP, r.ScoringATK) * 20;
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-
-                keep += r.Speed;
-                keep += r.HealthPercent * 0.3;
-                keep += r.Accuracy * 0.4;
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-
-                keep += (Math.Pow(1.04, r.manageStats.GetOrAdd("Set",0)) - 1)*10;
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-                keep += (Math.Pow(1.07, r.manageStats.GetOrAdd("RuneFilt", 0))-1)*10;
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-                keep += (Math.Pow(1.1, r.manageStats.GetOrAdd("TypeFilt",0))-1)*10;
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
-                if (r.manageStats.GetOrAdd("LoadGen",0) > 0)
-                    keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt",0) / r.manageStats["LoadGen"], 2) * 10;
-					*/
+                double keep = StatsKeepRune(r, colHead);
                 r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             }
 
             int rr = 0;
-			// from keepscore 1 to 100
+            // from keepscore 1 to 100
             foreach (Rune r in data.Runes.Where(r => r.manageStats["In"] == 0).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
             {
                 rr++;
                 if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.25)
                 {
                     //if (r.manageStats["Action"] == -2)
-					if (!r.manageStats.ContainsKey("Action"))
+                    if (!r.manageStats.ContainsKey("Action"))
                         r.manageStats["Action"] = -2;
                 }
-				else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.5)
-				{
-					if (r.manageStats["Action"] == -2)
-						r.manageStats["Action"] = -3;
-				}
+                else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.5)
+                {
+                    if (r.manageStats["Action"] == 0)
+                        r.manageStats["Action"] = -3;
+                }
                 else if (rr < data.Runes.Where(ru => ru.manageStats["In"] == 0).Count() * 0.75)
                 {
-                    if (r.manageStats["Action"] == -2)
+                    if (r.manageStats["Action"] == 0)
                         r.manageStats["Action"] = -1;
                 }
                 else
@@ -2352,7 +2320,7 @@ namespace RuneApp
                 }
             }
 
-            foreach (Rune r in data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep",0)))
+            foreach (Rune r in data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
             {
                 for (col = 1; col <= colHead.Count; col++)
                 {
@@ -2413,11 +2381,11 @@ namespace RuneApp
                             break;
                         case "Points":
                             break;
-						case "CurMon":
-							if (r.AssignedName != "Unknown name" && r.AssignedName != "Inventory")
-								ws.Cells[row, col].Value = r.AssignedName;
-							break;
-						case "Mon":
+                        case "CurMon":
+                            if (r.AssignedName != "Unknown name" && r.AssignedName != "Inventory")
+                                ws.Cells[row, col].Value = r.AssignedName;
+                            break;
+                        case "Mon":
                             if (r.manageStats.GetOrAdd("Mon", -1) != -1)
                             {
                                 ws.Cells[row, col].Value = data.GetMonster((int)r.manageStats["Mon"]).Name;
@@ -2436,7 +2404,18 @@ namespace RuneApp
                             ws.Cells[row, col].Formula = fstr;
                             break;
                         case "Action":
-                            if (r.manageStats.GetOrAdd("Action", 0) >= 0)
+                            if (r.manageStats.GetOrAdd("Action", 0) == 0)
+                            {
+                                if (r.ScoringATK < 0.5
+                                    && r.ScoringHP < 0.5
+                                    && r.ScoringRune < 0.5
+                                    && r.Efficiency < 0.5
+                                    && r.manageStats.GetOrAdd("Keep", 0) < 40)
+                                {
+                                    ws.Cells[row, col].Value = "Sell";
+                                }
+                            }
+                            else if (r.manageStats.GetOrAdd("Action", 0) > 0)
                                 ws.Cells[row, col].Value = "To " + r.manageStats.GetOrAdd("Action", 0);
                             else if (r.manageStats.GetOrAdd("Action", 0) == -1)
                                 ws.Cells[row, col].Value = "Keep";
@@ -2537,15 +2516,15 @@ namespace RuneApp
             keep += Math.Pow(r.Grade, 1.4);
             formula += "+power(" + (heads.Contains("Grade") ? "RuneTable[[#This Row],[Grade]]" : r.Grade.ToString()) + ",1.4)";
 
-            r.manageStats["Action"] = -2;
+            r.manageStats["Action"] = 0;
             if (!r.manageStats.ContainsKey("In"))
                 r.manageStats["In"] = 0;
-
+            
             r.manageStats.GetOrAdd("Mon", -1);
             if (r.manageStats["In"] > 0)
             {
                 var b = builds.Where(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r)).FirstOrDefault();
-				r.manageStats["Action"] = -1;
+                r.manageStats["Action"] = -1;
                 if (b == null)
                 {
                     r.manageStats["Priority"] = 2;
@@ -2566,7 +2545,7 @@ namespace RuneApp
             }
             formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]],10,0)" : ((r.manageStats["In"] > 0) ? "+10" : "");
 
-			// TODO: skip upgrading if rune is trash
+            // TODO: skip upgrading if rune is trash
 
             if (r.Rarity > Math.Floor(r.Level / (double)3))
             {
@@ -2574,9 +2553,10 @@ namespace RuneApp
                 if (r.Rarity > Math.Floor(r.Level / (double)3) + 1)
                     r.manageStats["Action"] = r.Rarity * 3;
             }
-            /**/formula += "+if(" + (heads.Contains("Rarity") ? "RuneTable[[#This Row],[Rarity]]" : r.Rarity.ToString()) 
-                + ">floor(" + (heads.Contains("Level") ? "RuneTable[[#This Row],[Level]]" : r.Level.ToString()) + "/3,1),power(" 
-                + (heads.Contains("Rarity") ? "RuneTable[[#This Row],[Rarity]]" : r.Rarity.ToString()) + "-min(4,floor(" + (heads.Contains("Level") ? "RuneTable[[#This Row],[Level]]" : r.Level.ToString()) + "/3,1)),1.1)*6,0)";//*/
+            /**/
+            formula += "+if(" + (heads.Contains("Rarity") ? "RuneTable[[#This Row],[Rarity]]" : r.Rarity.ToString())
+            + ">floor(" + (heads.Contains("Level") ? "RuneTable[[#This Row],[Level]]" : r.Level.ToString()) + "/3,1),power("
+            + (heads.Contains("Rarity") ? "RuneTable[[#This Row],[Rarity]]" : r.Rarity.ToString()) + "-min(4,floor(" + (heads.Contains("Level") ? "RuneTable[[#This Row],[Level]]" : r.Level.ToString()) + "/3,1)),1.1)*6,0)";//*/
 
             keep -= r.FlatCount();
             formula += "-" + (heads.Contains("Flats") ? "RuneTable[[#This Row],[Flats]]" : r.FlatCount().ToString()) + "";
@@ -2585,8 +2565,9 @@ namespace RuneApp
             formula += "+" + (heads.Contains("Eff") ? "RuneTable[[#This Row],[Eff]]" : r.Efficiency.ToString()) + "*5";
 
             keep += r.ScoringRune * Math.Max(r.ScoringHP, r.ScoringATK) * 20;
-            /**/formula += "+" + (heads.Contains("Pts") ? "RuneTable[[#This Row],[Pts]]" : r.ScoringRune.ToString()) + "*max(" 
-                + (heads.Contains("HPpts") ? "RuneTable[[#This Row],[HPpts]]" : r.ScoringHP.ToString()) + "," + (heads.Contains("ATKpts") ? "RuneTable[[#This Row],[ATKpts]]" : r.ScoringATK.ToString()) + ")*20";//*/
+            /**/
+            formula += "+" + (heads.Contains("Pts") ? "RuneTable[[#This Row],[Pts]]" : r.ScoringRune.ToString()) + "*max("
+            + (heads.Contains("HPpts") ? "RuneTable[[#This Row],[HPpts]]" : r.ScoringHP.ToString()) + "," + (heads.Contains("ATKpts") ? "RuneTable[[#This Row],[ATKpts]]" : r.ScoringATK.ToString()) + ")*20";//*/
 
             keep += r.Speed;
             formula += "+" + (heads.Contains("SPD") ? "RuneTable[[#This Row],[SPD]]" : r.Speed.ToString()) + "";
@@ -2608,9 +2589,10 @@ namespace RuneApp
             {
                 keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt", 0) / r.manageStats["LoadGen"], 2) * 10;
             }
-            /**/formula += "+if(" + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ">0,power("
-                + (heads.Contains("Load") ? "RuneTable[[#This Row],[Load]]" : r.manageStats.GetOrAdd("LoadFilt", 0).ToString()) + "/" 
-                + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ",2)*10,0)";//*/
+            /**/
+            formula += "+if(" + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ">0,power("
+            + (heads.Contains("Load") ? "RuneTable[[#This Row],[Load]]" : r.manageStats.GetOrAdd("LoadFilt", 0).ToString()) + "/"
+            + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ",2)*10,0)";//*/
 
             r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             return keep;
@@ -2888,7 +2870,7 @@ namespace RuneApp
 
             if (toolmap.Keys.Contains(first) && toolmap.Keys.Contains(second))
                 return 1;
-            
+
             foreach (var k in toolmap)
             {
                 if (k.Value.Contains(first) && k.Value.Contains(second))
@@ -2962,5 +2944,134 @@ namespace RuneApp
                 }
             }
         }
+
+        private void toolStripButton18_Click(object sender, EventArgs e)
+        {
+            SaveLoadouts();
+        }
+
+        private void SaveLoadouts(string fname = "loads.json")
+        {
+            var lbs = loadoutList.Items;
+            var lloads = new List<Loadout>();
+
+            foreach (ListViewItem li in lbs)
+            {
+                var bb = (Loadout)li.Tag;
+                lloads.Add(bb);
+            }
+
+            // only write if there are builds, may save some files
+            if (lloads.Count > 0)
+            {
+                try
+                {
+                    // keep a single recent backup
+                    if (File.Exists(fname))
+                        File.Copy(fname, fname + ".backup", true);
+                    var str = JsonConvert.SerializeObject(lloads);
+                    File.WriteAllText(fname, str);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.ToString());
+                }
+            }
+        }
+
+        private void toolStripButton19_Click(object sender, EventArgs e)
+        {
+            LoadLoadouts();
+        }
+        
+        private void LoadLoadouts(string fname = "loads.json")
+        {
+            try
+            {
+                string text = File.ReadAllText(fname);
+                var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
+
+                foreach (var load in lloads)
+                {
+                    ListViewItem nli;
+
+                    var b = builds.Where(bu => bu.ID == load.BuildID).FirstOrDefault();
+
+                    var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
+
+                    if (lvs.Length == 0)
+                        nli = new ListViewItem();
+                    else
+                        nli = lvs.First();
+
+                    foreach (var rid in load.RuneIDs)
+                    {
+                        load.AddRune(data.Runes.Where(r => r.ID == rid).FirstOrDefault());
+                    }
+
+                    int numchanged = 0;
+                    int numnew = 0;
+                    int powerup = 0;
+                    int upgrades = 0;
+                    foreach (Rune r in load.Runes)
+                    {
+                        r.manageStats = load.manageStats[r.Slot - 1];
+                        r.Locked = true;
+                        r.manageStats["Mon"] = b.mon.ID;
+                        if (r.AssignedName != b.MonName)
+                        {
+                            if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
+                                numnew++;
+                            else
+                                numchanged++;
+                        }
+                        powerup += Math.Max(0, load.FakeLevel[r.Slot - 1] - r.Level);
+                        if (load.FakeLevel[r.Slot - 1] != 0)
+                        {
+                            int tup = (int)Math.Floor(Math.Min(12, load.FakeLevel[r.Slot - 1]) / (double)3);
+                            int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
+                            upgrades += Math.Max(0, tup - cup);
+                        }
+                    }
+
+                    nli.Tag = load;
+                    nli.Text = b.ID.ToString();
+                    nli.Name = b.ID.ToString();
+                    while (nli.SubItems.Count < 6)
+                        nli.SubItems.Add("");
+                    nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
+                    nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
+                    nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.ID.ToString());
+                    nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                    if (numnew > 0 && load.RuneCount < 6)
+                        nli.SubItems[3].ForeColor = Color.Green;
+                    if (Main.config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                    {
+                        bool check = false;
+                        bool.TryParse(Main.config.AppSettings.Settings["splitassign"].Value, out check);
+                        if (check)
+                            nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
+                    }
+                    nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
+                    nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (load.Time / (double)1000).ToString("0.##"));
+                    nli.UseItemStyleForSubItems = false;
+                    if (load.Time / (double)1000 > 60)
+                        nli.SubItems[5].BackColor = Color.Red;
+                    else if (load.Time / (double)1000 > 20)
+                        nli.SubItems[5].BackColor = Color.Orange;
+
+                    if (lvs.Length == 0)
+                        loadoutList.Items.Add(nli);
+                }
+                checkLocked();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType().ToString() + "\r\nInformation is saved to error_save.txt");
+                File.WriteAllText("error_loads.txt", e.ToString());
+                return;
+            }
+        }
     }
+
 }

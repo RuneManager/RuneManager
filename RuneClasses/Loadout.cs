@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace RuneOptim
 {
@@ -22,10 +24,49 @@ namespace RuneOptim
         private int[] fakeLevel = new int[6];
         private bool[] predictSubs = new bool[6];
 
+        private int buildID;
+        public int BuildID { get { return buildID; } set { buildID = value; } }
+
+        [JsonIgnore]
         public Rune[] Runes { get { return runes; } }
+        [JsonIgnore]
         public int RuneCount { get { return runeCount; } }
         public RuneSet[] Sets { get { return sets; } }
+        [JsonIgnore]
         public bool SetsFull { get { return setsFull; } }
+
+        public double Time;
+
+        public ConcurrentDictionary<string, double>[] manageStats;
+        public ConcurrentDictionary<string, double>[] ManageStats
+        {
+            get
+            {
+                if (runes.All(r => r != null))
+                    return runes.Select(r => r.manageStats).ToArray();
+                return null;
+            }
+            set
+            {
+                manageStats = value;
+            }
+        }
+
+
+        private int[] runeIDs;
+        public int[] RuneIDs
+        {
+            get
+            {
+                if (runes.All(r => r != null))
+                    runeIDs = runes.Select(r => r.ID).ToArray();
+                return runeIDs;
+            }
+            set
+            {
+                runeIDs = value;
+            }
+        }
 
         public int[] FakeLevel { get { return fakeLevel; } set { fakeLevel = value; changed = true; } }
         public bool[] PredictSubs { get { return predictSubs; } set { predictSubs = value; changed = true; } }
@@ -34,8 +75,10 @@ namespace RuneOptim
         private Stats leader = new Stats();
 
         private bool changed = false;
+        [JsonIgnore]
         public bool Changed { get { return changed; } }
 
+        [JsonIgnore]
         public Stats Shrines
         {
             get
@@ -89,6 +132,7 @@ namespace RuneOptim
         #region AttrGetters
 
         // Could have used runes.Where(x => x != null).Sum(x => x.STAT) + SetStat(Attr.STAT), but it was a bottleneck
+        [JsonIgnore]
         public int HealthFlat
         {
             get
@@ -103,6 +147,7 @@ namespace RuneOptim
                     SetStat(Attr.HealthFlat);
             }
         }
+        [JsonIgnore]
         public int HealthPercent
         {
             get
@@ -118,6 +163,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int AttackFlat
         {
             get
@@ -132,6 +178,7 @@ namespace RuneOptim
                     SetStat(Attr.AttackFlat);
             }
         }
+        [JsonIgnore]
         public int AttackPercent
         {
             get
@@ -147,6 +194,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int DefenseFlat
         {
             get
@@ -161,6 +209,7 @@ namespace RuneOptim
                     SetStat(Attr.DefenseFlat);
             }
         }
+        [JsonIgnore]
         public int DefensePercent
         {
             get
@@ -176,6 +225,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int Speed
         {
             get
@@ -192,6 +242,7 @@ namespace RuneOptim
         }
 
         // Runes don't get SPD%
+        [JsonIgnore]
         public int SpeedPercent
         {
             get
@@ -200,6 +251,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int CritRate
         {
             get
@@ -215,6 +267,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int CritDamage
         {
             get
@@ -230,6 +283,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int Accuracy
         {
             get
@@ -245,6 +299,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int Resistance
         {
             get
