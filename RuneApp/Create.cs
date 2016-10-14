@@ -1078,6 +1078,7 @@ namespace RuneApp
 
             using (RuneSelect rs = new RuneSelect())
             {
+                rs.returnedRune = build.mon.Current.Runes[(int)tc.Tag - 1];
                 rs.build = build;
                 rs.slot = ((int)tc.Tag).ToString();
                 rs.runes = build.runes[(int)tc.Tag-1];

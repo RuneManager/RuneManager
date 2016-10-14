@@ -336,13 +336,14 @@ namespace RuneOptim
                     Console.WriteLine("Zero permuations");
                     return;
                 }
-                if (!AllowBroken && !autoRuneSelect && BuildSets.Count == 1 && Rune.SetRequired(BuildSets[0]) == 4)
+                /*
+                if (!AllowBroken && (BuildSets.Any(s => Rune.SetRequired(s) == 2) || RequiredSets.Any(s => Rune.SetRequired(s) == 2)))
                 {
                     if (printTo != null)
                         printTo.Invoke("Bad sets");
                     Console.WriteLine("Cannot use 4 set with no broken");
                     return;
-                }
+                }*/
 
                 bool hasSort = false;
                 foreach (Attr stat in statEnums)
