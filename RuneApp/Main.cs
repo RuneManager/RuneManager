@@ -2270,7 +2270,7 @@ namespace RuneApp
             List<string> colHead = new List<string>();
 
             // ,MType,Points,FlatPts
-            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,CurMon,Mon,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
             {
                 colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
@@ -2396,6 +2396,9 @@ namespace RuneApp
                             break;
                         case "FlatPts":
                             ws.Cells[row, col].Style.Numberformat.Format = "[>0]0.00;";
+                            break;
+                        case "RatingScore":
+                            ws.Cells[row, col].Value = r.RatingScore;
                             break;
                         case "Keep":
                             //ws.Cells[row, col].Value = r.manageStats.GetOrAdd("Keep", 0);

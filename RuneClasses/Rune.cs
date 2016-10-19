@@ -343,6 +343,106 @@ namespace RuneOptim
         }
 
         [JsonIgnore]
+        public double RatingScore
+        {
+            get
+            {
+                double r = 0;
+
+                // for each sub (if flat = 0, null = 0.3, else 1)
+
+                // set types
+                // stat types
+                // offense/defense/support/neutral
+                var neutral = new RuneSet[] { RuneSet.Violent, RuneSet.Swift, RuneSet.Focus, RuneSet.Nemesis };
+                var type = 0; // n
+                if (new RuneSet[] { RuneSet.Fatal, RuneSet.Blade, RuneSet.Rage, RuneSet.Vampire, RuneSet.Revenge }.Contains(Set)) // o
+                    type = 1;
+                else if (new RuneSet[] { RuneSet.Energy, RuneSet.Endure, RuneSet.Guard, RuneSet.Shield, RuneSet.Will }.Contains(Set)) // d
+                    type = 2;
+                else if (new RuneSet[] { RuneSet.Despair, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight, RuneSet.Accuracy }.Contains(Set)) // s
+                    type = 3;
+
+                var subs = new Attr[] { Sub1Type, Sub2Type, Sub3Type, Sub4Type };
+
+                foreach (var sub in subs)
+                {
+                    // if null
+                    if (sub == Attr.Null)
+                    {
+                        r += 1 / 3;
+                        continue;
+                    }
+
+                    // if not flat
+                    if (!new Attr[] { Attr.AttackFlat, Attr.DefenseFlat, Attr.HealthFlat }.Contains(sub))
+                        r += 1;
+
+                    if (new Attr[] { Attr.HealthPercent, Attr.Speed }.Contains(sub))
+                        r += 0.5;
+
+                    var subt = 0;
+
+                    var attackSubs = new Attr[] { Attr.AttackPercent, Attr.CritDamage, Attr.CritRate };
+                    var defenseSubs = new Attr[] { Attr.HealthPercent, Attr.DefensePercent };
+                    var supportSubs = new Attr[] { Attr.Accuracy, Attr.Resistance };
+
+                    if (attackSubs.Contains(sub))
+                    {
+                        if (type == 1)
+                            r += 1;
+                        if (type == 2)
+                            r += 0.25;
+                        if (type == 3)
+                            r += 0.25;
+                        subt = 1;
+                    }
+                    if (defenseSubs.Contains(sub))
+                    {
+                        if (type == 1)
+                            r += 0.25;
+                        if (type == 2)
+                            r += 1;
+                        if (type == 3)
+                            r += 0.5;
+                        subt = 2;
+                    }
+                    if (supportSubs.Contains(sub))
+                    {
+                        if (type == 1)
+                            r += 0.25;
+                        if (type == 2)
+                            r += 0.5;
+                        if (type == 3)
+                            r += 1;
+                        subt = 3;
+                    }
+                    foreach (var sub2 in subs)
+                    {
+                        if (sub == sub2)
+                            continue;
+                        if (sub2 == Attr.Null)
+                            continue;
+
+                        if (subt == 1 && attackSubs.Contains(sub))
+                            r += 1;
+                        if (subt == 2 && defenseSubs.Contains(sub))
+                            r += 1;
+                        if (subt == 3 && supportSubs.Contains(sub))
+                            r += 1;
+                    }
+                }
+
+                if (Grade == 5)
+                    r += 1;
+                else if (Grade == 6)
+                    r += 1;
+
+                return r;
+            }
+        }
+
+        [JsonIgnore]
         public ConcurrentDictionary<string, double> manageStats = new ConcurrentDictionary<string, double>();
         
         [JsonIgnore]
