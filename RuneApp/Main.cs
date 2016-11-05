@@ -49,6 +49,9 @@ namespace RuneApp
         private bool gotExcelPack = false;
         ExcelWorksheets excelSheets = null;
 
+        RuneDial runeDial = null;
+        Monster displayMon = null;
+
         bool teamChecking = false;
         Build teamBuild = null;
         Dictionary<string, List<string>> toolmap = null;
@@ -1185,7 +1188,8 @@ namespace RuneApp
 
         private void ShowMon(Monster mon)
         {
-            Stats cur = mon.GetStats();
+            displayMon = mon;
+            var cur = mon.GetStats();
 
             statName.Text = mon.Name;
             statID.Text = mon.ID.ToString();
@@ -1194,6 +1198,7 @@ namespace RuneApp
             ShowStats(cur, mon);
             ShowRunes(mon.Current.Runes);
             ShowSets(mon.Current);
+
         }
 
         private void ShowSets(Loadout load)
@@ -1217,6 +1222,8 @@ namespace RuneApp
                         Set3Label.Text = "Broken";
                 }
             }
+            if (runeDial != null && !runeDial.IsDisposed)
+                runeDial.UpdateSets(load.Sets, !load.SetsFull);
         }
 
         private void ShowStats(Stats cur, Stats mon)
@@ -1275,12 +1282,23 @@ namespace RuneApp
                 if (tc.Tag != null)
                 {
                     tc.Show();
+                    // if the RuneControl is clicked, update the preview
+                    if (tc.Gamma > 1.1)
+                    {
+                        tc.Gamma = 1.4f;
+                        tc.Refresh();
+                        rune_Stats((Rune)tc.Tag);
+                        runeBuild.Show();
+                        runeShown.SetRune((Rune)tc.Tag);
+                    }
                 }
                 else
                 {
                     tc.Hide();
                 }
             }
+            if (runeDial != null && !runeDial.IsDisposed)
+                runeDial.UpdateRunes(rune);
         }
 
         public int LoadMons(string fname)
@@ -2023,23 +2041,23 @@ namespace RuneApp
                 runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Numberformat.Format = "0.00";
                 if (build.Time / 1000 < 2)
                 {
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
                 }
                 else if (build.Time / 1000 < 15)
                 {
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
                 }
                 else if (build.Time / 1000 < 60)
                 {
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Orange);
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Orange);
                 }
                 else
                 {
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
-                    ws.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
                 }
 
             }
@@ -2053,7 +2071,8 @@ namespace RuneApp
             ws.Cells[row, 2].Value = build.buildUsage.failed;
             ws.Cells[row, 3].Value = build.buildUsage.passed;
 
-            build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => Build.sort(build, m.GetStats())).ToList();
+            if (build.buildUsage != null && build.buildUsage.loads != null)
+                build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => Build.sort(build, m.GetStats())).ToList();
 
             double scoreav = 0;
             int c = 0;
@@ -2579,23 +2598,23 @@ namespace RuneApp
             keep += r.Accuracy * 0.4;
             formula += "+" + (heads.Contains("ACC") ? "RuneTable[[#This Row],[ACC]]" : r.Accuracy.ToString()) + "*0.4";
 
-            keep += (Math.Pow(1.04, r.manageStats.GetOrAdd("Set", 0)) - 1) * 10;
-            formula += "+(power(1.04, " + (heads.Contains("Select") ? "RuneTable[[#This Row],[Select]]" : r.manageStats.GetOrAdd("Set", 0).ToString()) + ")-1)*10";
+            keep += (Math.Pow(1.004, r.manageStats.GetOrAdd("Set", 0)) - 1) * 10;
+            formula += "+(power(1.004, " + (heads.Contains("Select") ? "RuneTable[[#This Row],[Select]]" : r.manageStats.GetOrAdd("Set", 0).ToString()) + ")-1)*10";
 
-            keep += (Math.Pow(1.07, r.manageStats.GetOrAdd("RuneFilt", 0)) - 1) * 10;
-            formula += "+(power(1.07, " + (heads.Contains("Rune") ? "RuneTable[[#This Row],[Rune]]" : r.manageStats.GetOrAdd("RuneFilt", 0).ToString()) + ")-1)*10";
+            keep += (Math.Pow(1.007, r.manageStats.GetOrAdd("RuneFilt", 0)) - 1) * 10;
+            formula += "+(power(1.007, " + (heads.Contains("Rune") ? "RuneTable[[#This Row],[Rune]]" : r.manageStats.GetOrAdd("RuneFilt", 0).ToString()) + ")-1)*10";
 
-            keep += (Math.Pow(1.1, r.manageStats.GetOrAdd("TypeFilt", 0)) - 1) * 10;
-            formula += "+(power(1.1, " + (heads.Contains("Type") ? "RuneTable[[#This Row],[Type]]" : r.manageStats.GetOrAdd("TypeFilt", 0).ToString()) + ")-1)*10";
+            keep += (Math.Pow(1.01, r.manageStats.GetOrAdd("TypeFilt", 0)) - 1) * 10;
+            formula += "+(power(1.01, " + (heads.Contains("Type") ? "RuneTable[[#This Row],[Type]]" : r.manageStats.GetOrAdd("TypeFilt", 0).ToString()) + ")-1)*10";
 
             if (r.manageStats.GetOrAdd("LoadGen", 0) > 0)
             {
-                keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt", 0) / r.manageStats["LoadGen"], 2) * 10;
+                keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt", 0) / r.manageStats["LoadGen"], 1.1) * 10;
             }
             /**/
             formula += "+if(" + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ">0,power("
             + (heads.Contains("Load") ? "RuneTable[[#This Row],[Load]]" : r.manageStats.GetOrAdd("LoadFilt", 0).ToString()) + "/"
-            + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ",2)*10,0)";//*/
+            + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString()) + ",1.1)*10,0)";//*/
 
             r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             return keep;
@@ -3074,6 +3093,23 @@ namespace RuneApp
                 File.WriteAllText("error_loads.txt", e.ToString());
                 return;
             }
+        }
+
+        private void pictureBox1_DoubleClick(object sender, EventArgs e)
+        {
+            if (runeDial == null || runeDial.IsDisposed)
+                runeDial = new RuneDial();
+            if (!runeDial.Visible)
+            {
+                runeDial.Show(this);
+                var xx = this.Location.X + 1105 + 8 - 271;//271, 213
+                var yy = this.Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
+
+                runeDial.Location = new Point(xx, yy);
+                runeDial.Location = new Point(this.Location.X + this.Width, this.Location.Y);
+            }
+            if (displayMon != null)
+                runeDial.UpdateLoad(displayMon.Current);
         }
     }
 
