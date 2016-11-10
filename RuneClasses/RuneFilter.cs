@@ -14,6 +14,13 @@ namespace RuneOptim
         public double? Flat = null; // div flat by
         public double? Percent = null; // div percent by
         public double? Test = null; // sum both >= test
+        
+        public RuneFilter(double? f = null, double? p = null, double? t = null)
+        {
+            Flat = f;
+            Percent = p;
+            Test = t;
+        }
 
         // for debugging niceness
         public override string ToString()
@@ -45,7 +52,7 @@ namespace RuneOptim
         }
 
         // Returns the smaller int that's not zero
-        private static double? MinNZero(double? a, double? b)
+        public static double? MinNZero(double? a, double? b)
         {
             if (a != null)
             {

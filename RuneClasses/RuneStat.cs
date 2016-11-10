@@ -10,6 +10,8 @@ namespace RuneOptim
     {
         private Rune parent = null;
         private Attr stat = Attr.Null;
+        private int? val = null;
+        private bool? isMain = null;
 
         public RuneStat(Rune p, Attr s)
         {
@@ -21,11 +23,31 @@ namespace RuneOptim
         {
             get
             {
-                return parent.GetValue(stat, fake, pred);
+                if ((val == null) || (isMain ?? true) || pred) 
+                    return parent.GetValue(stat, fake, pred);
+                return val ?? 0;
             }
         }
 
-        public int Value { get { return parent.GetValue(stat, -1, false); } }
+        public int Value
+        {
+            get
+            {
+                if (val == null)
+                {
+                    val = parent.GetValue(stat, -1, false);
+                    if (parent.MainType == stat)
+                        isMain = true;
+                }
+                
+                return val.Value;
+            }
+        }
+
+        public int ValueGet()
+        {
+            return this.Value;
+        }
 
         public static implicit operator int (RuneStat rhs)
         {

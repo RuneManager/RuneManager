@@ -8,7 +8,6 @@ namespace RuneOptim
 {
     public static class ExtensionMethods
     {
-        
         // Enable casting Attr enums to a string
         public static string ToForms(this Attr attr)
         {

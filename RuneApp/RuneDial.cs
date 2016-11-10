@@ -43,10 +43,13 @@ namespace RuneApp
 
             foreach (var r in rs)
             {
-                int i = r.Slot - 1;
-                runes[i].Show();
-                runes[i].SetRune(r);
-                runeBoxes[i].SetRune(r);
+                if (r != null)
+                {
+                    int i = r.Slot - 1;
+                    runes[i].Show();
+                    runes[i].SetRune(r);
+                    runeBoxes[i].SetRune(r);
+                }
             }
         }
 

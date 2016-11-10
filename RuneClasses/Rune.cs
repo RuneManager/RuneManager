@@ -304,6 +304,42 @@ namespace RuneOptim
             }
         }
 
+        // fast iterate over rune stat types
+        public int this[Attr stat, int fake, bool pred]
+        {
+            get
+            {
+                switch (stat)
+                {
+                    case Attr.HealthFlat:
+                        return HealthFlat[fake, pred];
+                    case Attr.HealthPercent:
+                        return HealthPercent[fake, pred];
+                    case Attr.AttackFlat:
+                        return AttackFlat[fake, pred];
+                    case Attr.AttackPercent:
+                        return AttackPercent[fake, pred];
+                    case Attr.DefenseFlat:
+                        return DefenseFlat[fake, pred];
+                    case Attr.DefensePercent:
+                        return DefensePercent[fake, pred];
+                    case Attr.Speed:
+                    case Attr.SpeedPercent:
+                        return Speed[fake, pred];
+                    case Attr.CritDamage:
+                        return CritDamage[fake, pred];
+                    case Attr.CritRate:
+                        return CritRate[fake, pred];
+                    case Attr.Accuracy:
+                        return Accuracy[fake, pred];
+                    case Attr.Resistance:
+                        return Resistance[fake, pred];
+                }
+                return 0;
+            }
+        }
+
+
         //[JsonIgnore]
         //public int FakeLevel = 0;
 
@@ -725,7 +761,7 @@ namespace RuneOptim
         }
 
         // Gets the value of that Attribute on this rune
-        public int GetValue(Attr stat, int FakeLevel, bool PredictSubs)
+        public int GetValue(Attr stat, int FakeLevel = -1, bool PredictSubs = false)
         {
             // the stat can only be present once per rune, early exit
             if (MainType == stat)
@@ -770,7 +806,8 @@ namespace RuneOptim
         }
 
         // Does it have this stat at all?
-        public bool HasStat(Attr stat, int fake, bool pred)
+        // TODO: should I listen to fake/pred?
+        public bool HasStat(Attr stat, int fake = -1, bool pred = false)
         {
             if (GetValue(stat, fake, pred) > 0)
                 return true;
@@ -778,8 +815,22 @@ namespace RuneOptim
         }
 
         // For each non-zero stat in flat and percent, divide the runes value and see if any >= test
-        public bool Or(Stats rFlat, Stats rPerc, Stats rTest, int fake, bool pred)
+        public bool Or(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false)
         {
+#if !OLDOR
+            foreach (Attr attr in Build.statEnums)
+            {
+                if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
+                    if (this[attr, fake, pred] / (double)rPerc[attr] >= rTest[attr])
+                        return true;
+            }
+            foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
+            {
+                if (rFlat[attr] != 0 && rTest[attr] != 0)
+                    if (this[attr, fake, pred] / (double)rFlat[attr] >= rTest[attr])
+                        return true;
+            }
+#else
             for (int i = 0; i < Build.statNames.Length; i++)
             {
                 string stat = Build.statNames[i];
@@ -790,12 +841,27 @@ namespace RuneOptim
                     if (this[stat + "perc", fake, pred] / (double)rPerc[stat] >= rTest[stat])
                         return true;
             }
+#endif
             return false;
         }
 
         // For each non-zero stat in flat and percent, divide the runes value and see if *ALL* >= test
-        public bool And(Stats rFlat, Stats rPerc, Stats rTest, int fake, bool pred)
+        public bool And(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false)
         {
+#if !OLDAND
+            foreach (Attr attr in Build.statEnums)
+            {
+                if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
+                    if (this[attr, fake, pred] / (double)rPerc[attr] < rTest[attr])
+                        return false;
+            }
+            foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
+            {
+                if (rFlat[attr] != 0 && rTest[attr] != 0)
+                    if (this[attr, fake, pred] / (double)rFlat[attr] < rTest[attr])
+                        return false;
+            }
+#else
             for (int i = 0; i < Build.statNames.Length; i++)
             {
                 string stat = Build.statNames[i];
@@ -806,13 +872,27 @@ namespace RuneOptim
                     if (this[stat + "perc", fake, pred] / (double)rPerc[stat] < rTest[stat])
                         return false;
             }
+#endif
             return true;
         }
-        
+
         // sum the result of dividing the runes value by flat/percent per stat
-        internal double Test(Stats rFlat, Stats rPerc, int fake, bool pred)
+        public double Test(Stats rFlat, Stats rPerc, int fake = -1, bool pred = false)
         {
             double val = 0;
+#if !OLDTEST
+            foreach (Attr attr in Build.statEnums)
+            {
+                if (attr != Attr.Speed && rPerc[attr] != 0)
+                    val += this[attr, fake, pred] / (double)rPerc[attr];
+
+            }
+            foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
+            {
+                if (rFlat[attr] != 0)
+                    val += this[attr, fake, pred] / (double)rFlat[attr];
+            }
+#else
             for (int i = 0; i < Build.statNames.Length; i++)
             {
                 string stat = Build.statNames[i];
@@ -821,6 +901,7 @@ namespace RuneOptim
                 if (i != 3 && rPerc[stat] != 0)
                     val += this[stat + "perc", fake, pred] / (double)rPerc[stat];
             }
+#endif
             return val;
         }
 
@@ -850,7 +931,7 @@ namespace RuneOptim
             return EquipCompare.Better;
         }
 
-        #region stats
+#region stats
 
         private static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
         {
@@ -956,6 +1037,6 @@ namespace RuneOptim
             {Attr.Resistance, MainValues_ResAcc },
         };
 
-        #endregion
+#endregion
     }
 }
