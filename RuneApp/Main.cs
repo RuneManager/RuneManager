@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
@@ -32,8 +29,8 @@ namespace RuneApp
         public static Configuration config = null;
 
         private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
-        string[] shrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
-        double[] shrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
+        readonly string[] shrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
+        readonly double[] shrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
 
         private Task runTask = null;
         private CancellationToken runToken;
@@ -62,14 +59,17 @@ namespace RuneApp
         {
             get
             {
-                if (config != null && config.AppSettings.Settings.AllKeys.Contains("nostats"))
-                {
-                    bool tstats = false;
-                    if (bool.TryParse(Main.config.AppSettings.Settings["nostats"].Value, out tstats))
-                        makeStats = !tstats;
-                }
-                return makeStats;
+                if (config == null || !config.AppSettings.Settings.AllKeys.Contains("nostats")) return makeStats;
+                return UpdateMakeStats();
             }
+        }
+
+        public static bool UpdateMakeStats()
+        {
+            bool tstats;
+            if (bool.TryParse(config.AppSettings.Settings["nostats"].Value, out tstats))
+                makeStats = !tstats;
+            return tstats;
         }
 
         public Main()
@@ -88,12 +88,12 @@ namespace RuneApp
                     useEquipped = true;
                 }
                 // this?
-                if (Main.config.AppSettings.Settings.AllKeys.Contains("noupdate"))
-                    bool.TryParse(Main.config.AppSettings.Settings["noupdate"].Value, out dontupdate);
-                if (Main.config.AppSettings.Settings.AllKeys.Contains("nostats"))
+                if (config.AppSettings.Settings.AllKeys.Contains("noupdate"))
+                    bool.TryParse(config.AppSettings.Settings["noupdate"].Value, out dontupdate);
+                if (config.AppSettings.Settings.AllKeys.Contains("nostats"))
                 {
-                    bool tstats = false;
-                    if (bool.TryParse(Main.config.AppSettings.Settings["nostats"].Value, out tstats))
+                    bool tstats;
+                    if (bool.TryParse(config.AppSettings.Settings["nostats"].Value, out tstats))
                         makeStats = !tstats;
                 }
             }
@@ -398,7 +398,7 @@ namespace RuneApp
 
         private void loadSaveDialogue(object sender, EventArgs e)
         {
-            int size = -1;
+            int size;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
             openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
             DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
@@ -439,7 +439,7 @@ namespace RuneApp
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // confirm maybe?
-            this.Close();
+            Close();
         }
 
         private void rune_Click(object sender, EventArgs e)
@@ -520,7 +520,7 @@ namespace RuneApp
                 if (dataMonsterList.FocusedItem.Tag != null)
                 {
                     Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
-                    int maxPri = (int)data.Monsters.Max(x => x.priority);
+                    int maxPri = data.Monsters.Max(x => x.priority);
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
@@ -532,7 +532,6 @@ namespace RuneApp
                         Monster mon2 = data.Monsters.Where(x => x.priority == pri - 1).FirstOrDefault();
                         if (mon2 != null)
                         {
-                            var items = dataMonsterList.Items;
                             ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
                             mon2.priority += 1;
                             listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
@@ -552,7 +551,7 @@ namespace RuneApp
                 if (dataMonsterList.FocusedItem.Tag != null)
                 {
                     Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
-                    int maxPri = (int)data.Monsters.Max(x => x.priority);
+                    int maxPri = data.Monsters.Max(x => x.priority);
                     if (mon.priority == 0)
                     {
                         mon.priority = maxPri + 1;
@@ -580,36 +579,33 @@ namespace RuneApp
         private void button2_Click(object sender, EventArgs e)
         {
             tabControl1.SelectTab(tabRunes.Name);
-            filterList(dataRuneList, x => ((Rune)x).Slot == ((Rune)runeShown.Tag).Slot);
+            filterRunesList(x => ((Rune)x).Slot == ((Rune)runeShown.Tag).Slot);
         }
 
-        private void filterList(ListView list, Predicate<object> p)
+        private void filterRunesList(Predicate<object> p)
         {
             dataRuneList.Items.Clear();
-            if (data == null)
-                return;
 
-            if (data.Runes != null)
+            if (data?.Runes == null) return;
+
+            foreach (Rune rune in data.Runes.Where(p.Invoke))
             {
-                foreach (Rune rune in data.Runes.Where(x => p.Invoke(x)))
-                {
-                    ListViewItem item = new ListViewItem(new string[]{
-                        rune.Set.ToString(),
-                        rune.ID.ToString(),
-                        rune.Grade.ToString(),
-                        Rune.StringIt(rune.MainType, true),
-                        rune.MainValue.ToString()
-                    });
-                    item.Tag = rune;
-                    item.BackColor = rune.Locked ? Color.Red : Color.Transparent;
-                    dataRuneList.Items.Add(item);
-                }
+                ListViewItem item = new ListViewItem(new string[]{
+                    rune.Set.ToString(),
+                    rune.ID.ToString(),
+                    rune.Grade.ToString(),
+                    Rune.StringIt(rune.MainType, true),
+                    rune.MainValue.ToString()
+                });
+                item.Tag = rune;
+                item.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+                dataRuneList.Items.Add(item);
             }
         }
 
         private void runetab_clearfilter(object sender, EventArgs e)
         {
-            filterList(dataRuneList, x => true);
+            filterRunesList(x => true);
         }
 
         private void loadout_list_select(object sender, EventArgs e)
@@ -624,7 +620,7 @@ namespace RuneApp
                     var monid = int.Parse(item.SubItems[2].Text);
                     var bid = int.Parse(item.SubItems[0].Text);
 
-                    var build = builds.Where(b => b.ID == bid).FirstOrDefault();
+                    var build = builds.FirstOrDefault(b => b.ID == bid);
 
                     Monster mon = null;
                     if (build == null)
@@ -657,15 +653,12 @@ namespace RuneApp
             int cost = 0;
             foreach (ListViewItem li in loadoutList.SelectedItems)
             {
-                if (li.Tag != null)
+                Loadout load = li.Tag as Loadout;
+                if (load != null)
                 {
-                    Loadout load = (Loadout)li.Tag;
-                    if (load != null)
-                    {
-                        var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
-                        if (mon != null)
-                            cost += mon.SwapCost(load);
-                    }
+                    var mon = data.GetMonster(int.Parse(li.SubItems[2].Text));
+                    if (mon != null)
+                        cost += mon.SwapCost(load);
                 }
             }
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
@@ -678,39 +671,40 @@ namespace RuneApp
 
         private void toolStripButton7_Click(object sender, EventArgs e)
         {
-            if (dataMonsterList.SelectedItems.Count > 0)
+            if (dataMonsterList.SelectedItems.Count <= 0) return;
+            var mon = dataMonsterList.SelectedItems[0].Tag as Monster;
+            if (mon == null)
+                return;
+
+            using (var ff = new Create())
             {
-                using (var ff = new Create())
+                var bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
                 {
-                    var bb = new Build();
-                    bb.New = true;
-                    bb.mon = (Monster)dataMonsterList.SelectedItems[0].Tag;
-                    bb.ID = buildList.Items.Count + 1;
-                    while (builds.Any(b => b.ID == bb.ID))
-                    {
-                        bb.ID++;
-                    }
-
-                    ff.Tag = bb;
-                    var res = ff.ShowDialog();
-                    if (res == System.Windows.Forms.DialogResult.OK)
-                    {
-                        if (builds.Count > 0)
-                            ff.build.priority = builds.Max(b => b.priority) + 1;
-                        else
-                            ff.build.priority = 1;
-
-                        ListViewItem li = new ListViewItem(new string[] { ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name, "", ff.build.mon.ID.ToString(), "" });
-                        li.Tag = ff.build;
-                        buildList.Items.Add(li);
-                        builds.Add(ff.build);
-
-                        var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
-                        if (lv1li != null)
-                            lv1li.ForeColor = Color.Green;
-
-                    }
+                    New = true,
+                    ID = buildList.Items.Count + 1
+                };
+                while (builds.Any(b => b.ID == bb.ID))
+                {
+                    bb.ID++;
                 }
+
+                ff.build = bb;
+                var res = ff.ShowDialog();
+                if (res != DialogResult.OK) return;
+
+                if (builds.Count > 0)
+                    ff.build.priority = builds.Max(b => b.priority) + 1;
+                else
+                    ff.build.priority = 1;
+
+                ListViewItem li = new ListViewItem(new string[] { ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name, "", ff.build.mon.ID.ToString(), "" });
+                li.Tag = ff.build;
+                buildList.Items.Add(li);
+                builds.Add(ff.build);
+
+                var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.Name));
+                if (lv1li != null)
+                    lv1li.ForeColor = Color.Green;
             }
         }
 
@@ -726,9 +720,9 @@ namespace RuneApp
                     Monster before = bb.mon;
                     using (var ff = new Create())
                     {
-                        ff.Tag = bb;
+                        ff.build = bb;
                         var res = ff.ShowDialog();
-                        if (res == System.Windows.Forms.DialogResult.OK)
+                        if (res == DialogResult.OK)
                         {
                             item.SubItems[2].Text = bb.mon.Name;
                             item.SubItems[4].Text = bb.mon.ID.ToString();
@@ -1232,14 +1226,14 @@ namespace RuneApp
             {
                 groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat].ToString();
                 groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat].ToString();
-                groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]).ToString();
+                groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]);
             }
 
             foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" })
             {
-                groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat].ToString() + "%";
-                groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat].ToString() + "%";
-                groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]).ToString();
+                groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat] + "%";
+                groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat] + "%";
+                groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]);
             }
         }
 
@@ -1338,7 +1332,7 @@ namespace RuneApp
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error occurred loading Build JSON.\r\n" + e.GetType().ToString() + "\r\nInformation is saved to error_build.txt");
+                MessageBox.Show("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
                 File.WriteAllText("error_build.txt", e.ToString());
                 return;
             }
@@ -1423,7 +1417,7 @@ namespace RuneApp
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType().ToString() + "\r\nInformation is saved to error_save.txt");
+                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
                 File.WriteAllText("error_save.txt", e.ToString());
                 return;
             }
@@ -1496,14 +1490,13 @@ namespace RuneApp
                         int level = (int)Math.Floor(val / shrineLevel[i]);
                         shrineMap[stat][level].Checked = true;
                     }
-                    else if (data.Decorations != null)
+                    else
                     {
-                        var shrine = data.Decorations.Where(d => d.Shrine.ToString() == stat).FirstOrDefault();
-                        if (shrine != null)
-                        {
-                            data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
-                            shrineMap[stat][shrine.Level].Checked = true;
-                        }
+                        var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
+                        if (shrine == null) continue;
+
+                        data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
+                        shrineMap[stat][shrine.Level].Checked = true;
                     }
                 }
             }
@@ -1514,9 +1507,9 @@ namespace RuneApp
             if (data == null)
                 return;
             if (data.Runes != null)
-                toolStripStatusLabel1.Text = "Locked: " + data.Runes.Where(r => r.Locked == true).Count().ToString();
+                toolStripStatusLabel1.Text = "Locked: " + data.Runes.Count(r => r.Locked);
 
-            this.Invoke((MethodInvoker)delegate
+            Invoke((MethodInvoker)delegate
             {
                 foreach (ListViewItem li in dataRuneList.Items)
                 {
@@ -1567,7 +1560,7 @@ namespace RuneApp
 
                 if (nR != "")
                 {
-                    this.Invoke((MethodInvoker)delegate
+                    Invoke((MethodInvoker)delegate
                     {
                         pli.SubItems[3].Text = ":( " + nR + "Runes";
                     });
@@ -1578,7 +1571,7 @@ namespace RuneApp
                 {
                     if (!IsDisposed && IsHandleCreated)
                     {
-                        this.Invoke((MethodInvoker)delegate
+                        Invoke((MethodInvoker)delegate
                         {
                             pli.SubItems[3].Text = str;
                         });
@@ -1587,7 +1580,7 @@ namespace RuneApp
 
                 if (b.Best == null)
                 {
-                    this.Invoke((MethodInvoker)delegate
+                    Invoke((MethodInvoker)delegate
                     {
                         if (saveStats)
                         {
@@ -1631,7 +1624,7 @@ namespace RuneApp
                 b.Time = buildTime.ElapsedMilliseconds;
                 buildTime.Stop();
 
-                this.Invoke((MethodInvoker)delegate
+                Invoke((MethodInvoker)delegate
                 {
                     checkLocked();
 
@@ -1677,10 +1670,10 @@ namespace RuneApp
                     nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
                     if (numnew > 0 && b.mon.Current.RuneCount < 6)
                         nli.SubItems[3].ForeColor = Color.Green;
-                    if (Main.config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                    if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
                     {
                         bool check = false;
-                        bool.TryParse(Main.config.AppSettings.Settings["splitassign"].Value, out check);
+                        bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
                         if (check)
                             nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
                     }
@@ -1836,7 +1829,7 @@ namespace RuneApp
 
                 if (makeStats)
                 {
-                    this.Invoke((MethodInvoker)delegate
+                    Invoke((MethodInvoker)delegate
                     {
                         if (!skipLoaded)
                             StatsExcelRunes();
@@ -2089,7 +2082,7 @@ namespace RuneApp
                 }
                 c++;
             }
-            scoreav /= (double)c;
+            scoreav /= c;
             minav /= c;
 
             ws.Cells[row - 1, 4].Value = scoreav;
@@ -2106,7 +2099,7 @@ namespace RuneApp
                         c++;
                     }
                 }
-                lowQ[s] /= (double)c;
+                lowQ[s] /= c;
             }
             foreach (var s in Build.extraNames)
             {
@@ -2119,20 +2112,20 @@ namespace RuneApp
                         c++;
                     }
                 }
-                lowQ[s] /= (double)c;
+                lowQ[s] /= c;
             }
 
             Stats versus = new Stats();
             bool enough = false;
 
-            foreach (var s in Build.statNames.Union(Build.extraNames))
+            foreach (Attr s in Build.statAll)
             {
-                if (Build.statNames.Contains(s))
+                if (!s.HasFlag(Attr.ExtraStat))
                 {
                     if (build.Minimum[s] != 0)
                     {
                         versus[s] = lowQ[s];
-                        if (build.buildUsage.loads.Where(m => m.GetStats().GreaterEqual(versus, true)).Count() < 0.25 * build.buildUsage.passed)
+                        if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
                         {
                             enough = true;
                             break;
@@ -2144,7 +2137,7 @@ namespace RuneApp
                     if (build.Minimum.ExtraGet(s) != 0)
                     {
                         versus.ExtraSet(s, lowQ.ExtraGet(s));
-                        if (build.buildUsage.loads.Where(m => m.GetStats().GreaterEqual(versus, true)).Count() < 0.25 * build.buildUsage.passed)
+                        if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
                         {
                             enough = true;
                             break;
@@ -2155,14 +2148,14 @@ namespace RuneApp
 
             if (!enough)
             {
-                foreach (var s in Build.statNames.Union(Build.extraNames))
+                foreach (Attr s in Build.statAll)
                 {
-                    if (Build.statNames.Contains(s))
+                    if (!s.HasFlag(Attr.ExtraStat))
                     {
                         if (build.Sort[s] != 0)
                         {
                             versus[s] = lowQ[s];
-                            if (build.buildUsage.loads.Where(m => m.GetStats().GreaterEqual(versus, true)).Count() < 0.25 * build.buildUsage.passed)
+                            if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
                             {
                                 enough = true;
                                 break;
@@ -2174,7 +2167,7 @@ namespace RuneApp
                         if (build.Sort.ExtraGet(s) != 0)
                         {
                             versus.ExtraSet(s, lowQ.ExtraGet(s));
-                            if (build.buildUsage.loads.Where(m => m.GetStats().GreaterEqual(versus, true)).Count() < 0.25 * build.buildUsage.passed)
+                            if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
                             {
                                 enough = true;
                                 break;
@@ -2185,15 +2178,15 @@ namespace RuneApp
             }
 
 
-            ws.Cells[row, 4].Value = build.buildUsage.loads.Where(m => m.GetStats().GreaterEqual(versus, true)).Count();
+            ws.Cells[row, 4].Value = build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true));
 
             var trow = row;
             row++;
 
-            foreach (var stat in Build.statNames.Union(Build.extraNames))
+            foreach (Attr stat in Build.statAll)
             {
                 ws.Cells[row, 1].Value = stat;
-                if (Build.statNames.Contains(stat))
+                if (!stat.HasFlag(Attr.ExtraStat))
                 {
                     if (build.Minimum[stat] > 0 || build.Sort[stat] != 0)
                     {
@@ -2227,9 +2220,9 @@ namespace RuneApp
                     ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightPink);
                 }
                 row++;
-                foreach (var stat in Build.statNames.Union(Build.extraNames))
+                foreach (Attr stat in Build.statAll)
                 {
-                    if (Build.statNames.Contains(stat))
+                    if (!stat.HasFlag(Attr.ExtraStat))
                     {
                         ws.Cells[row, col].Value = b.GetStats()[stat];
                     }
@@ -2558,7 +2551,7 @@ namespace RuneApp
                 else
                 {
                     r.manageStats["Mon"] = b.mon.ID;
-                    r.manageStats["Priority"] = b.priority / builds.Max(bu => bu.priority);
+                    r.manageStats["Priority"] = b.priority / (double)builds.Max(bu => bu.priority);
                     int p = b.GetPredict(r);
                     if (r.Level < p)
                         r.manageStats["Action"] = p;
@@ -2852,7 +2845,7 @@ namespace RuneApp
                     {
                         tsmi.Image = null;
                         if (tsTeamCheck(tsmi))
-                            tsmi.Image = global::RuneApp.App.add;
+                            tsmi.Image = App.add;
                     }
                     teamChecking = false;
 
@@ -2875,7 +2868,7 @@ namespace RuneApp
             {
                 if (tsTeamCheck(smi))
                 {
-                    t.Image = global::RuneApp.App.add;
+                    t.Image = App.add;
                     ret = true;
                 }
             }
@@ -2924,9 +2917,9 @@ namespace RuneApp
         private void buildList_SelectedIndexChanged(object sender, EventArgs e)
         {
             bool check = false;
-            if (Main.config.AppSettings.Settings.AllKeys.Contains("colorteams"))
+            if (config.AppSettings.Settings.AllKeys.Contains("colorteams"))
             {
-                bool.TryParse(Main.config.AppSettings.Settings["colorteams"].Value, out check);
+                bool.TryParse(config.AppSettings.Settings["colorteams"].Value, out check);
             }
 
             bool doColor = buildList.SelectedItems.Count == 1;
@@ -3067,15 +3060,15 @@ namespace RuneApp
                     nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
                     if (numnew > 0 && load.RuneCount < 6)
                         nli.SubItems[3].ForeColor = Color.Green;
-                    if (Main.config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                    if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
                     {
-                        bool check = false;
-                        bool.TryParse(Main.config.AppSettings.Settings["splitassign"].Value, out check);
+                        bool check;
+                        bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
                         if (check)
-                            nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
+                            nli.SubItems[3].Text = numnew + "/" + numchanged;
                     }
                     nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
-                    nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (load.Time / (double)1000).ToString("0.##"));
+                    nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (load.Time / 1000).ToString("0.##"));
                     nli.UseItemStyleForSubItems = false;
                     if (load.Time / (double)1000 > 60)
                         nli.SubItems[5].BackColor = Color.Red;
@@ -3089,9 +3082,8 @@ namespace RuneApp
             }
             catch (Exception e)
             {
-                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType().ToString() + "\r\nInformation is saved to error_save.txt");
+                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
                 File.WriteAllText("error_loads.txt", e.ToString());
-                return;
             }
         }
 
@@ -3102,11 +3094,11 @@ namespace RuneApp
             if (!runeDial.Visible)
             {
                 runeDial.Show(this);
-                var xx = this.Location.X + 1105 + 8 - 271;//271, 213
-                var yy = this.Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
+                var xx = Location.X + 1105 + 8 - 271;//271, 213
+                var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
 
                 runeDial.Location = new Point(xx, yy);
-                runeDial.Location = new Point(this.Location.X + this.Width, this.Location.Y);
+                runeDial.Location = new Point(Location.X + Width, Location.Y);
             }
             if (displayMon != null)
                 runeDial.UpdateLoad(displayMon.Current);

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="LoadoutTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuneFilterTests.cs" />
     <Compile Include="RuneStatTests.cs" />
     <Compile Include="RuneTests.cs" />
     <Compile Include="StatsTests.cs" />

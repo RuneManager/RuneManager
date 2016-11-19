@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -15,8 +13,7 @@ namespace RuneOptim
         /// Original test program.
         /// Do not use
         /// </summary>
-        /// <param name="args"></param>
-        static void Main(string[] args)
+        static void Main()
         {
             string save = System.IO.File.ReadAllText("..\\..\\save.json");
             Save data = JsonConvert.DeserializeObject<Save>(save);
@@ -28,9 +25,6 @@ namespace RuneOptim
                 {
                     mon.ApplyRune(rune);
                 }
-
-                var stats = mon.GetStats();
-
             }
 
             var rsets = new Rune[(int)RuneSet.Destroy + 1][][];
@@ -65,9 +59,7 @@ namespace RuneOptim
             var garoche = data.GetMonster("Garoche (In Storage)");
             var lushen1 = data.GetMonster(20);
             var lushen2 = data.GetMonster(21);
-            var mav = data.GetMonster("Mav");
             var darion = data.GetMonster("Darion");
-            var gina = data.GetMonster("Gina");
             var xing = data.GetMonster("Xing Zhe");
             
             foreach (Rune r in data.Runes)
@@ -386,9 +378,9 @@ namespace RuneOptim
 
         #region Builders
 
-        public static IEnumerable<Rune>[] MakeSets(IList<Rune> runes, Predicate<Rune> evens, Predicate<Rune> odds, RuneSet[] reqsets = null)
+        public static Rune[][] MakeSets(IList<Rune> runes, Predicate<Rune> evens, Predicate<Rune> odds, RuneSet[] reqsets = null)
         {
-            IEnumerable<Rune>[] runesSlot = new IEnumerable<Rune>[6];
+            Rune[][] runesSlot = new Rune[6][];
 
             Predicate<Rune> set = r => true;
             if (reqsets != null)
@@ -401,16 +393,17 @@ namespace RuneOptim
                     set = r => reqsets.Any(s => s == r.Set);
             }
 
-            runesSlot[0] = runes.Where(r => r.Slot == 1 && !r.Locked && odds.Invoke(r) && set.Invoke(r));
-            runesSlot[1] = runes.Where(r => r.Slot == 2 && !r.Locked && evens.Invoke(r) && set.Invoke(r));
-            runesSlot[2] = runes.Where(r => r.Slot == 3 && !r.Locked && odds.Invoke(r) && set.Invoke(r));
-            runesSlot[3] = runes.Where(r => r.Slot == 4 && !r.Locked && evens.Invoke(r) && set.Invoke(r));
-            runesSlot[4] = runes.Where(r => r.Slot == 5 && !r.Locked && odds.Invoke(r) && set.Invoke(r));
-            runesSlot[5] = runes.Where(r => r.Slot == 6 && !r.Locked && evens.Invoke(r) && set.Invoke(r));
+            runesSlot[0] = runes.Where(r => r.Slot == 1 && !r.Locked && odds.Invoke(r) && set.Invoke(r)).ToArray();
+            runesSlot[1] = runes.Where(r => r.Slot == 2 && !r.Locked && evens.Invoke(r) && set.Invoke(r)).ToArray();
+            runesSlot[2] = runes.Where(r => r.Slot == 3 && !r.Locked && odds.Invoke(r) && set.Invoke(r)).ToArray();
+            runesSlot[3] = runes.Where(r => r.Slot == 4 && !r.Locked && evens.Invoke(r) && set.Invoke(r)).ToArray();
+            runesSlot[4] = runes.Where(r => r.Slot == 5 && !r.Locked && odds.Invoke(r) && set.Invoke(r)).ToArray();
+            runesSlot[5] = runes.Where(r => r.Slot == 6 && !r.Locked && evens.Invoke(r) && set.Invoke(r)).ToArray();
 
             return runesSlot;
         }
-        public static IEnumerable<Rune>[] MakeSets(IList<Rune> runes, Attr slot2, Attr slot4, Attr slot6, Predicate<Rune> odds, RuneSet[] reqsets = null)
+
+        public static Rune[][] MakeSets(IList<Rune> runes, Attr slot2, Attr slot4, Attr slot6, Predicate<Rune> odds, RuneSet[] reqsets = null)
         {
             Rune[][] runesSlot = new Rune[6][];
 
@@ -442,10 +435,10 @@ namespace RuneOptim
             return runesSlot;
         }
 
-        public static Loadout MakeBuild(Monster mon, IEnumerable<Rune>[] runesSlot, Func<Stats, double> sort, Predicate<RuneSet[]> reqsets = null, Predicate<Stats> minimum = null)
+        public static Loadout MakeBuild(Monster mon, Rune[][] runesSlot, Func<Stats, double> sort, Predicate<RuneSet[]> reqsets = null, Predicate<Stats> minimum = null)
         {
 
-            System.Collections.Generic.SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();//new List<Monster>();
+            SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();//new List<Monster>();
             long count = 0;
             long total = runesSlot[0].Count();
             total *= runesSlot[1].Count();
@@ -457,9 +450,9 @@ namespace RuneOptim
 
             DateTime timer = DateTime.Now;
 
-            Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+            Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", ((count + complete - total) / (double)complete)));
 
-            Parallel.ForEach<Rune>(runesSlot[0], r0 =>
+            Parallel.ForEach(runesSlot[0], r0 =>
             {
                 int kill = 0;
                 int plus = 0;
@@ -500,7 +493,7 @@ namespace RuneOptim
                                     if (DateTime.Now > timer.AddSeconds(1))
                                     {
                                         timer = DateTime.Now;
-                                        Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+                                        Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
                                     }
                                 }
                                 Interlocked.Add(ref total, -kill);
@@ -512,7 +505,7 @@ namespace RuneOptim
                     }
                 }
             });
-            Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (double)(count + complete - total) / (double)complete));
+            Console.WriteLine(count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
 
             var desc = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take(10).ToArray();
             foreach (var l in desc)
@@ -521,7 +514,7 @@ namespace RuneOptim
                     + "  " + l.GetStats().CritRate + "%" + "  " + l.GetStats().CritDamage + "%" + "  " + l.GetStats().Resistance + "%" + "  " + l.GetStats().Accuracy + "%");
             }
 
-            if (desc.Count() == 0)
+            if (!desc.Any())
             {
                 Console.WriteLine("No builds :(");
                 return null;

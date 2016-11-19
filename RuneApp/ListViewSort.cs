@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
@@ -64,9 +60,9 @@ namespace RuneApp
             }
             else
             {
-                comp = val1.CompareTo(val2);
+                comp = String.Compare(val1, val2, StringComparison.Ordinal);
             }
-            if (comp != 0)
+            if (Math.Abs(comp) > 0.00000001)
                 return Math.Sign(comp) * (int)Math.Max(1, Math.Abs(comp)) * (orderPrimary ? 1 : -1);
 
             if (sortSecondary == -1)
@@ -85,7 +81,7 @@ namespace RuneApp
 			if (val4sp != -1)
 				val4i = val2.Substring(0, val4sp);
 
-            if (double.TryParse(val3, out val))
+            if (double.TryParse(val3i, out val))
             {
                 if (val4 == "" || !double.TryParse(val4i, out valc))
                     return -(int)Math.Max(1, val);
@@ -93,7 +89,7 @@ namespace RuneApp
             }
             else
             {
-                comp = val3.CompareTo(val4);
+                comp = String.Compare(val3, val4, StringComparison.Ordinal);
             }
 
             return Math.Sign(comp) * (int)Math.Max(1, Math.Abs( comp)) * (orderSecondary ? 1 : -1);

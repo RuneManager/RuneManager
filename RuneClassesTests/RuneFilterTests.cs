@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RuneOptim;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RuneOptim.Tests
 {
@@ -36,7 +30,7 @@ namespace RuneOptim.Tests
             var ft = RuneFilter.Min(f1, f2);
             Assert.AreEqual(2, ft.Flat);
             Assert.AreEqual(3, ft.Percent);
-            Assert.AreEqual(1, ft.Test);
+            Assert.AreEqual(0, ft.Test);
         }
 
         [TestMethod()]

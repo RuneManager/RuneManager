@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Runtime.Serialization;
@@ -67,31 +65,39 @@ namespace RuneOptim
 
 			Console.WriteLine("searching for \"" + name + "\"");
 			if (element == "")
-				return monStats.Where(m => m.name == name).FirstOrDefault();
+				return monStats.FirstOrDefault(m => m.name == name);
 			else
-				return monStats.Where(m => m.name == name && m.element.ToString() == element).FirstOrDefault();
+				return monStats.FirstOrDefault(m => m.name == name && m.element.ToString() == element);
 		}
 
 		public static MonsterStat Download(StatReference refer)
 		{
-			HttpWebRequest req = (HttpWebRequest) HttpWebRequest.Create(refer.URL);
+			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(refer.URL);
 			req.Accept = "application/json";
 
-			string resp = "";
+			string resp;
 
-			using (var stream = new StreamReader(req.GetResponse().GetResponseStream()))
-			{
-				resp = stream.ReadToEnd();
-			}
+		    var wresp = req.GetResponse();
+		    var respStr = wresp.GetResponseStream();
 
-            var ret = JsonConvert.DeserializeObject<MonsterStat>(resp);
+		    if (respStr == null)
+		    {
+		        return null;
+		    }
+
+		    using (var stream = new StreamReader(respStr))
+		    {
+		        resp = stream.ReadToEnd();
+		    }
+
+		    var ret = JsonConvert.DeserializeObject<MonsterStat>(resp);
 
 			return ret;
 		}
 
 		public Monster GetMon(StatReference mref, Monster mon)
 		{
-			var mstat = mref.Download();
+			//var mstat = mref.Download();
 			return GetMon(mon);
 		}
 
@@ -180,12 +186,20 @@ namespace RuneOptim
 		
 		public MonsterStat Download()
 		{
-			HttpWebRequest req = (HttpWebRequest)HttpWebRequest.Create(URL);
+			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(URL);
 			req.Accept = "application/json";
 
-			string resp = "";
+			string resp;
 
-			using (var stream = new StreamReader(req.GetResponse().GetResponseStream()))
+            var wresp = req.GetResponse();
+            var respStr = wresp.GetResponseStream();
+
+            if (respStr == null)
+            {
+                return null;
+            }
+
+            using (var stream = new StreamReader(respStr))
 			{
 				resp = stream.ReadToEnd();
 			}

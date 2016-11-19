@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -11,7 +7,7 @@ namespace RuneApp
 {
     // A really overloaded control to display runes cool-like with a million options
     // Mostly stolen from TransparentControl
-    public class RuneControl : Control
+    public sealed class RuneControl : Control
     {
         private readonly Timer refresher;
 
@@ -73,105 +69,107 @@ namespace RuneApp
             switch (rune.Slot)
             {
                 case 1:
-                    _imageSlot = global::RuneApp.Runes.rune1;
+                    _imageSlot = Runes.rune1;
                     break;
                 case 2:
-                    _imageSlot = global::RuneApp.Runes.rune2;
+                    _imageSlot = Runes.rune2;
                     break;
                 case 3:
-                    _imageSlot = global::RuneApp.Runes.rune3;
+                    _imageSlot = Runes.rune3;
                     break;
                 case 4:
-                    _imageSlot = global::RuneApp.Runes.rune4;
+                    _imageSlot = Runes.rune4;
                     break;
                 case 5:
-                    _imageSlot = global::RuneApp.Runes.rune5;
+                    _imageSlot = Runes.rune5;
                     break;
                 case 6:
-                    _imageSlot = global::RuneApp.Runes.rune6;
+                    _imageSlot = Runes.rune6;
                     break;
-
+                default:
+                    _imageSlot = Runes.rune1;
+                    break;
             }
             switch (rune.Set)
             {
                 case RuneOptim.RuneSet.Blade:
-                    _imageSet = global::RuneApp.Runes.blade;
+                    _imageSet = Runes.blade;
                     break;
                 case RuneOptim.RuneSet.Despair:
-                    _imageSet = global::RuneApp.Runes.despair;
+                    _imageSet = Runes.despair;
                     break;
                 case RuneOptim.RuneSet.Destroy:
-                    _imageSet = global::RuneApp.Runes.destroy;
+                    _imageSet = Runes.destroy;
                     break;
                 case RuneOptim.RuneSet.Endure:
-                    _imageSet = global::RuneApp.Runes.endure;
+                    _imageSet = Runes.endure;
                     break;
                 case RuneOptim.RuneSet.Energy:
-                    _imageSet = global::RuneApp.Runes.energy;
+                    _imageSet = Runes.energy;
                     break;
                 case RuneOptim.RuneSet.Fatal:
-                    _imageSet = global::RuneApp.Runes.fatal;
+                    _imageSet = Runes.fatal;
                     break;
                 case RuneOptim.RuneSet.Focus:
-                    _imageSet = global::RuneApp.Runes.focus;
+                    _imageSet = Runes.focus;
                     break;
                 case RuneOptim.RuneSet.Guard:
-                    _imageSet = global::RuneApp.Runes.guard;
+                    _imageSet = Runes.guard;
                     break;
                 case RuneOptim.RuneSet.Nemesis:
-                    _imageSet = global::RuneApp.Runes.nemesis;
+                    _imageSet = Runes.nemesis;
                     break;
                 case RuneOptim.RuneSet.Rage:
-                    _imageSet = global::RuneApp.Runes.rage;
+                    _imageSet = Runes.rage;
                     break;
                 case RuneOptim.RuneSet.Revenge:
-                    _imageSet = global::RuneApp.Runes.revenge;
+                    _imageSet = Runes.revenge;
                     break;
                 case RuneOptim.RuneSet.Shield:
-                    _imageSet = global::RuneApp.Runes.shield;
+                    _imageSet = Runes.shield;
                     break;
                 case RuneOptim.RuneSet.Swift:
-                    _imageSet = global::RuneApp.Runes.swift;
+                    _imageSet = Runes.swift;
                     break;
                 case RuneOptim.RuneSet.Vampire:
-                    _imageSet = global::RuneApp.Runes.vampire;
+                    _imageSet = Runes.vampire;
                     break;
                 case RuneOptim.RuneSet.Violent:
-                    _imageSet = global::RuneApp.Runes.violent;
+                    _imageSet = Runes.violent;
                     break;
                 case RuneOptim.RuneSet.Will:
-                    _imageSet = global::RuneApp.Runes.will;
+                    _imageSet = Runes.will;
                     break;
 
             }
 
 
-            _imageBack = global::RuneApp.Runes.bg_normal;
+            _imageBack = Runes.bg_normal;
             coolness = 0;
             if (rune.Sub4Type != RuneOptim.Attr.Null)
             {
-                _imageBack = global::RuneApp.Runes.bg_legend;
+                _imageBack = Runes.bg_legend;
                 coolness = 4;
             }
             else if (rune.Sub3Type != RuneOptim.Attr.Null)
             {
-                _imageBack = global::RuneApp.Runes.bg_hero;
+                _imageBack = Runes.bg_hero;
                 coolness = 3;
             }
             else if (rune.Sub2Type != RuneOptim.Attr.Null)
             {
-                _imageBack = global::RuneApp.Runes.bg_rare;
+                _imageBack = Runes.bg_rare;
                 coolness = 2;
             }
             else if (rune.Sub1Type != RuneOptim.Attr.Null)
             {
-                _imageBack = global::RuneApp.Runes.bg_magic;
+                _imageBack = Runes.bg_magic;
                 coolness = 1;
             }
 
-            _imageStars = global::RuneApp.Runes.star_unawakened;
+            _imageStars = Runes.star_unawakened;
             if (rune.Level == 15)
-                _imageStars = global::RuneApp.Runes.star_awakened;
+                _imageStars = Runes.star_awakened;
 
             Refresh();
         }
@@ -180,11 +178,7 @@ namespace RuneApp
         {
             if (_imageSlot != null)
             {
-                var attr = new System.Drawing.Imaging.ImageAttributes();
-                int top = Top;
-                int bottom = Top + Height;
-                int left = Left;
-                int right = Left + Width;
+                var attr = new ImageAttributes();
 
                 attr.SetGamma(gamma);
 

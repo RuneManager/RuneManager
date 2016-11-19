@@ -1,10 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RuneOptim;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RuneOptim.Tests
 {
@@ -55,6 +49,36 @@ namespace RuneOptim.Tests
             var stat1 = TestData.statsBase();
             var stat2 = TestData.statsFull();
             Assert.IsTrue(stat2.GreaterEqual(stat1));
+        }
+
+        [TestMethod()]
+        public void DivisionTest()
+        {
+            var stat1 = TestData.statsBase();
+            var stat2 = new Stats()
+            {
+                Attack = 200,
+                CritDamage = 65,
+                Defense = 300,
+                Resistance = 10,
+            };
+
+            var stat3 = stat2 / stat1;
+
+            Assert.AreEqual(0, stat3.Health);
+            Assert.AreEqual(2, stat3.Attack);
+            Assert.AreEqual(3, stat3.Defense);
+            Assert.AreEqual(0, stat3.Speed);
+            Assert.AreEqual(0, stat3.CritRate);
+            Assert.AreEqual(1.3, stat3.CritDamage);
+            Assert.AreEqual(0, stat3.Resistance);
+            Assert.AreEqual(0, stat3.Accuracy);
+
+            Assert.AreEqual(0, stat3.EffectiveHP);
+            Assert.AreEqual(0, stat3.EffectiveHPDefenseBreak);
+            Assert.AreEqual(0, stat3.DamagePerSpeed);
+            Assert.AreEqual(0, stat3.AverageDamage);
+            Assert.AreEqual(0, stat3.MaxDamage);
         }
 
         [TestMethod()]

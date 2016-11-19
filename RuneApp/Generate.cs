@@ -1,11 +1,8 @@
 ﻿using RuneOptim;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
@@ -15,22 +12,22 @@ namespace RuneApp
     // Generates a bunch of builds to preview the stats
     public partial class Generate : Form
     {
-		private static string[] statNames = new string[] { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
-        private static string[] extraNames = new string[] { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
+		//private static string[] statNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
+        //private static string[] extraNames = { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
 
         public static int buildsGen = 5000;
         public static int buildsShow = 100;
 
         // the build to use
-		public Build build = null;
+		public Build build;
 
-        private RuneControl lastclicked = null;
+        private RuneControl lastclicked;
 
         // if making builds
-		bool building = false;
+		bool building;
 
-        bool grayLocked = false;
-        bool noLocked = false;
+        bool grayLocked;
+        bool noLocked;
 		
 		public Generate(Build bb)
         {
@@ -46,8 +43,8 @@ namespace RuneApp
 
             // master has given Gener a Build?
             build = bb;
-			Label label = null;
-            TextBox textBox = null;
+			Label label;
+            TextBox textBox;
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
 
@@ -61,7 +58,7 @@ namespace RuneApp
 			int x, y;
 
 			y = 20;
-			foreach (string stat in statNames)
+			foreach (string stat in Build.statNames)
 			{
 				x = 25;
 				label = new Label();
@@ -85,7 +82,7 @@ namespace RuneApp
 
                 loadoutList.Columns.Add(stat).Width = 80;
 			}
-            foreach (string extra in extraNames)
+            foreach (string extra in Build.extraNames)
             {
                 x = 25;
                 label = new Label();
@@ -151,8 +148,8 @@ namespace RuneApp
 				}
 
                 int num = 0;
-                var takenLoads = build.loads.Take(buildsShow);
-                int tbuilds = takenLoads.Count();
+                var takenLoads = build.loads.Take(buildsShow).ToList();
+                int tbuilds = takenLoads.Count;
                 // pick the top 100
                 // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
                 foreach (var b in takenLoads)
@@ -198,18 +195,18 @@ namespace RuneApp
 
             // TODO: try to only mangle the column which is changing?
 
-			foreach (string stat in statNames)
+			foreach (string stat in Build.statNames)
             {
                 TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
-                double val = 0;
-                double.TryParse(tb.Text, out val);
+                double val;
+                double.TryParse(tb?.Text, out val);
                 build.Sort[stat] = val;
             }
-            foreach (string extra in extraNames)
+            foreach (string extra in Build.extraNames)
             {
                 TextBox tb = (TextBox)Controls.Find(extra + "Worth", true).FirstOrDefault();
-                double val = 0;
-                double.TryParse(tb.Text, out val);
+                double val;
+                double.TryParse(tb?.Text, out val);
                 build.Sort.ExtraSet(extra, val);
             }
             // "sort" as in, recalculate the whole number
@@ -217,7 +214,7 @@ namespace RuneApp
             {
                 ListItemSort(li);
             }
-            var lv = (ListView)loadoutList;
+            var lv = loadoutList;
             var lvs = (ListViewSort)(lv).ListViewItemSorter;
             lvs.OnColumnClick(0, false, true);
             // actually sort the list, on points
@@ -229,33 +226,37 @@ namespace RuneApp
             double pts = 0;
             double p;
             int i = 1;
-            foreach (var stat in statNames)
+            foreach (Attr stat in Build.statAll)
             {
-                string str = Cur[stat].ToString();
-                if (build.Sort[stat] != 0)
+                if (stat.HasFlag(Attr.ExtraStat))
                 {
-                    p = Cur[stat] / build.Sort[stat];
-                    if (build.Threshold[stat] != 0)
-                        p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
-                    str = p.ToString("0.#") + " (" + Cur[stat].ToString() + ")";
-                    pts += p;
+                    string str = Cur[stat].ToString();
+                    if (build.Sort[stat] != 0)
+                    {
+                        p = Cur[stat] / build.Sort[stat];
+                        if (build.Threshold[stat] != 0)
+                            p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
+                        str = p.ToString("0.#") + " (" + Cur[stat] + ")";
+                        pts += p;
+                    }
+                    w?.Invoke(str, i);
+                    i++;
                 }
-                w.Invoke(str, i);
-                i++;
-            }
-            foreach (var extra in extraNames)
-            {
-                string str = Cur.ExtraValue(extra).ToString();
-                if (build.Sort.ExtraGet(extra) != 0)
+                else
                 {
-                    p = Cur.ExtraValue(extra) / build.Sort.ExtraGet(extra);
-                    if (build.Threshold.ExtraGet(extra) != 0)
-                        p -= Math.Max(0, Cur.ExtraValue(extra) - build.Threshold.ExtraGet(extra)) / build.Sort.ExtraGet(extra);
-                    str = p.ToString("0.#") + " (" + Cur.ExtraValue(extra).ToString() + ")";
-                    pts += p;
+                    string str = Cur.ExtraValue(stat).ToString();
+                    if (build.Sort.ExtraGet(stat) != 0)
+                    {
+                        p = Cur.ExtraValue(stat) / build.Sort.ExtraGet(stat);
+                        if (build.Threshold.ExtraGet(stat) != 0)
+                            p -= Math.Max(0, Cur.ExtraValue(stat) - build.Threshold.ExtraGet(stat)) /
+                                 build.Sort.ExtraGet(stat);
+                        str = p.ToString("0.#") + " (" + Cur.ExtraValue(stat) + ")";
+                        pts += p;
+                    }
+                    w?.Invoke(str, i);
+                    i++;
                 }
-                w.Invoke(str, i);
-                i++;
             }
             return pts;
         }
@@ -286,14 +287,14 @@ namespace RuneApp
         private void button1_Click(object sender, EventArgs e)
         {
             // Things went okay
-            DialogResult = System.Windows.Forms.DialogResult.OK;
+            DialogResult = DialogResult.OK;
             Close();
         }
 
         private void button2_Click(object sender, EventArgs e)
         {
             // things were :(
-            DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
             Close();
 		}
 
@@ -310,32 +311,30 @@ namespace RuneApp
                 Monster mY = (Monster)lis.Tag;
                 Monster mN = (Monster)lit.Tag;
 
-                List<string> better = new List<string>();
+                List<Attr> better = new List<Attr>();
 
                 building = true;
 
-                foreach (var stat in statNames)
+                foreach (Attr stat in Build.statAll)
                 {
-                    if (mY.GetStats()[stat] > mN.GetStats()[stat])
+                    if (!stat.HasFlag(Attr.ExtraStat) && mY.GetStats()[stat] > mN.GetStats()[stat])
                         better.Add(stat);
                 }
                 double totalsort = 0;
-                foreach (var stat in statNames)
+                foreach (var stat in Build.statAll)
                 {
-                    if (build.Sort[stat] != 0)
+                    if (!stat.HasFlag(Attr.ExtraStat) && build.Sort[stat] != 0)
                         totalsort += Math.Abs(build.Sort[stat]);
-                }
-                foreach (var extra in extraNames)
-                {
-                    if (build.Sort.ExtraGet(extra) != 0)
-                        totalsort += Math.Abs(build.Sort.ExtraGet(extra));
+                
+                    if (stat.HasFlag(Attr.ExtraStat) && build.Sort.ExtraGet(stat) != 0)
+                        totalsort += Math.Abs(build.Sort.ExtraGet(stat));
                 }
                 if (totalsort == 0)
                 {
                     double totalstats = 0;
                     foreach (var stat in better)
                     {
-                        if (statNames.Contains(stat))
+                        if (!stat.HasFlag(Attr.ExtraStat))
                             totalstats += mY.GetStats()[stat];
                         else
                             totalstats += mY.GetStats().ExtraValue(stat);
@@ -343,23 +342,25 @@ namespace RuneApp
                     int amount = (int)Math.Max(30, Math.Sqrt(Math.Max(100, totalstats)));
                     foreach (var stat in better)
                     {
-                        if (statNames.Contains(stat))
+                        if (!stat.HasFlag(Attr.ExtraStat))
                         {
-                            build.Sort[stat] = (int)(amount * (double)(mY.GetStats()[stat] / (double)totalstats));
+                            build.Sort[stat] = (int)(amount * (mY.GetStats()[stat] / totalstats));
                             TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
-                            tb.Text = build.Sort[stat].ToString();
+                            if (tb != null)
+                                tb.Text = build.Sort[stat].ToString();
                         }
                         else
                         {
-                            build.Sort.ExtraSet(stat, (int)(amount * (double)(mY.GetStats().ExtraValue(stat) / (double)totalstats)));
+                            build.Sort.ExtraSet(stat, (int)(amount * (mY.GetStats().ExtraValue(stat) / totalstats)));
                             TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
-                            tb.Text = build.Sort.ExtraGet(stat).ToString();
+                            if (tb != null)
+                                tb.Text = build.Sort.ExtraGet(stat).ToString();
                         }
                     }
                 }
                 else
                 {
-                    // to do
+                    // todo
                 }
 
                 building = false;
@@ -453,15 +454,14 @@ namespace RuneApp
                 if (load.Sets.Length > 2)
                     Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
 
-                if (!load.SetsFull)
-                {
-                    if (load.Sets[0] == RuneSet.Null)
-                        Set1Label.Text = "Broken";
-                    else if (load.Sets[1] == RuneSet.Null)
-                        Set2Label.Text = "Broken";
-                    else if (load.Sets[2] == RuneSet.Null)
-                        Set3Label.Text = "Broken";
-                }
+                if (load.SetsFull) return;
+
+                if (load.Sets[0] == RuneSet.Null)
+                    Set1Label.Text = "Broken";
+                else if (load.Sets[1] == RuneSet.Null)
+                    Set2Label.Text = "Broken";
+                else if (load.Sets[2] == RuneSet.Null)
+                    Set3Label.Text = "Broken";
             }
         }
         

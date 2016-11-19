@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
@@ -51,47 +49,65 @@ namespace RuneOptim
 
     // Allows me to steal the JSON values into Enum
     [JsonConverter(typeof(StringEnumConverter))]
+    [Flags]
     public enum Attr
     {
         [EnumMember(Value = "")]
         Null = 0,
 
         [EnumMember(Value = "HP flat")]
-        HealthFlat = 1,
+        HealthFlat = 1<<0,
 
         [EnumMember(Value = "HP%")]
-        HealthPercent = 2,
+        HealthPercent = 1<<1,
 
         [EnumMember(Value = "ATK flat")]
-        AttackFlat = 4,
+        AttackFlat = 1<<2,
 
         [EnumMember(Value = "ATK%")]
-        AttackPercent = 8,
+        AttackPercent = 1<<3,
 
         [EnumMember(Value = "DEF flat")]
-        DefenseFlat = 16,
+        DefenseFlat = 1<<4,
 
         [EnumMember(Value = "DEF%")]
-        DefensePercent = 32,
+        DefensePercent = 1<<5,
 
         [EnumMember(Value = "SPD")]
-        Speed = 64,
+        Speed = 1<<6,
 
         // Thanks Swift -_-
-        SpeedPercent = 128,
+        SpeedPercent = 1<<7,
 
         [EnumMember(Value = "CRate")]
-        CritRate = 256,
+        CritRate = 1<<8,
 
         [EnumMember(Value = "CDmg")]
-        CritDamage = 512,
+        CritDamage = 1<<9,
 
         [EnumMember(Value = "ACC")]
-        Accuracy = 1024,
+        Accuracy = 1<<10,
 
         [EnumMember(Value = "RES")]
-        Resistance = 2048,
+        Resistance = 1<<11,
+        
+        // Flag for below
+        ExtraStat = 1<<12,
 
+        [EnumMember(Value = "EHP")]
+        EffectiveHP = (1<<13) | ExtraStat,
+
+        [EnumMember(Value = "EHPDB")]
+        EffectiveHPDefenseBreak = (1 << 14) | ExtraStat,
+
+        [EnumMember(Value = "DPS")]
+        DamagePerSpeed = (1 << 15) | ExtraStat,
+
+        [EnumMember(Value = "AvD")]
+        AverageDamage = (1 << 16) | ExtraStat,
+
+        [EnumMember(Value = "MxD")]
+        MaxDamage = (1 << 17) | ExtraStat
     }
     
     public class Rune
@@ -299,8 +315,9 @@ namespace RuneOptim
                         return Accuracy[fake, pred];
                     case "RESperc":
                         return Resistance[fake, pred];
+                    default:
+                        return 0;
                 }
-                return 0;
             }
         }
 
@@ -396,7 +413,7 @@ namespace RuneOptim
                     type = 1;
                 else if (new RuneSet[] { RuneSet.Energy, RuneSet.Endure, RuneSet.Guard, RuneSet.Shield, RuneSet.Will }.Contains(Set)) // d
                     type = 2;
-                else if (new RuneSet[] { RuneSet.Despair, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight, RuneSet.Accuracy }.Contains(Set)) // s
+                else if (new RuneSet[] { RuneSet.Despair, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight, RuneSet.Accuracy, RuneSet.Tolerance }.Contains(Set)) // s
                     type = 3;
 
                 var subs = new Attr[] { Sub1Type, Sub2Type, Sub3Type, Sub4Type };
@@ -406,7 +423,7 @@ namespace RuneOptim
                     // if null
                     if (sub == Attr.Null)
                     {
-                        r += 1 / 3;
+                        r += 1 / (double)3;
                         continue;
                     }
 
@@ -494,8 +511,8 @@ namespace RuneOptim
                 v += HealthPercent.Value / (double)subMaxes[Attr.HealthPercent];
                 v += DefensePercent.Value / (double)subMaxes[Attr.DefensePercent];
                 v += Resistance.Value / (double)subMaxes[Attr.Resistance];
-                v += 0.5 * HealthFlat.Value / (double)subMaxes[Attr.HealthFlat];
-                v += 0.5 * DefenseFlat.Value / (double)subMaxes[Attr.DefenseFlat];
+                v += 0.5 * HealthFlat.Value / subMaxes[Attr.HealthFlat];
+                v += 0.5 * DefenseFlat.Value / subMaxes[Attr.DefenseFlat];
 
 				if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
 				{
@@ -505,7 +522,7 @@ namespace RuneOptim
 				}
 				else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
 				{
-					v -= 0.5 * MainValue / (double)subMaxes[MainType];
+					v -= 0.5 * MainValue / subMaxes[MainType];
 					if (Slot % 2 == 0)
 						v += Grade / (double) 6;
 				}
@@ -535,7 +552,7 @@ namespace RuneOptim
         }
 
 		[JsonIgnore]
-		private Attr[] atkStats = new Attr[] { Attr.AttackFlat, Attr.AttackPercent, Attr.CritRate, Attr.CritDamage };
+		private readonly Attr[] atkStats = new Attr[] { Attr.AttackFlat, Attr.AttackPercent, Attr.CritRate, Attr.CritDamage };
 
         [JsonIgnore]
         public double ScoringATK
@@ -547,7 +564,7 @@ namespace RuneOptim
                 v += AttackPercent.Value / (double)subMaxes[Attr.AttackPercent];
                 v += CritRate.Value / (double)subMaxes[Attr.CritRate];
                 v += CritDamage.Value / (double)subMaxes[Attr.CritDamage];
-                v += 0.5 * AttackFlat.Value / (double)subMaxes[Attr.AttackFlat];
+                v += 0.5 * AttackFlat.Value / subMaxes[Attr.AttackFlat];
 
 				if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
 				{
@@ -557,7 +574,7 @@ namespace RuneOptim
 				}
 				else if (MainType == Attr.AttackFlat)
 				{
-					v -= 0.5 * MainValue / (double)subMaxes[MainType];
+					v -= 0.5 * MainValue / subMaxes[MainType];
 					if (Slot % 2 == 0)
 						v += Grade / (double)6;
 				}
@@ -597,7 +614,7 @@ namespace RuneOptim
 				if (InnateValue.HasValue && InnateValue.Value > 0)
 				{
 					if (InnateType == Attr.AttackFlat || InnateType == Attr.HealthFlat || InnateType == Attr.DefenseFlat)
-						v += 0.5 * InnateValue.Value / (double)subMaxes[InnateType];
+						v += 0.5 * InnateValue.Value / subMaxes[InnateType];
 					else
 						v += InnateValue.Value / (double)subMaxes[InnateType];
 				}
@@ -605,7 +622,7 @@ namespace RuneOptim
 				if (Sub1Value.HasValue && Sub1Value.Value > 0)
 				{
 					if (Sub1Type == Attr.AttackFlat || Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat)
-						v += 0.5 * Sub1Value.Value / (double)subMaxes[Sub1Type];
+						v += 0.5 * Sub1Value.Value / subMaxes[Sub1Type];
 					else
 						v += Sub1Value.Value / (double)subMaxes[Sub1Type];
 				}
@@ -613,7 +630,7 @@ namespace RuneOptim
 				if (Sub2Value.HasValue && Sub2Value.Value > 0)
 				{
 					if (Sub2Type == Attr.AttackFlat || Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat)
-						v += 0.5 * Sub2Value.Value / (double)subMaxes[Sub2Type];
+						v += 0.5 * Sub2Value.Value / subMaxes[Sub2Type];
 					else
 						v += Sub2Value.Value / (double)subMaxes[Sub2Type];
 				}
@@ -621,7 +638,7 @@ namespace RuneOptim
 				if (Sub3Value.HasValue && Sub3Value.Value > 0)
 				{
 					if (Sub3Type == Attr.AttackFlat || Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat)
-						v += 0.5 * Sub3Value.Value / (double)subMaxes[Sub3Type];
+						v += 0.5 * Sub3Value.Value / subMaxes[Sub3Type];
 					else
 						v += Sub3Value.Value / (double)subMaxes[Sub3Type];
 				}
@@ -629,7 +646,7 @@ namespace RuneOptim
 				if (Sub4Value.HasValue && Sub4Value.Value > 0)
 				{
 					if (Sub4Type == Attr.AttackFlat || Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat)
-						v += 0.5 * Sub4Value.Value / (double)subMaxes[Sub4Type];
+						v += 0.5 * Sub4Value.Value / subMaxes[Sub4Type];
 					else
 						v += Sub4Value.Value / (double)subMaxes[Sub4Type];
 				}
@@ -648,7 +665,7 @@ namespace RuneOptim
             if (a == Attr.Null)
                 return 0;
             if (a == Attr.HealthFlat || a == Attr.AttackFlat || a == Attr.DefenseFlat)
-                return val / 2 / (double)(5 * subUpgrades[a][Grade - 1]);
+                return val / (double)2 / (5 * subUpgrades[a][Grade - 1]);
 
             return val / (double) (5 * subUpgrades[a][Grade - 1]);
         }
@@ -752,7 +769,11 @@ namespace RuneOptim
 
         // these sets can't be superceded by really good stats
         // Eg. Blade can be replaced by 12% crit.
-        public static RuneSet[] MagicalSets = { RuneSet.Violent, RuneSet.Will, RuneSet.Nemesis, RuneSet.Shield, RuneSet.Revenge, RuneSet.Despair, RuneSet.Vampire, RuneSet.Destroy };
+        public static readonly RuneSet[] MagicalSets =
+        {
+            RuneSet.Violent, RuneSet.Will, RuneSet.Nemesis, RuneSet.Shield, RuneSet.Revenge, RuneSet.Despair, RuneSet.Vampire, RuneSet.Destroy,
+            RuneSet.Tolerance, RuneSet.Accuracy, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight,
+        };
 
         // Debugger niceness
         public override string ToString()
@@ -821,13 +842,13 @@ namespace RuneOptim
             foreach (Attr attr in Build.statEnums)
             {
                 if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / (double)rPerc[attr] >= rTest[attr])
+                    if (this[attr, fake, pred] / rPerc[attr] >= rTest[attr])
                         return true;
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
                 if (rFlat[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / (double)rFlat[attr] >= rTest[attr])
+                    if (this[attr, fake, pred] / rFlat[attr] >= rTest[attr])
                         return true;
             }
 #else
@@ -852,13 +873,13 @@ namespace RuneOptim
             foreach (Attr attr in Build.statEnums)
             {
                 if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / (double)rPerc[attr] < rTest[attr])
+                    if (this[attr, fake, pred] / rPerc[attr] < rTest[attr])
                         return false;
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
                 if (rFlat[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / (double)rFlat[attr] < rTest[attr])
+                    if (this[attr, fake, pred] / rFlat[attr] < rTest[attr])
                         return false;
             }
 #else
@@ -884,13 +905,13 @@ namespace RuneOptim
             foreach (Attr attr in Build.statEnums)
             {
                 if (attr != Attr.Speed && rPerc[attr] != 0)
-                    val += this[attr, fake, pred] / (double)rPerc[attr];
+                    val += this[attr, fake, pred] / rPerc[attr];
 
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
                 if (rFlat[attr] != 0)
-                    val += this[attr, fake, pred] / (double)rFlat[attr];
+                    val += this[attr, fake, pred] / rFlat[attr];
             }
 #else
             for (int i = 0; i < Build.statNames.Length; i++)

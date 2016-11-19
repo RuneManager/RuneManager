@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Drawing;
 
 namespace RuneApp
 {
     // Maybe from http://stackoverflow.com/questions/395256/transparent-images-with-c-sharp-winforms
-    public class TransparentControl : Control
+    public sealed class TransparentControl : Control
     {
         private readonly Timer refresher;
         private Image _image;
@@ -45,19 +41,14 @@ namespace RuneApp
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (_image != null)
-            {
-                var attr = new System.Drawing.Imaging.ImageAttributes();
-                int top = Top;
-                int bottom = Top + Height;
-                int left = Left;
-                int right = Left + Width;
+            if (_image == null) return;
 
-                attr.SetGamma(gamma);
+            var attr = new System.Drawing.Imaging.ImageAttributes();
 
-                // slight change to how they drew it
-                e.Graphics.DrawImage(_image, new Rectangle((Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2), _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, attr);
-            }
+            attr.SetGamma(gamma);
+
+            // slight change to how they drew it
+            e.Graphics.DrawImage(_image, new Rectangle((Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2), _image.Width, _image.Height), 0, 0, _image.Width, _image.Height, GraphicsUnit.Pixel, attr);
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)

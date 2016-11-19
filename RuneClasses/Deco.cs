@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -63,14 +58,14 @@ namespace RuneOptim
         public int Island;
 
         [JsonProperty("master_id")]
-        public int MasterID;
+        public int MasterId;
 
         [JsonIgnore]
         public Shrine Shrine
         {
             get
             {
-                switch (MasterID)
+                switch (MasterId)
                 {
                     case 4:
                     case 6:
@@ -82,7 +77,7 @@ namespace RuneOptim
                     case 18:
                     case 19:
                     case 31:
-                        return (Shrine)MasterID;
+                        return (Shrine)MasterId;
                     default:
                         return Shrine.Unknown;
                 }

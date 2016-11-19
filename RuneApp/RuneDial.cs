@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using RuneOptim;
 
 namespace RuneApp
@@ -22,12 +14,7 @@ namespace RuneApp
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
             runeBoxes = new RuneBox[] { runeBox1, runeBox2, runeBox3, runeBox4, runeBox5, runeBox6 };
         }
-
-        private void RuneDial_Load(object sender, EventArgs e)
-        {
-
-        }
-
+        
         public void UpdateLoad(Loadout load)
         {
             UpdateRunes(load.Runes);

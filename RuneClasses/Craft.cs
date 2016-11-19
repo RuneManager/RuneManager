@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -31,16 +26,16 @@ namespace RuneOptim
         public RuneSet Set;
 
         [JsonProperty("grade")]
-        public int grade;
+        public int Grade;
 
         [JsonProperty("item_id")]
-        public long ItemID;
+        public long ItemId;
 
         [JsonProperty("type")]
         public CraftType Type;
 
         [JsonProperty("id")]
-        public long ID;
+        public long Id;
 
     }
 }

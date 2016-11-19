@@ -1,11 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace RuneOptim
 {
+    // WON'T COMPILE
+    class AttrComparer : IEqualityComparer<Attr>
+    {
+        public bool Equals(Attr x, Attr y)
+        {
+            return (x == y);
+        }
+        public int GetHashCode(Attr obj)
+        {
+            return (int)obj;
+        }
+    }
+
     public static class ExtensionMethods
     {
         // Enable casting Attr enums to a string
@@ -13,6 +22,8 @@ namespace RuneOptim
         {
             switch (attr)
             {
+                case Attr.Null:
+                    return "null";
                 case Attr.Accuracy:
                     return "ACCperc";
                 case Attr.AttackFlat:
@@ -37,9 +48,21 @@ namespace RuneOptim
                     return "SPDflat";
                 case Attr.SpeedPercent:
                     return "SPDperc";
+                case Attr.ExtraStat:
+                    return "Ext";
+                case Attr.EffectiveHP:
+                    return "EHP";
+                case Attr.EffectiveHPDefenseBreak:
+                    return "EHPDB";
+                case Attr.DamagePerSpeed:
+                    return "DPS";
+                case Attr.AverageDamage:
+                    return "AvD";
+                case Attr.MaxDamage:
+                    return "MxD";
+                default:
+                    return "unhandled";
             }
-
-            return "null";
         }
 
         // Enable casting Attr enums to a string
@@ -47,6 +70,14 @@ namespace RuneOptim
         {
             switch (attr)
             {
+                case Attr.Null:
+                case Attr.ExtraStat:
+                case Attr.EffectiveHP:
+                case Attr.EffectiveHPDefenseBreak:
+                case Attr.DamagePerSpeed:
+                case Attr.AverageDamage:
+                case Attr.MaxDamage:
+                    return "";
                 case Attr.Accuracy:
                     return "ACC%";
                 case Attr.AttackFlat:
@@ -71,9 +102,9 @@ namespace RuneOptim
                     return "SPD";
                 case Attr.SpeedPercent:
                     return "SPD%";
+                default:
+                    return "unhandled";
             }
-
-            return "null";
         }
     }
 }

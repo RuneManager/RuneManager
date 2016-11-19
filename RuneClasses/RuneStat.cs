@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RuneOptim
+﻿namespace RuneOptim
 {
     public class RuneStat
     {
         private Rune parent = null;
-        private Attr stat = Attr.Null;
+        private Attr stat;
         private int? val = null;
         private bool? isMain = null;
 
@@ -35,7 +29,7 @@ namespace RuneOptim
             {
                 if (val == null)
                 {
-                    val = parent.GetValue(stat, -1, false);
+                    val = parent.GetValue(stat);
                     if (parent.MainType == stat)
                         isMain = true;
                 }
@@ -46,7 +40,7 @@ namespace RuneOptim
 
         public int ValueGet()
         {
-            return this.Value;
+            return Value;
         }
 
         public static implicit operator int (RuneStat rhs)

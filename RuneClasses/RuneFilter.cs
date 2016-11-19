@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using RuneOptim;
+﻿using Newtonsoft.Json;
 
 namespace RuneOptim
 {
@@ -77,8 +71,9 @@ namespace RuneOptim
                         return Flat;
                     case "perc":
                         return Percent;
+                    default:
+                        return Test;
                 }
-                return Test;
             }
             set
             {
@@ -93,6 +88,8 @@ namespace RuneOptim
                     case "test":
                         Test = value;
                         break;
+                    default:
+                        return;
                 }
             }
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json;
 
 namespace RuneOptim
@@ -443,6 +441,19 @@ namespace RuneOptim
         {
             switch (attr)
             {
+                case Attr.Null:
+                case Attr.HealthFlat:
+                case Attr.AttackFlat:
+                case Attr.DefenseFlat:
+                case Attr.Speed:
+                case Attr.ExtraStat:
+                case Attr.EffectiveHP:
+                case Attr.EffectiveHPDefenseBreak:
+                case Attr.DamagePerSpeed:
+                case Attr.AverageDamage:
+                case Attr.MaxDamage:
+                    return 0;
+
                 // I could use sets.Where(s => s.Equals(RuneSet.SET)).Count() * BONUS, but it was too slow
                 case Attr.HealthPercent:
                     return (sets[0] == RuneSet.Energy ? 15 : 0) + (sets[1] == RuneSet.Energy ? 15 : 0) + (sets[2] == RuneSet.Energy ? 15 : 0);
@@ -461,8 +472,9 @@ namespace RuneOptim
                     return (sets[0] == RuneSet.Guard ? 15 : 0) + (sets[1] == RuneSet.Guard ? 15 : 0) + (sets[2] == RuneSet.Guard ? 15 : 0);
                 case Attr.Resistance:
                     return (sets[0] == RuneSet.Endure ? 20 : 0) + (sets[1] == RuneSet.Endure ? 20 : 0) + (sets[2] == RuneSet.Endure ? 20 : 0);
+                default:
+                    return 0;
             }
-            return 0;
         }
 
         // Using the given stats as a base, apply the modifiers
