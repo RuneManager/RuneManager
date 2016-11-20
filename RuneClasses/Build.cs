@@ -11,8 +11,16 @@ namespace RuneOptim
 
     public class RuneUsage
     {
+        // the runes legit used 
         public ConcurrentDictionary<Rune, byte> runesUsed = new ConcurrentDictionary<Rune, byte>();
+        // runes which where in a passing build
         public ConcurrentDictionary<Rune, byte> runesGood = new ConcurrentDictionary<Rune, byte>();
+        
+        // the runes that got in the winning builds when runesUsed got banned
+        public ConcurrentDictionary<Rune, byte> runesSecond = new ConcurrentDictionary<Rune, byte>();
+        // runes which got generated while banning runesUsed --> goodRunes
+        public ConcurrentDictionary<Rune, byte> runesOkay = new ConcurrentDictionary<Rune, byte>();
+        public ConcurrentDictionary<Rune, byte> runesBetter = new ConcurrentDictionary<Rune, byte>();
     }
 
     public class BuildUsage
@@ -241,7 +249,11 @@ namespace RuneOptim
 		// magically scale Minimum with Sort while the build is running
 		public bool autoAdjust = false;
 
-        public int[][] bannedRunes = new int[6][];
+        // Save to JSON
+        public List<int> BannedRuneId = new List<int>();
+
+        [JsonIgnore]
+        public List<int> bannedRunesTemp = new List<int>();
 
         /// ---------------
 
@@ -254,6 +266,9 @@ namespace RuneOptim
         // The best loadout in loads
         [JsonIgnore]
         public Monster Best = null;
+
+        [JsonIgnore]
+        private object BestLock = new object();
 
         // The runes to be used to generate builds
         [JsonIgnore]
@@ -283,36 +298,88 @@ namespace RuneOptim
             return leader.NonZero();
         }
 
-        public static double sort (Build build, Stats m)
+        // Seems to out-of-mem if too many
+        private static readonly int MaxBuilds32 = 500000;
+        
+        public void BanEmTemp(params int[] brunes)
+        {
+            bannedRunesTemp.Clear();
+            foreach (var r in brunes)
+            {
+                bannedRunesTemp.Add(r);
+            }
+        }
+
+        // build the scoring function
+        public double sort(Stats m)
         {
             double pts = 0;
+            if (m == null)
+                return pts;
 
             foreach (Attr stat in statAll)
             {
+                // if this stat is used for sorting
                 if (!stat.HasFlag(Attr.ExtraStat))
                 {
-                    // if this stat is used for sorting
-                    if (build.Sort[stat] != 0)
+                    if (Sort[stat] != 0)
                     {
                         // sum points for the stat
-                        pts += m[stat]/build.Sort[stat];
+                        pts += m[stat] / Sort[stat];
                         // if exceeding max, subtracted the gained points and then some
-                        if (build.Threshold[stat] != 0)
-                            pts -= Math.Max(0, m[stat] - build.Threshold[stat])/build.Sort[stat];
+                        if (Threshold[stat] != 0)
+                            pts -= Math.Max(0, m[stat] - Threshold[stat]) / Sort[stat];
                     }
                 }
                 else
                 {
-                    if (build.Sort.ExtraGet(stat) != 0)
+                    if (Sort.ExtraGet(stat) != 0)
                     {
-                        pts += m.ExtraValue(stat) /build.Sort.ExtraGet(stat);
-                        if (build.Threshold.ExtraGet(stat) != 0)
-                            pts -= Math.Max(0, m.ExtraValue(stat) - build.Threshold.ExtraGet(stat))/
-                                   build.Sort.ExtraGet(stat);
+                        pts += m.ExtraValue(stat) / Sort.ExtraGet(stat);
+                        if (Threshold.ExtraGet(stat) != 0)
+                            pts -= Math.Max(0, m.ExtraValue(stat) - Threshold.ExtraGet(stat)) /
+                                   Sort.ExtraGet(stat);
                     }
                 }
             }
             return pts;
+        }
+
+        void GetPrediction(int[] slotFakes, bool[] slotPred)
+        {
+            // crank the rune prediction
+            for (int i = 0; i < 6; i++)
+            {
+                int raiseTo = 0;
+                bool predictSubs = false;
+
+                // find the largest number to raise to
+                // if any along the tree say to predict, do it
+                if (runePrediction.ContainsKey("g"))
+                {
+                    int glevel = runePrediction["g"].Key;
+                    if (glevel > raiseTo)
+                        raiseTo = glevel;
+                    predictSubs |= runePrediction["g"].Value;
+                }
+                if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
+                {
+                    int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                    if (mlevel > raiseTo)
+                        raiseTo = mlevel;
+                    predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
+                }
+                if (runePrediction.ContainsKey((i + 1).ToString()))
+                {
+                    int slevel = runePrediction[(i + 1).ToString()].Key;
+                    if (slevel > raiseTo)
+                        raiseTo = slevel;
+                    predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                }
+
+                slotFakes[i] = raiseTo;
+                slotPred[i] = predictSubs;
+            }
         }
 
         /// <summary>
@@ -324,13 +391,19 @@ namespace RuneOptim
         /// <param name="progTo">Periodically gives the progress% as a double</param>
         /// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
         /// <param name="saveStats">If to write stats to rune stats</param>
-        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false)
+        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
         {
             if (runes.Any(r => r == null))
                 return;
 
-            runeUsage = new RuneUsage();
-            buildUsage = new BuildUsage();
+            if (!saveStats)
+                goodRunes = false;
+
+            if (!goodRunes)
+            {
+                runeUsage = new RuneUsage();
+                buildUsage = new BuildUsage();
+            }
 
             // if to get awakened
             if (DownloadAwake && !mon.downloaded)
@@ -342,9 +415,7 @@ namespace RuneOptim
                     var mstat = mref.Download();
                     // if the retrieved mon is unawakened, get the awakened
                     if (!mstat.Awakened && mstat.AwakenRef != null)
-                    {
                         mon = mstat.AwakenRef.Download().GetMon(mon);
-                    }
                 }
             }
             // getting awakened also gets level 40, so...
@@ -353,9 +424,7 @@ namespace RuneOptim
             {
                 var mref = MonsterStat.FindMon(mon);
                 if (mref != null)
-                {
                     mon = mref.Download().GetMon(mon);
-                }
             }
 
             try
@@ -379,33 +448,14 @@ namespace RuneOptim
                     Console.WriteLine("Zero permuations");
                     return;
                 }
-                /*
-                if (!AllowBroken && (BuildSets.Any(s => Rune.SetRequired(s) == 2) || RequiredSets.Any(s => Rune.SetRequired(s) == 2)))
-                {
-                    if (printTo != null)
-                        printTo.Invoke("Bad sets");
-                    Console.WriteLine("Cannot use 4 set with no broken");
-                    return;
-                }*/
 
                 bool hasSort = false;
                 foreach (Attr stat in statAll)
                 {
-                    if (!stat.HasFlag((Attr.ExtraStat)))
+                    if ((stat.HasFlag((Attr.ExtraStat)) ? Sort.ExtraGet(stat) : Sort[stat]) != 0)
                     {
-                        if (Sort[stat] != 0)
-                        {
-                            hasSort = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        if (Sort.ExtraGet(stat) != 0)
-                        {
-                            hasSort = true;
-                            break;
-                        }
+                        hasSort = true;
+                        break;
                     }
                 }
                 if (top == 0 && !hasSort)
@@ -420,131 +470,65 @@ namespace RuneOptim
 
                 Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
-                // build the scoring function
-                Func<Stats, double> sort = (m) =>
-                {
-                    double pts = 0;
-                    if (m == null)
-                        return pts;
-
-                    foreach (Attr stat in statAll)
-                    {
-                        // if this stat is used for sorting
-                        if (!stat.HasFlag(Attr.ExtraStat))
-                        {
-                            if (Sort[stat] != 0)
-                            {
-                                // sum points for the stat
-                                pts += m[stat]/Sort[stat];
-                                // if exceeding max, subtracted the gained points and then some
-                                if (Threshold[stat] != 0)
-                                    pts -= Math.Max(0, m[stat] - Threshold[stat])/Sort[stat];
-                            }
-                        }
-                        else
-                        {
-                            if (Sort.ExtraGet(stat) != 0)
-                            {
-                                pts += m.ExtraValue(stat) /Sort.ExtraGet(stat);
-                                if (Threshold.ExtraGet(stat) != 0)
-                                    pts -= Math.Max(0, m.ExtraValue(stat) - Threshold.ExtraGet(stat))/
-                                           Sort.ExtraGet(stat);
-                            }
-                        }
-                    }
-                    return pts;
-                };
-
                 int[] slotFakes = new int[6];
                 bool[] slotPred = new bool[6];
-
-                // crank the rune prediction
-                for (int i = 0; i < 6; i++)
-                {
-                    int raiseTo = 0;
-                    bool predictSubs = false;
-
-                    // find the largest number to raise to
-                    // if any along the tree say to predict, do it
-                    if (runePrediction.ContainsKey("g"))
-                    {
-                        int glevel = runePrediction["g"].Key;
-                        if (glevel > raiseTo)
-                            raiseTo = glevel;
-                        predictSubs |= runePrediction["g"].Value;
-                    }
-                    if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
-                    {
-                        int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
-                        if (mlevel > raiseTo)
-                            raiseTo = mlevel;
-                        predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
-                    }
-                    if (runePrediction.ContainsKey((i + 1).ToString()))
-                    {
-                        int slevel = runePrediction[(i + 1).ToString()].Key;
-                        if (slevel > raiseTo)
-                            raiseTo = slevel;
-                        predictSubs |= runePrediction[(i + 1).ToString()].Value;
-                    }
-
-                    slotFakes[i] = raiseTo;
-                    slotPred[i] = predictSubs;
-
-                }
+                GetPrediction(slotFakes, slotPred);
+                
 
                 // set to running
                 isRun = true;
-
-                
 
                 // Parallel the outer loop
                 SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
                 Parallel.ForEach(runes[0], (r0, loopState) =>
                 {
-                    if (!isRun)
-                        //break;
-                        loopState.Break();
+                if (!isRun)
+                    //break;
+                    loopState.Break();
 
-                    // number of builds ruled out since last sync
-                    int kill = 0;
-                    // number of builds added since last sync
-                    int plus = 0;
+                // number of builds ruled out since last sync
+                int kill = 0;
+                // number of builds added since last sync
+                int plus = 0;
+
+                Monster test = new Monster(mon);
+                test.Current.Shrines = shrines;
+                test.Current.Leader = leader;
+
+                test.Current.FakeLevel = slotFakes;
+                test.Current.PredictSubs = slotPred;
+                test.ApplyRune(r0, 6);
 
                     foreach (Rune r1 in runes[1])
                     {
-                        if (!isRun) // Can't break to a lable, don't want to goto
+                        if (!isRun) // Can't break to a label, don't want to goto
                             break;
+                        test.ApplyRune(r1, 6);
+
                         foreach (Rune r2 in runes[2])
                         {
                             if (!isRun)
                                 break;
+                            test.ApplyRune(r2, 6);
+
                             foreach (Rune r3 in runes[3])
                             {
                                 if (!isRun)
                                     break;
+                                test.ApplyRune(r3, 6);
+
                                 foreach (Rune r4 in runes[4])
                                 {
                                     if (!isRun)
                                         break;
+                                    test.ApplyRune(r4, 6);
                                     foreach (Rune r5 in runes[5])
                                     {
                                         if (!isRun)
                                             break;
-                                        Monster test = new Monster(mon);
-                                        test.Current.Shrines = shrines;
-                                        test.Current.Leader = leader;
 
-                                        test.Current.FakeLevel = slotFakes;
-                                        test.Current.PredictSubs = slotPred;
+                                        test.ApplyRune(r5, 6);
 
-                                        test.ApplyRune(r0);
-                                        test.ApplyRune(r1);
-                                        test.ApplyRune(r2);
-                                        test.ApplyRune(r3);
-                                        test.ApplyRune(r4);
-                                        test.ApplyRune(r5);
-                                        
                                         var cstats = test.GetStats();
 
                                         bool maxdead = false;
@@ -561,27 +545,26 @@ namespace RuneOptim
                                             }
                                         }
 
+                                        bool isBad = false;
+                                        //if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
+                                        //    isBad = false;
+
                                         // check if build meets minimum
-                                        if (Minimum != null && !(cstats > Minimum))
-                                        {
-                                            kill++;
-                                        }
-                                        else if (maxdead)
-                                        {
-                                            kill++;
-                                        }
+                                        isBad |= (Minimum != null && !(cstats > Minimum));
+                                        isBad |= (maxdead);
                                         // if no broken sets, check for broken sets
-                                        else if (!AllowBroken && !test.Current.SetsFull)
-                                        {
-                                            kill++;
-                                        }
+                                        isBad |= (!AllowBroken && !test.Current.SetsFull);
                                         // if there are required sets, ensure we have them
-                                        else if (RequiredSets != null && RequiredSets.Count > 0
+                                        isBad |= (RequiredSets != null && RequiredSets.Count > 0
                                             // this Linq adds no overhead compared to GetStats() and ApplyRune()
-                                            && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)))
+                                            && !RequiredSets.All(s => test.Current.Sets.Contains(s)));
+                                        //    && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
+
+                                        if (isBad)
                                         {
                                             kill++;
                                         }
+
                                         else
                                         {
                                             // we found an okay build!
@@ -591,26 +574,32 @@ namespace RuneOptim
                                             {
                                                 foreach (Rune r in test.Current.Runes)
                                                 {
-                                                    r.manageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
-                                                    runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                                    if (!goodRunes)
+                                                    {
+                                                        r.manageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
+                                                        runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                                    }
+                                                    else
+                                                    {
+                                                        r.manageStats.AddOrUpdate("LoadFilt", 0.001, (s, d) => { return d + 0.001; });
+                                                        runeUsage.runesOkay.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                                    }
                                                 }
                                             }
 
                                             // if we are to track all good builds, keep it
                                             if (!dumpBads)
                                             {
-                                                if (tests.Count < 500000)
-                                                    tests.Add(test);
-                                                if (Best == null)
+                                                if (tests.Count < MaxBuilds32)
+                                                    tests.Add(new Monster(test, true));
+
+                                                var bestScore = sort(bstats);
+                                                var curScore = sort(cstats);
+                                                lock(BestLock)
                                                 {
-                                                    Best = test;
-                                                    bstats = Best.GetStats();
-                                                }
-                                                else
-                                                {
-                                                    if (sort(bstats) < sort(cstats))
+                                                    if (Best == null || bestScore < curScore)
                                                     {
-                                                        Best = test;
+                                                        Best = new Monster(test, true);
                                                         bstats = Best.GetStats();
                                                     }
                                                 }
@@ -619,29 +608,23 @@ namespace RuneOptim
                                             else
                                             {
                                                 // if there are currently no good builds, keep it
-                                                if (tests.FirstOrDefault() == null)
+                                                // or if this build is better than the best, keep it
+
+                                                var bestScore = sort(bstats);
+                                                var curScore = sort(cstats);
+
+                                                lock(BestLock)
                                                 {
-                                                    if (tests.Count < 500000)
-                                                        tests.Add(test);
-                                                    Best = test;
-                                                    bstats = Best.GetStats();
-                                                }
-                                                else
-                                                {
-                                                    // if this build is better than the best, keep it
-                                                    if (sort(bstats) < sort(cstats))
+                                                    if (Best == null || bestScore < curScore)
                                                     {
-                                                        Best = test;
+                                                        Best = new Monster(test, true);
                                                         bstats = Best.GetStats();
-                                                        if (tests.Count < 500000)
-                                                            tests.Add(test);
                                                     }
+                                                }
+                                                if (tests.Count < MaxBuilds32 && (saveStats || Best == test))
+                                                {
                                                     // keep it for spreadsheeting
-                                                    else if (saveStats)
-                                                    {
-                                                        if (tests.Count < 500000)
-                                                            tests.Add(test);
-                                                    }
+                                                    tests.Add(new Monster(test, true));
                                                 }
                                             }
                                         }
@@ -692,8 +675,16 @@ namespace RuneOptim
                     {
                         foreach (var r in ra)
                         {
-                            runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                            r.manageStats.AddOrUpdate("LoadGen", total, (s, d) => { return d + total; });
+                            if (!goodRunes)
+                            {
+                                runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                r.manageStats.AddOrUpdate("LoadGen", total, (s, d) => { return d + total; });
+                            }
+                            else
+                            {
+                                runeUsage.runesBetter.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                                r.manageStats.AddOrUpdate("LoadGen", total * 0.001, (s, d) => { return d + total * 0.001; });
+                            }
                         }
                     }
                 }
@@ -706,7 +697,8 @@ namespace RuneOptim
                 // sort *all* the builds
                 loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();
 
-                buildUsage.loads = tests.ToList();
+                if (!goodRunes)
+                    buildUsage.loads = tests.ToList();
                 
                 // dump everything to console, if nothing to print to
                 if (printTo == null)
@@ -731,11 +723,16 @@ namespace RuneOptim
                     //Best.Current.buildUsage = usage.buildUsage;
                     foreach (Rune r in Best.Current.Runes)
                     {
-                        r.manageStats["In"] = 1;
+                        if (!goodRunes)
+                            r.manageStats["In"] = 1;
+                        else
+                        {
+                            runeUsage.runesSecond.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                        }
                     }
                     for (int i = 0; i < 6; i++)
                     {
-                        if (mon.Current.Runes[i] != null && mon.Current.Runes[i].ID != Best.Current.Runes[i].ID)
+                        if (!goodRunes && mon.Current.Runes[i] != null && mon.Current.Runes[i].ID != Best.Current.Runes[i].ID)
                             mon.Current.Runes[i].Swapped = true;
                     }
                 }
@@ -1065,7 +1062,7 @@ namespace RuneOptim
         /// <param name="useLocked">If it should include locked runes</param>
         /// <param name="useEquipped">If it should include equipped runes (other than the current monster)</param>
         /// <param name="saveStats">If to write information to the runes about usage</param>
-        public void GenRunes(Save save, bool useLocked = false, bool useEquipped = false, bool saveStats = false)
+        public void GenRunes(Save save, bool useLocked = false, bool useEquipped = false, bool saveStats = false, bool goodRunes = false)
         {
             if (save?.Runes == null)
                 return;
@@ -1082,14 +1079,16 @@ namespace RuneOptim
                 // only if the rune isn't currently locked for another purpose
                 if (!useLocked)
                     rsGlobal = rsGlobal.Where(r => r.Locked == false);
+                rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.ID) && !bannedRunesTemp.Any(b => b == r.ID));
             }
 
+            
             if (BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4))
             {
                 // if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
                 rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
             }
-            else
+            else if (BuildSets.Any() || RequiredSets.Any())
             {
                 rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
                 // Only runes which we've included
@@ -1099,50 +1098,23 @@ namespace RuneOptim
             {
                 foreach (Rune r in rsGlobal)
                 {
-                    r.manageStats.AddOrUpdate("Set", 1, (s,d)=> { return d + 1; });
+                    if (!goodRunes)
+                        r.manageStats.AddOrUpdate("Set", 1, (s,d)=> { return d + 1; });
+                    else
+                        r.manageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
+
                 }
             }
 
 			int[] slotFakes = new int[6];
 			bool[] slotPred = new bool[6];
+            GetPrediction(slotFakes, slotPred);
 
 			// Set up each runeslot
 			for (int i = 0; i < 6; i++)
 			{
 				// put the right ones in
 				runes[i] = rsGlobal.Where(r => r.Slot == i + 1).ToArray();
-
-				// crank the rune prediction
-				int raiseTo = 0;
-				bool predictSubs = false;
-
-				// find the largest number to raise to
-				// if any along the tree say to predict, do it
-				if (runePrediction.ContainsKey("g"))
-				{
-					int glevel = runePrediction["g"].Key;
-					if (glevel > raiseTo)
-						raiseTo = glevel;
-					predictSubs |= runePrediction["g"].Value;
-				}
-				if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
-				{
-					int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
-					if (mlevel > raiseTo)
-						raiseTo = mlevel;
-					predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
-				}
-				if (runePrediction.ContainsKey((i + 1).ToString()))
-				{
-					int slevel = runePrediction[(i + 1).ToString()].Key;
-					if (slevel > raiseTo)
-						raiseTo = slevel;
-					predictSubs |= runePrediction[(i + 1).ToString()].Value;
-				}
-
-				slotFakes[i] = raiseTo;
-				slotPred[i] = predictSubs;
-
 
 				if (i % 2 == 1) // actually evens because off by 1
 				{
@@ -1155,7 +1127,10 @@ namespace RuneOptim
 				{
 					foreach (Rune r in runes[i])
 					{
-						r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
+                        if (!goodRunes)
+						    r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
+                        else
+						    r.manageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
 					}
 					// cull here instead
 					if (!useEquipped)
@@ -1203,9 +1178,12 @@ namespace RuneOptim
 					{
 						foreach (Rune r in runes[i])
 						{
-							r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
-						}
-					}
+                            if (!goodRunes)
+    							r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
+                            else
+    							r.manageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
+                        }
+                    }
 				}
 			}
         }

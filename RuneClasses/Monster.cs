@@ -62,17 +62,21 @@ namespace RuneOptim
         }
 
         // copy down!
-        public Monster(Monster rhs) : base(rhs)
+        public Monster(Monster rhs, bool loadout = false) : base(rhs)
         {
             Name = rhs.Name;
             ID = rhs.ID;
             level = rhs.level;
+            if (loadout)
+            {
+                Current = new Loadout(rhs.Current); 
+            }
         }
 
         // put this rune on the current build
-        public void ApplyRune(Rune rune)
+        public void ApplyRune(Rune rune, int checkOn = 2)
         {
-            Current.AddRune(rune);
+            Current.AddRune(rune, checkOn);
             chaStats = true;
         }
 

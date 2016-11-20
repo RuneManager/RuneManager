@@ -102,6 +102,24 @@ namespace RuneOptim
             }
         }
 
+        public Loadout(Loadout rhs = null)
+        {
+            if (rhs != null)
+            {
+                shrines = rhs.shrines;
+                leader = rhs.leader;
+                fakeLevel = rhs.fakeLevel;
+                predictSubs = rhs.predictSubs;
+                buildID = rhs.buildID;
+                foreach (var r in rhs.Runes)
+                {
+                    AddRune(r);
+                }
+                // TODO: do we even need to?
+                manageStats = rhs.manageStats;
+            }
+        }
+
         // Debugging niceness
         public override string ToString()
         {
@@ -316,7 +334,7 @@ namespace RuneOptim
         #endregion
 
         // Put the rune on the build
-        public void AddRune(Rune rune)
+        public void AddRune(Rune rune, int checkOn = 2)
         {
             // don't bother if not a rune
             if (rune == null)
@@ -328,7 +346,7 @@ namespace RuneOptim
                 runeCount++;
 
             runes[rune.Slot - 1] = rune;//new Rune(rune);
-            if (runeCount % 2 == 0)
+            if (runeCount % checkOn == 0)
                 CheckSets();
         }
 

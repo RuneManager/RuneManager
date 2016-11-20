@@ -17,7 +17,14 @@
         {
             get
             {
-                if ((val == null) || (isMain ?? true) || pred) 
+                return parent.GetValue(stat, fake, pred);
+                if (val == null)
+                {
+                    val = parent.GetValue(stat);
+                    isMain = parent.MainType == stat;
+                }
+
+                if ((isMain ?? true) || pred) 
                     return parent.GetValue(stat, fake, pred);
                 return val ?? 0;
             }
@@ -27,15 +34,21 @@
         {
             get
             {
+                return parent.GetValue(stat);
                 if (val == null)
                 {
                     val = parent.GetValue(stat);
-                    if (parent.MainType == stat)
-                        isMain = true;
+                    isMain = parent.MainType == stat;
                 }
                 
                 return val.Value;
             }
+        }
+
+        public void SetVals(int v, bool m)
+        {
+            val = v;
+            isMain = m;
         }
 
         public int ValueGet()

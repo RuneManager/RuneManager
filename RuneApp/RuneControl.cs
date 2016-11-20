@@ -30,6 +30,14 @@ namespace RuneApp
         // Normal, Magic, Rare, Hero, Legend
         private int coolness;
 
+        protected override Size DefaultSize
+        {
+            get
+            {
+                return new Size(171, 179);
+            }
+        }
+
         public RuneControl()
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);

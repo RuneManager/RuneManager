@@ -228,7 +228,7 @@ namespace RuneApp
             int i = 1;
             foreach (Attr stat in Build.statAll)
             {
-                if (stat.HasFlag(Attr.ExtraStat))
+                if (!stat.HasFlag(Attr.ExtraStat))
                 {
                     string str = Cur[stat].ToString();
                     if (build.Sort[stat] != 0)

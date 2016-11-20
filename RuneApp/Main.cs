@@ -36,10 +36,12 @@ namespace RuneApp
         private CancellationToken runToken;
         private CancellationTokenSource runSource = null;
         bool plsDie = false;
+        bool isRunning = false;
         public static Help help = null;
 
         public static bool makeStats = true;
         private int linkCol = 1;
+        public static bool goodRunes = false;
 
         FileInfo excelFile = new FileInfo(@"runestats.xlsx");
         public static ExcelPackage excelPack = null;
@@ -69,7 +71,7 @@ namespace RuneApp
             bool tstats;
             if (bool.TryParse(config.AppSettings.Settings["nostats"].Value, out tstats))
                 makeStats = !tstats;
-            return tstats;
+            return makeStats;
         }
 
         public Main()
@@ -97,6 +99,11 @@ namespace RuneApp
                         makeStats = !tstats;
                 }
             }
+
+            findGoodRunes.Enabled = MakeStats;
+            if (!MakeStats)
+                findGoodRunes.Checked = false;
+
             #endregion
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
@@ -182,38 +189,19 @@ namespace RuneApp
 
             int xx = 0;
             int yy = 0;
-            foreach (var s in Build.statNames.Concat(Build.extraNames))
+            var labelPrefixes = new string[] { "Pts" }.Concat(Build.statNames).Concat(Build.extraNames);
+            foreach (var s in labelPrefixes)
             {
-                l = new Label();
-                l.Location = new Point(4 + xx, 400 + yy);
-                l.Name = s + "compStat";
-                l.Text = s;
-                l.Size = new Size(50, 14);
-                groupBox1.Controls.Add(l);
+                groupBox1.Controls.MakeControl<Label>(s, "compStat", 4 + xx, 400 + yy, 50, 14, s);
                 xx += 50;
 
-                l = new Label();
-                l.Location = new Point(4 + xx, 400 + yy);
-                l.Name = s + "compBefore";
-                l.Text = "";
-                l.Size = new Size(50, 14);
-                groupBox1.Controls.Add(l);
+                groupBox1.Controls.MakeControl<Label>(s, "compBefore", 4 + xx, 400 + yy, 50, 14, "");
                 xx += 50;
 
-                l = new Label();
-                l.Location = new Point(4 + xx, 400 + yy);
-                l.Name = s + "compAfter";
-                l.Text = "";
-                l.Size = new Size(50, 14);
-                groupBox1.Controls.Add(l);
+                groupBox1.Controls.MakeControl<Label>(s, "compAfter", 4 + xx, 400 + yy, 50, 14, "");
                 xx += 50;
 
-                l = new Label();
-                l.Location = new Point(4 + xx, 400 + yy);
-                l.Name = s + "compDiff";
-                l.Text = "";
-                l.Size = new Size(50, 14);
-                groupBox1.Controls.Add(l);
+                groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, 400 + yy, 50, 14, "");
                 xx += 50;
 
                 if (s == "SPD")
@@ -455,20 +443,22 @@ namespace RuneApp
             {
                 tc.Gamma = 1.4f;
                 tc.Refresh();
-                rune_Stats((Rune)tc.Tag);
-                runeBuild.Show();
-                runeShown.SetRune((Rune)tc.Tag);
+                runeEquipped.Show();
+                runeEquipped.SetRune((Rune)tc.Tag);
+                lbCloseEquipped.Show();
             }
             else
             {
                 tc.Hide();
-                runeBuild.Hide();
+                runeEquipped.Hide();
+                lbCloseEquipped.Hide();
             }
         }
 
-        private void label8_Click(object sender, EventArgs e)
+        private void lbCloseEquipped_Click(object sender, EventArgs e)
         {
-            runeBuild.Hide();
+            lbCloseEquipped.Hide();
+            runeEquipped.Hide();
             foreach (RuneControl r in runes)
             {
                 r.Gamma = 1;
@@ -476,9 +466,10 @@ namespace RuneApp
             }
         }
 
-        private void label8_Click_1(object sender, EventArgs e)
+        private void lbCloseInventory_Click(object sender, EventArgs e)
         {
-            runeBox.Hide();
+            lbCloseInventory.Hide();
+            runeInventory.Hide();
         }
 
         private void runetab_list_select(object sender, EventArgs e)
@@ -490,17 +481,9 @@ namespace RuneApp
                 {
                     Rune rune = (Rune)item.Tag;
 
-                    runeBox.Show();
+                    lbCloseInventory.Show();
+                    runeInventory.Show();
                     runeInventory.SetRune(rune);
-
-                    IRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
-                    IRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
-                    IRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
-                    IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
-                    IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
-                    IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
-                    IRuneLevel.Text = rune.Level.ToString();
-                    IRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
                 }
             }
 
@@ -579,7 +562,7 @@ namespace RuneApp
         private void button2_Click(object sender, EventArgs e)
         {
             tabControl1.SelectTab(tabRunes.Name);
-            filterRunesList(x => ((Rune)x).Slot == ((Rune)runeShown.Tag).Slot);
+            filterRunesList(x => ((Rune)x).Slot == ((Rune)runeEquipped.Tag).Slot);
         }
 
         private void filterRunesList(Predicate<object> p)
@@ -641,6 +624,15 @@ namespace RuneApp
                         var dmonsh = dmon.Current.Shrines;
                         dmon.Current.Leader = load.Leader;
                         dmon.Current.Shrines = load.Shrines;
+
+                        if (build != null)
+                        {
+                            var beforeScore = build.sort(dmon.GetStats());
+                            var afterScore = build.sort(load.GetStats(mon));
+                            groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString();
+                            groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString();
+                            groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = (afterScore - beforeScore).ToString();
+                        }
 
                         ShowDiff(dmon.GetStats(), load.GetStats(mon));
 
@@ -920,7 +912,7 @@ namespace RuneApp
             }
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void useRunesCheck_CheckedChanged(object sender, EventArgs e)
         {
             useEquipped = ((CheckBox)sender).Checked;
             if (config != null)
@@ -1025,6 +1017,9 @@ namespace RuneApp
             using (var f = new Options())
             {
                 f.ShowDialog();
+                findGoodRunes.Enabled = MakeStats;
+                if (!MakeStats)
+                    findGoodRunes.Checked = false;
             }
         }
 
@@ -1155,19 +1150,7 @@ namespace RuneApp
                 selected = (buildList.SelectedItems[0].Tag as Build).ID;
             RunBuilds(true, selected);
         }
-
-        private void rune_Stats(Rune rune)
-        {
-            SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
-            SRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
-            SRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
-            SRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
-            SRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
-            SRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
-            SRuneLevel.Text = rune.Level.ToString();
-            SRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
-        }
-
+        
         static int VersionCompare(string v1, string v2)
         {
             Version ver1;
@@ -1239,6 +1222,8 @@ namespace RuneApp
 
         private void ShowDiff(Stats old, Stats load)
         {
+           
+
             foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" })
             {
                 groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
@@ -1281,9 +1266,9 @@ namespace RuneApp
                     {
                         tc.Gamma = 1.4f;
                         tc.Refresh();
-                        rune_Stats((Rune)tc.Tag);
-                        runeBuild.Show();
-                        runeShown.SetRune((Rune)tc.Tag);
+                        runeEquipped.Show();
+                        runeEquipped.SetRune((Rune)tc.Tag);
+                        lbCloseEquipped.Show();
                     }
                 }
                 else
@@ -1504,13 +1489,12 @@ namespace RuneApp
 
         public void checkLocked()
         {
-            if (data == null)
+            if (data?.Runes == null)
                 return;
-            if (data.Runes != null)
-                toolStripStatusLabel1.Text = "Locked: " + data.Runes.Count(r => r.Locked);
 
             Invoke((MethodInvoker)delegate
             {
+                toolStripStatusLabel1.Text = "Locked: " + data.Runes.Count(r => r.Locked);
                 foreach (ListViewItem li in dataRuneList.Items)
                 {
                     var rune = li.Tag as Rune;
@@ -1522,176 +1506,260 @@ namespace RuneApp
 
         private void RunBuild(ListViewItem pli, bool saveStats = false)
         {
+            if ((pli?.Tag as Build) == null)
+            {
+                return;
+            }
+
+            RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate { pli.SubItems[3].Text = s; }));
+        }
+
+        private void RunBuild(Build b, bool saveStats = false, Action<string> printTo = null)
+        {
             if (plsDie)
                 return;
 
             if (currentBuild != null)
                 currentBuild.isRun = false;
 
-            if (pli.Tag != null)
+            if (b == null)
             {
-                Stopwatch buildTime = Stopwatch.StartNew();
-                Build b = (Build)pli.Tag;
-                currentBuild = b;
+                return;
+            }
 
-                ListViewItem[] olvs = null;
-                Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
+            while (isRunning)
+            {
+                plsDie = true;
+                b.isRun = false;
+                Thread.Sleep(100);
+            }
+            if (plsDie)
+            {
+                plsDie = false;
+                return;
+            }
 
-                if (olvs.Length > 0)
+            Stopwatch buildTime = Stopwatch.StartNew();
+            currentBuild = b;
+
+            ListViewItem[] olvs = null;
+            Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
+
+            if (olvs.Length > 0)
+            {
+                var olv = olvs.First();
+                Loadout ob = (Loadout)olv.Tag;
+                foreach (Rune r in ob.Runes)
                 {
-                    var olv = olvs.First();
-                    Loadout ob = (Loadout)olv.Tag;
-                    foreach (Rune r in ob.Runes)
+                    r.Locked = false;
+                }
+            }
+
+            b.GenRunes(data, false, useEquipped, saveStats);
+            b.shrines = data.shrines;
+
+            #region Check enough runes
+            string nR = "";
+            for (int i = 0; i < b.runes.Length; i++)
+            {
+                if (b.runes[i] != null && b.runes[i].Length == 0)
+                    nR += (i + 1) + " ";
+            }
+
+            if (nR != "")
+            {
+                printTo?.Invoke(":( " + nR + "Runes");
+                return;
+            }
+            #endregion
+
+            isRunning = true;
+
+            b.GenBuilds(0, 0, (str) =>
+            {
+                if (!IsDisposed && IsHandleCreated)
+                {
+                    printTo?.Invoke(str);
+                }
+            }, null, true, saveStats);
+
+            #region Save null build
+            if (b.Best == null)
+            {
+                Invoke((MethodInvoker)delegate
+                {
+                    if (saveStats)
                     {
-                        r.Locked = false;
+                        if (StatsExcelBind(true))
+                        {
+                            StatsExcelBuild(b, b.mon, null);
+                            StatsExcelSave();
+                        }
+                        StatsExcelBind(true);
                     }
-                }
+                });
+                return;
+            }
+            #endregion
 
-                b.GenRunes(data, false, useEquipped, saveStats);
-                b.shrines = data.shrines;
+            b.Best.Current.BuildID = b.ID;
+            builds.Add(b);
 
-                string nR = "";
-
-                for (int i = 0; i < b.runes.Length; i++)
+            #region Get the rune diff
+            int numchanged = 0;
+            int numnew = 0;
+            int powerup = 0;
+            int upgrades = 0;
+            foreach (Rune r in b.Best.Current.Runes)
+            {
+                r.Locked = true;
+                if (r.AssignedName != b.Best.Name)
                 {
-                    if (b.runes[i] != null && b.runes[i].Length == 0)
-                        nR += (i + 1) + " ";
+                    if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
+                        numnew++;
+                    else
+                        numchanged++;
                 }
-
-                if (nR != "")
+                powerup += Math.Max(0, b.Best.Current.FakeLevel[r.Slot - 1] - r.Level);
+                if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
                 {
-                    Invoke((MethodInvoker)delegate
-                    {
-                        pli.SubItems[3].Text = ":( " + nR + "Runes";
-                    });
+                    int tup = (int)Math.Floor(Math.Min(12, b.Best.Current.FakeLevel[r.Slot - 1]) / (double)3);
+                    int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
+                    upgrades += Math.Max(0, tup - cup);
+                }
+            }
+            #endregion
+
+            currentBuild = null;
+            b.Time = buildTime.ElapsedMilliseconds;
+            buildTime.Stop();
+
+            Invoke((MethodInvoker)delegate
+            {
+                checkLocked();
+
+                ListViewItem nli;
+
+                var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
+
+                if (lvs.Length == 0)
+                    nli = new ListViewItem();
+                else
+                    nli = lvs.First();
+
+                b.Best.Current.Time = b.Time;
+
+                nli.Tag = b.Best.Current;
+                nli.Text = b.ID.ToString();
+                nli.Name = b.ID.ToString();
+                while (nli.SubItems.Count < 6)
+                    nli.SubItems.Add("");
+                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
+                nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
+                nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
+                nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                if (numnew > 0 && b.mon.Current.RuneCount < 6)
+                    nli.SubItems[3].ForeColor = Color.Green;
+                if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                {
+                    bool check = false;
+                    bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
+                    if (check)
+                        nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
+                }
+                nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
+                nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
+                nli.UseItemStyleForSubItems = false;
+                if (b.Time / (double)1000 > 60)
+                    nli.SubItems[5].BackColor = Color.Red;
+                else if (b.Time / (double)1000 > 20)
+                    nli.SubItems[5].BackColor = Color.Orange;
+
+                if (lvs.Length == 0)
+                    loadoutList.Items.Add(nli);
+            });
+
+            // if we are on the hunt of good runes.
+            if (goodRunes && saveStats)
+            {
+                var theBest = b.Best;
+                int count = 0;
+                // we must progressively ban more runes from the build to find second-place runes.
+                GenDeep(b, 0, printTo, ref count);
+
+                // after messing all that shit up
+                b.Best = theBest;
+            }
+
+            #region Save Build stats
+
+            if (saveStats)
+            {
+                if (StatsExcelBind(true))
+                {
+                    StatsExcelBuild(b, b.mon, b.Best.Current);
+                    StatsExcelSave();
+                }
+                StatsExcelBind(true);
+            }
+
+            // clean up for GC
+            if (b.buildUsage != null)
+                b.buildUsage.loads.Clear();
+            if (b.runeUsage != null)
+            {
+                b.runeUsage.runesGood.Clear();
+                b.runeUsage.runesUsed.Clear();
+            }
+            b.runeUsage = null;
+            b.buildUsage = null;
+
+            #endregion
+
+            if (plsDie)
+                printTo?.Invoke("Canned");
+            else
+                printTo?.Invoke("Done");
+
+            isRunning = false;
+        }
+
+        private void GenDeep(Build b, int slot0, Action<string> printTo, ref int count, params int[] doneIds)
+        {
+            if (plsDie)
+                return;
+
+            if (doneIds == null)
+                doneIds = new int[] { };
+
+            for (int i = slot0; i < 6; i++)
+            {
+                if (plsDie)
                     return;
-                }
+
+                count++;
+                var c = count;
+                Rune r = b.Best.Current.Runes[i];
+                doneIds = doneIds.Concat(new int[]{ r.ID}).ToArray();
+                b.BanEmTemp(doneIds);
+
+                b.GenRunes(data, false, useEquipped, true, goodRunes);
 
                 b.GenBuilds(0, 0, (str) =>
                 {
                     if (!IsDisposed && IsHandleCreated)
                     {
-                        Invoke((MethodInvoker)delegate
-                        {
-                            pli.SubItems[3].Text = str;
-                        });
+                        printTo?.Invoke(c + " " + str);
                     }
-                }, null, true, saveStats);
+                }, null, true, true, goodRunes);
 
-                if (b.Best == null)
+                for (int j = i + 1; j < 6; j++)
                 {
-                    Invoke((MethodInvoker)delegate
-                    {
-                        if (saveStats)
-                        {
-                            if (StatsExcelBind(true))
-                            {
-                                StatsExcelBuild(b, b.mon, null);
-                                StatsExcelSave();
-                            }
-                            StatsExcelBind(true);
-                        }
-                    });
-                    return;
+                    if (plsDie)
+                        return;
+                    GenDeep(b, j, printTo, ref count, doneIds);
                 }
-
-                b.Best.Current.BuildID = b.ID;
-                builds.Add(b);
-
-                int numchanged = 0;
-                int numnew = 0;
-                int powerup = 0;
-                int upgrades = 0;
-                foreach (Rune r in b.Best.Current.Runes)
-                {
-                    r.Locked = true;
-                    if (r.AssignedName != b.Best.Name)
-                    {
-                        if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
-                            numnew++;
-                        else
-                            numchanged++;
-                    }
-                    powerup += Math.Max(0, b.Best.Current.FakeLevel[r.Slot - 1] - r.Level);
-                    if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
-                    {
-                        int tup = (int)Math.Floor(Math.Min(12, b.Best.Current.FakeLevel[r.Slot - 1]) / (double)3);
-                        int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
-                        upgrades += Math.Max(0, tup - cup);
-                    }
-                }
-                currentBuild = null;
-                b.Time = buildTime.ElapsedMilliseconds;
-                buildTime.Stop();
-
-                Invoke((MethodInvoker)delegate
-                {
-                    checkLocked();
-
-                    if (saveStats)
-                    {
-                        if (StatsExcelBind(true))
-                        {
-                            StatsExcelBuild(b, b.mon, b.Best.Current);
-                            StatsExcelSave();
-                        }
-                        StatsExcelBind(true);
-                    }
-                    if (b.buildUsage != null)
-                        b.buildUsage.loads.Clear();
-                    if (b.runeUsage != null)
-                    {
-                        b.runeUsage.runesGood.Clear();
-                        b.runeUsage.runesUsed.Clear();
-                    }
-                    b.runeUsage = null;
-                    b.buildUsage = null;
-
-
-                    ListViewItem nli;
-
-                    var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
-
-                    if (lvs.Length == 0)
-                        nli = new ListViewItem();
-                    else
-                        nli = lvs.First();
-
-                    b.Best.Current.Time = b.Time;
-
-                    nli.Tag = b.Best.Current;
-                    nli.Text = b.ID.ToString();
-                    nli.Name = b.ID.ToString();
-                    while (nli.SubItems.Count < 6)
-                        nli.SubItems.Add("");
-                    nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
-                    nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
-                    nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
-                    nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
-                    if (numnew > 0 && b.mon.Current.RuneCount < 6)
-                        nli.SubItems[3].ForeColor = Color.Green;
-                    if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
-                    {
-                        bool check = false;
-                        bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
-                        if (check)
-                            nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
-                    }
-                    nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
-                    nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
-                    nli.UseItemStyleForSubItems = false;
-                    if (b.Time / (double)1000 > 60)
-                        nli.SubItems[5].BackColor = Color.Red;
-                    else if (b.Time / (double)1000 > 20)
-                        nli.SubItems[5].BackColor = Color.Orange;
-
-                    if (lvs.Length == 0)
-                        loadoutList.Items.Add(nli);
-
-                });
-
             }
-
         }
 
         private void SaveBuilds(string fname = "builds.json")
@@ -1822,6 +1890,7 @@ namespace RuneApp
                     }
                 }
 
+#warning consider making it nicer by using the List<Build>
                 foreach (ListViewItem li in list5)
                 {
                     RunBuild(li, makeStats);
@@ -2065,14 +2134,14 @@ namespace RuneApp
             ws.Cells[row, 3].Value = build.buildUsage.passed;
 
             if (build.buildUsage != null && build.buildUsage.loads != null)
-                build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => Build.sort(build, m.GetStats())).ToList();
+                build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => build.sort(m.GetStats())).ToList();
 
             double scoreav = 0;
             int c = 0;
             Stats minav = new Stats();
             foreach (var b in build.buildUsage.loads)
             {
-                double sc = Build.sort(build, b.GetStats());
+                double sc = build.sort(b.GetStats());
                 b.score = sc;
                 scoreav += sc;
                 minav += b.GetStats();
@@ -2643,6 +2712,12 @@ namespace RuneApp
             var good = build.runeUsage.runesGood.Select(r => r.Key);
             var goodSlot = good.Where(r => aslot(r.Slot));
 
+            var okay = build.runeUsage.runesOkay.Select(r => r.Key);
+            var okaySlot = okay.Where(r => aslot(r.Slot));
+            var second = build.runeUsage.runesSecond.Select(r => r.Key);
+            var secondSlot = second.Where(r => aslot(r.Slot));
+
+
             foreach (var r in usedSlot)
             {
                 r.manageStats["buildScore"] = build.ScoreRune(r, build.GetPredict(r), false);
@@ -2655,6 +2730,11 @@ namespace RuneApp
 
             foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.manageStats["buildScore"]))
             {
+                if (secondSlot.Contains(r))
+                {
+                    ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
+                }
                 ws.Cells[row, col].Value = r.manageStats["buildScore"];
                 row++;
                 ws.Cells[row, col].Value = r.Set.ToString();
@@ -3102,6 +3182,17 @@ namespace RuneApp
             }
             if (displayMon != null)
                 runeDial.UpdateLoad(displayMon.Current);
+        }
+
+        private void findGoodRunes_CheckedChanged(object sender, EventArgs e)
+        {
+            if (findGoodRunes.Checked && MessageBox.Show("This runs each test multiple times.\r\nThat means leaving it overnight or something.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK)
+            {
+                goodRunes = true;
+            }
+            else
+                findGoodRunes.Checked = false;
+            goodRunes = findGoodRunes.Checked;
         }
     }
 

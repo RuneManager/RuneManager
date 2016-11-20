@@ -107,18 +107,6 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.runeBuild = new System.Windows.Forms.GroupBox();
-            this.SRuneLevel = new System.Windows.Forms.Label();
-            this.SRuneMon = new System.Windows.Forms.Label();
-            this.button2 = new System.Windows.Forms.Button();
-            this.hideBuildRune = new System.Windows.Forms.Label();
-            this.runeShown = new RuneApp.RuneControl();
-            this.SRuneSub4 = new System.Windows.Forms.Label();
-            this.SRuneSub3 = new System.Windows.Forms.Label();
-            this.SRuneSub2 = new System.Windows.Forms.Label();
-            this.SRuneSub1 = new System.Windows.Forms.Label();
-            this.SRuneInnate = new System.Windows.Forms.Label();
-            this.SRuneMain = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabMonsters = new System.Windows.Forms.TabPage();
             this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -144,18 +132,6 @@
             this.buildID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
-            this.runeBox = new System.Windows.Forms.GroupBox();
-            this.IRuneLevel = new System.Windows.Forms.Label();
-            this.IRuneMon = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.hideBoxRune = new System.Windows.Forms.Label();
-            this.runeInventory = new RuneApp.RuneControl();
-            this.IRuneSub4 = new System.Windows.Forms.Label();
-            this.IRuneSub3 = new System.Windows.Forms.Label();
-            this.IRuneSub2 = new System.Windows.Forms.Label();
-            this.IRuneSub1 = new System.Windows.Forms.Label();
-            this.IRuneInnate = new System.Windows.Forms.Label();
-            this.IRuneMain = new System.Windows.Forms.Label();
             this.loadoutList = new System.Windows.Forms.ListView();
             this.buildIDCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buildNameCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -202,11 +178,15 @@
             this.updateCurrent = new System.Windows.Forms.Label();
             this.menu_buildlist = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.teamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.runeEquipped = new RuneApp.RuneBox();
+            this.lbCloseEquipped = new System.Windows.Forms.Label();
+            this.runeInventory = new RuneApp.RuneBox();
+            this.lbCloseInventory = new System.Windows.Forms.Label();
+            this.findGoodRunes = new System.Windows.Forms.CheckBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.runeBuild.SuspendLayout();
             this.tabControl1.SuspendLayout();
             this.tabMonsters.SuspendLayout();
             this.toolStrip2.SuspendLayout();
@@ -214,7 +194,6 @@
             this.toolStrip3.SuspendLayout();
             this.tabBuilds.SuspendLayout();
             this.toolStrip5.SuspendLayout();
-            this.runeBox.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.toolStrip4.SuspendLayout();
             this.groupBox3.SuspendLayout();
@@ -229,6 +208,8 @@
             this.splitContainer2.SuspendLayout();
             this.updateBox.SuspendLayout();
             this.menu_buildlist.SuspendLayout();
+            this.runeEquipped.SuspendLayout();
+            this.runeInventory.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataMonsterList
@@ -1082,152 +1063,6 @@
             this.pictureBox1.TabStop = false;
             this.pictureBox1.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
             // 
-            // runeBuild
-            // 
-            this.runeBuild.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.runeBuild.Controls.Add(this.SRuneLevel);
-            this.runeBuild.Controls.Add(this.SRuneMon);
-            this.runeBuild.Controls.Add(this.button2);
-            this.runeBuild.Controls.Add(this.hideBuildRune);
-            this.runeBuild.Controls.Add(this.runeShown);
-            this.runeBuild.Controls.Add(this.SRuneSub4);
-            this.runeBuild.Controls.Add(this.SRuneSub3);
-            this.runeBuild.Controls.Add(this.SRuneSub2);
-            this.runeBuild.Controls.Add(this.SRuneSub1);
-            this.runeBuild.Controls.Add(this.SRuneInnate);
-            this.runeBuild.Controls.Add(this.SRuneMain);
-            this.runeBuild.Location = new System.Drawing.Point(884, 294);
-            this.runeBuild.Margin = new System.Windows.Forms.Padding(2);
-            this.runeBuild.Name = "runeBuild";
-            this.runeBuild.Padding = new System.Windows.Forms.Padding(2);
-            this.runeBuild.Size = new System.Drawing.Size(217, 179);
-            this.runeBuild.TabIndex = 9;
-            this.runeBuild.TabStop = false;
-            this.runeBuild.Text = "Rune";
-            this.runeBuild.Visible = false;
-            // 
-            // SRuneLevel
-            // 
-            this.SRuneLevel.AutoSize = true;
-            this.SRuneLevel.Location = new System.Drawing.Point(69, 52);
-            this.SRuneLevel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneLevel.Name = "SRuneLevel";
-            this.SRuneLevel.Size = new System.Drawing.Size(21, 13);
-            this.SRuneLevel.TabIndex = 20;
-            this.SRuneLevel.Text = "Lvl";
-            // 
-            // SRuneMon
-            // 
-            this.SRuneMon.AutoSize = true;
-            this.SRuneMon.Location = new System.Drawing.Point(4, 159);
-            this.SRuneMon.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneMon.Name = "SRuneMon";
-            this.SRuneMon.Size = new System.Drawing.Size(52, 13);
-            this.SRuneMon.TabIndex = 19;
-            this.SRuneMon.Text = "Equipped";
-            // 
-            // button2
-            // 
-            this.button2.Location = new System.Drawing.Point(130, 156);
-            this.button2.Margin = new System.Windows.Forms.Padding(2);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(56, 19);
-            this.button2.TabIndex = 18;
-            this.button2.Text = "Find Slot";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // hideBuildRune
-            // 
-            this.hideBuildRune.AutoSize = true;
-            this.hideBuildRune.Location = new System.Drawing.Point(199, 15);
-            this.hideBuildRune.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.hideBuildRune.Name = "hideBuildRune";
-            this.hideBuildRune.Size = new System.Drawing.Size(14, 13);
-            this.hideBuildRune.TabIndex = 10;
-            this.hideBuildRune.Text = "X";
-            this.hideBuildRune.Click += new System.EventHandler(this.label8_Click);
-            // 
-            // runeShown
-            // 
-            this.runeShown.BackColor = System.Drawing.Color.Transparent;
-            this.runeShown.BackImage = global::RuneApp.Runes.bg_normal;
-            this.runeShown.Coolness = 0;
-            this.runeShown.Gamma = 1F;
-            this.runeShown.Grade = 2;
-            this.runeShown.Location = new System.Drawing.Point(4, 17);
-            this.runeShown.Margin = new System.Windows.Forms.Padding(2);
-            this.runeShown.Name = "runeShown";
-            this.runeShown.SetImage = global::RuneApp.Runes.despair;
-            this.runeShown.ShowBack = true;
-            this.runeShown.ShowStars = true;
-            this.runeShown.Size = new System.Drawing.Size(58, 58);
-            this.runeShown.SlotImage = global::RuneApp.Runes.rune2;
-            this.runeShown.StarImage = global::RuneApp.Runes.star_unawakened;
-            this.runeShown.TabIndex = 11;
-            this.runeShown.Text = "runeControl2";
-            // 
-            // SRuneSub4
-            // 
-            this.SRuneSub4.AutoSize = true;
-            this.SRuneSub4.Location = new System.Drawing.Point(4, 119);
-            this.SRuneSub4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneSub4.Name = "SRuneSub4";
-            this.SRuneSub4.Size = new System.Drawing.Size(32, 13);
-            this.SRuneSub4.TabIndex = 17;
-            this.SRuneSub4.Text = "Sub4";
-            // 
-            // SRuneSub3
-            // 
-            this.SRuneSub3.AutoSize = true;
-            this.SRuneSub3.Location = new System.Drawing.Point(4, 105);
-            this.SRuneSub3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneSub3.Name = "SRuneSub3";
-            this.SRuneSub3.Size = new System.Drawing.Size(32, 13);
-            this.SRuneSub3.TabIndex = 16;
-            this.SRuneSub3.Text = "Sub3";
-            // 
-            // SRuneSub2
-            // 
-            this.SRuneSub2.AutoSize = true;
-            this.SRuneSub2.Location = new System.Drawing.Point(4, 91);
-            this.SRuneSub2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneSub2.Name = "SRuneSub2";
-            this.SRuneSub2.Size = new System.Drawing.Size(32, 13);
-            this.SRuneSub2.TabIndex = 15;
-            this.SRuneSub2.Text = "Sub2";
-            // 
-            // SRuneSub1
-            // 
-            this.SRuneSub1.AutoSize = true;
-            this.SRuneSub1.Location = new System.Drawing.Point(4, 77);
-            this.SRuneSub1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneSub1.Name = "SRuneSub1";
-            this.SRuneSub1.Size = new System.Drawing.Size(32, 13);
-            this.SRuneSub1.TabIndex = 14;
-            this.SRuneSub1.Text = "Sub1";
-            // 
-            // SRuneInnate
-            // 
-            this.SRuneInnate.AutoSize = true;
-            this.SRuneInnate.Location = new System.Drawing.Point(69, 37);
-            this.SRuneInnate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneInnate.Name = "SRuneInnate";
-            this.SRuneInnate.Size = new System.Drawing.Size(37, 13);
-            this.SRuneInnate.TabIndex = 13;
-            this.SRuneInnate.Text = "Innate";
-            // 
-            // SRuneMain
-            // 
-            this.SRuneMain.AutoSize = true;
-            this.SRuneMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.SRuneMain.Location = new System.Drawing.Point(69, 17);
-            this.SRuneMain.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.SRuneMain.Name = "SRuneMain";
-            this.SRuneMain.Size = new System.Drawing.Size(40, 18);
-            this.SRuneMain.TabIndex = 12;
-            this.SRuneMain.Text = "Main";
-            // 
             // tabControl1
             // 
             this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1487,151 +1322,6 @@
             this.toolStripButton5.Name = "toolStripButton5";
             this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton5.Text = "Use Build";
-            // 
-            // runeBox
-            // 
-            this.runeBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.runeBox.Controls.Add(this.IRuneLevel);
-            this.runeBox.Controls.Add(this.IRuneMon);
-            this.runeBox.Controls.Add(this.button3);
-            this.runeBox.Controls.Add(this.hideBoxRune);
-            this.runeBox.Controls.Add(this.runeInventory);
-            this.runeBox.Controls.Add(this.IRuneSub4);
-            this.runeBox.Controls.Add(this.IRuneSub3);
-            this.runeBox.Controls.Add(this.IRuneSub2);
-            this.runeBox.Controls.Add(this.IRuneSub1);
-            this.runeBox.Controls.Add(this.IRuneInnate);
-            this.runeBox.Controls.Add(this.IRuneMain);
-            this.runeBox.Location = new System.Drawing.Point(884, 124);
-            this.runeBox.Margin = new System.Windows.Forms.Padding(2);
-            this.runeBox.Name = "runeBox";
-            this.runeBox.Padding = new System.Windows.Forms.Padding(2);
-            this.runeBox.Size = new System.Drawing.Size(217, 166);
-            this.runeBox.TabIndex = 11;
-            this.runeBox.TabStop = false;
-            this.runeBox.Text = "Rune";
-            this.runeBox.Visible = false;
-            // 
-            // IRuneLevel
-            // 
-            this.IRuneLevel.AutoSize = true;
-            this.IRuneLevel.Location = new System.Drawing.Point(69, 50);
-            this.IRuneLevel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneLevel.Name = "IRuneLevel";
-            this.IRuneLevel.Size = new System.Drawing.Size(21, 13);
-            this.IRuneLevel.TabIndex = 21;
-            this.IRuneLevel.Text = "Lvl";
-            // 
-            // IRuneMon
-            // 
-            this.IRuneMon.AutoSize = true;
-            this.IRuneMon.Location = new System.Drawing.Point(4, 145);
-            this.IRuneMon.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneMon.Name = "IRuneMon";
-            this.IRuneMon.Size = new System.Drawing.Size(52, 13);
-            this.IRuneMon.TabIndex = 20;
-            this.IRuneMon.Text = "Equipped";
-            // 
-            // button3
-            // 
-            this.button3.Location = new System.Drawing.Point(130, 127);
-            this.button3.Margin = new System.Windows.Forms.Padding(2);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(56, 19);
-            this.button3.TabIndex = 19;
-            this.button3.Text = "Equip";
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // hideBoxRune
-            // 
-            this.hideBoxRune.AutoSize = true;
-            this.hideBoxRune.Location = new System.Drawing.Point(199, 15);
-            this.hideBoxRune.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.hideBoxRune.Name = "hideBoxRune";
-            this.hideBoxRune.Size = new System.Drawing.Size(14, 13);
-            this.hideBoxRune.TabIndex = 10;
-            this.hideBoxRune.Text = "X";
-            this.hideBoxRune.Click += new System.EventHandler(this.label8_Click_1);
-            // 
-            // runeInventory
-            // 
-            this.runeInventory.BackColor = System.Drawing.Color.Transparent;
-            this.runeInventory.BackImage = global::RuneApp.Runes.bg_normal;
-            this.runeInventory.Coolness = 0;
-            this.runeInventory.Gamma = 1F;
-            this.runeInventory.Grade = 2;
-            this.runeInventory.Location = new System.Drawing.Point(4, 17);
-            this.runeInventory.Margin = new System.Windows.Forms.Padding(2);
-            this.runeInventory.Name = "runeInventory";
-            this.runeInventory.SetImage = global::RuneApp.Runes.despair;
-            this.runeInventory.ShowBack = true;
-            this.runeInventory.ShowStars = true;
-            this.runeInventory.Size = new System.Drawing.Size(58, 58);
-            this.runeInventory.SlotImage = global::RuneApp.Runes.rune2;
-            this.runeInventory.StarImage = global::RuneApp.Runes.star_unawakened;
-            this.runeInventory.TabIndex = 11;
-            this.runeInventory.Text = "runeControl2";
-            // 
-            // IRuneSub4
-            // 
-            this.IRuneSub4.AutoSize = true;
-            this.IRuneSub4.Location = new System.Drawing.Point(4, 119);
-            this.IRuneSub4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub4.Name = "IRuneSub4";
-            this.IRuneSub4.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub4.TabIndex = 17;
-            this.IRuneSub4.Text = "Sub4";
-            // 
-            // IRuneSub3
-            // 
-            this.IRuneSub3.AutoSize = true;
-            this.IRuneSub3.Location = new System.Drawing.Point(4, 105);
-            this.IRuneSub3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub3.Name = "IRuneSub3";
-            this.IRuneSub3.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub3.TabIndex = 16;
-            this.IRuneSub3.Text = "Sub3";
-            // 
-            // IRuneSub2
-            // 
-            this.IRuneSub2.AutoSize = true;
-            this.IRuneSub2.Location = new System.Drawing.Point(4, 91);
-            this.IRuneSub2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub2.Name = "IRuneSub2";
-            this.IRuneSub2.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub2.TabIndex = 15;
-            this.IRuneSub2.Text = "Sub2";
-            // 
-            // IRuneSub1
-            // 
-            this.IRuneSub1.AutoSize = true;
-            this.IRuneSub1.Location = new System.Drawing.Point(4, 77);
-            this.IRuneSub1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub1.Name = "IRuneSub1";
-            this.IRuneSub1.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub1.TabIndex = 14;
-            this.IRuneSub1.Text = "Sub1";
-            // 
-            // IRuneInnate
-            // 
-            this.IRuneInnate.AutoSize = true;
-            this.IRuneInnate.Location = new System.Drawing.Point(69, 37);
-            this.IRuneInnate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneInnate.Name = "IRuneInnate";
-            this.IRuneInnate.Size = new System.Drawing.Size(37, 13);
-            this.IRuneInnate.TabIndex = 13;
-            this.IRuneInnate.Text = "Innate";
-            // 
-            // IRuneMain
-            // 
-            this.IRuneMain.AutoSize = true;
-            this.IRuneMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IRuneMain.Location = new System.Drawing.Point(69, 17);
-            this.IRuneMain.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneMain.Name = "IRuneMain";
-            this.IRuneMain.Size = new System.Drawing.Size(40, 18);
-            this.IRuneMain.TabIndex = 12;
-            this.IRuneMain.Text = "Main";
             // 
             // loadoutList
             // 
@@ -2015,13 +1705,13 @@
             // 
             this.useRunesCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.useRunesCheck.AutoSize = true;
-            this.useRunesCheck.Location = new System.Drawing.Point(891, 66);
+            this.useRunesCheck.Location = new System.Drawing.Point(894, 66);
             this.useRunesCheck.Name = "useRunesCheck";
             this.useRunesCheck.Size = new System.Drawing.Size(127, 17);
             this.useRunesCheck.TabIndex = 18;
             this.useRunesCheck.Text = "Use Equipped Runes";
             this.useRunesCheck.UseVisualStyleBackColor = true;
-            this.useRunesCheck.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.useRunesCheck.CheckedChanged += new System.EventHandler(this.useRunesCheck_CheckedChanged);
             // 
             // updateBox
             // 
@@ -2103,16 +1793,72 @@
             this.teamToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
             this.teamToolStripMenuItem.Text = "Team";
             // 
+            // runeEquipped
+            // 
+            this.runeEquipped.Controls.Add(this.lbCloseEquipped);
+            this.runeEquipped.Location = new System.Drawing.Point(885, 320);
+            this.runeEquipped.Name = "runeEquipped";
+            this.runeEquipped.Size = new System.Drawing.Size(215, 179);
+            this.runeEquipped.TabIndex = 20;
+            this.runeEquipped.TabStop = false;
+            this.runeEquipped.Text = "Equipped";
+            this.runeEquipped.Visible = false;
+            // 
+            // lbCloseEquipped
+            // 
+            this.lbCloseEquipped.AutoSize = true;
+            this.lbCloseEquipped.Location = new System.Drawing.Point(197, 16);
+            this.lbCloseEquipped.Name = "lbCloseEquipped";
+            this.lbCloseEquipped.Size = new System.Drawing.Size(14, 13);
+            this.lbCloseEquipped.TabIndex = 21;
+            this.lbCloseEquipped.Text = "X";
+            this.lbCloseEquipped.Click += new System.EventHandler(this.lbCloseEquipped_Click);
+            // 
+            // runeInventory
+            // 
+            this.runeInventory.Controls.Add(this.lbCloseInventory);
+            this.runeInventory.Location = new System.Drawing.Point(885, 135);
+            this.runeInventory.Name = "runeInventory";
+            this.runeInventory.Size = new System.Drawing.Size(215, 179);
+            this.runeInventory.TabIndex = 20;
+            this.runeInventory.TabStop = false;
+            this.runeInventory.Text = "Inventory";
+            this.runeInventory.Visible = false;
+            // 
+            // lbCloseInventory
+            // 
+            this.lbCloseInventory.AutoSize = true;
+            this.lbCloseInventory.Location = new System.Drawing.Point(195, 16);
+            this.lbCloseInventory.Name = "lbCloseInventory";
+            this.lbCloseInventory.Size = new System.Drawing.Size(14, 13);
+            this.lbCloseInventory.TabIndex = 21;
+            this.lbCloseInventory.Text = "X";
+            this.lbCloseInventory.Click += new System.EventHandler(this.lbCloseInventory_Click);
+            // 
+            // findGoodRunes
+            // 
+            this.findGoodRunes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.findGoodRunes.AutoSize = true;
+            this.findGoodRunes.Enabled = false;
+            this.findGoodRunes.Location = new System.Drawing.Point(894, 89);
+            this.findGoodRunes.Name = "findGoodRunes";
+            this.findGoodRunes.Size = new System.Drawing.Size(109, 17);
+            this.findGoodRunes.TabIndex = 18;
+            this.findGoodRunes.Text = "Find Good Runes";
+            this.findGoodRunes.UseVisualStyleBackColor = true;
+            this.findGoodRunes.CheckedChanged += new System.EventHandler(this.findGoodRunes_CheckedChanged);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1350, 730);
+            this.Controls.Add(this.runeInventory);
+            this.Controls.Add(this.runeEquipped);
             this.Controls.Add(this.updateBox);
+            this.Controls.Add(this.findGoodRunes);
             this.Controls.Add(this.useRunesCheck);
             this.Controls.Add(this.splitContainer2);
-            this.Controls.Add(this.runeBox);
-            this.Controls.Add(this.runeBuild);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.statusStrip1);
@@ -2131,8 +1877,6 @@
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.runeBuild.ResumeLayout(false);
-            this.runeBuild.PerformLayout();
             this.tabControl1.ResumeLayout(false);
             this.tabMonsters.ResumeLayout(false);
             this.tabMonsters.PerformLayout();
@@ -2146,8 +1890,6 @@
             this.tabBuilds.PerformLayout();
             this.toolStrip5.ResumeLayout(false);
             this.toolStrip5.PerformLayout();
-            this.runeBox.ResumeLayout(false);
-            this.runeBox.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.toolStrip4.ResumeLayout(false);
@@ -2167,6 +1909,10 @@
             this.updateBox.ResumeLayout(false);
             this.updateBox.PerformLayout();
             this.menu_buildlist.ResumeLayout(false);
+            this.runeEquipped.ResumeLayout(false);
+            this.runeEquipped.PerformLayout();
+            this.runeInventory.ResumeLayout(false);
+            this.runeInventory.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -2224,21 +1970,12 @@
         private System.Windows.Forms.Label Set2Label;
         private System.Windows.Forms.Label Set1Label;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.GroupBox runeBuild;
-        private System.Windows.Forms.Label SRuneSub3;
-        private System.Windows.Forms.Label SRuneSub2;
-        private System.Windows.Forms.Label SRuneSub1;
-        private System.Windows.Forms.Label SRuneInnate;
-        private System.Windows.Forms.Label SRuneMain;
-        private System.Windows.Forms.Label SRuneSub4;
-        private RuneControl runeShown;
         private RuneControl runeControl1;
         private RuneControl runeControl6;
         private RuneControl runeControl5;
         private RuneControl runeControl4;
         private RuneControl runeControl3;
         private RuneControl runeControl2;
-        private System.Windows.Forms.Label hideBuildRune;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabMonsters;
         private System.Windows.Forms.TabPage tabRunes;
@@ -2247,23 +1984,12 @@
         private System.Windows.Forms.ColumnHeader runesID;
         private System.Windows.Forms.ColumnHeader runesGrade;
         private System.Windows.Forms.ColumnHeader runesMType;
-        private System.Windows.Forms.GroupBox runeBox;
-        private System.Windows.Forms.Label hideBoxRune;
-        private RuneControl runeInventory;
-        private System.Windows.Forms.Label IRuneSub4;
-        private System.Windows.Forms.Label IRuneSub3;
-        private System.Windows.Forms.Label IRuneSub2;
-        private System.Windows.Forms.Label IRuneSub1;
-        private System.Windows.Forms.Label IRuneInnate;
-        private System.Windows.Forms.Label IRuneMain;
         private System.Windows.Forms.ColumnHeader runesMValue;
         private System.Windows.Forms.ToolStrip toolStrip2;
         private System.Windows.Forms.ToolStripButton toolStripButton1;
         private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.ToolStrip toolStrip3;
         private System.Windows.Forms.ToolStripButton RuneTab_UnfilterButton;
-        private System.Windows.Forms.Button button3;
         private System.Windows.Forms.ListView loadoutList;
         private System.Windows.Forms.TabPage tabBuilds;
         private System.Windows.Forms.GroupBox groupBox2;
@@ -2297,8 +2023,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButton11;
         private System.Windows.Forms.ToolStripButton toolStripButton12;
 		private System.Windows.Forms.ToolStripButton toolStripButton13;
-        private System.Windows.Forms.Label SRuneMon;
-        private System.Windows.Forms.Label SRuneLevel;
         private System.Windows.Forms.ToolStripButton toolStripButton14;
         private System.Windows.Forms.ToolStripButton toolStripButton15;
         private System.Windows.Forms.ToolStripButton toolStripButton16;
@@ -2317,7 +2041,6 @@
 		private System.Windows.Forms.ColumnHeader buildTimeCol;
         private System.Windows.Forms.ToolStripMenuItem shrinesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem speedToolStripMenuItem;
-        private System.Windows.Forms.Label IRuneMon;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkForUpdatesToolStripMenuItem;
@@ -2330,7 +2053,6 @@
         private System.Windows.Forms.ToolStripButton toolStripButton3;
         private System.Windows.Forms.ToolStripButton build_btn_resume;
         private System.Windows.Forms.ToolStripButton build_btn_upto;
-        private System.Windows.Forms.Label IRuneLevel;
         private System.Windows.Forms.ColumnHeader columnHeader5;
         private System.Windows.Forms.ToolStripMenuItem attackToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem healthToolStripMenuItem;
@@ -2347,6 +2069,11 @@
         private System.Windows.Forms.ColumnHeader columnHeader6;
         private System.Windows.Forms.ToolStripButton toolStripButton18;
         private System.Windows.Forms.ToolStripButton toolStripButton19;
+        private RuneBox runeEquipped;
+        private RuneBox runeInventory;
+        private System.Windows.Forms.Label lbCloseEquipped;
+        private System.Windows.Forms.Label lbCloseInventory;
+        private System.Windows.Forms.CheckBox findGoodRunes;
     }
 }
 
