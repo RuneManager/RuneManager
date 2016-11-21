@@ -529,7 +529,11 @@ namespace RuneOptim
 
                                         test.ApplyRune(r5, 6);
 
-                                        var cstats = test.GetStats();
+										bool isBad = false;
+										//if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
+										//	isBad = false;
+
+										var cstats = test.GetStats();
 
                                         bool maxdead = false;
 
@@ -544,11 +548,7 @@ namespace RuneOptim
                                                 }
                                             }
                                         }
-
-                                        bool isBad = false;
-                                        //if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
-                                        //    isBad = false;
-
+                                        
                                         // check if build meets minimum
                                         isBad |= (Minimum != null && !(cstats > Minimum));
                                         isBad |= (maxdead);
