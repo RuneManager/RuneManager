@@ -102,6 +102,10 @@ namespace RuneOptim
             }
         }
 
+        public Loadout()
+        {
+        }
+
         public Loadout(Loadout rhs = null)
         {
             if (rhs != null)

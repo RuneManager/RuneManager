@@ -1360,9 +1360,12 @@ namespace RuneApp
                 }
 
                 int id = b.ID;
-                if (b.ID == 0)
+                if (b.ID == 0 || builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID))
                 {
-                    id = buildList.Items.Count + 1;
+                    //id = buildList.Items.Count + 1;
+                    id = 1;
+                    while (builds.Any(bu => bu.ID == id))
+                        id++;
                     b.ID = id;
                 }
                 b.priority = current_pri++;
@@ -2279,7 +2282,7 @@ namespace RuneApp
             col = 5;
             row = trow;
 
-            foreach (var b in build.buildUsage.loads.Take(300))
+            foreach (var b in build.buildUsage.loads.Take(20))
             {
                 row = trow;
                 ws.Cells[row, col].Value = b.score;// Build.sort(build, b.GetStats());
@@ -2307,6 +2310,8 @@ namespace RuneApp
             row++;
             col = 1;
 
+            StatsExcelRuneBoard(ws, ref row, ref col, build, load);
+            /*
             ws.Cells[row, 2].Value = "Good Av";
             ws.Cells[row, 3].Value = "Bad Av";
             ws.Cells[row, 4].Value = "Good Mult";
@@ -2322,8 +2327,342 @@ namespace RuneApp
             {
                 StatsExcelRune(ws, ref row, ref col, slot, build, load);
                 row++;
-            }
+            }*/
+
             Console.WriteLine("Finished Writing");
+        }
+
+        public void StatsExcelRuneBoard(ExcelWorksheet ws, ref int row, ref int col, Build build, Loadout load)
+        {
+            // write each slots scoring weights
+            // reference and gray out things which inherit
+            var cmax = 1;
+            var rowstat = row + 2;
+            var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            foreach (int i in new int[] {-1, -2, -3, 0, 1, 2, 3, 4, 5 })
+            {
+                col = 5;
+                var slot = i + 1;
+                string sslot = "g";
+                if (slot > 0)
+                    sslot = slot.ToString();
+                else if (slot == -1)
+                    sslot = "o";
+                else if (slot == -2)
+                    sslot = "e";
+
+                ws.Cells[row, col].Value = sslot;
+                col++;
+
+
+                var rf = build.runeFilters.ContainsKey(sslot) ? build.runeFilters[sslot] : null;
+
+                var btest = build.runeScoring.ContainsKey(sslot) ? build.runeScoring[sslot] : new KeyValuePair<int, double>(-1,-1);
+                double test = btest.Value;
+                bool isTestInherited = false;
+                string testForm = null;
+
+                if (test == -1)
+                {
+                    if (slot > 0)
+                    {
+                        if (build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")))
+                        {
+                            var bgf = build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")) ? build.runeScoring[(slot % 2 == 0 ? "e" : "o")] : new KeyValuePair<int, double>(-1, -1);
+                            if (bgf.Value != -1)
+                            {
+                                test = bgf.Value;
+                                isTestInherited = true;
+                                testForm = "=A" + (rowstat - (slot) % 2);
+                            }
+                        }
+
+                        if (!isTestInherited && build.runeScoring.ContainsKey("g"))
+                        {
+                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double>(-1, -1);
+                            if (bgf.Value != -1)
+                            {
+                                test = bgf.Value;
+                                isTestInherited = true;
+                                testForm = "=A" + (rowstat - 2);
+                            }
+                        }
+                    }
+                    else if (slot < 0)
+                    {
+                        if (build.runeScoring.ContainsKey("g"))
+                        {
+                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double>(-1, -1);
+                            if (bgf.Value != -1)
+                            {
+                                test = bgf.Value;
+                                isTestInherited = true;
+                                testForm = "=A" + (rowstat - 2);
+                            }
+                        }
+                    }
+                }
+                if (test >= 0)
+                {
+                    if (testForm == null)
+                        ws.Cells[row, 1].Value = test;
+                    else
+                        ws.Cells[row, 1].Formula = testForm;
+                }
+
+                if (isTestInherited)
+                {
+                    ws.Cells[row, 1].Style.Font.Color.SetColor(Color.Gray);
+                }
+
+                for (int j = 0; j < Build.statNames.Length; j++)
+                {
+                    var stat = Build.statNames[j];
+                    
+                    double? flat = rf?.ContainsKey(stat) ?? false ? rf[stat].Flat : null;
+                    double? perc = rf?.ContainsKey(stat) ?? false ? rf[stat].Percent : null;
+                    bool isFlatInherited = false;
+                    bool isPercInherited = false;
+                    string flatForm = null;
+                    string percForm = null;
+
+                    if (flat == null)
+                    {
+                        if (slot > 0)
+                        {
+                            if (build.runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
+                            {
+                                var bgf = build.runeFilters[(slot % 2 == 0 ? "e" : "o")];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
+                                {
+                                    flat = bgf[stat].Flat;
+                                    isFlatInherited = true;
+                                    flatForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
+                                }
+                            }
+
+                            if (!isFlatInherited && build.runeFilters.ContainsKey("g"))
+                            {
+                                var bgf = build.runeFilters["g"];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
+                                {
+                                    flat = bgf[stat].Flat;
+                                    isFlatInherited = true;
+                                    flatForm = "=" + abc[col - 1] + (rowstat - 2);
+                                }
+                            }
+                        }
+                        else if (slot < 0)
+                        {
+                            if (build.runeFilters.ContainsKey("g"))
+                            {
+                                var bgf = build.runeFilters["g"];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
+                                {
+                                    flat = bgf[stat].Flat;
+                                    isFlatInherited = true;
+                                    flatForm = "=" + abc[col - 1] + (rowstat - 2);
+                                }
+                            }
+                        }
+                    }
+
+                    if (j < 4)
+                    {
+                        if (flatForm == null)
+                            ws.Cells[row, col].Value = flat;
+                        else
+                            ws.Cells[row, col].Formula = flatForm;
+
+                        if (isFlatInherited)
+                        {
+                            ws.Cells[row, col].Style.Font.Color.SetColor(Color.Gray);
+                        }
+                        col++;
+                    }
+
+                    if (perc == null)
+                    {
+                        if (slot > 0)
+                        {
+                            if (build.runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
+                            {
+                                var bgf = build.runeFilters[(slot % 2 == 0 ? "e" : "o")];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
+                                {
+                                    perc = bgf[stat].Percent;
+                                    isPercInherited = true;
+                                    percForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
+                                }
+                            }
+
+                            if (!isFlatInherited && build.runeFilters.ContainsKey("g"))
+                            {
+                                var bgf = build.runeFilters["g"];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
+                                {
+                                    perc = bgf[stat].Percent;
+                                    isPercInherited = true;
+                                    percForm = "=" + abc[col - 1] + (rowstat - 2);
+                                }
+                            }
+                        }
+                        else if (slot < 0)
+                        {
+                            if (build.runeFilters.ContainsKey("g"))
+                            {
+                                var bgf = build.runeFilters["g"];
+                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
+                                {
+                                    perc = bgf[stat].Percent;
+                                    isPercInherited = true;
+                                    percForm = "=" + abc[col - 1] + (rowstat - 2);
+                                }
+                            }
+                        }
+                    }
+
+                    if (j != 3)
+                    {
+                        if (percForm == null)
+                            ws.Cells[row, col].Value = perc;
+                        else
+                            ws.Cells[row, col].Formula = percForm;
+
+                        if (isPercInherited)
+                        {
+                            ws.Cells[row, col].Style.Font.Color.SetColor(Color.Gray);
+                        }
+                        col++;
+                    }
+                }
+
+                if (col > cmax)
+                    cmax = col;
+
+                row++;
+            }
+            var rstart = row;
+
+            // maximum column (may need to be after writing table)
+
+            // table
+            // PTS, set, slot, primary, HP, %, ATK, %, DEF, %, SPD, CR, CD, RES, ACC
+            col = 1;
+            ws.Cells[row, col].Value = "Pts";
+            col++;
+            ws.Cells[row, col].Value = "Set";
+            col++;
+            ws.Cells[row, col].Value = "Slot";
+            col++;
+            ws.Cells[row, col].Value = "Main";
+            col++;
+            ws.Cells[row, col].Value = "Good";
+            col++;
+            foreach (Attr stat in Build.statBoth)
+            {
+                ws.Cells[row, col].Value = stat.ToString();
+                col++;
+                if (col > cmax)
+                    cmax = col;
+            }
+            row++;
+
+            // for each rune
+            // make the pts use the hardwriten values and the appropriate slot weights
+
+            // slot 0 = global, -1 = odd, -2 even
+
+            var used = build.runeUsage.runesUsed.Select(r => r.Key);
+            var good = build.runeUsage.runesGood.Select(r => r.Key);
+            var second = build.runeUsage.runesSecond.Select(r => r.Key);
+            var bad = used.Except(good);
+
+            //string[] cellStrings = Enumerable.Repeat("=", 6).ToArray();
+            
+            foreach (var r in used.OrderByDescending(r => good.Contains(r)).ThenByDescending(r => build.ScoreRune(r, build.GetPredict(r), false)))
+            {
+                col = 1;
+                ws.Cells[row, col].Formula = ""; // build.ScoreRune(r, build.GetPredict(r), false);
+                for (int i = 0; i < Build.statBoth.Length; i++)
+                {
+                    var attr = Build.statBoth[i];
+                    if (i != 0) ws.Cells[row, col].Formula += "+";
+                    var statCell = "$" + abc[i + 5] + "$" + (rowstat + r.Slot);
+                    ws.Cells[row, col].Formula += "if(" + statCell + "<>0, runesFor" + build.ID + "[[#This Row],[" + attr + "]]/" + statCell + ", 0)";
+                }
+
+                col++;
+                ws.Cells[row, col].Value = r.Set;
+                col++;
+                ws.Cells[row, col].Value = r.Slot;
+                col++;
+                ws.Cells[row, col].Value = r.MainType;
+                col++;
+                ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
+                if (load.Runes.Contains(r))
+                {
+                    ws.Cells[row, col].Value = "Best";
+                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
+                }
+                else if (second.Contains(r))
+                {
+                    ws.Cells[row, col].Value = "Second";
+                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
+                }
+                else if (good.Contains(r))
+                {
+                    ws.Cells[row, col].Value = "Good";
+                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
+                }
+
+                col++;
+
+                foreach (Attr stat in Build.statBoth)
+                {
+                    var fake = build.GetPredict(r);
+
+                    var rval = r[stat, fake, false];
+
+                    if (rval > 0)
+                    {
+                        ws.Cells[row, col].Value = rval;
+                    }
+                    col++;
+                }
+                if (col > cmax)
+                    cmax = col;
+                row++;
+            }
+            
+            var table = ws.Tables.Where(t => t.Name == "runesFor" + build.ID).FirstOrDefault();
+            if (table == null)
+                table = ws.Tables.Add(ws.Cells[rstart, 1, row - 1, cmax - 1], "runesFor" + build.ID);
+
+            if (table.Address.Columns != cmax - 1 || table.Address.Rows != row - 1)
+            {
+                var start = table.Address.Start;
+                var newRange = new ExcelAddress(rstart, 1, row - 1, cmax - 1).ToString();
+
+                var tableElement = table.TableXml.DocumentElement;
+                tableElement.Attributes["ref"].Value = newRange;
+                tableElement["autoFilter"].Attributes["ref"].Value = newRange;
+
+            }
+
+            table.ShowHeader = true;
+            table.StyleName = "TableStyleMedium2";
+
+            var cond = ws.ConditionalFormatting.AddExpression(new ExcelAddress(rstart + 1, 1, row - 1, 1));
+            cond.Formula = "A" + (rstart + 1) + ">=INDIRECT(ADDRESS(" + (rstart - 7) + "+C" + (rstart + 1) + ",1))";
+            cond.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            cond.Style.Fill.BackgroundColor.Color = Color.Green;
+
+            cond = ws.ConditionalFormatting.AddExpression(new ExcelAddress(rstart + 1, 1, row - 1, 1));
+            cond.Formula = "A" + (rstart + 1) + "<INDIRECT(ADDRESS(" + (rstart - 7) + "+C" + (rstart + 1) + ",1))";
+            cond.Style.Fill.PatternType = ExcelFillStyle.Solid;
+            cond.Style.Fill.BackgroundColor.Color = Color.Red;
         }
 
         public void StatsExcelRunes()

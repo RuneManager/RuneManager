@@ -39,6 +39,7 @@ namespace RuneOptim
 		[Obsolete("Consider changing to statEnums")]
 		public static string[] statNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
 		public static Attr[] statEnums = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
+		public static Attr[] statBoth = { Attr.HealthFlat, Attr.HealthPercent, Attr.AttackFlat, Attr.AttackPercent, Attr.DefenseFlat, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
         [Obsolete("Consider changing to extraEnums")]
         public static string[] extraNames = { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
         public static Attr[] extraEnums = { Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
@@ -762,11 +763,11 @@ namespace RuneOptim
                 rfG = runeFilters["g"];
 
             Dictionary<string, RuneFilter> rfM = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
+            if (slot != 0 && runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
                 rfM = runeFilters[(slot % 2 == 0 ? "e" : "o")];
 
             Dictionary<string, RuneFilter> rfS = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey(slot.ToString()))
+            if (slot > 0 && runeFilters.ContainsKey(slot.ToString()))
                 rfS = runeFilters[slot.ToString()];
 
             foreach (string stat in statNames)
@@ -866,7 +867,7 @@ namespace RuneOptim
             // TODO: check what inheriting AND/OR then SUM (or visa versa)
 
             // find the most significant operatand of joining checks
-            if (runeScoring.ContainsKey("g") && runeFilters.ContainsKey("g") && runeFilters["g"].Any(r => r.Value.NonZero))
+            if (runeScoring.ContainsKey("g") && runeFilters.ContainsKey("g"))// && runeFilters["g"].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring["g"];
                 and = kv.Key;
@@ -877,7 +878,7 @@ namespace RuneOptim
             }
             // is it and odd or even slot?
             string tmk = (slot % 2 == 0 ? "e" : "o");
-            if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk) && runeFilters[tmk].Any(r => r.Value.NonZero))
+            if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
                 and = kv.Key;
@@ -888,7 +889,7 @@ namespace RuneOptim
             }
             // turn the 0-5 to a 1-6
             tmk = slot.ToString();
-            if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk) && runeFilters[tmk].Any(r => r.Value.NonZero))
+            if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
                 and = kv.Key;
