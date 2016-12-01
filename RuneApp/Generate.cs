@@ -127,13 +127,14 @@ namespace RuneApp
 				}
 
 				// generate 5000 builds
-				build.GenBuilds(buildsGen, timeout, (s) => { }, (d) =>
+				build.GenBuilds(buildsGen, timeout, (s) => { }, (d,i) =>
 				{
                     if (!IsDisposed && IsHandleCreated)
                     {
                         Invoke((MethodInvoker)delegate
                         {
                             toolStripProgressBar1.Value = (int)(d * buildsShow);
+                            toolStripStatusLabel1.Text = "Generated " + i + " so far...";
                         });
                     }
                     else
@@ -164,6 +165,22 @@ namespace RuneApp
 					li.Tag = b;
                     if (grayLocked && b.Current.Runes.Any(r => r.Locked))
                         li.ForeColor = Color.Gray;
+                    else
+                    {
+                        if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+                            b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+                        {
+                            li.ForeColor = Color.Green;
+                        }
+                        else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+                        {
+                            li.ForeColor = Color.Goldenrod;
+                        }
+                        else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+                        {
+                            li.ForeColor = Color.DarkBlue;
+                        }
+                    }
 
                     if (!IsDisposed && IsHandleCreated)
                     {

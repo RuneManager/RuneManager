@@ -392,7 +392,7 @@ namespace RuneOptim
         /// <param name="progTo">Periodically gives the progress% as a double</param>
         /// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
         /// <param name="saveStats">If to write stats to rune stats</param>
-        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
+        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double, int> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
         {
             if (runes.Any(r => r == null))
                 return;
@@ -636,14 +636,14 @@ namespace RuneOptim
                                             timer = DateTime.Now;
                                             Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
                                             printTo?.Invoke(string.Format("{0:P2}", (count + complete - total) / (double)complete));
-                                            progTo?.Invoke((count + complete - total) / (double)complete);
+                                            progTo?.Invoke((count + complete - total) / (double)complete, tests.Count);
 
                                             if (time <= 0) continue;
                                             if (DateTime.Now > begin.AddSeconds(time))
                                             {
                                                 Console.WriteLine("Timeout");
                                                 printTo?.Invoke("Timeout");
-                                                progTo?.Invoke(1);
+                                                progTo?.Invoke(1, tests.Count);
 
                                                 isRun = false;
                                                 break;
@@ -693,7 +693,7 @@ namespace RuneOptim
                 // write out completion
                 Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
                 printTo?.Invoke("100%");
-                progTo?.Invoke(1);
+                progTo?.Invoke(1, tests.Count);
 
                 // sort *all* the builds
                 loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();

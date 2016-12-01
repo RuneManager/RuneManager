@@ -1601,7 +1601,7 @@ namespace RuneApp
                         StatsExcelBind(true);
                     }
                 });
-                return;
+                goto finishBuild;
             }
             #endregion
 
@@ -1675,7 +1675,7 @@ namespace RuneApp
                 nli.UseItemStyleForSubItems = false;
                 if (b.Time / (double)1000 > 60)
                     nli.SubItems[5].BackColor = Color.Red;
-                else if (b.Time / (double)1000 > 20)
+                else if (b.Time / (double)1000 > 30)
                     nli.SubItems[5].BackColor = Color.Orange;
 
                 if (lvs.Length == 0)
@@ -1688,7 +1688,10 @@ namespace RuneApp
                 var theBest = b.Best;
                 int count = 0;
                 // we must progressively ban more runes from the build to find second-place runes.
-                GenDeep(b, 0, printTo, ref count);
+                //GenDeep(b, 0, printTo, ref count);
+                RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
+                RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
+                RunBanned(b, printTo, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
 
                 // after messing all that shit up
                 b.Best = theBest;
@@ -1718,10 +1721,11 @@ namespace RuneApp
             b.buildUsage = null;
 
             #endregion
-
+            
+            finishBuild:
             if (plsDie)
                 printTo?.Invoke("Canned");
-            else
+            else if (b.Best != null)
                 printTo?.Invoke("Done");
 
             isRunning = false;
@@ -1744,18 +1748,9 @@ namespace RuneApp
                 var c = count;
                 Rune r = b.Best.Current.Runes[i];
                 doneIds = doneIds.Concat(new int[]{ r.ID}).ToArray();
-                b.BanEmTemp(doneIds);
 
-                b.GenRunes(data, false, useEquipped, true, goodRunes);
-
-                b.GenBuilds(0, 0, (str) =>
-                {
-                    if (!IsDisposed && IsHandleCreated)
-                    {
-                        printTo?.Invoke(c + " " + str);
-                    }
-                }, null, true, true, goodRunes);
-
+                RunBanned(b, printTo, c, doneIds);
+                
                 for (int j = i + 1; j < 6; j++)
                 {
                     if (plsDie)
@@ -1763,6 +1758,21 @@ namespace RuneApp
                     GenDeep(b, j, printTo, ref count, doneIds);
                 }
             }
+        }
+
+        private void RunBanned(Build b, Action<string> printTo, int c, params int[] doneIds)
+        {
+            b.BanEmTemp(doneIds);
+
+            b.GenRunes(data, false, useEquipped, true, goodRunes);
+
+            b.GenBuilds(0, 0, (str) =>
+            {
+                if (!IsDisposed && IsHandleCreated)
+                {
+                    printTo?.Invoke(c + " " + str);
+                }
+            }, null, true, true, goodRunes);
         }
 
         private void SaveBuilds(string fname = "builds.json")
@@ -1831,6 +1841,7 @@ namespace RuneApp
                 if (currentBuild != null)
                     currentBuild.isRun = false;
                 plsDie = true;
+                isRunning = false;
                 return;
             }
             plsDie = false;
@@ -1896,6 +1907,7 @@ namespace RuneApp
 #warning consider making it nicer by using the List<Build>
                 foreach (ListViewItem li in list5)
                 {
+                    if (plsDie) break;
                     RunBuild(li, makeStats);
                 }
 
@@ -2600,21 +2612,28 @@ namespace RuneApp
                 col++;
                 ws.Cells[row, col].Value = r.MainType;
                 col++;
-                ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.MediumGray;
-                if (load.Runes.Contains(r))
+                ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
+                if (load?.Runes != null)
                 {
-                    ws.Cells[row, col].Value = "Best";
-                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
-                }
-                else if (second.Contains(r))
-                {
-                    ws.Cells[row, col].Value = "Second";
-                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
-                }
-                else if (good.Contains(r))
-                {
-                    ws.Cells[row, col].Value = "Good";
-                    ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
+                    if (load.Runes.Contains(r))
+                    {
+                        ws.Cells[row, col].Value = "Best";
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
+                    }
+                    else if (second.Contains(r))
+                    {
+                        ws.Cells[row, col].Value = "Second";
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
+                    }
+                    else if (good.Contains(r))
+                    {
+                        ws.Cells[row, col].Value = "Good";
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
+                    }
+                    else
+                    {
+                        ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Red);
+                    }
                 }
 
                 col++;

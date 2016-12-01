@@ -1835,7 +1835,7 @@ namespace RuneApp
 					}
 					if (num > 1)
 						li.Text = set.ToString() + " x" + num;
-					if (num > 3 || num == 1)
+					if (num > 3 || num <= 1)
 						li.Text = set.ToString();
 				}
 			}
