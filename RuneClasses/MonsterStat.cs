@@ -195,18 +195,14 @@ namespace RuneOptim
             var respStr = wresp.GetResponseStream();
 
             if (respStr == null)
-            {
                 return null;
-            }
 
             using (var stream = new StreamReader(respStr))
 			{
 				resp = stream.ReadToEnd();
 			}
 
-			var ret = JsonConvert.DeserializeObject<MonsterStat>(resp);
-
-			return ret;
+            return JsonConvert.DeserializeObject<MonsterStat>(resp);
 		}
 	}
 

@@ -1100,26 +1100,23 @@ namespace RuneApp
 
         private void unequipMonsterButton_Click(object sender, EventArgs e)
         {
-            if (data == null)
+            if (data?.Monsters == null)
                 return;
 
-            if (data.Monsters != null)
+            foreach (ListViewItem li in dataMonsterList.SelectedItems)
             {
-                foreach (ListViewItem li in dataMonsterList.SelectedItems)
+                Monster mon = li.Tag as Monster;
+                if (mon == null)
+                    continue;
+
+                for (int i = 1; i < 7; i++)
                 {
-                    Monster mon = li.Tag as Monster;
-                    if (mon != null)
-                    {
-                        for (int i = 1; i < 7; i++)
-                        {
-                            var r = mon.Current.RemoveRune(i);
-                            if (r != null)
-                            {
-                                r.AssignedId = 0;
-                                r.AssignedName = "Inventory";
-                            }
-                        }
-                    }
+                    var r = mon.Current.RemoveRune(i);
+                    if (r == null)
+                        continue;
+
+                    r.AssignedId = 0;
+                    r.AssignedName = "Inventory";
                 }
             }
         }
@@ -1222,8 +1219,6 @@ namespace RuneApp
 
         private void ShowDiff(Stats old, Stats load)
         {
-           
-
             foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" })
             {
                 groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
@@ -1462,32 +1457,31 @@ namespace RuneApp
             if (data.shrines == null)
                 data.shrines = new Stats();
 
-            if (config != null)
+            if (config == null)
+                return;
+
+            for (int i = 0; i < shrineStats.Length; i++)
             {
+                var stat = shrineStats[i];
 
-                for (int i = 0; i < shrineStats.Length; i++)
+                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
                 {
-                    var stat = shrineStats[i];
+                    int val = 0;
+                    int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
+                    data.shrines[stat] = val;
+                    int level = (int)Math.Floor(val / shrineLevel[i]);
+                    shrineMap[stat][level].Checked = true;
+                }
+                else
+                {
+                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
+                    if (shrine == null) continue;
 
-
-                    if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
-                    {
-                        int val = 0;
-                        int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
-                        data.shrines[stat] = val;
-                        int level = (int)Math.Floor(val / shrineLevel[i]);
-                        shrineMap[stat][level].Checked = true;
-                    }
-                    else
-                    {
-                        var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
-                        if (shrine == null) continue;
-
-                        data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
-                        shrineMap[stat][shrine.Level].Checked = true;
-                    }
+                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
+                    shrineMap[stat][shrine.Level].Checked = true;
                 }
             }
+
         }
 
         public void checkLocked()
@@ -1510,9 +1504,7 @@ namespace RuneApp
         private void RunBuild(ListViewItem pli, bool saveStats = false)
         {
             if ((pli?.Tag as Build) == null)
-            {
                 return;
-            }
 
             RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate { pli.SubItems[3].Text = s; }));
         }
@@ -1526,9 +1518,7 @@ namespace RuneApp
                 currentBuild.isRun = false;
 
             if (b == null)
-            {
                 return;
-            }
 
             while (isRunning)
             {
@@ -2370,8 +2360,8 @@ namespace RuneApp
 
                 var rf = build.runeFilters.ContainsKey(sslot) ? build.runeFilters[sslot] : null;
 
-                var btest = build.runeScoring.ContainsKey(sslot) ? build.runeScoring[sslot] : new KeyValuePair<int, double>(-1,-1);
-                double test = btest.Value;
+                var btest = build.runeScoring.ContainsKey(sslot) ? build.runeScoring[sslot] : new KeyValuePair<int, double?>(-1, null);
+                double? test = btest.Value;
                 bool isTestInherited = false;
                 string testForm = null;
 
@@ -2381,8 +2371,8 @@ namespace RuneApp
                     {
                         if (build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")))
                         {
-                            var bgf = build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")) ? build.runeScoring[(slot % 2 == 0 ? "e" : "o")] : new KeyValuePair<int, double>(-1, -1);
-                            if (bgf.Value != -1)
+                            var bgf = build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")) ? build.runeScoring[(slot % 2 == 0 ? "e" : "o")] : new KeyValuePair<int, double?>(-1, null);
+                            if (bgf.Value != null)
                             {
                                 test = bgf.Value;
                                 isTestInherited = true;
@@ -2392,8 +2382,8 @@ namespace RuneApp
 
                         if (!isTestInherited && build.runeScoring.ContainsKey("g"))
                         {
-                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double>(-1, -1);
-                            if (bgf.Value != -1)
+                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double?>(-1, null);
+                            if (bgf.Value != null)
                             {
                                 test = bgf.Value;
                                 isTestInherited = true;
@@ -2405,8 +2395,8 @@ namespace RuneApp
                     {
                         if (build.runeScoring.ContainsKey("g"))
                         {
-                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double>(-1, -1);
-                            if (bgf.Value != -1)
+                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double?>(-1, null);
+                            if (bgf.Value != null)
                             {
                                 test = bgf.Value;
                                 isTestInherited = true;
@@ -2816,7 +2806,18 @@ namespace RuneApp
                             ws.Cells[row, col].Value = r.Efficiency;
                             break;
                         case "Used":
-                            ws.Cells[row, col].Value = (r.manageStats.GetOrAdd("In", 0) > 0 ? "TRUE" : "FALSE");
+                            switch ((int)r.manageStats.GetOrAdd("In", 0))
+                            {
+                                case 1:
+                                    ws.Cells[row, col].Value = "Best";
+                                    break;
+                                case 2:
+                                    ws.Cells[row, col].Value = "Second";
+                                    break;
+                                default:
+                                    ws.Cells[row, col].Value = "No";
+                                    break;
+                            }
                             break;
                         case "Points":
                             break;
@@ -3262,7 +3263,6 @@ namespace RuneApp
                 }
                 col++;
             }
-
         }
 
         private void buildList_MouseClick(object sender, MouseEventArgs e)

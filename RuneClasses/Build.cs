@@ -145,15 +145,15 @@ namespace RuneOptim
         // Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value
         // tab, TYPE, test
         [JsonProperty("runeScoring")]
-        public Dictionary<string, KeyValuePair<int, double>> runeScoring = new Dictionary<string, KeyValuePair<int, double>>();
+        public Dictionary<string, KeyValuePair<int, double?>> runeScoring = new Dictionary<string, KeyValuePair<int, double?>>();
 
         public bool ShouldSerializeruneScoring()
         {
-            Dictionary<string, KeyValuePair<int, double>> nscore = new Dictionary<string, KeyValuePair<int, double>>();
+            Dictionary<string, KeyValuePair<int, double?>> nscore = new Dictionary<string, KeyValuePair<int, double?>>();
             foreach (var tabPair in runeScoring)
             {
-                if (tabPair.Value.Key != 0 || tabPair.Value.Value != 0)
-                    nscore.Add(tabPair.Key, new KeyValuePair<int, double>(tabPair.Value.Key, tabPair.Value.Value));
+                if (tabPair.Value.Key != 0 || tabPair.Value.Value != null)
+                    nscore.Add(tabPair.Key, new KeyValuePair<int, double?>(tabPair.Value.Key, tabPair.Value.Value));
             }
             runeScoring = nscore;
 
@@ -725,9 +725,10 @@ namespace RuneOptim
                     foreach (Rune r in Best.Current.Runes)
                     {
                         if (!goodRunes)
-                            r.manageStats["In"] = 1;
+                            r.manageStats.AddOrUpdate("In", 1, (s,e) => 1);
                         else
                         {
+                            r.manageStats.AddOrUpdate("In", 2, (s,e) => e);
                             runeUsage.runesSecond.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                         }
                     }
@@ -830,7 +831,7 @@ namespace RuneOptim
         public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false)
         {
             int slot = r.Slot;
-            double testVal;
+            double? testVal;
             Stats rFlat, rPerc, rTest;
 
             // if there where no filters with data
@@ -857,10 +858,10 @@ namespace RuneOptim
             return ret;
         }
 
-        public int LoadFilters(int slot, out double testVal)
+        public int LoadFilters(int slot, out double? testVal)
         {
             // which tab we pulled the filter from
-            testVal = 0;
+            testVal = null;
             int and = 0;
 
             // TODO: check what inheriting SUM (eg. Odd and 3) does
@@ -873,7 +874,8 @@ namespace RuneOptim
                 and = kv.Key;
                 if (kv.Key == 2)
                 {
-                    testVal = kv.Value;
+                    if (kv.Value != null)
+                        testVal = kv.Value;
                 }
             }
             // is it and odd or even slot?
@@ -884,7 +886,8 @@ namespace RuneOptim
                 and = kv.Key;
                 if (kv.Key == 2)
                 {
-                    testVal = kv.Value;
+                    if (kv.Value != null)
+                        testVal = kv.Value;
                 }
             }
             // turn the 0-5 to a 1-6
@@ -895,7 +898,8 @@ namespace RuneOptim
                 and = kv.Key;
                 if (kv.Key == 2)
                 {
-                    testVal = kv.Value;
+                    if (kv.Value != null)
+                        testVal = kv.Value;
                 }
             }
 
@@ -908,25 +912,14 @@ namespace RuneOptim
             Predicate<Rune> slotTest = r => false;
 
             // the value to test SUM against
-            double testVal;
+            double? testVal;
 
             int and = LoadFilters(slot, out testVal);
 
             // this means that runes won't get in unless they meet at least 1 criteria
             
             // if an operand was found, ensure the tab contains filter data
-            /*if (gotScore != "")
-            {
-                if (runeFilters.ContainsKey(gotScore))
-                {
-                    // if all the filters for the tab are zero
-                    if (runeFilters[gotScore].All(r => !r.Value.NonZero))
-                    {
-                        and = 0;
-                    }
-                }
-            }*/
-
+            
             Stats rFlat, rPerc, rTest;
 
             // if there where no filters with data

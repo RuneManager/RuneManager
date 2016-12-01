@@ -36,15 +36,7 @@ namespace RuneApp
 		};
 
         static readonly string[] tabNames = { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
-        /*
-		[Obsolete("Consider changing to statEnums")]
-        static readonly string[] statNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
-		public static Attr[] statEnums = new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
-        [Obsolete("Consider changing to extraEnums")]
-        static readonly string[] extraNames = { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
-        public static ExtraAttr[] extraEnums = new ExtraAttr[] { ExtraAttr.EffectiveHP, ExtraAttr.EffectiveHPDefenseBreak, ExtraAttr.DamagePerSpeed, ExtraAttr.AverageDamage, ExtraAttr.MaxDamage };
-        */
-
+        
         private ToolTip tooltipNoSorting = new ToolTip();
         private ToolTip tooltipBadRuneFilter = new ToolTip();
         private ToolTip tooltipSets = new ToolTip();
@@ -213,35 +205,18 @@ namespace RuneApp
             #region Statbox
             foreach (var stat in comb)
             {
-                x = 4; 
-                label = new Label();
-                groupBox1.Controls.Add(label);
-                label.Name = stat + "Label";
-                label.Text = stat;
-                label.Size = new Size(50, 20);
-                label.Location = new Point(x, y);
+                x = 4;
+                groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, stat);
                 x += colWidth;
 
-                label = new Label();
-                groupBox1.Controls.Add(label);
-                label.Name = stat + "Base";
-                label.Size = new Size(50, 20);
-                label.Location = new Point(x, y);
+                groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, stat);
 				dlCheckX = x;
                 x += colWidth;
 
-                label = new Label();
-                groupBox1.Controls.Add(label);
-                label.Name = stat + "Bonus";
-                label.Size = new Size(50, 20);
-                label.Location = new Point(x, y);
+                groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, stat);
                 x += colWidth;
 
-                textBox = new TextBox();
-                groupBox1.Controls.Add(textBox);
-                textBox.Name = stat + "Total";
-                textBox.Size = new Size(40, 20);
-                textBox.Location = new Point(x, y);
+                textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
                 textBox.TextChanged += global_TextChanged;
                 textBox.TextChanged += Total_TextChanged;
 				dlBtnX = x;
@@ -249,43 +224,23 @@ namespace RuneApp
 
 
 
-                label = new Label();
-                groupBox1.Controls.Add(label);
-                label.Name = stat + "Current";
-                label.Size = new Size(50, 20);
-                label.Location = new Point(x, y);
+                groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, stat);
                 x += colWidth;
 
                 genX = x;
 
-                textBox = new TextBox();
-                groupBox1.Controls.Add(textBox);
-                textBox.Name = stat + "Worth";
-                textBox.Size = new Size(40, 20);
-                textBox.Location = new Point(x, y);
+                textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
                 textBox.TextChanged += global_TextChanged;
                 x += colWidth;
 
-                label = new Label();
-                groupBox1.Controls.Add(label);
-                label.Name = stat + "CurrentPts";
-                label.Size = new Size((int)(50 * 0.8), 20);
-                label.Location = new Point(x, y);
+                groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, stat);
                 x += (int)(colWidth * 0.8);
 
-                textBox = new TextBox();
-                groupBox1.Controls.Add(textBox);
-                textBox.Name = stat + "Thresh";
-                textBox.Size = new Size(40, 20);
-                textBox.Location = new Point(x, y);
+                textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
                 textBox.TextChanged += global_TextChanged;
                 x += colWidth;
 
-                textBox = new TextBox();
-                groupBox1.Controls.Add(textBox);
-                textBox.Name = stat + "Max";
-                textBox.Size = new Size(40, 20);
-                textBox.Location = new Point(x, y);
+                textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
                 textBox.TextChanged += global_TextChanged;
 
                 y += rowHeight;
@@ -306,26 +261,9 @@ namespace RuneApp
                 TabPage page = tabControl1.TabPages["tab" + tab];
                 page.Tag = tab;
 
-                label = new Label();
-                page.Controls.Add(label);
-                label.Text = "Divide stats into points:";
-                label.Name = tab + "divprompt";
-                label.Size = new Size(140, 14);
-                label.Location = new Point(6, 6);
-
-                label = new Label();
-                page.Controls.Add(label);
-                label.Text = "Inherited";
-                label.Name = tab + "inhprompt";
-                label.Size = new Size(60, 14);
-                label.Location = new Point(134, 6);
-
-                label = new Label();
-                page.Controls.Add(label);
-                label.Text = "Current";
-                label.Name = tab + "curprompt";
-                label.Size = new Size(60, 14);
-                label.Location = new Point(214, 6);
+                page.Controls.MakeControl<Label>(tab, "divprompt", 6, 6, 140, 14, "Divide stats into points");
+                page.Controls.MakeControl<Label>(tab, "inhprompt", 60, 14, 134, 6, "Inherited");
+                page.Controls.MakeControl<Label>(tab, "curprompt", 60, 14, 214, 6, "Current");
 
                 ComboBox filterJoin = new ComboBox();
                 filterJoin.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -349,12 +287,7 @@ namespace RuneApp
                 y = 45;
                 foreach (var stat in Build.statNames)
                 {
-                    label = new Label();
-                    page.Controls.Add(label);
-                    label.Name = tab + stat;
-                    label.Location = new Point(5, y);
-                    label.Text = stat;
-                    label.Size = new Size(30, 20);
+                    page.Controls.MakeControl<Label>(tab, stat, 5, y, 30, 20, stat);
 
                     x = 35;
                     foreach (var pref in new string[] { "", "i", "c" })
@@ -363,16 +296,11 @@ namespace RuneApp
                         {
                             if (first)
                             {
-                                label = new Label();
-                                page.Controls.Add(label);
-                                label.Name = tab + pref + type;
-                                label.Location = new Point(x, 25);
-                                label.Text = pref + type;
+                                label = page.Controls.MakeControl<Label>(tab + pref, type, x, 25, 45, 16, pref + type);
                                 if (type == "flat")
                                     label.Text = "Flat";
                                 if (type == "perc")
                                     label.Text = "Percent";
-                                label.Size = new Size(45, 16);
                             }
                             
                             if (type == "perc" && stat == "SPD")
@@ -400,23 +328,14 @@ namespace RuneApp
 
                     predX = x;
 
-                    label = new Label();
-                    page.Controls.Add(label);
-                    label.Name = tab + stat + "gt";
-                    label.Location = new Point(x, y);
-                    label.Text = ">=";
-                    label.Size = new Size(30, 20);
+                    page.Controls.MakeControl<Label>(tab + stat, "gt", x, y, 30, 20, ">=");
                     x += colWidth;
 
                     textBox = page.Controls.MakeControl<TextBox>(tab + stat, "test", x, y-2);
                     textBox.TextChanged += global_TextChanged;
                     x += colWidth;
 
-                    label = new Label();
-                    page.Controls.Add(label);
-                    label.Name = tab + "r" + stat + "test";
-                    label.Location = new Point(x, y);
-                    label.Size = new Size(30, 20);
+                    page.Controls.MakeControl<Label>(tab + "r", stat + "test", x, y, 30, 20, ">=");
                     x += colWidth;
 
                     y += rowHeight;
@@ -512,13 +431,15 @@ namespace RuneApp
                 if (ctrl != null) ctrl.Enabled = (box.SelectedIndex == 2);
             }
 
-            double test = 0;
+            double? test = null;
+            double temp;
             ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
-            double.TryParse(ctrl?.Text, out test);
+            if (double.TryParse(ctrl?.Text, out temp))
+                test = temp;
 
             if (!build.runeScoring.ContainsKey(tabName))
-                build.runeScoring.Add(tabName, new KeyValuePair<int, double>(box.SelectedIndex, test));
-            build.runeScoring[tabName] = new KeyValuePair<int, double>(box.SelectedIndex, test);
+                build.runeScoring.Add(tabName, new KeyValuePair<int, double?>(box.SelectedIndex, test));
+            build.runeScoring[tabName] = new KeyValuePair<int, double?>(box.SelectedIndex, test);
 
             // TODO: trim the ZERO nodes on the tree
 
@@ -1043,15 +964,22 @@ namespace RuneApp
                     // if there is a non-zero
                     if (build.runeFilters[tab].Any(r => r.Value.NonZero))
                     {
-                        build.runeScoring.Add(tab, new KeyValuePair<int, double>(0,0));
+                        build.runeScoring.Add(tab, new KeyValuePair<int, double?>(0, null));
                     }
                 }
                 if (build.runeScoring.ContainsKey(tab))
                 {
                     var kv = build.runeScoring[tab];
                     var ctrlTest = Controls.Find(tab + "test", true).FirstOrDefault();
-                    if (!string.IsNullOrWhiteSpace(ctrlTest?.Text))
-                        build.runeScoring[tab] = new KeyValuePair<int, double>(kv.Key, double.Parse(ctrlTest.Text));
+
+                    //if (!string.IsNullOrWhiteSpace(ctrlTest?.Text))
+                    double? testVal = null;
+                    double tempval;
+                    if (double.TryParse(ctrlTest?.Text, out tempval))
+                        testVal = tempval;
+
+                    build.runeScoring[tab] = new KeyValuePair<int, double?>(kv.Key, testVal);
+                    
                 }
                 TextBox tb = (TextBox)Controls.Find(tab + "raise", true).FirstOrDefault();
                 int raiseLevel;
@@ -1671,7 +1599,7 @@ namespace RuneApp
             {
                 int num = build.runes[i].Length;
 
-                if (perms == 0)
+                if (i == 0)
                     perms = num;
                 else
                     perms *= num;

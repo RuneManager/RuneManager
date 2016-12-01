@@ -265,8 +265,6 @@ namespace RuneOptim
             Grade = rhs.Grade;
             Slot = rhs.Slot;
             Level = rhs.Level;
-            //FakeLevel = rhs.FakeLevel;
-            //PredictSubs = rhs.PredictSubs;
             Locked = rhs.Locked;
             AssignedId = rhs.AssignedId;
             AssignedName = rhs.AssignedName;
@@ -355,14 +353,7 @@ namespace RuneOptim
                 return 0;
             }
         }
-
-
-        //[JsonIgnore]
-        //public int FakeLevel = 0;
-
-        //[JsonIgnore]
-        //public bool PredictSubs = false;
-
+        
         [JsonIgnore]
         public double Efficiency
         {
@@ -673,12 +664,6 @@ namespace RuneOptim
         public void ResetStats()
         {
             manageStats.Clear();
-            /*
-            manageStats_In = false;
-            manageStats_Set = 0;
-            manageStats_TypeFilt = 0;
-            manageStats_RuneFilt = 0;
-            manageStats_LoadFilt = 0;*/
         }
 
         // Number of sets

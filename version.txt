@@ -1,8 +1,9 @@
-0.2.2.0
+0.3.0.0
 https://github.com/Skibisky/RuneManager/releases/latest
-NEW: AutoSelectRunes - use magic to pick the best ~15 runes per slot.
-IMPROVED: Faster comparion in slow functions.
-Max/Avg Damage calculate correctly.
+You can now try to check for second-best runes!
+Will run each build multiple times.
+Can stash loadouts for view later!
+A big runedial for easy viewing, click the mon face.
+0.2.2.0 - Faster!
+AutoSelectRunes - use magic to pick the best ~15 runes per slot.
 Test timeout is configurable (0 = off, default = 20)
-Runestats.xlsx is having a hard time selling runes, defaults off.
-Can tag builds with teams for fun.

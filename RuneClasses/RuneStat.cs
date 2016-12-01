@@ -17,7 +17,6 @@
         {
             get
             {
-                //return parent.GetValue(stat, fake, pred);
                 if (isMain == null)
                 {
                     val = parent.GetValue(stat);
@@ -34,7 +33,6 @@
         {
             get
             {
-                //return parent.GetValue(stat);
                 if (isMain == null)
                 {
                     val = parent.GetValue(stat);
