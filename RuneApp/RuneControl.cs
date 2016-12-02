@@ -148,7 +148,21 @@ namespace RuneApp
                 case RuneOptim.RuneSet.Will:
                     _imageSet = Runes.will;
                     break;
-
+                case RuneOptim.RuneSet.Fight:
+                    _imageSet = Runes.fight;
+                    break;
+                case RuneOptim.RuneSet.Determination:
+                    _imageSet = Runes.fight;
+                    break;
+                case RuneOptim.RuneSet.Enhance:
+                    _imageSet = Runes.enhance;
+                    break;
+                case RuneOptim.RuneSet.Accuracy:
+                    _imageSet = Runes.accuracy;
+                    break;
+                case RuneOptim.RuneSet.Tolerance:
+                    _imageSet = Runes.tolerance;
+                    break;
             }
 
 
