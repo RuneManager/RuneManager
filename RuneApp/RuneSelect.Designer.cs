@@ -36,20 +36,11 @@
             this.runesMValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
-            this.runeBox2 = new System.Windows.Forms.GroupBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.runeInventory = new RuneApp.RuneControl();
-            this.IRuneSub4 = new System.Windows.Forms.Label();
-            this.IRuneSub3 = new System.Windows.Forms.Label();
-            this.IRuneSub2 = new System.Windows.Forms.Label();
-            this.IRuneSub1 = new System.Windows.Forms.Label();
-            this.IRuneInnate = new System.Windows.Forms.Label();
-            this.IRuneMain = new System.Windows.Forms.Label();
             this.button3 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.IRuneMon = new System.Windows.Forms.Label();
+            this.runesPoints = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.runeBox1 = new RuneApp.RuneBox();
             this.toolStrip1.SuspendLayout();
-            this.runeBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // listView2
@@ -63,7 +54,8 @@
             this.runesID,
             this.runesGrade,
             this.runesMType,
-            this.runesMValue});
+            this.runesMValue,
+            this.runesPoints});
             this.listView2.FullRowSelect = true;
             this.listView2.Location = new System.Drawing.Point(11, 27);
             this.listView2.Margin = new System.Windows.Forms.Padding(2);
@@ -74,6 +66,7 @@
             this.listView2.TabIndex = 1;
             this.listView2.UseCompatibleStateImageBehavior = false;
             this.listView2.View = System.Windows.Forms.View.Details;
+            this.listView2.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
             this.listView2.SelectedIndexChanged += new System.EventHandler(this.listView2_SelectedIndexChanged);
             this.listView2.DoubleClick += new System.EventHandler(this.listView2_DoubleClick);
             // 
@@ -96,11 +89,13 @@
             // 
             // runesMType
             // 
+            this.runesMType.DisplayIndex = 4;
             this.runesMType.Text = "MainType";
             this.runesMType.Width = 80;
             // 
             // runesMValue
             // 
+            this.runesMValue.DisplayIndex = 5;
             this.runesMValue.Text = "MainValue";
             // 
             // toolStrip1
@@ -121,118 +116,6 @@
             this.toolStripButton4.Name = "toolStripButton4";
             this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
             this.toolStripButton4.Text = "toolStripButton3";
-            // 
-            // runeBox2
-            // 
-            this.runeBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.runeBox2.Controls.Add(this.IRuneMon);
-            this.runeBox2.Controls.Add(this.label8);
-            this.runeBox2.Controls.Add(this.runeInventory);
-            this.runeBox2.Controls.Add(this.IRuneSub4);
-            this.runeBox2.Controls.Add(this.IRuneSub3);
-            this.runeBox2.Controls.Add(this.IRuneSub2);
-            this.runeBox2.Controls.Add(this.IRuneSub1);
-            this.runeBox2.Controls.Add(this.IRuneInnate);
-            this.runeBox2.Controls.Add(this.IRuneMain);
-            this.runeBox2.Location = new System.Drawing.Point(361, 27);
-            this.runeBox2.Margin = new System.Windows.Forms.Padding(2);
-            this.runeBox2.Name = "runeBox2";
-            this.runeBox2.Padding = new System.Windows.Forms.Padding(2);
-            this.runeBox2.Size = new System.Drawing.Size(217, 167);
-            this.runeBox2.TabIndex = 13;
-            this.runeBox2.TabStop = false;
-            this.runeBox2.Text = "Rune";
-            this.runeBox2.Visible = false;
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(199, 15);
-            this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(14, 13);
-            this.label8.TabIndex = 10;
-            this.label8.Text = "X";
-            // 
-            // runeInventory
-            // 
-            this.runeInventory.BackColor = System.Drawing.Color.Transparent;
-            this.runeInventory.BackImage = global::RuneApp.Runes.bg_normal;
-            this.runeInventory.Coolness = 0;
-            this.runeInventory.Gamma = 1F;
-            this.runeInventory.Grade = 2;
-            this.runeInventory.Location = new System.Drawing.Point(4, 17);
-            this.runeInventory.Margin = new System.Windows.Forms.Padding(2);
-            this.runeInventory.Name = "runeInventory";
-            this.runeInventory.SetImage = global::RuneApp.Runes.despair;
-            this.runeInventory.ShowBack = true;
-            this.runeInventory.ShowStars = true;
-            this.runeInventory.Size = new System.Drawing.Size(58, 58);
-            this.runeInventory.SlotImage = global::RuneApp.Runes.rune2;
-            this.runeInventory.StarImage = global::RuneApp.Runes.star_unawakened;
-            this.runeInventory.TabIndex = 11;
-            this.runeInventory.Text = "runeControl2";
-            // 
-            // IRuneSub4
-            // 
-            this.IRuneSub4.AutoSize = true;
-            this.IRuneSub4.Location = new System.Drawing.Point(4, 119);
-            this.IRuneSub4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub4.Name = "IRuneSub4";
-            this.IRuneSub4.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub4.TabIndex = 17;
-            this.IRuneSub4.Text = "Sub4";
-            // 
-            // IRuneSub3
-            // 
-            this.IRuneSub3.AutoSize = true;
-            this.IRuneSub3.Location = new System.Drawing.Point(4, 105);
-            this.IRuneSub3.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub3.Name = "IRuneSub3";
-            this.IRuneSub3.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub3.TabIndex = 16;
-            this.IRuneSub3.Text = "Sub3";
-            // 
-            // IRuneSub2
-            // 
-            this.IRuneSub2.AutoSize = true;
-            this.IRuneSub2.Location = new System.Drawing.Point(4, 91);
-            this.IRuneSub2.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub2.Name = "IRuneSub2";
-            this.IRuneSub2.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub2.TabIndex = 15;
-            this.IRuneSub2.Text = "Sub2";
-            // 
-            // IRuneSub1
-            // 
-            this.IRuneSub1.AutoSize = true;
-            this.IRuneSub1.Location = new System.Drawing.Point(4, 77);
-            this.IRuneSub1.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneSub1.Name = "IRuneSub1";
-            this.IRuneSub1.Size = new System.Drawing.Size(32, 13);
-            this.IRuneSub1.TabIndex = 14;
-            this.IRuneSub1.Text = "Sub1";
-            // 
-            // IRuneInnate
-            // 
-            this.IRuneInnate.AutoSize = true;
-            this.IRuneInnate.Location = new System.Drawing.Point(69, 37);
-            this.IRuneInnate.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneInnate.Name = "IRuneInnate";
-            this.IRuneInnate.Size = new System.Drawing.Size(37, 13);
-            this.IRuneInnate.TabIndex = 13;
-            this.IRuneInnate.Text = "Innate";
-            // 
-            // IRuneMain
-            // 
-            this.IRuneMain.AutoSize = true;
-            this.IRuneMain.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.IRuneMain.Location = new System.Drawing.Point(69, 17);
-            this.IRuneMain.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneMain.Name = "IRuneMain";
-            this.IRuneMain.Size = new System.Drawing.Size(40, 18);
-            this.IRuneMain.TabIndex = 12;
-            this.IRuneMain.Text = "Main";
             // 
             // button3
             // 
@@ -258,32 +141,35 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // IRuneMon
+            // runesPoints
             // 
-            this.IRuneMon.AutoSize = true;
-            this.IRuneMon.Location = new System.Drawing.Point(14, 143);
-            this.IRuneMon.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.IRuneMon.Name = "IRuneMon";
-            this.IRuneMon.Size = new System.Drawing.Size(52, 13);
-            this.IRuneMon.TabIndex = 18;
-            this.IRuneMon.Text = "Equipped";
+            this.runesPoints.DisplayIndex = 3;
+            this.runesPoints.Text = "Score";
+            this.runesPoints.Width = 0;
+            // 
+            // runeBox1
+            // 
+            this.runeBox1.Location = new System.Drawing.Point(362, 28);
+            this.runeBox1.Name = "runeBox1";
+            this.runeBox1.Size = new System.Drawing.Size(215, 186);
+            this.runeBox1.TabIndex = 21;
+            this.runeBox1.TabStop = false;
+            this.runeBox1.Text = "Rune";
             // 
             // RuneSelect
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(589, 580);
+            this.Controls.Add(this.runeBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button3);
-            this.Controls.Add(this.runeBox2);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.listView2);
             this.Name = "RuneSelect";
             this.Text = "RuneSelect";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
-            this.runeBox2.ResumeLayout(false);
-            this.runeBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -299,17 +185,9 @@
         private System.Windows.Forms.ColumnHeader runesMValue;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
-        private System.Windows.Forms.GroupBox runeBox2;
-        private System.Windows.Forms.Label label8;
-        private RuneControl runeInventory;
-        private System.Windows.Forms.Label IRuneSub4;
-        private System.Windows.Forms.Label IRuneSub3;
-        private System.Windows.Forms.Label IRuneSub2;
-        private System.Windows.Forms.Label IRuneSub1;
-        private System.Windows.Forms.Label IRuneInnate;
-        private System.Windows.Forms.Label IRuneMain;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label IRuneMon;
+        private RuneBox runeBox1;
+        private System.Windows.Forms.ColumnHeader runesPoints;
     }
 }

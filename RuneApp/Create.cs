@@ -995,7 +995,7 @@ namespace RuneApp
                         build.runePrediction.Remove(tab);
                     }
                     else
-                        build.runePrediction[tab] = new KeyValuePair<int, bool>(raiseLevel, cb.Checked);
+                        build.runePrediction[tab] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
                 }
 
                 if (build.runePrediction.ContainsKey(tab))
@@ -1283,7 +1283,7 @@ namespace RuneApp
             if (!build.runeScoring.ContainsKey(tab))
                 return;
 
-            int fake = 0;
+            int? fake = 0;
             bool pred = false;
             if (build.runePrediction.ContainsKey(tab))
             {
@@ -1299,7 +1299,7 @@ namespace RuneApp
             double points = 0;
             foreach (var stat in Build.statNames)
             {
-                bool s = GetPts(rune, tab, stat, ref points, fake, pred);
+                bool s = GetPts(rune, tab, stat, ref points, fake ?? 0, pred);
                 if (scoring == 1)
                     res &= s;
                 else if (scoring == 0)

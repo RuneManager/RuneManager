@@ -1613,10 +1613,10 @@ namespace RuneApp
                     else
                         numchanged++;
                 }
-                powerup += Math.Max(0, b.Best.Current.FakeLevel[r.Slot - 1] - r.Level);
+                powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1] ?? 0) - r.Level);
                 if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
                 {
-                    int tup = (int)Math.Floor(Math.Min(12, b.Best.Current.FakeLevel[r.Slot - 1]) / (double)3);
+                    int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1] ?? 0)) / (double)3);
                     int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
                     upgrades += Math.Max(0, tup - cup);
                 }
@@ -2365,177 +2365,57 @@ namespace RuneApp
                 bool isTestInherited = false;
                 string testForm = null;
 
-                if (test == -1)
+                if (test == null)
                 {
                     if (slot > 0)
                     {
-                        if (build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")))
-                        {
-                            var bgf = build.runeScoring.ContainsKey((slot % 2 == 0 ? "e" : "o")) ? build.runeScoring[(slot % 2 == 0 ? "e" : "o")] : new KeyValuePair<int, double?>(-1, null);
-                            if (bgf.Value != null)
-                            {
-                                test = bgf.Value;
-                                isTestInherited = true;
-                                testForm = "=A" + (rowstat - (slot) % 2);
-                            }
-                        }
-
-                        if (!isTestInherited && build.runeScoring.ContainsKey("g"))
-                        {
-                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double?>(-1, null);
-                            if (bgf.Value != null)
-                            {
-                                test = bgf.Value;
-                                isTestInherited = true;
-                                testForm = "=A" + (rowstat - 2);
-                            }
-                        }
+                        isTestInherited = true;
+                        testForm = "=A" + (rowstat - (slot) % 2);
+                        
                     }
                     else if (slot < 0)
                     {
-                        if (build.runeScoring.ContainsKey("g"))
-                        {
-                            var bgf = build.runeScoring.ContainsKey("g") ? build.runeScoring["g"] : new KeyValuePair<int, double?>(-1, null);
-                            if (bgf.Value != null)
-                            {
-                                test = bgf.Value;
-                                isTestInherited = true;
-                                testForm = "=A" + (rowstat - 2);
-                            }
-                        }
+                        isTestInherited = true;
+                        testForm = "=A" + (rowstat - 2);
                     }
                 }
-                if (test >= 0)
-                {
-                    if (testForm == null)
-                        ws.Cells[row, 1].Value = test;
-                    else
-                        ws.Cells[row, 1].Formula = testForm;
-                }
+                if (testForm == null)
+                    ws.Cells[row, 1].Value = test;
+                else
+                    ws.Cells[row, 1].Formula = testForm;
 
                 if (isTestInherited)
                 {
                     ws.Cells[row, 1].Style.Font.Color.SetColor(Color.Gray);
                 }
+                ws.Cells[row, 1].Style.Numberformat.Format = "#";
 
                 for (int j = 0; j < Build.statNames.Length; j++)
                 {
                     var stat = Build.statNames[j];
-                    
-                    double? flat = rf?.ContainsKey(stat) ?? false ? rf[stat].Flat : null;
-                    double? perc = rf?.ContainsKey(stat) ?? false ? rf[stat].Percent : null;
-                    bool isFlatInherited = false;
-                    bool isPercInherited = false;
-                    string flatForm = null;
-                    string percForm = null;
 
-                    if (flat == null)
+                    foreach (var sstr in new string[] { "flat", "perc" })
                     {
-                        if (slot > 0)
+                        if (!((sstr == "flat" && j < 4) || (sstr == "perc" && j != 3)))
+                            continue;
+                        
+                        double? vvv = rf?.ContainsKey(stat) ?? false ? rf[stat][sstr] : null;
+                        string sssForm = null;
+                        if (vvv == null)
                         {
-                            if (build.runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
-                            {
-                                var bgf = build.runeFilters[(slot % 2 == 0 ? "e" : "o")];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
-                                {
-                                    flat = bgf[stat].Flat;
-                                    isFlatInherited = true;
-                                    flatForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
-                                }
-                            }
-
-                            if (!isFlatInherited && build.runeFilters.ContainsKey("g"))
-                            {
-                                var bgf = build.runeFilters["g"];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
-                                {
-                                    flat = bgf[stat].Flat;
-                                    isFlatInherited = true;
-                                    flatForm = "=" + abc[col - 1] + (rowstat - 2);
-                                }
-                            }
+                            if (slot > 0)
+                                sssForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
+                            else if (slot < 0)
+                                sssForm = "=" + abc[col - 1] + (rowstat - 2);
                         }
-                        else if (slot < 0)
-                        {
-                            if (build.runeFilters.ContainsKey("g"))
-                            {
-                                var bgf = build.runeFilters["g"];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Flat != null)
-                                {
-                                    flat = bgf[stat].Flat;
-                                    isFlatInherited = true;
-                                    flatForm = "=" + abc[col - 1] + (rowstat - 2);
-                                }
-                            }
-                        }
-                    }
-
-                    if (j < 4)
-                    {
-                        if (flatForm == null)
-                            ws.Cells[row, col].Value = flat;
+                        if (sssForm == null)
+                            ws.Cells[row, col].Value = vvv;
                         else
-                            ws.Cells[row, col].Formula = flatForm;
-
-                        if (isFlatInherited)
                         {
+                            ws.Cells[row, col].Formula = sssForm;
                             ws.Cells[row, col].Style.Font.Color.SetColor(Color.Gray);
                         }
-                        col++;
-                    }
-
-                    if (perc == null)
-                    {
-                        if (slot > 0)
-                        {
-                            if (build.runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
-                            {
-                                var bgf = build.runeFilters[(slot % 2 == 0 ? "e" : "o")];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
-                                {
-                                    perc = bgf[stat].Percent;
-                                    isPercInherited = true;
-                                    percForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
-                                }
-                            }
-
-                            if (!isFlatInherited && build.runeFilters.ContainsKey("g"))
-                            {
-                                var bgf = build.runeFilters["g"];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
-                                {
-                                    perc = bgf[stat].Percent;
-                                    isPercInherited = true;
-                                    percForm = "=" + abc[col - 1] + (rowstat - 2);
-                                }
-                            }
-                        }
-                        else if (slot < 0)
-                        {
-                            if (build.runeFilters.ContainsKey("g"))
-                            {
-                                var bgf = build.runeFilters["g"];
-                                if (bgf.ContainsKey(stat) && bgf[stat].Percent != null)
-                                {
-                                    perc = bgf[stat].Percent;
-                                    isPercInherited = true;
-                                    percForm = "=" + abc[col - 1] + (rowstat - 2);
-                                }
-                            }
-                        }
-                    }
-
-                    if (j != 3)
-                    {
-                        if (percForm == null)
-                            ws.Cells[row, col].Value = perc;
-                        else
-                            ws.Cells[row, col].Formula = percForm;
-
-                        if (isPercInherited)
-                        {
-                            ws.Cells[row, col].Style.Font.Color.SetColor(Color.Gray);
-                        }
+                        ws.Cells[row, col].Style.Numberformat.Format = "#";
                         col++;
                     }
                 }
@@ -2580,6 +2460,8 @@ namespace RuneApp
             var good = build.runeUsage.runesGood.Select(r => r.Key);
             var second = build.runeUsage.runesSecond.Select(r => r.Key);
             var bad = used.Except(good);
+
+            Console.WriteLine("Used runes: " + used.Count());
 
             //string[] cellStrings = Enumerable.Repeat("=", 6).ToArray();
             
@@ -2666,7 +2548,7 @@ namespace RuneApp
             var cond = ws.ConditionalFormatting.AddExpression(new ExcelAddress(rstart + 1, 1, row - 1, 1));
             cond.Formula = "A" + (rstart + 1) + ">=INDIRECT(ADDRESS(" + (rstart - 7) + "+C" + (rstart + 1) + ",1))";
             cond.Style.Fill.PatternType = ExcelFillStyle.Solid;
-            cond.Style.Fill.BackgroundColor.Color = Color.Green;
+            cond.Style.Fill.BackgroundColor.Color = Color.LimeGreen;
 
             cond = ws.ConditionalFormatting.AddExpression(new ExcelAddress(rstart + 1, 1, row - 1, 1));
             cond.Formula = "A" + (rstart + 1) + "<INDIRECT(ADDRESS(" + (rstart - 7) + "+C" + (rstart + 1) + ",1))";
@@ -2986,7 +2868,7 @@ namespace RuneApp
                 }
                 keep += 10;
             }
-            formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]],10,0)" : ((r.manageStats["In"] > 0) ? "+10" : "");
+            formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]]<>\"No\",10,0)" : ((r.manageStats["In"] > 0) ? "+10" : "");
 
             // TODO: skip upgrading if rune is trash
 
@@ -3478,10 +3360,10 @@ namespace RuneApp
                             else
                                 numchanged++;
                         }
-                        powerup += Math.Max(0, load.FakeLevel[r.Slot - 1] - r.Level);
+                        powerup += Math.Max(0, (load.FakeLevel[r.Slot - 1] ?? 0) - r.Level);
                         if (load.FakeLevel[r.Slot - 1] != 0)
                         {
-                            int tup = (int)Math.Floor(Math.Min(12, load.FakeLevel[r.Slot - 1]) / (double)3);
+                            int tup = (int)Math.Floor(Math.Min(12, (load.FakeLevel[r.Slot - 1] ?? 0)) / (double)3);
                             int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
                             upgrades += Math.Max(0, tup - cup);
                         }

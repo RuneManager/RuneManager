@@ -164,15 +164,15 @@ namespace RuneOptim
         // also, attempt to give weight to unassigned powerup bonuses
         // tab, RAISE, magic
         [JsonProperty("runePrediction")]
-        public Dictionary<string, KeyValuePair<int, bool>> runePrediction = new Dictionary<string, KeyValuePair<int, bool>>();
+        public Dictionary<string, KeyValuePair<int?, bool>> runePrediction = new Dictionary<string, KeyValuePair<int?, bool>>();
 
         public bool ShouldSerializerunePrediction()
         {
-            Dictionary<string, KeyValuePair<int, bool>> npred = new Dictionary<string, KeyValuePair<int, bool>>();
+            Dictionary<string, KeyValuePair<int?, bool>> npred = new Dictionary<string, KeyValuePair<int?, bool>>();
             foreach (var tabPair in runePrediction)
             {
                 if (tabPair.Value.Key != 0 || tabPair.Value.Value)
-                    npred.Add(tabPair.Key, new KeyValuePair<int, bool>(tabPair.Value.Key, tabPair.Value.Value));
+                    npred.Add(tabPair.Key, new KeyValuePair<int?, bool>(tabPair.Value.Key, tabPair.Value.Value));
             }
             runePrediction = npred;
 
@@ -346,33 +346,33 @@ namespace RuneOptim
             return pts;
         }
 
-        void GetPrediction(int[] slotFakes, bool[] slotPred)
+        void GetPrediction(int?[] slotFakes, bool[] slotPred)
         {
             // crank the rune prediction
             for (int i = 0; i < 6; i++)
             {
-                int raiseTo = 0;
+                int? raiseTo = 0;
                 bool predictSubs = false;
 
                 // find the largest number to raise to
                 // if any along the tree say to predict, do it
                 if (runePrediction.ContainsKey("g"))
                 {
-                    int glevel = runePrediction["g"].Key;
+                    int? glevel = runePrediction["g"].Key;
                     if (glevel > raiseTo)
                         raiseTo = glevel;
                     predictSubs |= runePrediction["g"].Value;
                 }
                 if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
                 {
-                    int mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                    int? mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
                     if (mlevel > raiseTo)
                         raiseTo = mlevel;
                     predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
                 }
                 if (runePrediction.ContainsKey((i + 1).ToString()))
                 {
-                    int slevel = runePrediction[(i + 1).ToString()].Key;
+                    int? slevel = runePrediction[(i + 1).ToString()].Key;
                     if (slevel > raiseTo)
                         raiseTo = slevel;
                     predictSubs |= runePrediction[(i + 1).ToString()].Value;
@@ -471,7 +471,7 @@ namespace RuneOptim
 
                 Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
-                int[] slotFakes = new int[6];
+                int?[] slotFakes = new int?[6];
                 bool[] slotPred = new bool[6];
                 GetPrediction(slotFakes, slotPred);
                 
@@ -483,22 +483,22 @@ namespace RuneOptim
                 SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
                 Parallel.ForEach(runes[0], (r0, loopState) =>
                 {
-                if (!isRun)
-                    //break;
-                    loopState.Break();
+                    if (!isRun)
+                        //break;
+                        loopState.Break();
 
-                // number of builds ruled out since last sync
-                int kill = 0;
-                // number of builds added since last sync
-                int plus = 0;
+                    // number of builds ruled out since last sync
+                    int kill = 0;
+                    // number of builds added since last sync
+                    int plus = 0;
 
-                Monster test = new Monster(mon);
-                test.Current.Shrines = shrines;
-                test.Current.Leader = leader;
+                    Monster test = new Monster(mon);
+                    test.Current.Shrines = shrines;
+                    test.Current.Leader = leader;
 
-                test.Current.FakeLevel = slotFakes;
-                test.Current.PredictSubs = slotPred;
-                test.ApplyRune(r0, 6);
+                    test.Current.FakeLevel = slotFakes;
+                    test.Current.PredictSubs = slotPred;
+                    test.ApplyRune(r0, 6);
 
                     foreach (Rune r1 in runes[1])
                     {
@@ -815,17 +815,23 @@ namespace RuneOptim
 
         public int GetPredict(Rune r)
         {
-            int pred = runePrediction.ContainsKey("g") ? runePrediction["g"].Key : 0;
+            int? pred = runePrediction.ContainsKey("g") ? runePrediction["g"].Key : null;
 
-            if (r.Slot > 0 && runePrediction.ContainsKey(r.Slot % 2 == 0 ? "e" : "o") && runePrediction[r.Slot % 2 == 0 ? "e" : "o"].Key >= 0)
-                pred = runePrediction[r.Slot % 2 == 0 ? "e" : "o"].Key;
-            if (runePrediction.ContainsKey(r.Slot.ToString()) && runePrediction[r.Slot.ToString()].Key >= 0)
-                pred = runePrediction[r.Slot.ToString()].Key;
+            if (runePrediction.ContainsKey(r.Slot % 2 == 0 ? "e" : "o"))
+            {
+                var kv = runePrediction[r.Slot % 2 == 0 ? "e" : "o"];
+                if (pred == null || (kv.Key != null && kv.Key > pred))
+                    pred = kv.Key;
+            }
+
+            if (runePrediction.ContainsKey(r.Slot.ToString()))
+            {
+                var kv = runePrediction[r.Slot.ToString()];
+                if (pred == null || (kv.Key != null && kv.Key > pred))
+                    pred = kv.Key;
+            }
             
-            if (pred == -1)
-                pred = 0;
-
-            return pred;
+            return pred ?? 0;
         }
 
         public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false)
@@ -948,16 +954,16 @@ namespace RuneOptim
         }
 
 		// Try to determine the subs required to meet the minimum. Will guess Evens by: Slot, Health%, Attack%, Defense%
-		public Stats NeededForMin(int[] slotFakes, bool[] slotPred)
+		public Stats NeededForMin(int?[] slotFakes, bool[] slotPred)
 		{
 			var smon = (Stats)mon;//.GetStats();
 			var smin = Minimum;
 
             Stats ret = smin - smon;
 
-			var avATK = runes[0].Average(r => r.GetValue(Attr.AttackFlat, slotFakes[0], slotPred[0]));
-			var avDEF = runes[2].Average(r => r.GetValue(Attr.DefenseFlat, slotFakes[2], slotPred[2]));
-			var avHP = runes[4].Average(r => r.GetValue(Attr.HealthFlat, slotFakes[4], slotPred[4]));
+			var avATK = runes[0].Average(r => r.GetValue(Attr.AttackFlat, (slotFakes[0] ?? 0), slotPred[0]));
+			var avDEF = runes[2].Average(r => r.GetValue(Attr.DefenseFlat, (slotFakes[2] ?? 0), slotPred[2]));
+			var avHP = runes[4].Average(r => r.GetValue(Attr.HealthFlat, (slotFakes[4] ?? 0), slotPred[4]));
 
 			ret.Attack -= avATK;
 			ret.Defense -= avDEF;
@@ -979,15 +985,15 @@ namespace RuneOptim
 
 			// get the average MainStats for slots
 			var avSel = runes[1].Where(r => r.MainType == Attr.Speed).ToArray();
-			var avmSpeed = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Speed, slotFakes[1], slotPred[1]));
+			var avmSpeed = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Speed, (slotFakes[1] ?? 0), slotPred[1]));
 			avSel = runes[3].Where(r => r.MainType == Attr.CritRate).ToArray();
-			var avmCRate = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritRate, slotFakes[3], slotPred[3]));
+			var avmCRate = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritRate, (slotFakes[3] ?? 0), slotPred[3]));
 			avSel = runes[3].Where(r => r.MainType == Attr.CritDamage).ToArray();
-			var avmCDam = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritDamage, slotFakes[3], slotPred[3]));
+			var avmCDam = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritDamage, (slotFakes[3] ?? 0), slotPred[3]));
 			avSel = runes[5].Where(r => r.MainType == Attr.Accuracy).ToArray();
-			var avmAcc = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Accuracy, slotFakes[5], slotPred[5]));
+			var avmAcc = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Accuracy, (slotFakes[5] ?? 0), slotPred[5]));
 			avSel = runes[5].Where(r => r.MainType == Attr.Resistance).ToArray();
-			var avmRes = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Resistance, slotFakes[5], slotPred[5]));
+			var avmRes = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Resistance, (slotFakes[5] ?? 0), slotPred[5]));
 
 			if (avmSpeed > 20 && ret.Speed > avmSpeed + 10)
 			{
@@ -1100,7 +1106,7 @@ namespace RuneOptim
                 }
             }
 
-			int[] slotFakes = new int[6];
+			int?[] slotFakes = new int?[6];
 			bool[] slotPred = new bool[6];
             GetPrediction(slotFakes, slotPred);
 
@@ -1164,7 +1170,7 @@ namespace RuneOptim
 				for (int i = 0; i < 6; i++)
 				{
 					// default fail OR
-					Predicate<Rune> slotTest = RuneScoring(i + 1, slotFakes[i], slotPred[i]);
+					Predicate<Rune> slotTest = RuneScoring(i + 1, (slotFakes[i] ?? 0), slotPred[i]);
 
 					runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
 

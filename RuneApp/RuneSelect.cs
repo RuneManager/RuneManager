@@ -23,6 +23,10 @@ namespace RuneApp
             InitializeComponent();
             // when show, check if we have been given cool things
             Shown += RuneSelect_Shown;
+
+            var sorter = new ListViewSort();
+            listView2.ListViewItemSorter = sorter;
+
         }
 
         void RuneSelect_Shown(object sender, EventArgs e)
@@ -30,12 +34,18 @@ namespace RuneApp
             // dump out the rune details
             foreach (Rune rune in runes.OrderBy(r => r.ID))
             {
-                if (build != null && rune.Slot % 2 == 0)
+                double points = 0;
+                if (build != null)
                 {
-                    if (build.slotStats[rune.Slot-1].Count > 0)
+                    points = build.ScoreRune(rune, build.GetPredict(rune), false);
+
+                    if (rune.Slot % 2 == 0)
                     {
-                        if (!build.slotStats[rune.Slot-1].Contains(rune.MainType.ToForms()))
-                            continue;
+                        if (build.slotStats[rune.Slot - 1].Count > 0)
+                        {
+                            if (!build.slotStats[rune.Slot - 1].Contains(rune.MainType.ToForms()))
+                                continue;
+                        }
                     }
                 }
 
@@ -44,7 +54,8 @@ namespace RuneApp
                     rune.ID.ToString(),
                     rune.Grade.ToString(),
                     Rune.StringIt(rune.MainType, true),
-                    rune.MainValue.ToString()
+                    rune.MainValue.ToString(),
+                    points.ToString()
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
@@ -58,6 +69,8 @@ namespace RuneApp
             }
             if (build != null)
             {
+                listView2.Columns[5].Width = 50;
+
                 // Find all the runes in the build for the slot
                 List<Rune> fr = new List<Rune>();
                 switch (slot)
@@ -138,6 +151,9 @@ namespace RuneApp
         // Show the little preview window of the given rune
         private void ShowRune(Rune rune)
         {
+            runeBox1.Show();
+            runeBox1.SetRune(rune);
+            /*
             runeBox2.Show();
             runeInventory.SetRune(rune);
 
@@ -147,7 +163,7 @@ namespace RuneApp
             IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
             IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
             IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
-            IRuneMon.Text = rune.AssignedName;
+            IRuneMon.Text = rune.AssignedName;*/
         }
 
         // return the highlighted rune
@@ -177,6 +193,13 @@ namespace RuneApp
                 DialogResult = DialogResult.OK;
                 Close();
             }
+        }
+        
+        private void listView2_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            var sorter = (ListViewSort)((ListView)sender).ListViewItemSorter;
+            sorter.OnColumnClick(e.Column);
+            ((ListView)sender).Sort();
         }
 
     }

@@ -111,7 +111,7 @@ namespace RuneOptim
                 case "DPS":
                     return (ExtraValue("AvD") * (Speed / 100));
                 case "AvD":
-                    return Attack + (ExtraValue("MxD") * (Math.Min(CritRate, 100) / 100));
+                    return Attack + (Attack * CritDamage / 100 * (Math.Min(CritRate, 100) / 100));
                 case "MxD":
                     return (Attack * (1 + CritDamage / 100));
                 default:
@@ -130,7 +130,7 @@ namespace RuneOptim
                 case Attr.DamagePerSpeed:
                     return (ExtraValue("AvD") * (Speed / 100));
                 case Attr.AverageDamage:
-                    return Attack + (ExtraValue("MxD") * (Math.Min(CritRate, 100) / 100));
+                    return Attack + (Attack * CritDamage / 100 * (Math.Min(CritRate, 100) / 100));
                 case Attr.MaxDamage:
                     return (Attack * (1 + CritDamage / 100));
                 default:
