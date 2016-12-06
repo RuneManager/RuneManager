@@ -1047,8 +1047,18 @@ namespace RuneApp
 
         private void userManualHelpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            help = new Help();
-            help.Show();
+            if (help == null || help.IsDisposed)
+                help = new Help();
+
+            if (!help.Visible)
+            {
+                help.Show(this);
+                var xx = Location.X + 1105 + 8 - 271;//271, 213
+                var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
+                help.Height = this.Height;
+                help.Location = new Point(xx, yy);
+                help.Location = new Point(Location.X + Width, Location.Y);
+            }
         }
 
         private void runelistSwapLocked(object sender, EventArgs e)

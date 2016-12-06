@@ -14,6 +14,7 @@
                 ele.style.display = "";
         }
     </script>
+	<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <h1>Build Specs</h1>
@@ -51,9 +52,9 @@
     The right side is the amount needed (after division).<br />
     If you choose "SUM", then after adding all the divided numbers, it will check the Sum&gt;= Box.<br />
     <a href="javascript:showHide('example_or');">Or Example</a><br />
-    <div id="example_or" style="display: none">
-        Okay, so you want to get some Violent runes, but you know you need health and speed.<br />
-        You could say that you want greater than 5 SPD <b>OR</b>10% HP.<br />
+    <div id="example_or" class="showblock" style="display: none">
+        You want to get some Violent runes, but you know you need health and speed.<br />
+        You could say that you want greater than 5 SPD <b>OR</b> 10% HP.<br />
         Keeping the dropdown on "OR", just put a 1 in HP Percent and SPD Flat, <br />
         then a 10 in the last box for HP, and a 5 in the SPD box.<br />
         That'd allow runes like [7 spd], [12% hp], [6 spd & 11% hp].<br />
@@ -61,9 +62,9 @@
         <br />
     </div>
     <a href="javascript:showHide('example_and');">And Example</a><br />
-    <div id="example_and" style="display: none">
-        Okay, so you want to get some Violent runes, but you know you need health and speed.<br />
-        You could say that you want greater than 5 SPD <b>AND</b>10% HP.<br />
+    <div id="example_and" class="showblock" style="display: none">
+        You want to get some Violent runes, but you know you need health and speed.<br />
+        You could say that you want greater than 5 SPD <b>AND</b> 10% HP.<br />
         Changing the dropdown to "AND", just put a 1 in HP Percent and SPD Flat, <br />
         then a 10 in the last box for HP, and a 5 in the SPD box.<br />
         That'd only allow runes like [6 spd & 11% hp].<br />
@@ -71,8 +72,8 @@
         <br />
     </div>
     <a href="javascript:showHide('example_sum');">Sum Example</a><br />
-    <div id="example_sum" style="display: none">
-        Okay, so you want to get some Violent runes, but you know you need health and speed.<br />
+    <div id="example_sum" class="showblock" style="display: none">
+        You want to get some Violent runes, but you know you need health and speed.<br />
         You could say that you want the <b>SUM</b> of SPD and HP% to be greater than 12<br />
         Changing the dropdown to "SUM", just put a 1 in HP Percent and SPD Flat, <br />
         then in the Sum &gt;= box, a 12<br />

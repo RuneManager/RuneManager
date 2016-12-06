@@ -346,7 +346,11 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Resources\accuracy.png" />
     <Content Include="Resources\boxToMon.png" />
+    <None Include="Resources\enhance.png" />
+    <None Include="Resources\fight.png" />
+    <None Include="Resources\determination.png" />
     <Content Include="Resources\fromMon.png" />
     <Content Include="Resources\locked.png" />
     <Content Include="Resources\lockedNo.png" />
@@ -354,6 +358,7 @@
     <Content Include="Resources\monToBox.png" />
     <Content Include="Resources\resume.png" />
     <Content Include="Resources\runedial.png" />
+    <None Include="Resources\tolerance.png" />
     <Content Include="Resources\toMon.png" />
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />

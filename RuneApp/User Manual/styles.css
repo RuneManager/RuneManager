@@ -1,0 +1,10 @@
+h2[onclick] {
+	text-decoration: underline;
+	cursor: pointer;
+	background: lightblue;
+}
+
+.showblock {
+	border: 1px solid black;
+	display: table;
+}

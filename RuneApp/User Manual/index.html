@@ -14,6 +14,7 @@
                 ele.style.display = "";
         }
     </script>
+	<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <h1>Rune Manager</h1>
@@ -27,7 +28,7 @@
     <br />
     If you click some of the headers/titles, you can show/hide the section<br />
     <h2 onclick="javascript:showHide('updates');">Updates</h2>
-    <div id="updates">
+    <div id="updates" style="display: none">
         Clearly the most important.<br />
         If you didn't know how to use the program and I released a user guide, how would you know to get it?<br />
         <img src="images\update.png" /><br />
@@ -35,7 +36,7 @@
         The "Download" button will direct to a webpage to grab the latest version<br />
     </div>
     <h2 onclick="javascript:showHide('monsters');">Monsters</h2>
-    <div id="monsters">
+    <div id="monsters" style="display: none">
         The first thing you'll want, is to load up your Monsters and Runes.<br />
         Currently, you can either manually enter them in through 
         <a href="https://swarfarm.com/" target="_blank">SWarFarm</a>
@@ -60,7 +61,7 @@
         <img src="images/fromMon.png" />Unequips all the runes from the selected Monsters.<br />
     </div>
     <h2 onclick="javascript:showHide('builds');">Builds</h2>
-    <div id="builds">
+    <div id="builds" style="display: none">
         First off, this box:<br />
         <img src="images/equipped.png" /><br />
         If you want to use currently equipped runes in new builds, check it.<br />
@@ -84,7 +85,7 @@
         <img src="images/resume.png" />Runs all builds that don't have a loadout.<br />
     </div>
     <h2 onclick="javascript:showHide('loadouts');">Loadouts</h2>
-    <div id="loadouts">
+    <div id="loadouts" style="display: none">
         Here's all the fresh builds.<br />
         <img src="images/loadouts_list.png" /><br />
         This list contains a loadout that was generated based on the selected criteria in the associated build.<br />
@@ -114,7 +115,7 @@
         The Find Slot button will show all the runes you have for that slot.<br />
     </div>
     <h2 onclick="javascript:showHide('shrines');">Shrines</h2>
-    <div id="shrines">
+    <div id="shrines" style="display: none">
         Here you can set what level/effect your shrines have.<br />
         <img src="images/shrines.png" /><br />
         More will be added later.<br />
