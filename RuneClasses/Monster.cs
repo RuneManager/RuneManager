@@ -45,7 +45,7 @@ namespace RuneOptim
 					if (Current.Runes[i] != null)
 	                    cost += Current.Runes[i].UnequipCost;
                     // unequip new rune from host
-                    if ((l.Runes[i].AssignedName != "Unknown name" || l.Runes[i].AssignedName == "Inventory") && l.Runes[i].Swapped != true)
+                    if ((l.Runes[i].IsUnassigned) && l.Runes[i].Swapped != true)
                     {
                         cost += l.Runes[i].UnequipCost;
                     }

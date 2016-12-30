@@ -956,6 +956,12 @@ namespace RuneOptim
 		// Try to determine the subs required to meet the minimum. Will guess Evens by: Slot, Health%, Attack%, Defense%
 		public Stats NeededForMin(int?[] slotFakes, bool[] slotPred)
 		{
+            foreach (var rs in runes)
+            {
+                if (rs.Length <= 0)
+                    return null;
+            }
+
 			var smon = (Stats)mon;//.GetStats();
 			var smin = Minimum;
 
@@ -1075,7 +1081,7 @@ namespace RuneOptim
                 // Only using 'inventory' or runes on mon
                 // also, include runes which have been unequipped (should only look above)
                 if (!useEquipped)
-                    rsGlobal = rsGlobal.Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped);
+                    rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedName == mon.Name) || r.Swapped);
                 // only if the rune isn't currently locked for another purpose
                 if (!useLocked)
                     rsGlobal = rsGlobal.Where(r => r.Locked == false);
@@ -1134,7 +1140,7 @@ namespace RuneOptim
 					}
 					// cull here instead
 					if (!useEquipped)
-						runes[i] = runes[i].Where(r => (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory" || r.AssignedName == mon.Name) || r.Swapped).ToArray();
+						runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedName == mon.Name) || r.Swapped).ToArray();
 					if (!useLocked)
 						runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
 				}
@@ -1144,27 +1150,33 @@ namespace RuneOptim
 			if (autoRuneSelect)
 			{
 				var needed = NeededForMin(slotFakes, slotPred);
-				var needRune = new Stats(needed) / 6;
+                if (needed == null)
+                    autoRuneSelect = false;
 
-				// reduce number of runes to 10-15
+                if (autoRuneSelect)
+                {
+                    var needRune = new Stats(needed) / 6;
 
-				// odds first, then evens
-				foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 })
-				{
-                    Rune[] rr = new Rune[0];
-                    foreach (var rs in RequiredSets)
+                    // reduce number of runes to 10-15
+
+                    // odds first, then evens
+                    foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 })
                     {
-                        rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(7).ToArray()).ToArray();
+                        Rune[] rr = new Rune[0];
+                        foreach (var rs in RequiredSets)
+                        {
+                            rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(7).ToArray()).ToArray();
+                        }
+                        if (rr.Length < 15)
+                            rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(15 - rr.Length).ToArray()).Distinct().ToArray();
+
+                        runes[i] = rr;
                     }
-                    if (rr.Length < 15)
-                        rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(15 - rr.Length).ToArray()).Distinct().ToArray();
 
-                    runes[i] = rr;
+                    CleanBroken();
                 }
-
-                CleanBroken();
 			}
-			else
+			if (!autoRuneSelect)
 			{
 				// Filter each runeslot
 				for (int i = 0; i < 6; i++)

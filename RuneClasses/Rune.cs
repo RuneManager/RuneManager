@@ -353,6 +353,15 @@ namespace RuneOptim
                 return 0;
             }
         }
+
+        [JsonIgnore]
+        public bool IsUnassigned
+        {
+            get
+            {
+                return new string[] { "Unknown name", "Inventory", "Unknown name (???[0])" }.Any(s => s.Equals(this.AssignedName));
+            }
+        }
         
         [JsonIgnore]
         public double Efficiency

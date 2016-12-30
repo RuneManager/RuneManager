@@ -1516,7 +1516,7 @@ namespace RuneApp
             if ((pli?.Tag as Build) == null)
                 return;
 
-            RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate { pli.SubItems[3].Text = s; }));
+            RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate { if (!this.IsDisposed) pli.SubItems[3].Text = s; }));
         }
 
         private void RunBuild(Build b, bool saveStats = false, Action<string> printTo = null)
@@ -1618,7 +1618,7 @@ namespace RuneApp
                 r.Locked = true;
                 if (r.AssignedName != b.Best.Name)
                 {
-                    if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
+                    if (r.IsUnassigned)
                         numnew++;
                     else
                         numchanged++;
@@ -2591,7 +2591,7 @@ namespace RuneApp
             List<string> colHead = new List<string>();
 
             // ,MType,Points,FlatPts
-            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
             {
                 colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
@@ -2643,6 +2643,18 @@ namespace RuneApp
 
             foreach (Rune r in data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
             {
+                Monster m = null;
+                if (r.manageStats.GetOrAdd("Mon", -1) != -1)
+                {
+                    m = data.GetMonster((int)r.manageStats["Mon"]);
+                }
+
+                Build b = null;
+                if (m != null)
+                {
+                    b = builds.Where(bu => bu.mon == m).FirstOrDefault();
+                }
+
                 for (col = 1; col <= colHead.Count; col++)
                 {
                     switch (colHead[col - 1])
@@ -2713,15 +2725,15 @@ namespace RuneApp
                             break;
                         case "Points":
                             break;
+                        case "Priority":
+                            ws.Cells[row, col].Value = b?.priority;
+                            break;
                         case "CurMon":
-                            if (r.AssignedName != "Unknown name" && r.AssignedName != "Inventory")
+                            if (!r.IsUnassigned)
                                 ws.Cells[row, col].Value = r.AssignedName;
                             break;
                         case "Mon":
-                            if (r.manageStats.GetOrAdd("Mon", -1) != -1)
-                            {
-                                ws.Cells[row, col].Value = data.GetMonster((int)r.manageStats["Mon"]).Name;
-                            }
+                            ws.Cells[row, col].Value = m?.Name;
                             break;
                         case "Flats":
                             ws.Cells[row, col].Value = r.FlatCount();
@@ -3365,7 +3377,7 @@ namespace RuneApp
                         r.manageStats["Mon"] = b.mon.ID;
                         if (r.AssignedName != b.MonName)
                         {
-                            if (r.AssignedName == "Unknown name" || r.AssignedName == "Inventory")
+                            if (r.IsUnassigned)
                                 numnew++;
                             else
                                 numchanged++;
