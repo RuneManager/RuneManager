@@ -61,22 +61,13 @@ namespace RuneApp
 			foreach (string stat in Build.statNames)
 			{
 				x = 25;
-				label = new Label();
-				label.Name = stat + "Label";
-				label.Location = new Point(x, y);
-				label.Size = new Size(40, 20);
-				label.Text = stat;
-				groupBox1.Controls.Add(label);
+				label = groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, text: stat);
 				x += 45;
 
-				textBox = new TextBox();
-				textBox.Name = stat + "Worth";
-				textBox.Location = new Point(x, y);
-				textBox.Size = new Size(40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y);
 				if (build.Sort[stat] != 0)
 					textBox.Text = build.Sort[stat].ToString();
                 textBox.TextChanged += textBox_TextChanged;
-                groupBox1.Controls.Add(textBox);
 
 				y += 22;
 
@@ -85,22 +76,13 @@ namespace RuneApp
             foreach (string extra in Build.extraNames)
             {
                 x = 25;
-                label = new Label();
-                label.Name = extra + "Label";
-                label.Location = new Point(x, y);
-                label.Size = new Size(40, 20);
-                label.Text = extra;
-                groupBox1.Controls.Add(label);
+                label = groupBox1.Controls.MakeControl<Label>(extra, "Label", x, y, text: extra);
                 x += 45;
 
-                textBox = new TextBox();
-                textBox.Name = extra + "Worth";
-                textBox.Location = new Point(x, y);
-                textBox.Size = new Size(40, 20);
+                textBox = groupBox1.Controls.MakeControl<TextBox>(extra, "Worth", x, y);
                 if (build.Sort.ExtraGet(extra) != 0)
                     textBox.Text = build.Sort.ExtraGet(extra).ToString();
                 textBox.TextChanged += textBox_TextChanged;
-                groupBox1.Controls.Add(textBox);
 
                 y += 22;
 
@@ -162,6 +144,18 @@ namespace RuneApp
                     
                     // put the sum points into the first item
 					li.SubItems[0].Text = pts.ToString("0.##");
+
+                    int underSpec = 0;
+                    int under12 = 0;
+                    foreach (var r in b.Current.Runes)
+                    {
+                        if (r.Level < 12)
+                            under12 += 12 - r.Level;
+                        if (build.runePrediction.ContainsKey(r.Slot.ToString()) && r.Level < (build.runePrediction[r.Slot.ToString()].Key ?? 0))
+                            underSpec += (build.runePrediction[r.Slot.ToString()].Key ?? 0) - r.Level;
+                    }
+
+                    li.SubItems[1].Text = underSpec + "/" + under12;
 					li.Tag = b;
                     if (grayLocked && b.Current.Runes.Any(r => r.Locked))
                         li.ForeColor = Color.Gray;

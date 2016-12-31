@@ -59,6 +59,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
             this.runeBuild.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -71,7 +72,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.loadoutList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
+            this.columnHeader1,
+            this.columnHeader2});
             this.loadoutList.FullRowSelect = true;
             this.loadoutList.Location = new System.Drawing.Point(12, 12);
             this.loadoutList.Name = "loadoutList";
@@ -470,6 +472,10 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "Levels";
+            // 
             // Generate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -526,5 +532,6 @@
         private System.Windows.Forms.Label SRuneSub1;
         private System.Windows.Forms.Label SRuneInnate;
         private System.Windows.Forms.Label SRuneMain;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
     }
 }
