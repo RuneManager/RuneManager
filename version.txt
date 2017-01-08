@@ -1,9 +1,7 @@
-0.3.0.0
+0.3.0.1
 https://github.com/Skibisky/RuneManager/releases/latest
-You can now try to check for second-best runes!
-Will run each build multiple times.
-Can stash loadouts for view later!
-A big runedial for easy viewing, click the mon face.
+Fixed AvDmg and leader stats.
+Added new runeset images.
+Prediction is a little nicer.
+0.3 - A big runedial for easy viewing, click the mon face.
 0.2.2.0 - Faster!
-AutoSelectRunes - use magic to pick the best ~15 runes per slot.
-Test timeout is configurable (0 = off, default = 20)
