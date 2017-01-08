@@ -140,11 +140,7 @@ namespace RuneApp
 					ListViewItem li = new ListViewItem();
 					var Cur = b.GetStats();
 
-                    double pts = GetPoints(Cur, (str, i)=> { li.SubItems.Add(str); });
                     
-                    // put the sum points into the first item
-					li.SubItems[0].Text = pts.ToString("0.##");
-
                     int underSpec = 0;
                     int under12 = 0;
                     foreach (var r in b.Current.Runes)
@@ -155,8 +151,13 @@ namespace RuneApp
                             underSpec += (build.runePrediction[r.Slot.ToString()].Key ?? 0) - r.Level;
                     }
 
-                    li.SubItems[1].Text = underSpec + "/" + under12;
-					li.Tag = b;
+                    li.SubItems.Add(underSpec + "/" + under12);
+                    double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
+
+                    // put the sum points into the first item
+                    li.SubItems[0].Text = pts.ToString("0.##");
+
+                    li.Tag = b;
                     if (grayLocked && b.Current.Runes.Any(r => r.Locked))
                         li.ForeColor = Color.Gray;
                     else
@@ -236,7 +237,7 @@ namespace RuneApp
         {
             double pts = 0;
             double p;
-            int i = 1;
+            int i = 2;
             foreach (Attr stat in Build.statAll)
             {
                 if (!stat.HasFlag(Attr.ExtraStat))
