@@ -153,6 +153,7 @@ namespace RuneApp
 
                     li.SubItems.Add(underSpec + "/" + under12);
                     double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
+                    b.score = pts;
 
                     // put the sum points into the first item
                     li.SubItems[0].Text = pts.ToString("0.##");
@@ -499,5 +500,31 @@ namespace RuneApp
             }
         }
 
+        private void btn_powerrunes_Click(object sender, EventArgs e)
+        {
+            if (!building)
+            {
+                var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
+                List<Rune> lrunes = new List<Rune>();
+                foreach (var g in mons)
+                {
+                    foreach (var r in g.Current.Runes)
+                    {
+                        r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
+
+                        if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
+                            lrunes.Add(r);
+                    }
+                }
+
+                using (var qq = new RuneSelect())
+                {
+                    qq.runes = lrunes;
+                    qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
+                    qq.runeStatKey = "besttestscore";
+                    qq.ShowDialog();
+                }
+            }
+        }
     }
 }

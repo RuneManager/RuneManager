@@ -1386,6 +1386,18 @@ namespace RuneApp
                     lv1li.ForeColor = Color.Green;
                 }
 
+                // make sure bad things are removed
+                foreach (var ftab in b.runeFilters)
+                {
+                    foreach (var filter in ftab.Value)
+                    {
+                        if (filter.Key == "SPD")
+                            filter.Value.Percent = null;
+                        if (filter.Key == "ACC" || filter.Key == "RES" || filter.Key == "CR" || filter.Key == "CD")
+                            filter.Value.Flat = null;
+                    }
+                }
+
                 // upgrade builds, hopefully
                 while (b.VERSIONNUM < Create.VERSIONNUM)
                 {
@@ -2475,7 +2487,7 @@ namespace RuneApp
 
             //string[] cellStrings = Enumerable.Repeat("=", 6).ToArray();
             
-            foreach (var r in used.OrderByDescending(r => good.Contains(r)).ThenByDescending(r => build.ScoreRune(r, build.GetPredict(r), false)))
+            foreach (var r in used.OrderByDescending(r => good.Contains(r)).ThenByDescending(r => build.ScoreRune(r, build.GetFakeLevel(r), false)))
             {
                 col = 1;
                 ws.Cells[row, col].Formula = ""; // build.ScoreRune(r, build.GetPredict(r), false);
@@ -2522,7 +2534,7 @@ namespace RuneApp
 
                 foreach (Attr stat in Build.statBoth)
                 {
-                    var fake = build.GetPredict(r);
+                    var fake = build.GetFakeLevel(r);
 
                     var rval = r[stat, fake, false];
 
@@ -2884,7 +2896,7 @@ namespace RuneApp
                 {
                     r.manageStats["Mon"] = b.mon.ID;
                     r.manageStats["Priority"] = b.priority / (double)builds.Max(bu => bu.priority);
-                    int p = b.GetPredict(r);
+                    int p = b.GetFakeLevel(r);
                     if (r.Level < p)
                         r.manageStats["Action"] = p;
                 }
@@ -2983,7 +2995,7 @@ namespace RuneApp
 
             foreach (var r in usedSlot)
             {
-                r.manageStats["buildScore"] = build.ScoreRune(r, build.GetPredict(r), false);
+                r.manageStats["buildScore"] = build.ScoreRune(r, build.GetFakeLevel(r), false);
             }
 
             col = 5;
@@ -3096,23 +3108,23 @@ namespace RuneApp
 
             var used = build.runeUsage.runesUsed.Select(r => r.Key);
             var usedSlot = used.Where(r => aslot(r.Slot));
-            var usedFilt = usedSlot.Where(r => r[stat + ssuff, build.GetPredict(r), false] != 0);
+            var usedFilt = usedSlot.Where(r => r[stat + ssuff, build.GetFakeLevel(r), false] != 0);
 
             var good = build.runeUsage.runesGood.Select(r => r.Key);
             var goodSlot = good.Where(r => aslot(r.Slot));
-            var goodFilt = goodSlot.Where(r => r[stat + ssuff, build.GetPredict(r), false] != 0);
+            var goodFilt = goodSlot.Where(r => r[stat + ssuff, build.GetFakeLevel(r), false] != 0);
 
             var badFilt = usedFilt.Except(goodFilt);
 
             double gav = 0;
             if (goodFilt.Count() > 0)
-                gav = goodFilt.Average(r => r[stat + ssuff, build.GetPredict(r), false]);
+                gav = goodFilt.Average(r => r[stat + ssuff, build.GetFakeLevel(r), false]);
             ws.Cells[row, col].Value = gav;
             col++;
 
             double bav = 0;
             if (badFilt.Count() > 0)
-                bav = badFilt.Average(r => r[stat + ssuff, build.GetPredict(r), false]);
+                bav = badFilt.Average(r => r[stat + ssuff, build.GetFakeLevel(r), false]);
             ws.Cells[row, col].Value = bav;
             col++;
 
@@ -3127,8 +3139,8 @@ namespace RuneApp
             double std = 0;
             if (goodFilt.Count() > 0)
             {
-                av = goodFilt.Average(r => r[stat + ssuff, build.GetPredict(r), false]);
-                std = goodFilt.StandardDeviation(r => r[stat + ssuff, build.GetPredict(r), false]);
+                av = goodFilt.Average(r => r[stat + ssuff, build.GetFakeLevel(r), false]);
+                std = goodFilt.StandardDeviation(r => r[stat + ssuff, build.GetFakeLevel(r), false]);
             }
 
             if (mul >= 2)
@@ -3139,7 +3151,7 @@ namespace RuneApp
 
             foreach (var r in usedSlot.OrderByDescending(r => goodSlot.Contains(r)).ThenByDescending(r => r.manageStats["buildScore"]))
             {
-                var rval = r[stat + ssuff, build.GetPredict(r), false];
+                var rval = r[stat + ssuff, build.GetFakeLevel(r), false];
 
                 if (rval > 0)
                 {

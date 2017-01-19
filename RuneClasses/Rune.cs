@@ -803,12 +803,12 @@ namespace RuneOptim
             else
             {
                 // count how many upgrades have gone into the rune
-                int maxUpgrades = Math.Min(4, (int)Math.Floor(FakeLevel / (double)3));
+                int maxUpgrades = Math.Min(4, (int)Math.Floor(Math.Max(Level, FakeLevel) / (double)3));
                 int upgradesGone = Math.Min(4, (int)Math.Floor(Level / (double)3));
                 // how many new sub are to appear (0 legend will be 4 - 4 = 0, 6 rare will be 4 - 3 = 1, 6 magic will be 4 - 2 = 2)
                 int subNew = 4 - Rarity;
                 // how many subs will go into existing stats (0 legend will be 4 - 0 - 0 = 4, 6 rare will be 4 - 1 - 2 = 1, 6 magic will be 4 - 2 - 2 = 0)
-                int subEx = maxUpgrades - upgradesGone - subNew;
+                int subEx = maxUpgrades - upgradesGone;// - subNew;
                 int subVal = (subNew > 0 ? 1 : 0);
 
                 if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value + subEx ?? subVal;

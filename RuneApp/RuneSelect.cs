@@ -16,6 +16,9 @@ namespace RuneApp
 
         public Build build = null;
 
+        public Func<Rune, int> sortFunc = r => r.ID;
+        public string runeStatKey = null;
+
         public string slot = "";
 
         public RuneSelect()
@@ -31,13 +34,16 @@ namespace RuneApp
 
         void RuneSelect_Shown(object sender, EventArgs e)
         {
+            if (runeStatKey == null)
+                this.runeStats.Width = 0;
+
             // dump out the rune details
-            foreach (Rune rune in runes.OrderBy(r => r.ID))
+            foreach (Rune rune in runes.OrderBy(sortFunc))
             {
                 double points = 0;
                 if (build != null)
                 {
-                    points = build.ScoreRune(rune, build.GetPredict(rune), false);
+                    points = build.ScoreRune(rune, build.GetFakeLevel(rune), false);
 
                     if (rune.Slot % 2 == 0)
                     {
@@ -55,7 +61,8 @@ namespace RuneApp
                     rune.Grade.ToString(),
                     Rune.StringIt(rune.MainType, true),
                     rune.MainValue.ToString(),
-                    points.ToString()
+                    points.ToString(),
+                    runeStatKey == null ? null : rune.manageStats.GetOrAdd(runeStatKey, 0).ToString()
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
@@ -100,7 +107,7 @@ namespace RuneApp
                         break;
                 }
                 // find the chosen runes in the list and colour them in
-                foreach (Rune r in fr.OrderBy(r => r.ID))
+                foreach (Rune r in fr.OrderBy(sortFunc))
                 {
                     foreach (ListViewItem li in listView2.Items)
                     {

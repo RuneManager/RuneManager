@@ -813,7 +813,7 @@ namespace RuneOptim
             return blank;
         }
 
-        public int GetPredict(Rune r)
+        public int GetFakeLevel(Rune r)
         {
             int? pred = runePrediction.ContainsKey("g") ? runePrediction["g"].Key : null;
 

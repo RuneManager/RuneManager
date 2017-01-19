@@ -34,11 +34,12 @@
             this.runesGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesMType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesMValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.runesPoints = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.runeStats = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
             this.button3 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
-            this.runesPoints = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runeBox1 = new RuneApp.RuneBox();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -55,13 +56,14 @@
             this.runesGrade,
             this.runesMType,
             this.runesMValue,
-            this.runesPoints});
+            this.runesPoints,
+            this.runeStats});
             this.listView2.FullRowSelect = true;
             this.listView2.Location = new System.Drawing.Point(11, 27);
             this.listView2.Margin = new System.Windows.Forms.Padding(2);
             this.listView2.MultiSelect = false;
             this.listView2.Name = "listView2";
-            this.listView2.Size = new System.Drawing.Size(346, 542);
+            this.listView2.Size = new System.Drawing.Size(385, 542);
             this.listView2.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.listView2.TabIndex = 1;
             this.listView2.UseCompatibleStateImageBehavior = false;
@@ -98,13 +100,23 @@
             this.runesMValue.DisplayIndex = 5;
             this.runesMValue.Text = "MainValue";
             // 
+            // runesPoints
+            // 
+            this.runesPoints.DisplayIndex = 3;
+            this.runesPoints.Text = "Score";
+            this.runesPoints.Width = 0;
+            // 
+            // runeStats
+            // 
+            this.runeStats.Text = "Custom";
+            // 
             // toolStrip1
             // 
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(589, 25);
+            this.toolStrip1.Size = new System.Drawing.Size(628, 25);
             this.toolStrip1.TabIndex = 12;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -120,7 +132,7 @@
             // button3
             // 
             this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button3.Location = new System.Drawing.Point(517, 545);
+            this.button3.Location = new System.Drawing.Point(556, 545);
             this.button3.Margin = new System.Windows.Forms.Padding(2);
             this.button3.Name = "button3";
             this.button3.Size = new System.Drawing.Size(61, 24);
@@ -132,7 +144,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(452, 545);
+            this.button1.Location = new System.Drawing.Point(491, 545);
             this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(61, 24);
@@ -141,15 +153,10 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // runesPoints
-            // 
-            this.runesPoints.DisplayIndex = 3;
-            this.runesPoints.Text = "Score";
-            this.runesPoints.Width = 0;
-            // 
             // runeBox1
             // 
-            this.runeBox1.Location = new System.Drawing.Point(362, 28);
+            this.runeBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.runeBox1.Location = new System.Drawing.Point(401, 28);
             this.runeBox1.Name = "runeBox1";
             this.runeBox1.Size = new System.Drawing.Size(215, 186);
             this.runeBox1.TabIndex = 21;
@@ -160,13 +167,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(589, 580);
+            this.ClientSize = new System.Drawing.Size(628, 580);
             this.Controls.Add(this.runeBox1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.listView2);
             this.Name = "RuneSelect";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "RuneSelect";
             this.toolStrip1.ResumeLayout(false);
             this.toolStrip1.PerformLayout();
@@ -189,5 +197,6 @@
         private System.Windows.Forms.Button button1;
         private RuneBox runeBox1;
         private System.Windows.Forms.ColumnHeader runesPoints;
+        private System.Windows.Forms.ColumnHeader runeStats;
     }
 }
