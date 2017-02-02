@@ -5,8 +5,11 @@ namespace RuneOptim
     // Per-stat filter
     public class RuneFilter
     {
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public double? Flat = null; // div flat by
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public double? Percent = null; // div percent by
+        [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
         public double? Test = null; // sum both >= test
         
         public RuneFilter(double? f = null, double? p = null, double? t = null)

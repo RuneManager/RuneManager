@@ -51,6 +51,10 @@
       <HintPath>..\packages\EPPlus.4.1.0\lib\net40\EPPlus.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=2.0.7.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.7\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -84,8 +88,14 @@
     <Compile Include="Generate.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="GenerateLive.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Generate.Designer.cs">
       <DependentUpon>Generate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GenerateLive.Designer.cs">
+      <DependentUpon>GenerateLive.cs</DependentUpon>
     </Compile>
     <Compile Include="Help.cs">
       <SubType>Form</SubType>
@@ -152,6 +162,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Generate.resx">
       <DependentUpon>Generate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GenerateLive.resx">
+      <DependentUpon>GenerateLive.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Help.resx">
       <DependentUpon>Help.cs</DependentUpon>
@@ -394,8 +407,14 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y
-xcopy "$(ProjectDir)basestats.json" "$(TargetDir)" /D /Y</PostBuildEvent>
+    <PostBuildEvent>
+      xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y
+      xcopy "$(ProjectDir)basestats.json" "$(TargetDir)" /D /Y
+      if exist "$(DevEnvDir)..\tools\vsvars32.bat" (
+      call "$(DevEnvDir)..\tools\vsvars32.bat"
+      editbin /largeaddressaware "$(TargetPath)"
+      )
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

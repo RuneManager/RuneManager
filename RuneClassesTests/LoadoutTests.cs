@@ -1,12 +1,14 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Timers;
+using System.Diagnostics;
 
 namespace RuneOptim.Tests
 {
     [TestClass()]
     public class LoadoutTests
     {
-        
+
         [TestMethod()]
         public void LockTest()
         {

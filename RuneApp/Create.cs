@@ -29,6 +29,8 @@ namespace RuneApp
         // is the form loading? wouldn't want to trigger any OnChanges, eh?
         private bool loading = false;
 
+        private GenerateLive testWindow = null;
+
         private readonly LeaderType[] leadTypes = {
             new LeaderType(Attr.Null),
             new LeaderType(Attr.SpeedPercent).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 }),
@@ -393,7 +395,32 @@ namespace RuneApp
         private TabPage GetTab(string tabName)
         {
             // figure out which tab it's on
-            int tabId = tabName == "g" ? 0 : tabName == "e" ? -2 : tabName == "o" ? -1 : int.Parse(tabName);
+            int tabId;
+            if (!int.TryParse(tabName, out tabId))
+            {
+                if (tabName == "g" || tabName == "Global")
+                    tabId = 0;
+                else if (tabName == "e" || tabName == "Even")
+                    tabId = -2;
+                else if (tabName == "o" || tabName == "Odd")
+                    tabId = -1;
+                else if (tabName == "One")
+                    tabId = 1;
+                else if (tabName == "Two")
+                    tabId = 2;
+                else if (tabName == "Three")
+                    tabId = 3;
+                else if (tabName == "Four")
+                    tabId = 4;
+                else if (tabName == "Five")
+                    tabId = 5;
+                else if (tabName == "Six")
+                    tabId = 6;
+                else
+                    throw new Exception();
+            }
+            //= tabName == "g" ? 0 : tabName == "e" ? -2 : tabName == "o" ? -1 : int.Parse(tabName);
+
             TabPage tab = null;
             if (tabId <= 0)
                 tab = tabControl1.TabPages[-tabId];
@@ -438,9 +465,9 @@ namespace RuneApp
             if (double.TryParse(ctrl?.Text, out temp))
                 test = temp;
 
-            if (!build.runeScoring.ContainsKey(tabName))
-                build.runeScoring.Add(tabName, new KeyValuePair<int, double?>(box.SelectedIndex, test));
-            build.runeScoring[tabName] = new KeyValuePair<int, double?>(box.SelectedIndex, test);
+            if (!build.runeScoring.ContainsKey(ExtensionMethods.GetIndex(tabName)))
+                build.runeScoring.Add(ExtensionMethods.GetIndex(tabName), new KeyValuePair<int, double?>(box.SelectedIndex, test));
+            build.runeScoring[ExtensionMethods.GetIndex(tabName)] = new KeyValuePair<int, double?>(box.SelectedIndex, test);
 
             // TODO: trim the ZERO nodes on the tree
 
@@ -548,7 +575,7 @@ namespace RuneApp
             foreach (var rs in build.runeFilters)
             {
                 var tab = rs.Key;
-                TabPage ctab = GetTab(tab);
+                TabPage ctab = GetTab(tab.ToString());
                 // for each stats filter
                 foreach (var f in rs.Value)
                 {
@@ -556,65 +583,58 @@ namespace RuneApp
                     // for each stat type
                     foreach (var type in new string[] { "flat", "perc", "test" })
                     {
+                        if (type == "perc" && stat == "SPD")
+                            continue;
+                        if (type == "flat" && (stat == "CR" || stat == "CD" || stat == "RES" || stat == "ACC"))
+                            continue;
+
                         // find the controls and shove the value in it
-                        var ctrl = ctab.Controls.Find(tab + stat + type, true).FirstOrDefault();
-                        if (ctrl != null)
-                        {
-                            double? val = f.Value[type];
-                            // unless it's zero, I don't want zeros
-                            if (val != null)
-                                ctrl.Text = val.Value.ToString("0.##");
-                            else
-                                ctrl.Text = "";
-                        }
+                        var ctrl = ctab.Controls.Find(ctab.Tag + stat + type, true).FirstOrDefault();
+                        double? val = f.Value[type];
+                        // unless it's zero, I don't want zeros
+                        if (val != null)
+                            ctrl.Text = val.Value.ToString("0.##");
+                        else
+                            ctrl.Text = "";
                     }
                 }
             }
             foreach (var tab in build.runePrediction)
             {
-                TabPage ctab = GetTab(tab.Key);
-                TextBox tb = (TextBox)ctab.Controls.Find(tab.Key + "raise", true).FirstOrDefault();
-                if (tb != null)
-                {
-                    if (tab.Value.Key != 0)
-                        tb.Text = tab.Value.Key.ToString();
-                }
-                CheckBox cb = (CheckBox)ctab.Controls.Find(tab.Key + "bonus", true).FirstOrDefault();
-                if (cb != null)
-                {
-                    cb.Checked = tab.Value.Value;
-                }
+                TabPage ctab = GetTab(tab.Key.ToString());
+                TextBox tb = (TextBox)ctab.Controls.Find(ctab.Tag + "raise", true).FirstOrDefault();
+                if (tab.Value.Key != 0)
+                    tb.Text = tab.Value.Key.ToString();
+                CheckBox cb = (CheckBox)ctab.Controls.Find(ctab.Tag + "bonus", true).FirstOrDefault();
+                cb.Checked = tab.Value.Value;
             }
 
             // for each tabs scoring
             foreach (var tab in build.runeScoring)
             {
-                TabPage ctab = GetTab(tab.Key);
+                TabPage ctab = GetTab(tab.Key.ToString());
                 // find that box
-                ComboBox box = (ComboBox)ctab.Controls.Find(tab.Key + "join", true).FirstOrDefault();
-                if (box != null)
+                ComboBox box = (ComboBox)ctab.Controls.Find(ctab.Tag + "join", true).FirstOrDefault();
+                // manually kajigger it
+                box.SelectedIndex = tab.Value.Key;
+                foreach (var stat in Build.statNames)
                 {
-                    // manually kajigger it
-                    box.SelectedIndex = tab.Value.Key;
-                    foreach (var stat in Build.statNames)
+                    Control ctrl;
+                    foreach (var type in new string[] { "flat", "perc" })
                     {
-                        Control ctrl;
-                        foreach (var type in new string[] { "flat", "perc" })
-                        {
-                            if (type == "perc" && stat == "SPD")
-                                continue;
-                            if (type == "flat" && (stat == "ACC" || stat == "RES" || stat == "CD" || stat == "CR"))
-                                continue;
-                            ctrl = ctab.Controls.Find(tab.Key + stat + type, true).FirstOrDefault();
-                        }
-                        ctrl = ctab.Controls.Find(tab.Key + stat + "test", true).FirstOrDefault();
-                        ctrl.Enabled = (box.SelectedIndex != 2);
-                        ctrl = ctab.Controls.Find(tab.Key + "test", true).FirstOrDefault();
-                        ctrl.Enabled = (box.SelectedIndex == 2);
+                        if (type == "perc" && stat == "SPD")
+                            continue;
+                        if (type == "flat" && (stat == "ACC" || stat == "RES" || stat == "CD" || stat == "CR"))
+                            continue;
+                        ctrl = ctab.Controls.Find(ctab.Tag + stat + type, true).FirstOrDefault();
                     }
+                    ctrl = ctab.Controls.Find(ctab.Tag + stat + "test", true).FirstOrDefault();
+                    ctrl.Enabled = (box.SelectedIndex != 2);
+                    ctrl = ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
+                    ctrl.Enabled = (box.SelectedIndex == 2);
                 }
 
-                var tb = (TextBox)ctab.Controls.Find(tab.Key + "test", true).FirstOrDefault();
+                var tb = (TextBox)ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
                 if (tab.Value.Value != 0)
                     tb.Text = tab.Value.Value.ToString();
             }
@@ -637,18 +657,15 @@ namespace RuneApp
 			foreach (var stat in Build.statNames)
 			{
 				var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
-		        if (ctrlBase != null)
-				    ctrlBase.Text = mon[stat].ToString();
+				ctrlBase.Text = mon[stat].ToString();
 
 				var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
 				var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
 
-		        if (ctrlTotal != null)
-                    ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+                ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
 
 				var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-		        if (ctrlCurrent != null)
-                    ctrlCurrent.Text = cur[stat].ToString();
+                ctrlCurrent.Text = cur[stat].ToString();
 
 				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 
@@ -656,13 +673,13 @@ namespace RuneApp
 
 				var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
 
-				if (build.Minimum[stat] > 0 && ctrlTotal != null)
+				if (build.Minimum[stat] > 0)
 					ctrlTotal.Text = build.Minimum[stat].ToString();
-				if (build.Sort[stat] != 0 && ctrlWorth != null)
+				if (build.Sort[stat] != 0)
 					ctrlWorth.Text = build.Sort[stat].ToString();
-				if (build.Maximum[stat] != 0 && ctrlMax != null)
+				if (build.Maximum[stat] != 0)
 					ctrlMax.Text = build.Maximum[stat].ToString();
-				if (build.Threshold[stat] != 0 && ctrlThresh != null)
+				if (build.Threshold[stat] != 0)
 					ctrlThresh.Text = build.Threshold[stat].ToString();
 
 			}
@@ -670,18 +687,15 @@ namespace RuneApp
 			foreach (var extra in Build.extraNames)
 			{
 				var ctrlBase = (Label)groupBox1.Controls.Find(extra + "Base", true).FirstOrDefault();
-		        if (ctrlBase != null)
 				ctrlBase.Text = mon.ExtraValue(extra).ToString();
 
 				var ctrlBonus = (Label)groupBox1.Controls.Find(extra + "Bonus", true).FirstOrDefault();
 				var ctrlTotal = (TextBox)groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
 
-		        if (ctrlTotal != null)
-                    ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+                ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
 
 				var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
-		        if (ctrlCurrent != null)
-                    ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
+                ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
 
 				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
 
@@ -689,13 +703,13 @@ namespace RuneApp
 
 				var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
 
-				if (build.Minimum.ExtraGet(extra) > 0 && ctrlTotal != null)
+				if (build.Minimum.ExtraGet(extra) > 0)
 					ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
-				if (build.Sort.ExtraGet(extra) != 0 && ctrlWorth != null)
+				if (build.Sort.ExtraGet(extra) != 0)
 					ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
-				if (build.Maximum.ExtraGet(extra) != 0 && ctrlMax != null)
+				if (build.Maximum.ExtraGet(extra) != 0)
 					ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
-				if (build.Threshold.ExtraGet(extra) != 0 && ctrlThresh != null)
+				if (build.Threshold.ExtraGet(extra) != 0)
 					ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
 			}
 
@@ -956,21 +970,22 @@ namespace RuneApp
 
             foreach (string tab in tabNames)
             {
+                SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
                 foreach (string stat in Build.statNames)
                 {
                     UpdateStat(tab, stat);
                 }
-                if (!build.runeScoring.ContainsKey(tab) && build.runeFilters.ContainsKey(tab))
+                if (!build.runeScoring.ContainsKey(tabdex) && build.runeFilters.ContainsKey(tabdex))
                 {
                     // if there is a non-zero
-                    if (build.runeFilters[tab].Any(r => r.Value.NonZero))
+                    if (build.runeFilters[tabdex].Any(r => r.Value.NonZero))
                     {
-                        build.runeScoring.Add(tab, new KeyValuePair<int, double?>(0, null));
+                        build.runeScoring.Add(tabdex, new KeyValuePair<int, double?>(0, null));
                     }
                 }
-                if (build.runeScoring.ContainsKey(tab))
+                if (build.runeScoring.ContainsKey(tabdex))
                 {
-                    var kv = build.runeScoring[tab];
+                    var kv = build.runeScoring[tabdex];
                     var ctrlTest = Controls.Find(tab + "test", true).FirstOrDefault();
 
                     //if (!string.IsNullOrWhiteSpace(ctrlTest?.Text))
@@ -979,7 +994,7 @@ namespace RuneApp
                     if (double.TryParse(ctrlTest?.Text, out tempval))
                         testVal = tempval;
 
-                    build.runeScoring[tab] = new KeyValuePair<int, double?>(kv.Key, testVal);
+                    build.runeScoring[tabdex] = new KeyValuePair<int, double?>(kv.Key, testVal);
                     
                 }
                 TextBox tb = (TextBox)Controls.Find(tab + "raise", true).FirstOrDefault();
@@ -988,19 +1003,16 @@ namespace RuneApp
                     raiseLevel = -1;
                 CheckBox cb = (CheckBox)Controls.Find(tab + "bonus", true).FirstOrDefault();
 
-                if (cb != null)
+                if (raiseLevel == -1 && !cb.Checked)
                 {
-                    if (raiseLevel == -1 && !cb.Checked)
-                    {
-                        build.runePrediction.Remove(tab);
-                    }
-                    else
-                        build.runePrediction[tab] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
+                    build.runePrediction.Remove(tabdex);
                 }
+                else
+                    build.runePrediction[tabdex] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
 
-                if (build.runePrediction.ContainsKey(tab))
+                if (build.runePrediction.ContainsKey(tabdex))
                 {
-                    var kv = build.runePrediction[tab];
+                    var kv = build.runePrediction[tabdex];
                     var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
                     ctrlRaise.Text = kv.Key.ToString();
                     var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
@@ -1130,10 +1142,14 @@ namespace RuneApp
             TestRune(runeTest);
 
 			updatePerms();
+
+            if (testWindow != null && !testWindow.IsDisposed)
+                testWindow.textBox_TextChanged(null, null);
 		}
 
         void UpdateStat(string tab, string stat)
         {
+            SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
             TabPage ctab = GetTab(tab);
             var ctest = ctab.Controls.Find(tab + stat + "test", true).First();
             double tt;
@@ -1143,11 +1159,11 @@ namespace RuneApp
             if (ctest.Text.Length == 0)
                 test = null;
 
-            if (!build.runeFilters.ContainsKey(tab))
+            if (!build.runeFilters.ContainsKey(tabdex))
             {
-                build.runeFilters.Add(tab, new Dictionary<string, RuneFilter>());
+                build.runeFilters.Add(tabdex, new Dictionary<string, RuneFilter>());
             }
-            var fd = build.runeFilters[tab];
+            var fd = build.runeFilters[tabdex];
             if (!fd.ContainsKey(stat))
             {
                 fd.Add(stat, new RuneFilter());
@@ -1280,18 +1296,19 @@ namespace RuneApp
         void TestRuneTab(Rune rune, string tab)
         {
             bool res = false;
-            if (!build.runeScoring.ContainsKey(tab))
+            SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
+            if (!build.runeScoring.ContainsKey(tabdex))
                 return;
 
             int? fake = 0;
             bool pred = false;
-            if (build.runePrediction.ContainsKey(tab))
+            if (build.runePrediction.ContainsKey(tabdex))
             {
-                fake = build.runePrediction[tab].Key;
-                pred = build.runePrediction[tab].Value;
+                fake = build.runePrediction[tabdex].Key;
+                pred = build.runePrediction[tabdex].Value;
             }
 
-            var kv = build.runeScoring[tab];
+            var kv = build.runeScoring[tabdex];
             int scoring = kv.Key;
             if (scoring == 1)
                 res = true;
@@ -1315,7 +1332,7 @@ namespace RuneApp
             {
                 ctrl.Text = points.ToString("#.##");
                 ctrl.ForeColor = Color.Red;
-                if (points >= build.runeScoring[tab].Value)
+                if (points >= build.runeScoring[tabdex].Value)
                     ctrl.ForeColor = Color.Green;
             }
         }
@@ -1506,8 +1523,9 @@ namespace RuneApp
                 // sort live on change
                 // copy weights back to here
 
-				var ff = new Generate(build);
-				var res = ff.ShowDialog();
+#if true
+                var ff = new Generate(build);
+                var res = ff.ShowDialog();
                 if (res == DialogResult.OK)
                 {
                     loading = true;
@@ -1520,13 +1538,13 @@ namespace RuneApp
                         ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
                     }
 					foreach (var extra in Build.extraNames)
-					{
+                    {
 						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
                         if (ctrlWorth == null)
                             continue;
 
                         ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
-					}
+                    }
 					loading = false;
                 }
                 else
@@ -1543,7 +1561,7 @@ namespace RuneApp
                     }
 
 					foreach (var extra in Build.extraNames)
-					{
+                    {
 						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
                         if (ctrlWorth == null)
                             continue;
@@ -1551,10 +1569,20 @@ namespace RuneApp
                         int val;
 						int.TryParse(ctrlWorth.Text, out val);
 						build.Sort.ExtraSet(extra, val);
-					}
+                    }
 
-				}
-				UpdateGlobal();
+                }
+                UpdateGlobal();
+#else
+                if (testWindow == null || testWindow.IsDisposed)
+                {
+                    testWindow = new GenerateLive(build);
+                    testWindow.Owner = this;
+                }
+                if (!testWindow.Visible)
+                    testWindow.Show();
+                testWindow.Location = new Point(Location.X + Width, Location.Y);
+#endif
             }
         }
 
@@ -1797,6 +1825,12 @@ namespace RuneApp
         {
             MessageBox.Show("NYI");
            // sampletext
+        }
+
+        private void Create_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (testWindow != null && !testWindow.IsDisposed)
+                testWindow.Close();
         }
     }
 }

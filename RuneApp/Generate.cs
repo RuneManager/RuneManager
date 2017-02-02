@@ -147,8 +147,8 @@ namespace RuneApp
                     {
                         if (r.Level < 12)
                             under12 += 12 - r.Level;
-                        if (build.runePrediction.ContainsKey(r.Slot.ToString()) && r.Level < (build.runePrediction[r.Slot.ToString()].Key ?? 0))
-                            underSpec += (build.runePrediction[r.Slot.ToString()].Key ?? 0) - r.Level;
+                        if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
+                            underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
                     }
 
                     li.SubItems.Add(underSpec + "/" + under12);
@@ -506,6 +506,13 @@ namespace RuneApp
             {
                 var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
                 List<Rune> lrunes = new List<Rune>();
+                foreach (var g in mons)
+                {
+                    foreach (var r in g.Current.Runes)
+                    {
+                        r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
+                    }
+                }
                 foreach (var g in mons)
                 {
                     foreach (var r in g.Current.Runes)

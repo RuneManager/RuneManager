@@ -5,6 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
 
 namespace RuneOptim
 {
@@ -117,11 +119,12 @@ namespace RuneOptim
         // Magical (and probably bad) tree structure for rune slot stat filters
         // tab, stat, FILTER
         [JsonProperty("runeFilters")]
-        public Dictionary<string, Dictionary<string, RuneFilter>> runeFilters = new Dictionary<string, Dictionary<string, RuneFilter>>();
+        [JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
+        public Dictionary<SlotIndex, Dictionary<string, RuneFilter>> runeFilters = new Dictionary<SlotIndex, Dictionary<string, RuneFilter>>();
 
         public bool ShouldSerializeruneFilters()
         {
-            Dictionary<string, Dictionary<string, RuneFilter>> nfilters = new Dictionary<string, Dictionary<string, RuneFilter>>();
+            Dictionary<SlotIndex, Dictionary<string, RuneFilter>> nfilters = new Dictionary<SlotIndex, Dictionary<string, RuneFilter>>();
             foreach (var tabPair in runeFilters)
             {
                 List<string> keep = new List<string>();
@@ -145,11 +148,12 @@ namespace RuneOptim
         // Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value
         // tab, TYPE, test
         [JsonProperty("runeScoring")]
-        public Dictionary<string, KeyValuePair<int, double?>> runeScoring = new Dictionary<string, KeyValuePair<int, double?>>();
+        [JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
+        public Dictionary<SlotIndex, KeyValuePair<int, double?>> runeScoring = new Dictionary<SlotIndex, KeyValuePair<int, double?>>();
 
         public bool ShouldSerializeruneScoring()
         {
-            Dictionary<string, KeyValuePair<int, double?>> nscore = new Dictionary<string, KeyValuePair<int, double?>>();
+            Dictionary<SlotIndex, KeyValuePair<int, double?>> nscore = new Dictionary<SlotIndex, KeyValuePair<int, double?>>();
             foreach (var tabPair in runeScoring)
             {
                 if (tabPair.Value.Key != 0 || tabPair.Value.Value != null)
@@ -164,11 +168,12 @@ namespace RuneOptim
         // also, attempt to give weight to unassigned powerup bonuses
         // tab, RAISE, magic
         [JsonProperty("runePrediction")]
-        public Dictionary<string, KeyValuePair<int?, bool>> runePrediction = new Dictionary<string, KeyValuePair<int?, bool>>();
+        [JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
+        public Dictionary<SlotIndex, KeyValuePair<int?, bool>> runePrediction = new Dictionary<SlotIndex, KeyValuePair<int?, bool>>();
 
         public bool ShouldSerializerunePrediction()
         {
-            Dictionary<string, KeyValuePair<int?, bool>> npred = new Dictionary<string, KeyValuePair<int?, bool>>();
+            Dictionary<SlotIndex, KeyValuePair<int?, bool>> npred = new Dictionary<SlotIndex, KeyValuePair<int?, bool>>();
             foreach (var tabPair in runePrediction)
             {
                 if (tabPair.Value.Key != 0 || tabPair.Value.Value)
@@ -356,31 +361,101 @@ namespace RuneOptim
 
                 // find the largest number to raise to
                 // if any along the tree say to predict, do it
-                if (runePrediction.ContainsKey("g"))
+                if (runePrediction.ContainsKey(SlotIndex.Global))
                 {
-                    int? glevel = runePrediction["g"].Key;
+                    int? glevel = runePrediction[SlotIndex.Global].Key;
                     if (glevel > raiseTo)
                         raiseTo = glevel;
-                    predictSubs |= runePrediction["g"].Value;
+                    predictSubs |= runePrediction[SlotIndex.Global].Value;
                 }
-                if (runePrediction.ContainsKey(((i % 2 == 0) ? "o" : "e")))
+                if (runePrediction.ContainsKey(((i % 2 == 0) ? SlotIndex.Odd : SlotIndex.Even)))
                 {
-                    int? mlevel = runePrediction[((i % 2 == 0) ? "o" : "e")].Key;
+                    int? mlevel = runePrediction[((i % 2 == 0) ? SlotIndex.Odd : SlotIndex.Even)].Key;
                     if (mlevel > raiseTo)
                         raiseTo = mlevel;
-                    predictSubs |= runePrediction[((i % 2 == 0) ? "o" : "e")].Value;
+                    predictSubs |= runePrediction[((i % 2 == 0) ? SlotIndex.Odd : SlotIndex.Even)].Value;
                 }
-                if (runePrediction.ContainsKey((i + 1).ToString()))
+                if (runePrediction.ContainsKey((SlotIndex)(i + 1)))
                 {
-                    int? slevel = runePrediction[(i + 1).ToString()].Key;
+                    int? slevel = runePrediction[(SlotIndex)(i + 1)].Key;
                     if (slevel > raiseTo)
                         raiseTo = slevel;
-                    predictSubs |= runePrediction[(i + 1).ToString()].Value;
+                    predictSubs |= runePrediction[(SlotIndex)(i + 1)].Value;
                 }
 
                 slotFakes[i] = raiseTo;
                 slotPred[i] = predictSubs;
             }
+        }
+
+        public Monster GenBuild(params Rune[] runes)
+        {
+            if (runes.Length != 6)
+                return null;
+
+            // if to get awakened
+            if (DownloadAwake && !mon.downloaded)
+            {
+                var mref = MonsterStat.FindMon(mon);
+                if (mref != null)
+                {
+                    // download the current (unawakened monster)
+                    var mstat = mref.Download();
+                    // if the retrieved mon is unawakened, get the awakened
+                    if (!mstat.Awakened && mstat.AwakenRef != null)
+                        mon = mstat.AwakenRef.Download().GetMon(mon);
+                }
+            }
+            // getting awakened also gets level 40, so...
+            // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
+            else if (mon.level < 40 && DownloadStats && !mon.downloaded)
+            {
+                var mref = MonsterStat.FindMon(mon);
+                if (mref != null)
+                    mon = mref.Download().GetMon(mon);
+            }
+
+            int?[] slotFakes = new int?[6];
+            bool[] slotPred = new bool[6];
+            GetPrediction(slotFakes, slotPred);
+
+            Monster test = new Monster(mon);
+            test.Current.Shrines = shrines;
+            test.Current.Leader = leader;
+
+            test.Current.FakeLevel = slotFakes;
+            test.Current.PredictSubs = slotPred;
+
+            test.ApplyRune(runes[0], 6);
+            test.ApplyRune(runes[1], 6);
+            test.ApplyRune(runes[2], 6);
+            test.ApplyRune(runes[3], 6);
+            test.ApplyRune(runes[4], 6);
+            test.ApplyRune(runes[5], 6);
+
+
+            // TODO: Outsource to whoever wants it
+
+            bool isBad = false;
+            //if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
+            //	isBad = false;
+
+            var cstats = test.GetStats();
+            
+            // check if build meets minimum
+            isBad |= (Minimum != null && !(cstats > Minimum));
+            // if no broken sets, check for broken sets
+            isBad |= (!AllowBroken && !test.Current.SetsFull);
+            // if there are required sets, ensure we have them
+            isBad |= (RequiredSets != null && RequiredSets.Count > 0
+                // this Linq adds no overhead compared to GetStats() and ApplyRune()
+                && !RequiredSets.All(s => test.Current.Sets.Contains(s)));
+            //    && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
+
+            if (isBad)
+                return null;
+                
+            return test;
         }
 
         /// <summary>
@@ -676,6 +751,7 @@ namespace RuneOptim
                     {
                         foreach (var r in ra)
                         {
+                            r.manageStats.AddOrUpdate("buildScoreTotal", sort(Best), (k, v) => v + sort(Best));
                             if (!goodRunes)
                             {
                                 runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
@@ -725,10 +801,14 @@ namespace RuneOptim
                     foreach (Rune r in Best.Current.Runes)
                     {
                         if (!goodRunes)
-                            r.manageStats.AddOrUpdate("In", 1, (s,e) => 1);
+                        {
+                            r.manageStats.AddOrUpdate("buildScoreIn", sort(Best), (k, v) => v + sort(Best));
+                            r.manageStats.AddOrUpdate("In", 1, (s, e) => 1);
+                        }
                         else
                         {
-                            r.manageStats.AddOrUpdate("In", 2, (s,e) => e);
+                            r.manageStats.AddOrUpdate("buildScoreIn", 0.25 * sort(Best), (k, v) => v + 0.25 * sort(Best));
+                            r.manageStats.AddOrUpdate("In", 2, (s, e) => e);
                             runeUsage.runesSecond.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
                         }
                     }
@@ -760,16 +840,16 @@ namespace RuneOptim
 
             // pull the filters (flat, perc, test) for all the tabs and stats
             Dictionary<string, RuneFilter> rfG = new Dictionary<string, RuneFilter>();
-            if (runeFilters.ContainsKey("g"))
-                rfG = runeFilters["g"];
+            if (runeFilters.ContainsKey(SlotIndex.Global))
+                rfG = runeFilters[SlotIndex.Global];
 
             Dictionary<string, RuneFilter> rfM = new Dictionary<string, RuneFilter>();
-            if (slot != 0 && runeFilters.ContainsKey((slot % 2 == 0 ? "e" : "o")))
-                rfM = runeFilters[(slot % 2 == 0 ? "e" : "o")];
+            if (slot != 0 && runeFilters.ContainsKey((slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd)))
+                rfM = runeFilters[(slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd)];
 
             Dictionary<string, RuneFilter> rfS = new Dictionary<string, RuneFilter>();
-            if (slot > 0 && runeFilters.ContainsKey(slot.ToString()))
-                rfS = runeFilters[slot.ToString()];
+            if (slot > 0 && runeFilters.ContainsKey((SlotIndex)slot))
+                rfS = runeFilters[(SlotIndex)slot];
 
             foreach (string stat in statNames)
             {
@@ -815,18 +895,18 @@ namespace RuneOptim
 
         public int GetFakeLevel(Rune r)
         {
-            int? pred = runePrediction.ContainsKey("g") ? runePrediction["g"].Key : null;
+            int? pred = runePrediction.ContainsKey(SlotIndex.Global) ? runePrediction[SlotIndex.Global].Key : null;
 
-            if (runePrediction.ContainsKey(r.Slot % 2 == 0 ? "e" : "o"))
+            if (runePrediction.ContainsKey(r.Slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd))
             {
-                var kv = runePrediction[r.Slot % 2 == 0 ? "e" : "o"];
+                var kv = runePrediction[r.Slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd];
                 if (pred == null || (kv.Key != null && kv.Key > pred))
                     pred = kv.Key;
             }
 
-            if (runePrediction.ContainsKey(r.Slot.ToString()))
+            if (runePrediction.ContainsKey((SlotIndex)r.Slot))
             {
-                var kv = runePrediction[r.Slot.ToString()];
+                var kv = runePrediction[(SlotIndex)r.Slot];
                 if (pred == null || (kv.Key != null && kv.Key > pred))
                     pred = kv.Key;
             }
@@ -874,9 +954,9 @@ namespace RuneOptim
             // TODO: check what inheriting AND/OR then SUM (or visa versa)
 
             // find the most significant operatand of joining checks
-            if (runeScoring.ContainsKey("g") && runeFilters.ContainsKey("g"))// && runeFilters["g"].Any(r => r.Value.NonZero))
+            if (runeScoring.ContainsKey(SlotIndex.Global) && runeFilters.ContainsKey(SlotIndex.Global))// && runeFilters["g"].Any(r => r.Value.NonZero))
             {
-                var kv = runeScoring["g"];
+                var kv = runeScoring[SlotIndex.Global];
                 and = kv.Key;
                 if (kv.Key == 2)
                 {
@@ -885,7 +965,7 @@ namespace RuneOptim
                 }
             }
             // is it and odd or even slot?
-            string tmk = (slot % 2 == 0 ? "e" : "o");
+            var tmk = (slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd);
             if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
@@ -897,7 +977,7 @@ namespace RuneOptim
                 }
             }
             // turn the 0-5 to a 1-6
-            tmk = slot.ToString();
+            tmk = (SlotIndex)slot;
             if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
             {
                 var kv = runeScoring[tmk];
@@ -1104,6 +1184,7 @@ namespace RuneOptim
             {
                 foreach (Rune r in rsGlobal)
                 {
+                    
                     if (!goodRunes)
                         r.manageStats.AddOrUpdate("Set", 1, (s,d)=> { return d + 1; });
                     else
@@ -1184,7 +1265,7 @@ namespace RuneOptim
 					// default fail OR
 					Predicate<Rune> slotTest = RuneScoring(i + 1, (slotFakes[i] ?? 0), slotPred[i]);
 
-					runes[i] = runes[i].Where(r => slotTest.Invoke(r)).ToArray();
+					runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
 
 					if (saveStats)
 					{

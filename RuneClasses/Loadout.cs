@@ -164,7 +164,7 @@ namespace RuneOptim
 					(runes[3]?.HealthFlat[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
 					(runes[4]?.HealthFlat[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
 					(runes[5]?.HealthFlat[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
-					SetStat(Attr.HealthFlat); ;
+					SetStat(Attr.HealthFlat);
             }
         }
         [JsonIgnore]
@@ -377,7 +377,7 @@ namespace RuneOptim
             CheckSets();
             return r;
         }
-
+        
         // Check what sets are completed in this build
         public void CheckSets()
         {

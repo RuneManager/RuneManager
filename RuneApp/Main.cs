@@ -48,7 +48,8 @@ namespace RuneApp
         private bool gotExcelPack = false;
         ExcelWorksheets excelSheets = null;
 
-        RuneDial runeDial = null;
+        public static Main currentMain = null;
+        public static RuneDial runeDial = null;
         Monster displayMon = null;
 
         bool teamChecking = false;
@@ -56,6 +57,8 @@ namespace RuneApp
         Dictionary<string, List<string>> toolmap = null;
         List<string> knownTeams = new List<string>();
         List<string> extraTeams = new List<string>();
+
+        public log4net.ILog Log { get { return Program.log; } }
 
         public static bool MakeStats
         {
@@ -77,6 +80,9 @@ namespace RuneApp
         public Main()
         {
             InitializeComponent();
+            Log.Info("Initialized Main");
+
+            currentMain = this;
 
             #region Config
             config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
@@ -128,6 +134,7 @@ namespace RuneApp
                 {
                     using (WebClient client = new WebClient())
                     {
+                        Log.Info("Checking for updates");
                         client.DownloadStringCompleted += client_DownloadStringCompleted;
                         client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
                     }
@@ -136,6 +143,7 @@ namespace RuneApp
             else
             {
                 updateBox.Show();
+                Log.Info("Updates Disabled");
                 updateComplain.Text = "Updates Disabled";
                 var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
                 string oldvernum = ver.ProductVersion;
@@ -1287,6 +1295,7 @@ namespace RuneApp
 
         public int LoadMons(string fname)
         {
+            Log.Info("Loading " + fname + " as mons.");
             string text = File.ReadAllText(fname);
 
             MonsterStat.monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(text);
@@ -1296,6 +1305,7 @@ namespace RuneApp
 
         public int LoadFile(string fname)
         {
+            Log.Info("Loading " + fname + " as save.");
             string text = File.ReadAllText(fname);
             dataMonsterList.Items.Clear();
             dataRuneList.Items.Clear();
@@ -1309,6 +1319,7 @@ namespace RuneApp
 
         public int LoadBuilds(string fname)
         {
+            Log.Info("Loading " + fname + " as builds.");
             string text = File.ReadAllText(fname);
             LoadBuildJSON(text);
             return text.Length;
@@ -1533,14 +1544,27 @@ namespace RuneApp
 
         private void RunBuild(Build b, bool saveStats = false, Action<string> printTo = null)
         {
-            if (plsDie)
+            if (b == null)
+            {
+                Log.Info("Build is null");
                 return;
+            }
+
+            if (plsDie)
+            {
+                Log.Info("Cancelling build " + b.ID + " " + b.MonName);
+                plsDie = false;
+                return;
+            }
 
             if (currentBuild != null)
+            {
+                Log.Info("Force stopping " + b.ID + " " + b.MonName);
                 currentBuild.isRun = false;
+            }
 
-            if (b == null)
-                return;
+            if (isRunning)
+                Log.Info("Looping...");
 
             while (isRunning)
             {
@@ -1548,12 +1572,9 @@ namespace RuneApp
                 b.isRun = false;
                 Thread.Sleep(100);
             }
-            if (plsDie)
-            {
-                plsDie = false;
-                return;
-            }
 
+            Log.Info("Starting watch");
+            
             Stopwatch buildTime = Stopwatch.StartNew();
             currentBuild = b;
 
@@ -1741,6 +1762,9 @@ namespace RuneApp
                 printTo?.Invoke("Done");
 
             isRunning = false;
+            plsDie = false;
+            b.isRun = false;
+            currentBuild = null;
         }
 
         private void GenDeep(Build b, int slot0, Action<string> printTo, ref int count, params int[] doneIds)
@@ -1847,100 +1871,113 @@ namespace RuneApp
         {
             if (data == null)
                 return;
-            if (runTask != null && runTask.Status == TaskStatus.Running)
-            {
-                runSource.Cancel();
-                if (currentBuild != null)
-                    currentBuild.isRun = false;
-                plsDie = true;
-                isRunning = false;
-                return;
-            }
-            plsDie = false;
 
-            List<int> loady = new List<int>();
+            try {
 
-            if (skipLoaded)
-            {
-                // collect loadouts
-                foreach (ListViewItem li in loadoutList.Items)
+                if (runTask != null && runTask.Status == TaskStatus.Running)
                 {
-                    Loadout load = li.Tag as Loadout;
-
-                    var monid = int.Parse(li.SubItems[2].Text);
-                    var bid = int.Parse(li.SubItems[0].Text);
-
-                    if (load != null)
-                        loady.Add(bid);
+                    runSource.Cancel();
+                    if (currentBuild != null)
+                        currentBuild.isRun = false;
+                    plsDie = true;
+                    isRunning = false;
+                    return;
                 }
-            }
-            else
-            {
-                ClearLoadouts();
-            }
+                plsDie = false;
 
-            bool collect = true;
-            int newPri = 1;
-            // collect the builds
-            List<ListViewItem> list5 = new List<ListViewItem>();
-            foreach (ListViewItem li in buildList.Items)
-            {
-                li.SubItems[0].Text = newPri.ToString();
-                (li.Tag as Build).priority = newPri++;
+                List<int> loady = new List<int>();
 
-                if (loady.Contains((li.Tag as Build).ID))
-                    continue;
-
-                if ((li.Tag as Build).ID == runTo)
-                    collect = false;
-
-                if (collect)
-                    list5.Add(li);
-
-                li.SubItems[3].Text = "";
-            }
-
-            if (makeStats)
-                StatsExcelBind();
-
-            runSource = new CancellationTokenSource();
-            runToken = runSource.Token;
-            runTask = Task.Factory.StartNew(() =>
-            {
-                if (data.Runes != null && !skipLoaded)
+                if (skipLoaded)
                 {
-                    foreach (Rune r in data.Runes)
+                    // collect loadouts
+                    foreach (ListViewItem li in loadoutList.Items)
                     {
-                        r.Swapped = false;
-                        r.ResetStats();
+                        Loadout load = li.Tag as Loadout;
+
+                        var monid = int.Parse(li.SubItems[2].Text);
+                        var bid = int.Parse(li.SubItems[0].Text);
+
+                        if (load != null)
+                            loady.Add(bid);
+                    }
+                }
+                else
+                {
+                    ClearLoadouts();
+                    foreach (var r in data.Runes)
+                    {
+                        r.manageStats.AddOrUpdate("buildScoreIn", 0, (k, v) => 0);
+                        r.manageStats.AddOrUpdate("buildScoreTotal", 0, (k, v) => 0);
                     }
                 }
 
-#warning consider making it nicer by using the List<Build>
-                foreach (ListViewItem li in list5)
+                bool collect = true;
+                int newPri = 1;
+                // collect the builds
+                List<ListViewItem> list5 = new List<ListViewItem>();
+                foreach (ListViewItem li in buildList.Items)
                 {
-                    if (plsDie) break;
-                    RunBuild(li, makeStats);
+                    li.SubItems[0].Text = newPri.ToString();
+                    (li.Tag as Build).priority = newPri++;
+
+                    if (loady.Contains((li.Tag as Build).ID))
+                        continue;
+
+                    if ((li.Tag as Build).ID == runTo)
+                        collect = false;
+
+                    if (collect)
+                        list5.Add(li);
+
+                    li.SubItems[3].Text = "";
                 }
 
                 if (makeStats)
+                    StatsExcelBind();
+
+                runSource = new CancellationTokenSource();
+                runToken = runSource.Token;
+                runTask = Task.Factory.StartNew(() =>
                 {
-                    Invoke((MethodInvoker)delegate
+                    if (data.Runes != null && !skipLoaded)
                     {
-                        if (!skipLoaded)
-                            StatsExcelRunes();
-                        try
+                        foreach (Rune r in data.Runes)
                         {
-                            StatsExcelSave();
+                            r.Swapped = false;
+                            r.ResetStats();
                         }
-                        catch (Exception ex)
+                    }
+
+#warning consider making it nicer by using the List<Build>
+                foreach (ListViewItem li in list5)
+                    {
+                        if (plsDie) break;
+                        RunBuild(li, makeStats);
+                    }
+
+                    if (makeStats)
+                    {
+                        Invoke((MethodInvoker)delegate
                         {
-                            Console.WriteLine(ex);
-                        }
-                    });
-                }
-                checkLocked();
-            }, runSource.Token);
+                            if (!skipLoaded)
+                                StatsExcelRunes();
+                            try
+                            {
+                                StatsExcelSave();
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex);
+                            }
+                        });
+                    }
+                    checkLocked();
+                }, runSource.Token);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message + Environment.NewLine + e.StackTrace, e.GetType().ToString());
+            }
         }
 
         void StatsExcelClear()
@@ -2380,9 +2417,9 @@ namespace RuneApp
                 col++;
 
 
-                var rf = build.runeFilters.ContainsKey(sslot) ? build.runeFilters[sslot] : null;
+                var rf = build.runeFilters.ContainsKey((SlotIndex)slot) ? build.runeFilters[(SlotIndex)slot] : null;
 
-                var btest = build.runeScoring.ContainsKey(sslot) ? build.runeScoring[sslot] : new KeyValuePair<int, double?>(-1, null);
+                var btest = build.runeScoring.ContainsKey((SlotIndex)slot) ? build.runeScoring[(SlotIndex)slot] : new KeyValuePair<int, double?>(-1, null);
                 double? test = btest.Value;
                 bool isTestInherited = false;
                 string testForm = null;
@@ -2603,7 +2640,7 @@ namespace RuneApp
             List<string> colHead = new List<string>();
 
             // ,MType,Points,FlatPts
-            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC,BuildG,BuildT".Split(','))
             {
                 colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
@@ -2716,6 +2753,12 @@ namespace RuneApp
                             break;
                         case "Gen":
                             ws.Cells[row, col].Value = r.manageStats.GetOrAdd("LoadGen", 0);
+                            break;
+                        case "BuildG":
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("buildScoreIn", 0);
+                            break;
+                        case "BuildT":
+                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("buildScoreTotal", 0);
                             break;
                         case "Eff":
                             ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
@@ -3031,7 +3074,7 @@ namespace RuneApp
                 {
                     var qqw = new Dictionary<string, RuneFilter>();
                     bool writeIt = false;
-                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                    if (build.runeFilters.TryGetValue((SlotIndex)slot, out qqw))
                     {
                         if (qqw.ContainsKey(stat))
                         {
@@ -3051,7 +3094,7 @@ namespace RuneApp
                 {
                     var qqw = new Dictionary<string, RuneFilter>();
                     bool writeIt = false;
-                    if (build.runeFilters.TryGetValue(sslot, out qqw))
+                    if (build.runeFilters.TryGetValue((SlotIndex)slot, out qqw))
                     {
                         if (qqw.ContainsKey(stat))
                         {

@@ -49,7 +49,6 @@ namespace RuneOptim
 
     // Allows me to steal the JSON values into Enum
     [JsonConverter(typeof(StringEnumConverter))]
-    [Flags]
     public enum Attr
     {
         [EnumMember(Value = "")]
@@ -109,7 +108,35 @@ namespace RuneOptim
         [EnumMember(Value = "MxD")]
         MaxDamage = (1 << 17) | ExtraStat
     }
-    
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum SlotIndex
+    {
+        [EnumMember(Value = "e")]
+        Even = -2,
+
+        //o = -1,
+
+        [EnumMember(Value = "o")]
+        Odd = -1,
+
+        [EnumMember(Value = "g")]
+        Global = 0,
+
+        [EnumMember(Value = "1")]
+        One = 1,
+        [EnumMember(Value = "2")]
+        Two = 2,
+        [EnumMember(Value = "3")]
+        Three = 3,
+        [EnumMember(Value = "4")]
+        Four = 4,
+        [EnumMember(Value = "5")]
+        Five = 5,
+        [EnumMember(Value = "6")]
+        Six = 6
+    };
+
     public class Rune
     {
         #region JSON Props
@@ -221,6 +248,16 @@ namespace RuneOptim
 
         [JsonIgnore]
         public static int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
+
+        private bool? setIs4;
+
+        public bool SetIs4
+        {
+            get
+            {
+                return setIs4 ?? (setIs4 = (Rune.SetRequired(this.Set) == 4)).Value;
+            }
+        }
 
         public int UnequipCost
         {
@@ -803,7 +840,7 @@ namespace RuneOptim
             else
             {
                 // count how many upgrades have gone into the rune
-                int maxUpgrades = Math.Min(4, (int)Math.Floor(Math.Max(Level, FakeLevel) / (double)3));
+                int maxUpgrades = Math.Min(Rarity, (int)Math.Floor(Math.Max(Level, FakeLevel) / (double)3));
                 int upgradesGone = Math.Min(4, (int)Math.Floor(Level / (double)3));
                 // how many new sub are to appear (0 legend will be 4 - 4 = 0, 6 rare will be 4 - 3 = 1, 6 magic will be 4 - 2 = 2)
                 int subNew = 4 - Rarity;
@@ -811,10 +848,10 @@ namespace RuneOptim
                 int subEx = maxUpgrades - upgradesGone;// - subNew;
                 int subVal = (subNew > 0 ? 1 : 0);
 
-                if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value + subEx ?? subVal;
-                if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value + subEx ?? subVal;
-                if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value + subEx ?? subVal;
-                if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value + subEx ?? subVal;
+                if (Sub1Type == stat || Sub1Type == Attr.Null) return (Sub1Value + subEx) ?? subVal;
+                if (Sub2Type == stat || Sub2Type == Attr.Null) return (Sub2Value + subEx) ?? subVal;
+                if (Sub3Type == stat || Sub3Type == Attr.Null) return (Sub3Value + subEx) ?? subVal;
+                if (Sub4Type == stat || Sub4Type == Attr.Null) return (Sub4Value + subEx) ?? subVal;
             }
         
             return 0;
@@ -917,6 +954,7 @@ namespace RuneOptim
                     val += this[stat + "perc", fake, pred] / (double)rPerc[stat];
             }
 #endif
+            manageStats.AddOrUpdate("testScore", val, (k, v) => val);
             return val;
         }
 
