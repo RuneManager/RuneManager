@@ -206,37 +206,37 @@ namespace RuneOptim
         #region Nicer getters for stats by type
 
         [JsonIgnore]
-        public RuneStat Accuracy = null;
+        public int[] Accuracy = new int[32];
 
         [JsonIgnore]
-        public RuneStat AttackFlat = null;
+        public int[] AttackFlat = new int[32];
 
         [JsonIgnore]
-        public RuneStat AttackPercent = null;
+        public int[] AttackPercent = new int[32];
 
         [JsonIgnore]
-        public RuneStat CritDamage = null;
+        public int[] CritDamage = new int[32];
 
         [JsonIgnore]
-        public RuneStat CritRate = null;
+        public int[] CritRate = new int[32];
 
         [JsonIgnore]
-        public RuneStat DefenseFlat = null;
+        public int[] DefenseFlat = new int[32];
 
         [JsonIgnore]
-        public RuneStat DefensePercent = null;
+        public int[] DefensePercent = new int[32];
 
         [JsonIgnore]
-        public RuneStat HealthFlat = null;
+        public int[] HealthFlat = new int[32];
 
         [JsonIgnore]
-        public RuneStat HealthPercent = null;
+        public int[] HealthPercent = new int[32];
 
         [JsonIgnore]
-        public RuneStat Resistance = null;
+        public int[] Resistance = new int[32];
 
         [JsonIgnore]
-        public RuneStat Speed = null;
+        public int[] Speed = new int[32];
 
         #endregion
         
@@ -281,7 +281,7 @@ namespace RuneOptim
 
         public Rune()
         {
-            Accuracy = new RuneStat(this, Attr.Accuracy);
+            /*Accuracy = new RuneStat(this, Attr.Accuracy);
             AttackFlat = new RuneStat(this, Attr.AttackFlat);
             AttackPercent = new RuneStat(this, Attr.AttackPercent);
             CritDamage = new RuneStat(this, Attr.CritDamage);
@@ -291,7 +291,7 @@ namespace RuneOptim
             HealthFlat = new RuneStat(this, Attr.HealthFlat);
             HealthPercent = new RuneStat(this, Attr.HealthPercent);
             Resistance = new RuneStat(this, Attr.Resistance);
-            Speed = new RuneStat(this, Attr.Speed);
+            Speed = new RuneStat(this, Attr.Speed);*/
         }
 
         public Rune(Rune rhs)
@@ -328,27 +328,27 @@ namespace RuneOptim
                 switch (stat)
                 {
                     case "HPflat":
-                        return HealthFlat[fake, pred];
+                        return HealthFlat[pred ? fake + 16 : fake];
                     case "HPperc":
-                        return HealthPercent[fake, pred];
+                        return HealthPercent[pred ? fake + 16 : fake];
                     case "ATKflat":
-                        return AttackFlat[fake, pred];
+                        return AttackFlat[pred ? fake + 16 : fake];
                     case "ATKperc":
-                        return AttackPercent[fake, pred];
+                        return AttackPercent[pred ? fake + 16 : fake];
                     case "DEFflat":
-                        return DefenseFlat[fake, pred];
+                        return DefenseFlat[pred ? fake + 16 : fake];
                     case "DEFperc":
-                        return DefensePercent[fake, pred];
+                        return DefensePercent[pred ? fake + 16 : fake];
                     case "SPDflat":
-                        return Speed[fake, pred];
+                        return Speed[pred ? fake + 16 : fake];
                     case "CDperc":
-                        return CritDamage[fake, pred];
+                        return CritDamage[pred ? fake + 16 : fake];
                     case "CRperc":
-                        return CritRate[fake, pred];
+                        return CritRate[pred ? fake + 16 : fake];
                     case "ACCperc":
-                        return Accuracy[fake, pred];
+                        return Accuracy[pred ? fake + 16 : fake];
                     case "RESperc":
-                        return Resistance[fake, pred];
+                        return Resistance[pred ? fake + 16 : fake];
                     default:
                         return 0;
                 }
@@ -363,28 +363,28 @@ namespace RuneOptim
                 switch (stat)
                 {
                     case Attr.HealthFlat:
-                        return HealthFlat[fake, pred];
+                        return HealthFlat[pred ? fake + 16 : fake];
                     case Attr.HealthPercent:
-                        return HealthPercent[fake, pred];
+                        return HealthPercent[pred ? fake + 16 : fake];
                     case Attr.AttackFlat:
-                        return AttackFlat[fake, pred];
+                        return AttackFlat[pred ? fake + 16 : fake];
                     case Attr.AttackPercent:
-                        return AttackPercent[fake, pred];
+                        return AttackPercent[pred ? fake + 16 : fake];
                     case Attr.DefenseFlat:
-                        return DefenseFlat[fake, pred];
+                        return DefenseFlat[pred ? fake + 16 : fake];
                     case Attr.DefensePercent:
-                        return DefensePercent[fake, pred];
+                        return DefensePercent[pred ? fake + 16 : fake];
                     case Attr.Speed:
                     case Attr.SpeedPercent:
-                        return Speed[fake, pred];
+                        return Speed[pred ? fake + 16 : fake];
                     case Attr.CritDamage:
-                        return CritDamage[fake, pred];
+                        return CritDamage[pred ? fake + 16 : fake];
                     case Attr.CritRate:
-                        return CritRate[fake, pred];
+                        return CritRate[pred ? fake + 16 : fake];
                     case Attr.Accuracy:
-                        return Accuracy[fake, pred];
+                        return Accuracy[pred ? fake + 16 : fake];
                     case Attr.Resistance:
-                        return Resistance[fake, pred];
+                        return Resistance[pred ? fake + 16 : fake];
                 }
                 return 0;
             }
@@ -544,11 +544,11 @@ namespace RuneOptim
             {
                 double v = 0;
 
-                v += HealthPercent.Value / (double)subMaxes[Attr.HealthPercent];
-                v += DefensePercent.Value / (double)subMaxes[Attr.DefensePercent];
-                v += Resistance.Value / (double)subMaxes[Attr.Resistance];
-                v += 0.5 * HealthFlat.Value / subMaxes[Attr.HealthFlat];
-                v += 0.5 * DefenseFlat.Value / subMaxes[Attr.DefenseFlat];
+                v += HealthPercent[0] / (double)subMaxes[Attr.HealthPercent];
+                v += DefensePercent[0] / (double)subMaxes[Attr.DefensePercent];
+                v += Resistance[0] / (double)subMaxes[Attr.Resistance];
+                v += 0.5 * HealthFlat[0] / subMaxes[Attr.HealthFlat];
+                v += 0.5 * DefenseFlat[0] / subMaxes[Attr.DefenseFlat];
 
 				if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
 				{
@@ -597,10 +597,10 @@ namespace RuneOptim
             {
                 double v = 0;
 
-                v += AttackPercent.Value / (double)subMaxes[Attr.AttackPercent];
-                v += CritRate.Value / (double)subMaxes[Attr.CritRate];
-                v += CritDamage.Value / (double)subMaxes[Attr.CritDamage];
-                v += 0.5 * AttackFlat.Value / subMaxes[Attr.AttackFlat];
+                v += AttackPercent[0] / (double)subMaxes[Attr.AttackPercent];
+                v += CritRate[0] / (double)subMaxes[Attr.CritRate];
+                v += CritDamage[0] / (double)subMaxes[Attr.CritDamage];
+                v += 0.5 * AttackFlat[0] / subMaxes[Attr.AttackFlat];
 
 				if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
 				{
@@ -963,21 +963,21 @@ namespace RuneOptim
             if (Set != rhs.Set)
                 return EquipCompare.Unknown;
 
-            if (HealthPercent < rhs.HealthPercent)
+            if (HealthPercent[0] < rhs.HealthPercent[0])
                 return EquipCompare.Worse;
-            if (AttackPercent < rhs.AttackPercent)
+            if (AttackPercent[0] < rhs.AttackPercent[0])
                 return EquipCompare.Worse;
-            if (DefensePercent < rhs.DefensePercent)
+            if (DefensePercent[0] < rhs.DefensePercent[0])
                 return EquipCompare.Worse;
-            if (Speed < rhs.Speed)
+            if (Speed[0] < rhs.Speed[0])
                 return EquipCompare.Worse;
-            if (CritRate < rhs.CritRate)
+            if (CritRate[0] < rhs.CritRate[0])
                 return EquipCompare.Worse;
-            if (CritDamage < rhs.CritDamage)
+            if (CritDamage[0] < rhs.CritDamage[0])
                 return EquipCompare.Worse;
-            if (Accuracy < rhs.Accuracy)
+            if (Accuracy[0] < rhs.Accuracy[0])
                 return EquipCompare.Worse;
-            if (Resistance < rhs.Resistance)
+            if (Resistance[0] < rhs.Resistance[0])
                 return EquipCompare.Worse;
 
             return EquipCompare.Better;
@@ -1089,6 +1089,32 @@ namespace RuneOptim
             {Attr.Resistance, MainValues_ResAcc },
         };
 
-#endregion
+        public void FixShit()
+        {
+            Accuracy = FixOneShit(Attr.Accuracy);
+            AttackFlat = FixOneShit(Attr.AttackFlat);
+            AttackPercent = FixOneShit(Attr.AttackPercent);
+            CritDamage = FixOneShit(Attr.CritDamage);
+            CritRate = FixOneShit(Attr.CritRate);
+            DefenseFlat = FixOneShit(Attr.DefenseFlat);
+            DefensePercent = FixOneShit(Attr.DefensePercent);
+            HealthFlat = FixOneShit(Attr.HealthFlat);
+            HealthPercent = FixOneShit(Attr.HealthPercent);
+            Resistance = FixOneShit(Attr.Resistance);
+            Speed = FixOneShit(Attr.Speed);
+        }
+
+        private int[] FixOneShit(Attr a)
+        {
+            int[] vs = new int[32];
+            for (int i = 0; i < 16; i++)
+            {
+                vs[i] = GetValue(a, i, false);
+                vs[i + 16] = GetValue(a, i, true);
+            }
+            return vs;
+        }
+
+        #endregion
     }
 }

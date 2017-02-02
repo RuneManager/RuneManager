@@ -911,6 +911,8 @@ namespace RuneOptim
                 if (pred == null || (kv.Key != null && kv.Key > pred))
                     pred = kv.Key;
             }
+            if (pred < 0)
+                return 0;
             
             return pred ?? 0;
         }
@@ -1318,22 +1320,22 @@ namespace RuneOptim
 		{
 			int ret = 0;
 
-			if (r.HealthPercent >= s.Health)
+			if (r.HealthPercent[0] >= s.Health)
 				ret++;
-			if (r.AttackPercent >= s.Attack)
+			if (r.AttackPercent[0] >= s.Attack)
 				ret++;
-			if (r.DefensePercent >= s.Defense)
+			if (r.DefensePercent[0] >= s.Defense)
 				ret++;
-			if (r.Speed >= s.Speed)
+			if (r.Speed[0] >= s.Speed)
 				ret++;
 
-			if (r.CritDamage >= s.CritDamage)
+			if (r.CritDamage[0] >= s.CritDamage)
 				ret++;
-			if (r.CritRate >= s.CritRate)
+			if (r.CritRate[0] >= s.CritRate)
 				ret++;
-			if (r.Accuracy >= s.Accuracy)
+			if (r.Accuracy[0] >= s.Accuracy)
 				ret++;
-			if (r.Resistance >= s.Resistance)
+			if (r.Resistance[0] >= s.Resistance)
 				ret++;
 
 			return ret;
@@ -1345,22 +1347,22 @@ namespace RuneOptim
 			double ret = 0;
 
 			if (s.Health > 0)
-				ret += r.HealthPercent / s.Health;
+				ret += r.HealthPercent[0] / s.Health;
 			if (s.Attack > 0)
-				ret += r.AttackPercent / s.Attack;
+				ret += r.AttackPercent[0] / s.Attack;
 			if (s.Defense > 0)
-				ret += r.DefensePercent / s.Defense;
+				ret += r.DefensePercent[0] / s.Defense;
 			if (s.Speed > 0)
-				ret += r.Speed / s.Speed;
+				ret += r.Speed[0] / s.Speed;
 
 			if (s.CritDamage > 0)
-				ret += r.CritDamage / s.CritDamage;
+				ret += r.CritDamage[0] / s.CritDamage;
 			if (s.CritRate > 0)
-				ret += r.CritRate / s.CritRate;
+				ret += r.CritRate[0] / s.CritRate;
 			if (s.Accuracy > 0)
-				ret += r.Accuracy / s.Accuracy;
+				ret += r.Accuracy[0] / s.Accuracy;
 			if (s.Resistance > 0)
-				ret += r.Resistance / s.Resistance;
+				ret += r.Resistance[0] / s.Resistance;
 			
 			return ret;
 		}

@@ -1474,6 +1474,8 @@ namespace RuneApp
             }
             foreach (Rune rune in data.Runes)
             {
+                rune.FixShit();
+
                 ListViewItem item = new ListViewItem(new string[]{
                     rune.Set.ToString(),
                     rune.ID.ToString(),
@@ -2862,13 +2864,13 @@ namespace RuneApp
                             ws.Cells[row, col].Value = r.ScoringRune;
                             break;
                         case "SPD":
-                            ws.Cells[row, col].Value = r.Speed.Value;
+                            ws.Cells[row, col].Value = r.Speed[0];
                             break;
                         case "HPP":
-                            ws.Cells[row, col].Value = r.HealthPercent.Value;
+                            ws.Cells[row, col].Value = r.HealthPercent[0];
                             break;
                         case "ACC":
-                            ws.Cells[row, col].Value = r.Accuracy.Value;
+                            ws.Cells[row, col].Value = r.Accuracy[0];
                             break;
 
                     }
@@ -2971,12 +2973,12 @@ namespace RuneApp
             formula += "+" + (heads.Contains("Pts") ? "RuneTable[[#This Row],[Pts]]" : r.ScoringRune.ToString()) + "*max("
             + (heads.Contains("HPpts") ? "RuneTable[[#This Row],[HPpts]]" : r.ScoringHP.ToString()) + "," + (heads.Contains("ATKpts") ? "RuneTable[[#This Row],[ATKpts]]" : r.ScoringATK.ToString()) + ")*20";//*/
 
-            keep += r.Speed;
-            formula += "+" + (heads.Contains("SPD") ? "RuneTable[[#This Row],[SPD]]" : r.Speed.ToString()) + "";
-            keep += r.HealthPercent * 0.3;
-            formula += "+" + (heads.Contains("HPP") ? "RuneTable[[#This Row],[HPP]]" : r.HealthPercent.ToString()) + "*0.3";
-            keep += r.Accuracy * 0.4;
-            formula += "+" + (heads.Contains("ACC") ? "RuneTable[[#This Row],[ACC]]" : r.Accuracy.ToString()) + "*0.4";
+            keep += r.Speed[0];
+            formula += "+" + (heads.Contains("SPD") ? "RuneTable[[#This Row],[SPD]]" : r.Speed[0].ToString()) + "";
+            keep += r.HealthPercent[0] * 0.3;
+            formula += "+" + (heads.Contains("HPP") ? "RuneTable[[#This Row],[HPP]]" : r.HealthPercent[0].ToString()) + "*0.3";
+            keep += r.Accuracy[0] * 0.4;
+            formula += "+" + (heads.Contains("ACC") ? "RuneTable[[#This Row],[ACC]]" : r.Accuracy[0].ToString()) + "*0.4";
 
             keep += (Math.Pow(1.004, r.manageStats.GetOrAdd("Set", 0)) - 1) * 10;
             formula += "+(power(1.004, " + (heads.Contains("Select") ? "RuneTable[[#This Row],[Select]]" : r.manageStats.GetOrAdd("Set", 0).ToString()) + ")-1)*10";
