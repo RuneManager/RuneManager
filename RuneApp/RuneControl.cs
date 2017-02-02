@@ -100,6 +100,9 @@ namespace RuneApp
             }
             switch (rune.Set)
             {
+                case RuneOptim.RuneSet.Null:
+                    _imageSet = null;
+                    break;
                 case RuneOptim.RuneSet.Blade:
                     _imageSet = Runes.blade;
                     break;

@@ -1656,10 +1656,10 @@ namespace RuneApp
                     else
                         numchanged++;
                 }
-                powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1] ?? 0) - r.Level);
+                powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1]) - r.Level);
                 if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
                 {
-                    int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1] ?? 0)) / (double)3);
+                    int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1])) / (double)3);
                     int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
                     upgrades += Math.Max(0, tup - cup);
                 }
@@ -3437,10 +3437,10 @@ namespace RuneApp
                             else
                                 numchanged++;
                         }
-                        powerup += Math.Max(0, (load.FakeLevel[r.Slot - 1] ?? 0) - r.Level);
+                        powerup += Math.Max(0, (load.FakeLevel[r.Slot - 1]) - r.Level);
                         if (load.FakeLevel[r.Slot - 1] != 0)
                         {
-                            int tup = (int)Math.Floor(Math.Min(12, (load.FakeLevel[r.Slot - 1] ?? 0)) / (double)3);
+                            int tup = (int)Math.Floor(Math.Min(12, (load.FakeLevel[r.Slot - 1])) / (double)3);
                             int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
                             upgrades += Math.Max(0, tup - cup);
                         }

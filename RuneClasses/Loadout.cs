@@ -19,7 +19,7 @@ namespace RuneOptim
         private RuneSet[] sets = new RuneSet[3];
         private bool setsFull = false;
 
-        private int?[] fakeLevel = new int?[6];
+        private int[] fakeLevel = new int[6];
         private bool[] predictSubs = new bool[6];
 
         private int buildID;
@@ -66,7 +66,7 @@ namespace RuneOptim
             }
         }
 
-        public int?[] FakeLevel { get { return fakeLevel; } set { fakeLevel = value; changed = true; } }
+        public int[] FakeLevel { get { return fakeLevel; } set { fakeLevel = value; changed = true; } }
         public bool[] PredictSubs { get { return predictSubs; } set { predictSubs = value; changed = true; } }
 
         private Stats shrines = new Stats();
@@ -158,12 +158,12 @@ namespace RuneOptim
             get
             {
 				return 
-					(runes[0]?.HealthFlat[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-					(runes[1]?.HealthFlat[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-					(runes[2]?.HealthFlat[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-					(runes[3]?.HealthFlat[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-					(runes[4]?.HealthFlat[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-					(runes[5]?.HealthFlat[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+					(runes[0]?.HealthFlat[fakeLevel[0], predictSubs[0]] ?? 0) +
+					(runes[1]?.HealthFlat[fakeLevel[1], predictSubs[1]] ?? 0) +
+					(runes[2]?.HealthFlat[fakeLevel[2], predictSubs[2]] ?? 0) +
+					(runes[3]?.HealthFlat[fakeLevel[3], predictSubs[3]] ?? 0) +
+					(runes[4]?.HealthFlat[fakeLevel[4], predictSubs[4]] ?? 0) +
+					(runes[5]?.HealthFlat[fakeLevel[5], predictSubs[5]] ?? 0) +
 					SetStat(Attr.HealthFlat);
             }
         }
@@ -173,12 +173,12 @@ namespace RuneOptim
             get
             {
 				return
-					(runes[0]?.HealthPercent[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-					(runes[1]?.HealthPercent[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-					(runes[2]?.HealthPercent[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-					(runes[3]?.HealthPercent[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-					(runes[4]?.HealthPercent[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-					(runes[5]?.HealthPercent[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+					(runes[0]?.HealthPercent[fakeLevel[0], predictSubs[0]] ?? 0) +
+					(runes[1]?.HealthPercent[fakeLevel[1], predictSubs[1]] ?? 0) +
+					(runes[2]?.HealthPercent[fakeLevel[2], predictSubs[2]] ?? 0) +
+					(runes[3]?.HealthPercent[fakeLevel[3], predictSubs[3]] ?? 0) +
+					(runes[4]?.HealthPercent[fakeLevel[4], predictSubs[4]] ?? 0) +
+					(runes[5]?.HealthPercent[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.Health + 
 					SetStat(Attr.HealthPercent);
             }
@@ -190,12 +190,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.AttackFlat[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.AttackFlat[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.AttackFlat[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.AttackFlat[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.AttackFlat[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.AttackFlat[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.AttackFlat[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.AttackFlat[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.AttackFlat[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.AttackFlat[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.AttackFlat[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.AttackFlat[fakeLevel[5], predictSubs[5]] ?? 0) +
                     SetStat(Attr.AttackFlat);
             }
         }
@@ -205,12 +205,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.AttackPercent[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.AttackPercent[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.AttackPercent[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.AttackPercent[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.AttackPercent[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.AttackPercent[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.AttackPercent[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.AttackPercent[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.AttackPercent[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.AttackPercent[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.AttackPercent[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.AttackPercent[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.Attack + 
                     SetStat(Attr.AttackPercent);
             }
@@ -222,12 +222,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.DefenseFlat[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.DefenseFlat[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.DefenseFlat[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.DefenseFlat[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.DefenseFlat[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.DefenseFlat[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.DefenseFlat[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.DefenseFlat[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.DefenseFlat[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.DefenseFlat[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.DefenseFlat[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.DefenseFlat[fakeLevel[5], predictSubs[5]] ?? 0) +
                     SetStat(Attr.DefenseFlat);
             }
         }
@@ -237,12 +237,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.DefensePercent[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.DefensePercent[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.DefensePercent[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.DefensePercent[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.DefensePercent[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.DefensePercent[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.DefensePercent[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.DefensePercent[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.DefensePercent[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.DefensePercent[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.DefensePercent[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.DefensePercent[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.Defense + 
                     SetStat(Attr.DefensePercent);
             }
@@ -254,12 +254,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.Speed[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.Speed[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.Speed[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.Speed[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.Speed[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.Speed[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.Speed[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.Speed[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.Speed[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.Speed[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.Speed[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.Speed[fakeLevel[5], predictSubs[5]] ?? 0) +
                     SetStat(Attr.Speed);
             }
         }
@@ -280,12 +280,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.CritRate[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.CritRate[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.CritRate[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.CritRate[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.CritRate[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.CritRate[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.CritRate[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.CritRate[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.CritRate[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.CritRate[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.CritRate[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.CritRate[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.CritRate + 
                     SetStat(Attr.CritRate);
             }
@@ -297,12 +297,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.CritDamage[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.CritDamage[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.CritDamage[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.CritDamage[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.CritDamage[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.CritDamage[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.CritDamage[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.CritDamage[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.CritDamage[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.CritDamage[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.CritDamage[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.CritDamage[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.CritDamage + 
                     SetStat(Attr.CritDamage);
             }
@@ -314,12 +314,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.Accuracy[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.Accuracy[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.Accuracy[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.Accuracy[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.Accuracy[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.Accuracy[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.Accuracy[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.Accuracy[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.Accuracy[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.Accuracy[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.Accuracy[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.Accuracy[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.Accuracy + 
                     SetStat(Attr.Accuracy);
             }
@@ -331,12 +331,12 @@ namespace RuneOptim
             get
             {
                 return
-                    (runes[0]?.Resistance[fakeLevel[0] ?? 0, predictSubs[0]] ?? 0) +
-                    (runes[1]?.Resistance[fakeLevel[1] ?? 0, predictSubs[1]] ?? 0) +
-                    (runes[2]?.Resistance[fakeLevel[2] ?? 0, predictSubs[2]] ?? 0) +
-                    (runes[3]?.Resistance[fakeLevel[3] ?? 0, predictSubs[3]] ?? 0) +
-                    (runes[4]?.Resistance[fakeLevel[4] ?? 0, predictSubs[4]] ?? 0) +
-                    (runes[5]?.Resistance[fakeLevel[5] ?? 0, predictSubs[5]] ?? 0) +
+                    (runes[0]?.Resistance[fakeLevel[0], predictSubs[0]] ?? 0) +
+                    (runes[1]?.Resistance[fakeLevel[1], predictSubs[1]] ?? 0) +
+                    (runes[2]?.Resistance[fakeLevel[2], predictSubs[2]] ?? 0) +
+                    (runes[3]?.Resistance[fakeLevel[3], predictSubs[3]] ?? 0) +
+                    (runes[4]?.Resistance[fakeLevel[4], predictSubs[4]] ?? 0) +
+                    (runes[5]?.Resistance[fakeLevel[5], predictSubs[5]] ?? 0) +
                     (int)leader.Resistance + 
                     SetStat(Attr.Resistance);
             }

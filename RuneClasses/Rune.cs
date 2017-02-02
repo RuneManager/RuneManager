@@ -292,7 +292,6 @@ namespace RuneOptim
             HealthPercent = new RuneStat(this, Attr.HealthPercent);
             Resistance = new RuneStat(this, Attr.Resistance);
             Speed = new RuneStat(this, Attr.Speed);
-
         }
 
         public Rune(Rune rhs)
@@ -840,8 +839,8 @@ namespace RuneOptim
             else
             {
                 // count how many upgrades have gone into the rune
-                int maxUpgrades = Math.Min(Rarity, (int)Math.Floor(Math.Max(Level, FakeLevel) / (double)3));
-                int upgradesGone = Math.Min(4, (int)Math.Floor(Level / (double)3));
+                int maxUpgrades = Math.Min(Rarity, Math.Max(Level, FakeLevel) / 3);
+                int upgradesGone = Math.Min(4, Level / 3);
                 // how many new sub are to appear (0 legend will be 4 - 4 = 0, 6 rare will be 4 - 3 = 1, 6 magic will be 4 - 2 = 2)
                 int subNew = 4 - Rarity;
                 // how many subs will go into existing stats (0 legend will be 4 - 0 - 0 = 4, 6 rare will be 4 - 1 - 2 = 1, 6 magic will be 4 - 2 - 2 = 0)

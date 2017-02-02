@@ -423,7 +423,7 @@ namespace RuneOptim
             test.Current.Shrines = shrines;
             test.Current.Leader = leader;
 
-            test.Current.FakeLevel = slotFakes;
+            test.Current.FakeLevel = slotFakes.Select(i => i ?? 0).ToArray();
             test.Current.PredictSubs = slotPred;
 
             test.ApplyRune(runes[0], 6);
@@ -546,10 +546,11 @@ namespace RuneOptim
 
                 Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
-                int?[] slotFakes = new int?[6];
+                int?[] slotFakesTemp = new int?[6];
                 bool[] slotPred = new bool[6];
-                GetPrediction(slotFakes, slotPred);
-                
+                GetPrediction(slotFakesTemp, slotPred);
+
+                int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
                 // set to running
                 isRun = true;
