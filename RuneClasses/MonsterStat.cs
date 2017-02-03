@@ -101,25 +101,42 @@ namespace RuneOptim
 			return GetMon(mon);
 		}
 
-		public Monster GetMon(Monster mon)
-		{
-			return new Monster()
-			{
-				ID = mon.ID,
-				priority = mon.priority,
-				Current = mon.Current,
-				Accuracy = Accuracy,
-				Attack = Attack,
-				CritDamage = CritDamage,
-				CritRate = CritRate,
-				Defense = Defense,
-				Health = Health,
-				level = 40,
-				Resistance = Resistance,
-				Speed = Speed,
-				Name = (Awakened ? name : name + " (" + element.ToString() + ")"),
-				downloaded = true
-			};
+        public Monster GetMon(Monster mon, bool copy = true)
+        {
+            if (copy)
+            {
+                return new Monster()
+                {
+                    ID = mon.ID,
+                    priority = mon.priority,
+                    Current = mon.Current,
+                    Accuracy = Accuracy,
+                    Attack = Attack,
+                    CritDamage = CritDamage,
+                    CritRate = CritRate,
+                    Defense = Defense,
+                    Health = Health,
+                    level = 40,
+                    Resistance = Resistance,
+                    Speed = Speed,
+                    Name = (Awakened ? name : name + " (" + element.ToString() + ")"),
+                    downloaded = true
+                };
+            }
+
+            mon.Accuracy = Accuracy;
+            mon.Attack = Attack;
+            mon.CritDamage = CritDamage;
+            mon.CritRate = CritRate;
+            mon.Defense = Defense;
+            mon.Health = Health;
+            mon.level = 40;
+            mon.Resistance = Resistance;
+            mon.Speed = Speed;
+            mon.Name = (Awakened ? name : name + " (" + element.ToString() + ")");
+            mon.downloaded = true;
+
+            return mon;
 		}
 	}
 

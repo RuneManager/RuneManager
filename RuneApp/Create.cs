@@ -488,6 +488,7 @@ namespace RuneApp
             loading = true;
 
             Monster mon = build.mon;
+            mon.Current.Leader = build.leader;
             Stats cur = mon.GetStats();
             if (mon.ID != -1)
                 monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
@@ -649,7 +650,7 @@ namespace RuneApp
 
 		private void refreshStats(Monster mon, Stats cur)
 		{
-			statName.Text = mon.Name;
+            statName.Text = mon.Name;
 			statID.Text = mon.ID.ToString();
 			statLevel.Text = mon.level.ToString();
 
@@ -1655,11 +1656,11 @@ namespace RuneApp
                 ctrl.ForeColor = Color.Black;
 
                 // arbitrary colours for goodness/badness
-                if (perms < 500000) // 500k
+                if (perms < 2*1000*1000) // 2m (0.5s)
                     ctrl.ForeColor = Color.Green;
-                if (perms > 7000000) // 7m
+                if (perms > 10*1000*1000) // 10m (~2s)
                     ctrl.ForeColor = Color.Orange;
-                if (perms > 21000000 || perms == 0) // 21m
+                if (perms > 50*1000*1000 || perms == 0) // 50m (>10s)
                     ctrl.ForeColor = Color.Red;
             }
 
@@ -1707,7 +1708,10 @@ namespace RuneApp
                     build.leader.Attack = lv.value;
                     break;
             }
-		}
+            var mon = build.mon;
+            mon.Current.Leader = build.leader;
+            refreshStats(mon, mon.GetStats());
+        }
 
         void btnHelp_Click(object sender, EventArgs e)
         {

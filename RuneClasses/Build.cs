@@ -470,8 +470,10 @@ namespace RuneOptim
         public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double, int> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
         {
             if (runes.Any(r => r == null))
+            {
+                printTo?.Invoke("Null rune");
                 return;
-
+            }
             if (!saveStats)
                 goodRunes = false;
 
@@ -480,27 +482,40 @@ namespace RuneOptim
                 runeUsage = new RuneUsage();
                 buildUsage = new BuildUsage();
             }
-
-            // if to get awakened
-            if (DownloadAwake && !mon.downloaded)
+            try
             {
-                var mref = MonsterStat.FindMon(mon);
-                if (mref != null)
+                // if to get awakened
+                if (DownloadAwake && !mon.downloaded)
                 {
-                    // download the current (unawakened monster)
-                    var mstat = mref.Download();
-                    // if the retrieved mon is unawakened, get the awakened
-                    if (!mstat.Awakened && mstat.AwakenRef != null)
-                        mon = mstat.AwakenRef.Download().GetMon(mon);
+                    printTo?.Invoke("Downloading Awake def");
+                    var mref = MonsterStat.FindMon(mon);
+                    if (mref != null)
+                    {
+                        // download the current (unawakened monster)
+                        var mstat = mref.Download();
+                        printTo?.Invoke("Reading stats");
+                        // if the retrieved mon is unawakened, get the awakened
+                        if (!mstat.Awakened && mstat.AwakenRef != null)
+                        {
+                            printTo?.Invoke("Awakening");
+                            mon = mstat.AwakenRef.Download().GetMon(mon, false);
+                        }
+                    }
+                    printTo?.Invoke("Downloaded");
+                }
+                // getting awakened also gets level 40, so...
+                // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
+                else if (mon.level < 40 && DownloadStats && !mon.downloaded)
+                {
+                    printTo?.Invoke("Downloading 40 def");
+                    var mref = MonsterStat.FindMon(mon);
+                    if (mref != null)
+                        mon = mref.Download().GetMon(mon, false);
                 }
             }
-            // getting awakened also gets level 40, so...
-            // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
-            else if (mon.level < 40 && DownloadStats && !mon.downloaded)
+            catch (Exception e)
             {
-                var mref = MonsterStat.FindMon(mon);
-                if (mref != null)
-                    mon = mref.Download().GetMon(mon);
+                printTo?.Invoke("Failed downloading def: " + e.Message + Environment.NewLine + e.StackTrace);
             }
 
             try
@@ -568,6 +583,10 @@ namespace RuneOptim
                     // number of builds added since last sync
                     int plus = 0;
 
+                    bool isBad;
+                    double bestScore, curScore;
+                    Stats cstats;
+
                     Monster test = new Monster(mon);
                     test.Current.Shrines = shrines;
                     test.Current.Leader = leader;
@@ -606,36 +625,20 @@ namespace RuneOptim
 
                                         test.ApplyRune(r5, 6);
 
-										bool isBad = false;
-										//if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
-										//	isBad = false;
+										isBad = false;
 
-										var cstats = test.GetStats();
+										cstats = test.GetStats();
 
-                                        bool maxdead = false;
-
-                                        if (Maximum != null)
-                                        {
-                                            foreach (var stat in statEnums)
-                                            {
-                                                if (Maximum[stat] > 0 && cstats[stat] > Maximum[stat])
-                                                {
-                                                    maxdead = true;
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                        
                                         // check if build meets minimum
-                                        isBad |= (Minimum != null && !(cstats > Minimum));
-                                        isBad |= (maxdead);
+                                        isBad |= (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
+                                        isBad |= (Maximum != null && cstats.CheckMax(Maximum));
                                         // if no broken sets, check for broken sets
                                         isBad |= (!AllowBroken && !test.Current.SetsFull);
                                         // if there are required sets, ensure we have them
                                         isBad |= (RequiredSets != null && RequiredSets.Count > 0
                                             // this Linq adds no overhead compared to GetStats() and ApplyRune()
-                                            && !RequiredSets.All(s => test.Current.Sets.Contains(s)));
-                                        //    && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
+                                        //    && !RequiredSets.All(s => test.Current.Sets.Contains(s)));
+                                            && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
 
                                         if (isBad)
                                         {
@@ -670,8 +673,8 @@ namespace RuneOptim
                                                 if (tests.Count < MaxBuilds32)
                                                     tests.Add(new Monster(test, true));
 
-                                                var bestScore = sort(bstats);
-                                                var curScore = sort(cstats);
+                                                bestScore = sort(bstats);
+                                                curScore = sort(cstats);
                                                 lock(BestLock)
                                                 {
                                                     if (Best == null || bestScore < curScore)
@@ -687,8 +690,8 @@ namespace RuneOptim
                                                 // if there are currently no good builds, keep it
                                                 // or if this build is better than the best, keep it
 
-                                                var bestScore = sort(bstats);
-                                                var curScore = sort(cstats);
+                                                bestScore = sort(bstats);
+                                                curScore = sort(cstats);
 
                                                 lock(BestLock)
                                                 {
@@ -775,6 +778,8 @@ namespace RuneOptim
                 // sort *all* the builds
                 loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();
 
+                printTo?.Invoke("Found a load " + loads.Count());
+
                 if (!goodRunes)
                     buildUsage.loads = tests.ToList();
                 
@@ -797,6 +802,7 @@ namespace RuneOptim
                 {
                     // remember the good one
                     Best = loads.First();
+                    printTo?.Invoke("best " + (Best?.score ?? -1));
                     //Best.Current.runeUsage = usage.runeUsage;
                     //Best.Current.buildUsage = usage.buildUsage;
                     foreach (Rune r in Best.Current.Runes)
@@ -823,6 +829,7 @@ namespace RuneOptim
                 //loads = null;
                 tests.Clear();
                 tests = null;
+                printTo?.Invoke("Test cleared");
             }
             catch (Exception e)
             {

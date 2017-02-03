@@ -1437,12 +1437,46 @@ namespace RuneApp
                 File.WriteAllText("error_save.txt", e.ToString());
                 return;
             }
+
+            if (data.shrines == null)
+                data.shrines = new Stats();
+
+            if (config == null)
+                return;
+
+            for (int i = 0; i < shrineStats.Length; i++)
+            {
+                var stat = shrineStats[i];
+
+                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
+                {
+                    int val = 0;
+                    int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
+                    data.shrines[stat] = val;
+                    int level = (int)Math.Floor(val / shrineLevel[i]);
+                    shrineMap[stat][level].Checked = true;
+                }
+                else
+                {
+                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
+                    if (shrine == null) continue;
+
+                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
+                    shrineMap[stat][shrine.Level].Checked = true;
+                }
+            }
+            foreach (Rune rune in data.Runes)
+            {
+                rune.FixShit();
+            }
             foreach (Monster mon in data.Monsters)
             {
                 var equipedRunes = data.Runes.Where(r => r.AssignedId == mon.ID);
 
                 mon.inStorage = (mon.Name.IndexOf("In Storage") >= 0);
                 mon.Name = mon.Name.Replace(" (In Storage)", "");
+
+                mon.Current.Shrines = data.shrines;
 
                 foreach (Rune rune in equipedRunes)
                 {
@@ -1474,8 +1508,6 @@ namespace RuneApp
             }
             foreach (Rune rune in data.Runes)
             {
-                rune.FixShit();
-
                 ListViewItem item = new ListViewItem(new string[]{
                     rune.Set.ToString(),
                     rune.ID.ToString(),
@@ -1489,33 +1521,6 @@ namespace RuneApp
                 dataRuneList.Items.Add(item);
             }
 
-            if (data.shrines == null)
-                data.shrines = new Stats();
-
-            if (config == null)
-                return;
-
-            for (int i = 0; i < shrineStats.Length; i++)
-            {
-                var stat = shrineStats[i];
-
-                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
-                {
-                    int val = 0;
-                    int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
-                    data.shrines[stat] = val;
-                    int level = (int)Math.Floor(val / shrineLevel[i]);
-                    shrineMap[stat][level].Checked = true;
-                }
-                else
-                {
-                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
-                    if (shrine == null) continue;
-
-                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
-                    shrineMap[stat][shrine.Level].Checked = true;
-                }
-            }
 
         }
 
@@ -1541,7 +1546,12 @@ namespace RuneApp
             if ((pli?.Tag as Build) == null)
                 return;
 
-            RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate { if (!this.IsDisposed) pli.SubItems[3].Text = s; }));
+            RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate
+            {
+                Log.Info(s);
+                if (!this.IsDisposed)
+                    pli.SubItems[3].Text = s;
+            }));
         }
 
         private void RunBuild(Build b, bool saveStats = false, Action<string> printTo = null)
@@ -1555,13 +1565,13 @@ namespace RuneApp
             if (plsDie)
             {
                 Log.Info("Cancelling build " + b.ID + " " + b.MonName);
-                plsDie = false;
+                //plsDie = false;
                 return;
             }
 
             if (currentBuild != null)
             {
-                Log.Info("Force stopping " + b.ID + " " + b.MonName);
+                Log.Info("Force stopping " + currentBuild.ID + " " + currentBuild.MonName);
                 currentBuild.isRun = false;
             }
 
@@ -1575,7 +1585,7 @@ namespace RuneApp
                 Thread.Sleep(100);
             }
 
-            Log.Info("Starting watch");
+            Log.Info("Starting watch " + b.ID + " " + b.MonName);
             
             Stopwatch buildTime = Stopwatch.StartNew();
             currentBuild = b;
@@ -1671,6 +1681,7 @@ namespace RuneApp
             currentBuild = null;
             b.Time = buildTime.ElapsedMilliseconds;
             buildTime.Stop();
+            Log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
 
             Invoke((MethodInvoker)delegate
             {
@@ -1756,17 +1767,20 @@ namespace RuneApp
             b.buildUsage = null;
 
             #endregion
-            
+
             finishBuild:
             if (plsDie)
                 printTo?.Invoke("Canned");
             else if (b.Best != null)
                 printTo?.Invoke("Done");
+            else
+                printTo?.Invoke("Zero :(");
 
+            Log.Info("Cleaning up");
             isRunning = false;
-            plsDie = false;
             b.isRun = false;
             currentBuild = null;
+            Log.Info("Cleaned");
         }
 
         private void GenDeep(Build b, int slot0, Action<string> printTo, ref int count, params int[] doneIds)
@@ -1800,17 +1814,20 @@ namespace RuneApp
 
         private void RunBanned(Build b, Action<string> printTo, int c, params int[] doneIds)
         {
+            Log.Info("Running ban");
             b.BanEmTemp(doneIds);
 
             b.GenRunes(data, false, useEquipped, true, goodRunes);
 
             b.GenBuilds(0, 0, (str) =>
             {
+                Log.Info(str);
                 if (!IsDisposed && IsHandleCreated)
                 {
                     printTo?.Invoke(c + " " + str);
                 }
             }, null, true, true, goodRunes);
+            Log.Info("Ban finished");
         }
 
         private void SaveBuilds(string fname = "builds.json")
@@ -1951,7 +1968,7 @@ namespace RuneApp
                     }
 
 #warning consider making it nicer by using the List<Build>
-                foreach (ListViewItem li in list5)
+                    foreach (ListViewItem li in list5)
                     {
                         if (plsDie) break;
                         RunBuild(li, makeStats);

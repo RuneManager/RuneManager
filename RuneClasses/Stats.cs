@@ -392,6 +392,28 @@ namespace RuneOptim
             return lhs.GreaterEqual(rhs);
         }
 
+        public bool CheckMax(Stats rhs)
+        {
+            if (rhs.Accuracy > 0 && Accuracy > rhs.Accuracy)
+                return true;
+            if (rhs.Attack > 0 && Attack > rhs.Attack)
+                return true;
+            if (rhs.CritDamage > 0 && CritDamage > rhs.CritDamage)
+                return true;
+            if (rhs.CritRate > 0 && CritRate > rhs.CritRate)
+                return true;
+            if (rhs.Defense > 0 && Defense > rhs.Defense)
+                return true;
+            if (rhs.Health > 0 && Health > rhs.Health)
+                return true;
+            if (rhs.Resistance > 0 && Resistance > rhs.Resistance)
+                return true;
+            if (rhs.Speed > 0 && Speed > rhs.Speed)
+                return true;
+
+            return false;
+        }
+
         public bool GreaterEqual(Stats rhs, bool extraGet = false)
         {
             if (Accuracy < rhs.Accuracy)
@@ -413,15 +435,15 @@ namespace RuneOptim
 
             if (!extraGet) return true;
 
-            if (EffectiveHP < rhs.EffectiveHP)
+            if (ExtraValue(Attr.EffectiveHP) < rhs.EffectiveHP)
                 return false;
-            if (EffectiveHPDefenseBreak < rhs.EffectiveHPDefenseBreak)
+            if (ExtraValue(Attr.EffectiveHPDefenseBreak) < rhs.EffectiveHPDefenseBreak)
                 return false;
-            if (DamagePerSpeed < rhs.DamagePerSpeed)
+            if (ExtraValue(Attr.DamagePerSpeed) < rhs.DamagePerSpeed)
                 return false;
-            if (AverageDamage < rhs.AverageDamage)
+            if (ExtraValue(Attr.AverageDamage) < rhs.AverageDamage)
                 return false;
-            if (MaxDamage < rhs.MaxDamage)
+            if (ExtraValue(Attr.MaxDamage) < rhs.MaxDamage)
                 return false;
 
             return true;
