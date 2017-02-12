@@ -57,6 +57,7 @@
     <Compile Include="RuneFilter.cs" />
     <Compile Include="Save.cs" />
     <Compile Include="Stats.cs" />
+    <Compile Include="SWarFarmSave.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

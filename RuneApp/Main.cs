@@ -267,7 +267,79 @@ namespace RuneApp
 
         private void Main_Load(object sender, EventArgs e)
         {
-            if (File.Exists("save.json"))
+            var files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
+
+            if (files.Count() > 0)
+            {
+                var qq = JsonConvert.DeserializeObject<SWarFarmSave>(File.ReadAllText(files.First()));
+                
+                data = new Save();
+
+                foreach (var r in qq.Runes)
+                {
+                    var rr = new Rune()
+                    {
+                        ID = (int)r.Id,
+                        MainType = r.Main.Type,
+                        MainValue = r.Main.Value,
+                        InnateType = r.Innate.Type,
+                        InnateValue = r.Innate.Value,
+                        Slot = r.Slot,
+                        Set = (RuneSet) r._set,
+                        Level = r.Level,
+                        Grade = r.Grade,
+                    };
+
+                    if (r.AssignedTo != null)
+                        rr.AssignedId = (int)r.AssignedTo.Id;
+                    else
+                        rr.AssignedName = "Inventory";
+
+                    if (r.Subs.Count > 0)
+                    {
+                        rr.Sub1Type = r.Subs[0].Type;
+                        rr.Sub1Value = r.Subs[0].Value;
+                    }
+                    if (r.Subs.Count > 1)
+                    {
+                        rr.Sub2Type = r.Subs[1].Type;
+                        rr.Sub2Value = r.Subs[1].Value;
+                    }
+                    if (r.Subs.Count > 2)
+                    {
+                        rr.Sub3Type = r.Subs[2].Type;
+                        rr.Sub3Value = r.Subs[2].Value;
+                    }
+                    if (r.Subs.Count > 3)
+                    {
+                        rr.Sub4Type = r.Subs[3].Type;
+                        rr.Sub4Value = r.Subs[3].Value;
+                    }
+
+                    data.Runes.Add(rr);
+                }
+
+                foreach (var m in qq.Monsters.Select(m => new Monster()
+                {
+                    ID = (int)m.Id,
+                    level = m.Level,
+                    Health = m.Health,
+                    Attack = m.Attack,
+                    Defense = m.Defense,
+                    Speed = m.Speed,
+                    CritRate = m.CritRate,
+                    CritDamage = m.CritDamage,
+                    Resistance = m.Resistance,
+                    Accuracy = m.Accuracy,
+                    Name = m.Name,
+                    
+                }))
+                {
+                    data.Monsters.Add(m);
+                }
+                data.Decorations = qq.Decorations;
+            }
+            else if (File.Exists("save.json"))
             {
                 LoadFile("save.json");
             }
