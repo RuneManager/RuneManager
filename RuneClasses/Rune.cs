@@ -12,29 +12,34 @@ namespace RuneOptim
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RuneSet
     {
-        [EnumMember(Value = "")]
-        Null, // No set
-
         [EnumMember(Value = "???")]
-        Unknown, // SW Proxy say what?
+        Unknown = -1, // SW Proxy say what?
+
+        [EnumMember(Value = "")]
+        Null = 0, // No set
 
         Energy, // Health
-        Fatal, // Attack
+        Guard, // Def
+        Swift, // Speed
         Blade, // CRate
         Rage, // CDmg
-        Swift, // Speed
         Focus, // Acc
-        Guard, // Def
         Endure, // Res
+        Fatal, // Attack
+
+        __unknown9,
 
         // Here be magic
-        Violent,
-        Will,
-        Nemesis,
-        Shield,
-        Revenge,
         Despair,
         Vampire,
+
+        __unknown12,
+
+        Violent,
+        Nemesis,
+        Will,
+        Shield,
+        Revenge,
         Destroy,
 
         // Ally sets
@@ -51,62 +56,65 @@ namespace RuneOptim
     [JsonConverter(typeof(StringEnumConverter))]
     public enum Attr
     {
+        [EnumMember(Value = "-")]
+        Neg = -1,
+
         [EnumMember(Value = "")]
         Null = 0,
 
         [EnumMember(Value = "HP flat")]
-        HealthFlat = 1<<0,
+        HealthFlat = 1,
 
         [EnumMember(Value = "HP%")]
-        HealthPercent = 1<<1,
+        HealthPercent = 2,
 
         [EnumMember(Value = "ATK flat")]
-        AttackFlat = 1<<2,
+        AttackFlat = 3,
 
         [EnumMember(Value = "ATK%")]
-        AttackPercent = 1<<3,
+        AttackPercent = 4,
 
         [EnumMember(Value = "DEF flat")]
-        DefenseFlat = 1<<4,
+        DefenseFlat = 5,
 
         [EnumMember(Value = "DEF%")]
-        DefensePercent = 1<<5,
-
-        [EnumMember(Value = "SPD")]
-        Speed = 1<<6,
+        DefensePercent = 6,
 
         // Thanks Swift -_-
-        SpeedPercent = 1<<7,
+        SpeedPercent = 7,
+
+        [EnumMember(Value = "SPD")]
+        Speed = 8,
 
         [EnumMember(Value = "CRate")]
-        CritRate = 1<<8,
+        CritRate = 9,
 
         [EnumMember(Value = "CDmg")]
-        CritDamage = 1<<9,
+        CritDamage = 10,
 
         [EnumMember(Value = "ACC")]
-        Accuracy = 1<<10,
+        Accuracy = 11,
 
         [EnumMember(Value = "RES")]
-        Resistance = 1<<11,
+        Resistance = 12,
         
         // Flag for below
-        ExtraStat = 1<<12,
+        ExtraStat = 16,
 
         [EnumMember(Value = "EHP")]
-        EffectiveHP = (1<<13) | ExtraStat,
+        EffectiveHP = 1 | ExtraStat,
 
         [EnumMember(Value = "EHPDB")]
-        EffectiveHPDefenseBreak = (1 << 14) | ExtraStat,
+        EffectiveHPDefenseBreak = 2 | ExtraStat,
 
         [EnumMember(Value = "DPS")]
-        DamagePerSpeed = (1 << 15) | ExtraStat,
+        DamagePerSpeed = 3 | ExtraStat,
 
         [EnumMember(Value = "AvD")]
-        AverageDamage = (1 << 16) | ExtraStat,
+        AverageDamage = 4 | ExtraStat,
 
         [EnumMember(Value = "MxD")]
-        MaxDamage = (1 << 17) | ExtraStat
+        MaxDamage = 5 | ExtraStat
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

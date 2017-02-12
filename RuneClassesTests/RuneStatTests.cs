@@ -27,7 +27,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
             
-            Assert.AreEqual(11, test.HealthPercent.Value);
+            Assert.AreEqual(11, test.HealthPercent[0]);
         }
 
         [TestMethod()]
@@ -35,7 +35,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
 
-            Assert.AreEqual(0, test.CritDamage.Value);
+            Assert.AreEqual(0, test.CritDamage[0]);
         }
 
         [TestMethod()]
@@ -43,7 +43,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
 
-            Assert.AreEqual(63, test.HealthPercent[15,false]);
+            Assert.AreEqual(63, test.HealthPercent[15]);
         }
 
         [TestMethod()]
@@ -51,7 +51,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
 
-            Assert.AreEqual(0, test.CritDamage[15, false]);
+            Assert.AreEqual(0, test.CritDamage[15]);
         }
 
         [TestMethod()]
@@ -59,7 +59,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
 
-            Assert.AreEqual(17, test.AttackFlat.Value);
+            Assert.AreEqual(17, test.AttackFlat[0]);
         }
 
         [TestMethod()]
@@ -67,7 +67,7 @@ namespace RuneOptim.Tests
         {
             Rune test = MakeTestRune();
 
-            Assert.AreEqual(7, test.DefensePercent.Value);
+            Assert.AreEqual(7, test.DefensePercent[0]);
         }
 
     }

@@ -21,7 +21,6 @@ namespace RuneApp
     {
         public static Save data;
         public static List<Build> builds = new List<Build>();
-        int priority = 1;
         public static bool useEquipped = false;
         string filelink = "";
         string whatsNewText = "";
@@ -272,6 +271,10 @@ namespace RuneApp
             {
                 LoadFile("save.json");
             }
+
+            ConfigShrines();
+            RegenLists();
+
             if (File.Exists("builds.json"))
             {
                 LoadBuilds("builds.json");
@@ -849,6 +852,7 @@ namespace RuneApp
             if (File.Exists("save.json"))
             {
                 LoadFile("save.json");
+                RegenLists();
             }
         }
 
@@ -1303,18 +1307,94 @@ namespace RuneApp
             return text.Length;
         }
 
+        public void ConfigShrines()
+        {
+            if (data.shrines == null)
+                data.shrines = new Stats();
+
+            if (config == null)
+                return;
+
+            for (int i = 0; i < shrineStats.Length; i++)
+            {
+                var stat = shrineStats[i];
+
+                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
+                {
+                    int val = 0;
+                    int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
+                    data.shrines[stat] = val;
+                    int level = (int)Math.Floor(val / shrineLevel[i]);
+                    shrineMap[stat][level].Checked = true;
+                }
+                else
+                {
+                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
+                    if (shrine == null) continue;
+
+                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
+                    shrineMap[stat][shrine.Level].Checked = true;
+                }
+            }
+        }
+
         public int LoadFile(string fname)
         {
             Log.Info("Loading " + fname + " as save.");
             string text = File.ReadAllText(fname);
+
+            try
+            {
+                data = JsonConvert.DeserializeObject<Save>(text);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
+                File.WriteAllText("error_save.txt", e.ToString());
+                return -1;
+            }
+            return text.Length;
+        }
+
+        public void RegenLists()
+        {
             dataMonsterList.Items.Clear();
             dataRuneList.Items.Clear();
             listView4.Items.Clear();
 
-            LoadJSON(text);
+            foreach (Monster mon in data.Monsters)
+            {
+                string pri = "";
+                if (mon.priority != 0)
+                    pri = mon.priority.ToString();
 
+                ListViewItem item = new ListViewItem(new string[]{
+                    mon.Name,
+                    mon.ID.ToString(),
+                    pri,
+                });
+                if (mon.inStorage)
+                    item.ForeColor = Color.Gray;
+
+                item.Tag = mon;
+                dataMonsterList.Items.Add(item);
+            }
+
+            foreach (Rune rune in data.Runes)
+            {
+                ListViewItem item = new ListViewItem(new string[]{
+                    rune.Set.ToString(),
+                    rune.ID.ToString(),
+                    rune.Grade.ToString(),
+                    Rune.StringIt(rune.MainType, true),
+                    rune.MainValue.ToString()
+                });
+                item.Tag = rune;
+                if (rune.Locked)
+                    item.BackColor = Color.Red;
+                dataRuneList.Items.Add(item);
+            }
             checkLocked();
-            return text.Length;
         }
 
         public int LoadBuilds(string fname)
@@ -1425,105 +1505,6 @@ namespace RuneApp
             }
         }
 
-        public void LoadJSON(string text)
-        {
-            try
-            {
-                data = JsonConvert.DeserializeObject<Save>(text);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
-                File.WriteAllText("error_save.txt", e.ToString());
-                return;
-            }
-
-            if (data.shrines == null)
-                data.shrines = new Stats();
-
-            if (config == null)
-                return;
-
-            for (int i = 0; i < shrineStats.Length; i++)
-            {
-                var stat = shrineStats[i];
-
-                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
-                {
-                    int val = 0;
-                    int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
-                    data.shrines[stat] = val;
-                    int level = (int)Math.Floor(val / shrineLevel[i]);
-                    shrineMap[stat][level].Checked = true;
-                }
-                else
-                {
-                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
-                    if (shrine == null) continue;
-
-                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
-                    shrineMap[stat][shrine.Level].Checked = true;
-                }
-            }
-            foreach (Rune rune in data.Runes)
-            {
-                rune.FixShit();
-            }
-            foreach (Monster mon in data.Monsters)
-            {
-                var equipedRunes = data.Runes.Where(r => r.AssignedId == mon.ID);
-
-                mon.inStorage = (mon.Name.IndexOf("In Storage") >= 0);
-                mon.Name = mon.Name.Replace(" (In Storage)", "");
-
-                mon.Current.Shrines = data.shrines;
-
-                foreach (Rune rune in equipedRunes)
-                {
-                    mon.ApplyRune(rune);
-                    rune.AssignedName = mon.Name;
-                }
-
-                if (mon.priority == 0 && mon.Current.RuneCount > 0)
-                {
-                    mon.priority = priority++;
-                }
-
-                var stats = mon.GetStats();
-
-                string pri = "";
-                if (mon.priority != 0)
-                    pri = mon.priority.ToString();
-
-                ListViewItem item = new ListViewItem(new string[]{
-                    mon.Name,
-                    mon.ID.ToString(),
-                    pri,
-                });
-                if (mon.inStorage)
-                    item.ForeColor = Color.Gray;
-
-                item.Tag = mon;
-                dataMonsterList.Items.Add(item);
-            }
-            foreach (Rune rune in data.Runes)
-            {
-                ListViewItem item = new ListViewItem(new string[]{
-                    rune.Set.ToString(),
-                    rune.ID.ToString(),
-                    rune.Grade.ToString(),
-                    Rune.StringIt(rune.MainType, true),
-                    rune.MainValue.ToString()
-                });
-                item.Tag = rune;
-                if (rune.Locked)
-                    item.BackColor = Color.Red;
-                dataRuneList.Items.Add(item);
-            }
-
-
-        }
-
         public void checkLocked()
         {
             if (data?.Runes == null)
@@ -1556,231 +1537,238 @@ namespace RuneApp
 
         private void RunBuild(Build b, bool saveStats = false, Action<string> printTo = null)
         {
-            if (b == null)
+            try
             {
-                Log.Info("Build is null");
-                return;
-            }
-
-            if (plsDie)
-            {
-                Log.Info("Cancelling build " + b.ID + " " + b.MonName);
-                //plsDie = false;
-                return;
-            }
-
-            if (currentBuild != null)
-            {
-                Log.Info("Force stopping " + currentBuild.ID + " " + currentBuild.MonName);
-                currentBuild.isRun = false;
-            }
-
-            if (isRunning)
-                Log.Info("Looping...");
-
-            while (isRunning)
-            {
-                plsDie = true;
-                b.isRun = false;
-                Thread.Sleep(100);
-            }
-
-            Log.Info("Starting watch " + b.ID + " " + b.MonName);
-            
-            Stopwatch buildTime = Stopwatch.StartNew();
-            currentBuild = b;
-
-            ListViewItem[] olvs = null;
-            Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
-
-            if (olvs.Length > 0)
-            {
-                var olv = olvs.First();
-                Loadout ob = (Loadout)olv.Tag;
-                foreach (Rune r in ob.Runes)
+                if (b == null)
                 {
-                    r.Locked = false;
+                    Log.Info("Build is null");
+                    return;
                 }
-            }
 
-            b.GenRunes(data, false, useEquipped, saveStats);
-            b.shrines = data.shrines;
-
-            #region Check enough runes
-            string nR = "";
-            for (int i = 0; i < b.runes.Length; i++)
-            {
-                if (b.runes[i] != null && b.runes[i].Length == 0)
-                    nR += (i + 1) + " ";
-            }
-
-            if (nR != "")
-            {
-                printTo?.Invoke(":( " + nR + "Runes");
-                return;
-            }
-            #endregion
-
-            isRunning = true;
-
-            b.GenBuilds(0, 0, (str) =>
-            {
-                if (!IsDisposed && IsHandleCreated)
+                if (plsDie)
                 {
-                    printTo?.Invoke(str);
+                    Log.Info("Cancelling build " + b.ID + " " + b.MonName);
+                    //plsDie = false;
+                    return;
                 }
-            }, null, true, saveStats);
 
-            #region Save null build
-            if (b.Best == null)
-            {
+                if (currentBuild != null)
+                {
+                    Log.Info("Force stopping " + currentBuild.ID + " " + currentBuild.MonName);
+                    currentBuild.isRun = false;
+                }
+
+                if (isRunning)
+                    Log.Info("Looping...");
+
+                while (isRunning)
+                {
+                    plsDie = true;
+                    b.isRun = false;
+                    Thread.Sleep(100);
+                }
+
+                Log.Info("Starting watch " + b.ID + " " + b.MonName);
+
+                Stopwatch buildTime = Stopwatch.StartNew();
+                currentBuild = b;
+
+                ListViewItem[] olvs = null;
+                Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
+
+                if (olvs.Length > 0)
+                {
+                    var olv = olvs.First();
+                    Loadout ob = (Loadout)olv.Tag;
+                    foreach (Rune r in ob.Runes)
+                    {
+                        r.Locked = false;
+                    }
+                }
+
+                b.GenRunes(data, false, useEquipped, saveStats);
+                b.shrines = data.shrines;
+
+                #region Check enough runes
+                string nR = "";
+                for (int i = 0; i < b.runes.Length; i++)
+                {
+                    if (b.runes[i] != null && b.runes[i].Length == 0)
+                        nR += (i + 1) + " ";
+                }
+
+                if (nR != "")
+                {
+                    printTo?.Invoke(":( " + nR + "Runes");
+                    return;
+                }
+                #endregion
+
+                isRunning = true;
+
+                b.GenBuilds(0, 0, (str) =>
+                {
+                    if (!IsDisposed && IsHandleCreated)
+                    {
+                        printTo?.Invoke(str);
+                    }
+                }, null, true, saveStats);
+
+                #region Save null build
+                if (b.Best == null)
+                {
+                    Invoke((MethodInvoker)delegate
+                    {
+                        if (saveStats)
+                        {
+                            if (StatsExcelBind(true))
+                            {
+                                StatsExcelBuild(b, b.mon, null);
+                                StatsExcelSave();
+                            }
+                            StatsExcelBind(true);
+                        }
+                    });
+                    goto finishBuild;
+                }
+                #endregion
+
+                b.Best.Current.BuildID = b.ID;
+                builds.Add(b);
+
+                #region Get the rune diff
+                int numchanged = 0;
+                int numnew = 0;
+                int powerup = 0;
+                int upgrades = 0;
+                foreach (Rune r in b.Best.Current.Runes)
+                {
+                    r.Locked = true;
+                    if (r.AssignedName != b.Best.Name)
+                    {
+                        if (r.IsUnassigned)
+                            numnew++;
+                        else
+                            numchanged++;
+                    }
+                    powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1]) - r.Level);
+                    if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
+                    {
+                        int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1])) / (double)3);
+                        int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
+                        upgrades += Math.Max(0, tup - cup);
+                    }
+                }
+                #endregion
+
+                currentBuild = null;
+                b.Time = buildTime.ElapsedMilliseconds;
+                buildTime.Stop();
+                Log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
+
                 Invoke((MethodInvoker)delegate
                 {
-                    if (saveStats)
-                    {
-                        if (StatsExcelBind(true))
-                        {
-                            StatsExcelBuild(b, b.mon, null);
-                            StatsExcelSave();
-                        }
-                        StatsExcelBind(true);
-                    }
-                });
-                goto finishBuild;
-            }
-            #endregion
+                    checkLocked();
 
-            b.Best.Current.BuildID = b.ID;
-            builds.Add(b);
+                    ListViewItem nli;
 
-            #region Get the rune diff
-            int numchanged = 0;
-            int numnew = 0;
-            int powerup = 0;
-            int upgrades = 0;
-            foreach (Rune r in b.Best.Current.Runes)
-            {
-                r.Locked = true;
-                if (r.AssignedName != b.Best.Name)
-                {
-                    if (r.IsUnassigned)
-                        numnew++;
+                    var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
+
+                    if (lvs.Length == 0)
+                        nli = new ListViewItem();
                     else
-                        numchanged++;
-                }
-                powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1]) - r.Level);
-                if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
+                        nli = lvs.First();
+
+                    b.Best.Current.Time = b.Time;
+
+                    nli.Tag = b.Best.Current;
+                    nli.Text = b.ID.ToString();
+                    nli.Name = b.ID.ToString();
+                    while (nli.SubItems.Count < 6)
+                        nli.SubItems.Add("");
+                    nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
+                    nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
+                    nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
+                    nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
+                    if (numnew > 0 && b.mon.Current.RuneCount < 6)
+                        nli.SubItems[3].ForeColor = Color.Green;
+                    if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
+                    {
+                        bool check = false;
+                        bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
+                        if (check)
+                            nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
+                    }
+                    nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
+                    nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
+                    nli.UseItemStyleForSubItems = false;
+                    if (b.Time / (double)1000 > 60)
+                        nli.SubItems[5].BackColor = Color.Red;
+                    else if (b.Time / (double)1000 > 30)
+                        nli.SubItems[5].BackColor = Color.Orange;
+
+                    if (lvs.Length == 0)
+                        loadoutList.Items.Add(nli);
+                });
+
+                // if we are on the hunt of good runes.
+                if (goodRunes && saveStats)
                 {
-                    int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1])) / (double)3);
-                    int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
-                    upgrades += Math.Max(0, tup - cup);
+                    var theBest = b.Best;
+                    int count = 0;
+                    // we must progressively ban more runes from the build to find second-place runes.
+                    //GenDeep(b, 0, printTo, ref count);
+                    RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
+                    RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
+                    RunBanned(b, printTo, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
+
+                    // after messing all that shit up
+                    b.Best = theBest;
                 }
-            }
-            #endregion
 
-            currentBuild = null;
-            b.Time = buildTime.ElapsedMilliseconds;
-            buildTime.Stop();
-            Log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
+                #region Save Build stats
 
-            Invoke((MethodInvoker)delegate
-            {
-                checkLocked();
+                if (saveStats)
+                {
+                    if (StatsExcelBind(true))
+                    {
+                        StatsExcelBuild(b, b.mon, b.Best.Current);
+                        StatsExcelSave();
+                    }
+                    StatsExcelBind(true);
+                }
 
-                ListViewItem nli;
+                // clean up for GC
+                if (b.buildUsage != null)
+                    b.buildUsage.loads.Clear();
+                if (b.runeUsage != null)
+                {
+                    b.runeUsage.runesGood.Clear();
+                    b.runeUsage.runesUsed.Clear();
+                }
+                b.runeUsage = null;
+                b.buildUsage = null;
 
-                var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
+                #endregion
 
-                if (lvs.Length == 0)
-                    nli = new ListViewItem();
+                finishBuild:
+                if (plsDie)
+                    printTo?.Invoke("Canned");
+                else if (b.Best != null)
+                    printTo?.Invoke("Done");
                 else
-                    nli = lvs.First();
+                    printTo?.Invoke("Zero :(");
 
-                b.Best.Current.Time = b.Time;
-
-                nli.Tag = b.Best.Current;
-                nli.Text = b.ID.ToString();
-                nli.Name = b.ID.ToString();
-                while (nli.SubItems.Count < 6)
-                    nli.SubItems.Add("");
-                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
-                nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
-                nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.ID.ToString());
-                nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (numnew + numchanged).ToString());
-                if (numnew > 0 && b.mon.Current.RuneCount < 6)
-                    nli.SubItems[3].ForeColor = Color.Green;
-                if (config.AppSettings.Settings.AllKeys.Contains("splitassign"))
-                {
-                    bool check = false;
-                    bool.TryParse(config.AppSettings.Settings["splitassign"].Value, out check);
-                    if (check)
-                        nli.SubItems[3].Text = numnew.ToString() + "/" + numchanged.ToString();
-                }
-                nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, powerup.ToString());
-                nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
-                nli.UseItemStyleForSubItems = false;
-                if (b.Time / (double)1000 > 60)
-                    nli.SubItems[5].BackColor = Color.Red;
-                else if (b.Time / (double)1000 > 30)
-                    nli.SubItems[5].BackColor = Color.Orange;
-
-                if (lvs.Length == 0)
-                    loadoutList.Items.Add(nli);
-            });
-
-            // if we are on the hunt of good runes.
-            if (goodRunes && saveStats)
-            {
-                var theBest = b.Best;
-                int count = 0;
-                // we must progressively ban more runes from the build to find second-place runes.
-                //GenDeep(b, 0, printTo, ref count);
-                RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
-                RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
-                RunBanned(b, printTo, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
-
-                // after messing all that shit up
-                b.Best = theBest;
+                Log.Info("Cleaning up");
+                isRunning = false;
+                b.isRun = false;
+                currentBuild = null;
+                Log.Info("Cleaned");
             }
-
-            #region Save Build stats
-
-            if (saveStats)
+            catch (Exception e)
             {
-                if (StatsExcelBind(true))
-                {
-                    StatsExcelBuild(b, b.mon, b.Best.Current);
-                    StatsExcelSave();
-                }
-                StatsExcelBind(true);
+                Log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
             }
-
-            // clean up for GC
-            if (b.buildUsage != null)
-                b.buildUsage.loads.Clear();
-            if (b.runeUsage != null)
-            {
-                b.runeUsage.runesGood.Clear();
-                b.runeUsage.runesUsed.Clear();
-            }
-            b.runeUsage = null;
-            b.buildUsage = null;
-
-            #endregion
-
-            finishBuild:
-            if (plsDie)
-                printTo?.Invoke("Canned");
-            else if (b.Best != null)
-                printTo?.Invoke("Done");
-            else
-                printTo?.Invoke("Zero :(");
-
-            Log.Info("Cleaning up");
-            isRunning = false;
-            b.isRun = false;
-            currentBuild = null;
-            Log.Info("Cleaned");
         }
 
         private void GenDeep(Build b, int slot0, Action<string> printTo, ref int count, params int[] doneIds)
@@ -2653,13 +2641,16 @@ namespace RuneApp
                 excelSheets.MoveBefore(ws.Index, ind);
             }
 
-            int row = 1;
-            int col = 1;
+            int tTop = (int)RuneSet.Broken + 2;
+            int tLeft = 1;
+
+            int row = tTop;
+            int col = tLeft;
 
             List<string> colHead = new List<string>();
 
             // ,MType,Points,FlatPts
-            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,SPD,HPP,ACC,BuildG,BuildT".Split(','))
+            foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
             {
                 colHead.Add(th);
                 ws.Cells[row, col].Value = th; col++;
@@ -2880,11 +2871,35 @@ namespace RuneApp
                             ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
                             ws.Cells[row, col].Value = r.ScoringRune;
                             break;
-                        case "SPD":
-                            ws.Cells[row, col].Value = r.Speed[0];
+                        case "HPF":
+                            ws.Cells[row, col].Value = r.HealthFlat[0];
                             break;
                         case "HPP":
                             ws.Cells[row, col].Value = r.HealthPercent[0];
+                            break;
+                        case "ATKF":
+                            ws.Cells[row, col].Value = r.AttackFlat[0];
+                            break;
+                        case "ATKP":
+                            ws.Cells[row, col].Value = r.AttackPercent[0];
+                            break;
+                        case "DEFF":
+                            ws.Cells[row, col].Value = r.DefenseFlat[0];
+                            break;
+                        case "DEFP":
+                            ws.Cells[row, col].Value = r.DefensePercent[0];
+                            break;
+                        case "SPD":
+                            ws.Cells[row, col].Value = r.Speed[0];
+                            break;
+                        case "CR":
+                            ws.Cells[row, col].Value = r.CritRate[0];
+                            break;
+                        case "CD":
+                            ws.Cells[row, col].Value = r.CritDamage[0];
+                            break;
+                        case "RES":
+                            ws.Cells[row, col].Value = r.Resistance[0];
                             break;
                         case "ACC":
                             ws.Cells[row, col].Value = r.Accuracy[0];
@@ -2899,22 +2914,132 @@ namespace RuneApp
 
             var table = ws.Tables.Where(t => t.Name == "RuneTable").FirstOrDefault();
             if (table == null)
-                table = ws.Tables.Add(ws.Cells[1, 1, row - 1, cmax - 1], "RuneTable");
+                table = ws.Tables.Add(ws.Cells[tTop, tLeft, row - 1, cmax - 1], "RuneTable");
 
-            if (table.Address.Columns != cmax - 1 || table.Address.Rows != row - 1)
+            if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop)
             {
                 var start = table.Address.Start;
-                var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(1, 1, row - 1, cmax - 1));
+                var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(tTop, tLeft, row - 1, cmax - 1));
 
                 var tableElement = table.TableXml.DocumentElement;
                 tableElement.Attributes["ref"].Value = newRange;
                 tableElement["autoFilter"].Attributes["ref"].Value = newRange;
-
             }
 
             table.ShowHeader = true;
             table.StyleName = "TableStyleMedium2";
             // write rune stats
+
+            // Breakdown by Set
+            row = 1;
+            col = 2;
+
+            ws.Cells[row, col].Formula = "COUNT(RuneTable[Id])"; col++;
+            ws.Cells[row, col].Formula = "SUM(C3:C23)"; col++;
+            ws.Cells[row, col].Formula = "SUM(D3:D23)"; col++;
+
+            tLeft = 2;
+            tTop = 2;
+
+            row = tTop;
+            col = tLeft;
+            cmax = tLeft;
+
+            ws.Cells[row, col].Value = "Set"; col++;
+            ws.Cells[row, col].Value = "Used"; col++;
+            ws.Cells[row, col].Value = "Stored"; col++;
+            ws.Cells[row, col].Value = "Usage"; col++;
+            ws.Cells[row, col].Value = "Storage"; col++;
+            ws.Cells[row, col].Value = "Total"; col++;
+            ws.Cells[row, col].Value = "Average Eff"; col++;
+            ws.Cells[row, col].Value = "Main2"; col++;
+            ws.Cells[row, col].Value = "Main4"; col++;
+            ws.Cells[row, col].Value = "Main6"; col++;
+            ws.Cells[row, col].Value = "S1"; col++;
+            ws.Cells[row, col].Value = "S2"; col++;
+            ws.Cells[row, col].Value = "S3"; col++;
+            ws.Cells[row, col].Value = "S4"; col++;
+
+            foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(','))
+            {
+                ws.Cells[row, col].Value = attr; col++;
+            }
+
+            row = 3;
+            cmax = Math.Max(cmax, col);
+            col = 2;
+
+            string getType = "MID({0}, FIND(\" \",{0})+1, 10)";
+            string matchString = "MATCH({0}, {0}, 0)";
+            string modeText = "INDEX({0}, MODE({1}))";
+            string ifblank = "IF({0},{1},\"\")";
+            string ifError = "IFERROR({0},\"\")";
+
+            Func<string, int, string> makeHardcore = (a, b) =>
+            {
+                string runetableSub = string.Format(getType, $"RuneTable[{a}]");
+                string runetableMatch = string.Format(matchString, runetableSub);
+                string ifs = string.Format(ifblank, "RuneTable[Set]=B" + row, runetableMatch);
+                if (b > 0)
+                    ifs = string.Format(ifblank, $"RuneTable[Slot]={b}", ifs);
+                ifs = string.Format(ifblank, "RuneTable[Used]=\"Best\"", ifs);
+                string indMode = string.Format(modeText, $"RuneTable[{a}]", ifs);
+                string finalCut = string.Format(getType, indMode);
+                return string.Format(ifError, finalCut);
+            };
+
+            foreach (var rs in Enum.GetNames(typeof(RuneSet)))
+            {
+                cmax = Math.Max(cmax, col);
+                col = 2;
+                if (rs[0] != '_' && rs != "Null" && rs != "Broken" && rs != "Unknown")
+                {
+                    ws.Cells[row, col].Value = rs.ToString(); col++;
+                    ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[Used],\"Best\")"; col++;
+                    ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[Used],\"<>Best\")"; col++;
+                    ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                    ws.Cells[row, col].Formula = $"C{row}/C$1"; col++;
+                    ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                    ws.Cells[row, col].Formula = $"D{row}/D$1"; col++;
+                    ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                    ws.Cells[row, col].Formula = $"(C{row}+D{row})/B$1"; col++;
+                    // =IF(D3=0,"",AVERAGEIFS(RuneTable[Eff],RuneTable[Set],C3,RuneTable[Used],"Best"))
+                    ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+                    ws.Cells[row, col].Formula = $"IF(C{row}=0,\"\",AVERAGEIFS(RuneTable[Eff],RuneTable[Set],B{row},RuneTable[Used],\"Best\"))"; col++;
+
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("Main", 2)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("Main", 4)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("Main", 6)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("1", 0)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("2", 0)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("3", 0)); col++;
+                    ws.Cells[row, col].CreateArrayFormula(makeHardcore("4", 0)); col++;
+
+                    foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(','))
+                    {
+                        ws.Cells[row, col].Formula = $"IFERROR(AVERAGEIFS(RuneTable[{attr}], RuneTable[Set], B{row},RuneTable[{attr}],\"<>0\", RuneTable[Used], \"Best\"),\"\")"; col++;
+                    }
+
+                    row++;
+                }
+            }
+
+            table = ws.Tables.Where(t => t.Name == "DetailedRunes").FirstOrDefault();
+            if (table == null)
+                table = ws.Tables.Add(ws.Cells[tTop, tLeft, row - 1, cmax - 1], "DetailedRunes");
+
+            if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop)
+            {
+                var start = table.Address.Start;
+                var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(tTop, tLeft, row - 1, cmax - 1));
+
+                var tableElement = table.TableXml.DocumentElement;
+                tableElement.Attributes["ref"].Value = newRange;
+                tableElement["autoFilter"].Attributes["ref"].Value = newRange;
+            }
+
+            table.ShowHeader = true;
+            table.StyleName = "TableStyleMedium2";
 
         }
 

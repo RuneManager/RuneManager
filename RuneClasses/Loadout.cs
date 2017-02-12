@@ -86,6 +86,8 @@ namespace RuneOptim
             set
             {
                 shrines = value;
+                if (shrines == null)
+                    shrines = new Stats();
                 changed = true;
             }
         }
