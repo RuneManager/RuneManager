@@ -58,6 +58,7 @@ namespace RuneApp
         List<string> extraTeams = new List<string>();
 
         public log4net.ILog Log { get { return Program.log; } }
+        public static Main Instance = null;
 
         public static bool MakeStats
         {
@@ -80,6 +81,7 @@ namespace RuneApp
         {
             InitializeComponent();
             Log.Info("Initialized Main");
+            Instance = this;
 
             currentMain = this;
 
@@ -318,6 +320,16 @@ namespace RuneApp
                     tsnone.Click += tsTeamHandler;
 
                     tsmi.DropDownItems.Add(tsnone);
+                }
+            }
+
+            if (config.AppSettings.Settings.AllKeys.Contains("startuphelp"))
+            {
+                bool startuphelp;
+                if (bool.TryParse(config.AppSettings.Settings["startuphelp"].Value, out startuphelp))
+                {
+                    if (startuphelp)
+                        OpenHelp();
                 }
             }
         }
@@ -1180,6 +1192,22 @@ namespace RuneApp
                 return -1;
 
             return ver1.CompareTo(ver2);
+        }
+
+        public void OpenHelp(string url = null, Form owner = null)
+        {
+            if (help == null || help.IsDisposed)
+                help = new Help();
+            help.url = url;
+
+            if (!help.Visible)
+                help.Show(owner ?? this);
+
+            var xx = Location.X + 1105 + 8 - 271;//271, 213
+            var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
+            help.Height = this.Height;
+            help.Location = new Point(xx, yy);
+            help.Location = new Point(Location.X + Width, Location.Y);
         }
 
         private void ShowMon(Monster mon)

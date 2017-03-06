@@ -38,6 +38,8 @@ namespace RuneApp
             AddCheck("nostats", cOtherStats);
             AddCheck("testgray", cDisplayGray);
             AddCheck("colorteams", cColorTeams);
+            AddCheck("startuphelp", cHelpStart);
+            cHelpStart.CheckedChanged += CHelpStart_CheckedChanged;
 
             AddNum("testGen", gTestRun);
             AddNum("testShow", gTestShow);
@@ -63,6 +65,15 @@ namespace RuneApp
                 }
             }
             loading = false;
+        }
+
+        private void CHelpStart_CheckedChanged(object sender, EventArgs e)
+        {
+            if (loading)
+                return;
+
+            if (Main.help != null)
+                Main.help.SetStartupCheck(cHelpStart.Checked);
         }
 
         private void Options_FormClosing(object sender, FormClosingEventArgs e)
@@ -111,11 +122,8 @@ namespace RuneApp
             if (Main.help != null)
                 Main.help.Close();
             
-            Main.help = new Help
-            {
-                url = Environment.CurrentDirectory + "\\User Manual\\options.html"
-            };
-            Main.help.Show();
+            Main.help = new Help();
+            Main.Instance.OpenHelp(Environment.CurrentDirectory + "\\User Manual\\options.html");//, this);
         }
 	}
 }
