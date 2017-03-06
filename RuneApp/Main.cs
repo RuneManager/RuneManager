@@ -28,9 +28,7 @@ namespace RuneApp
         public static Configuration config = null;
 
         private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
-        readonly string[] shrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
-        readonly double[] shrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
-
+        
         private Task runTask = null;
         private CancellationToken runToken;
         private CancellationTokenSource runSource = null;
@@ -154,25 +152,7 @@ namespace RuneApp
 
             #endregion
 
-            #region Shrines
-
-            ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
-            waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
-            for (int i = 0; i < 11; i++)
-            {
-                for (int j = 0; j < shrineStats.Length; j++)
-                {
-                    if (j < 4)
-                        AddShrine(shrineStats[j], i, (int)Math.Ceiling(i * shrineLevel[j]), shrineMenu[j]);
-                    else if (j < 9)
-                        AddShrine(shrineStats[j], i, (int)Math.Ceiling(1 + i * shrineLevel[j]), shrineMenu[j]);
-                    else
-                        AddShrine(shrineStats[j], i, (int)Math.Floor(i * shrineLevel[j]), shrineMenu[j]);
-                }
-            }
-
-            #endregion
-
+            
             #region Labels
 
             Label l = new Label();
@@ -234,7 +214,8 @@ namespace RuneApp
             if (!shrineMap.ContainsKey(stat))
                 shrineMap.Add(stat, new List<ToolStripMenuItem>());
             shrineMap[stat].Add(it);
-
+            if (value == data.shrines[stat])
+                it.Checked = true;
         }
 
         private void ShrineClick(object sender, EventArgs e)
@@ -274,8 +255,26 @@ namespace RuneApp
                 LoadFile("save.json");
             }
 
-            ConfigShrines();
             RegenLists();
+
+            #region Shrines
+
+            ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
+            waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
+            for (int i = 0; i < 11; i++)
+            {
+                for (int j = 0; j < Deco.ShrineStats.Length; j++)
+                {
+                    if (j < 4)
+                        AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                    else if (j < 9)
+                        AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                    else
+                        AddShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                }
+            }
+
+            #endregion
 
             if (File.Exists("builds.json"))
             {
@@ -285,6 +284,8 @@ namespace RuneApp
             {
                 LoadMons("basestats.json");
             }
+
+            ConfigShrines();
 
             buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
@@ -1337,31 +1338,20 @@ namespace RuneApp
 
         public void ConfigShrines()
         {
-            if (data.shrines == null)
-                data.shrines = new Stats();
-
             if (config == null)
                 return;
 
-            for (int i = 0; i < shrineStats.Length; i++)
+            // TODO: trash
+            for (int i = 0; i < Deco.ShrineStats.Length; i++)
             {
-                var stat = shrineStats[i];
+                var stat = Deco.ShrineStats[i];
 
-                if (config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
+                if (config != null && config.AppSettings.Settings.AllKeys.Contains("shrine" + stat))
                 {
                     int val = 0;
                     int.TryParse(config.AppSettings.Settings["shrine" + stat].Value, out val);
                     data.shrines[stat] = val;
-                    int level = (int)Math.Floor(val / shrineLevel[i]);
-                    shrineMap[stat][level].Checked = true;
-                }
-                else
-                {
-                    var shrine = data.Decorations?.FirstOrDefault(d => d.Shrine.ToString() == stat);
-                    if (shrine == null) continue;
-
-                    data.shrines[stat] = Math.Ceiling(shrine.Level * shrineLevel[i]);
-                    shrineMap[stat][shrine.Level].Checked = true;
+                    int level = (int)Math.Floor(val / Deco.ShrineLevel[i]);
                 }
             }
         }

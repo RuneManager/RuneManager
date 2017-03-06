@@ -776,7 +776,13 @@ namespace RuneOptim
                 progTo?.Invoke(1, tests.Count);
 
                 // sort *all* the builds
-                loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take((top > 0 ? top : 1)).ToList();
+                int takeAmount = 1;
+                if (saveStats)
+                    takeAmount = 10;
+                if (top > 0)
+                    takeAmount = top;
+
+                loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take(takeAmount).ToList();
 
                 printTo?.Invoke("Found a load " + loads.Count());
 
@@ -805,18 +811,24 @@ namespace RuneOptim
                     printTo?.Invoke("best " + (Best?.score ?? -1));
                     //Best.Current.runeUsage = usage.runeUsage;
                     //Best.Current.buildUsage = usage.buildUsage;
-                    foreach (Rune r in Best.Current.Runes)
+                    foreach (var bb in loads)
                     {
-                        if (!goodRunes)
+                        foreach (Rune r in bb.Current.Runes)
                         {
-                            r.manageStats.AddOrUpdate("buildScoreIn", sort(Best), (k, v) => v + sort(Best));
-                            r.manageStats.AddOrUpdate("In", 1, (s, e) => 1);
-                        }
-                        else
-                        {
-                            r.manageStats.AddOrUpdate("buildScoreIn", 0.25 * sort(Best), (k, v) => v + 0.25 * sort(Best));
-                            r.manageStats.AddOrUpdate("In", 2, (s, e) => e);
-                            runeUsage.runesSecond.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                            double val = sort(Best);
+                            if (goodRunes)
+                            {
+                                val *= 0.25;
+                                if (bb == Best)
+                                    runeUsage.runesSecond.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+                            }
+
+                            if (bb != Best)
+                                val *= 0.1;
+                            else
+                                r.manageStats.AddOrUpdate("In", (goodRunes ? 2 : 1), (s, e) => goodRunes ? 2 : 1);
+
+                            r.manageStats.AddOrUpdate("buildScoreIn", val, (k, v) => v + val);
                         }
                     }
                     for (int i = 0; i < 6; i++)
