@@ -111,7 +111,7 @@ namespace RuneApp
             // for each runeset, put it in the list as excluded
             foreach (var rs in Enum.GetNames(typeof(RuneSet)))
 			{
-                if (rs != "Null" && rs != "Broken")
+                if (rs != "Null" && rs != "Broken" && rs != "Unknown" && rs[0] != '_')
                 {
                     ListViewItem li = new ListViewItem(rs);
                     li.Name = rs;
@@ -950,7 +950,7 @@ namespace RuneApp
             tc.Refresh();
 
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Main.data, false, Main.useEquipped);
+            build.GenRunes(Program.data, false, Program.useEquipped);
 
             using (RuneSelect rs = new RuneSelect())
             {
@@ -1340,7 +1340,7 @@ namespace RuneApp
 
         void button1_Click(object sender, EventArgs e)
         {
-            build.GenRunes(Main.data, false, true);
+            build.GenRunes(Program.data, false, true);
             using (var ff = new RuneSelect())
             {
                 ff.returnedRune = runeTest;
@@ -1349,7 +1349,7 @@ namespace RuneApp
                 switch (tabControl1.SelectedTab.Text)
                 {
                     case "Evens":
-                        ff.runes = Main.data.Runes.Where(r => r.Slot % 2 == 0);
+                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 0);
                         List<Rune> fr = new List<Rune>();
                         fr.AddRange(ff.runes.Where(r => r.Slot == 2 && build.slotStats[1].Contains(r.MainType.ToForms())));
                         fr.AddRange(ff.runes.Where(r => r.Slot == 4 && build.slotStats[3].Contains(r.MainType.ToForms())));
@@ -1357,14 +1357,14 @@ namespace RuneApp
                         ff.runes = fr;
                         break;
                     case "Odds":
-                        ff.runes = Main.data.Runes.Where(r => r.Slot % 2 == 1);
+                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 1);
                         break;
                     case "Global":
-                        ff.runes = Main.data.Runes;
+                        ff.runes = Program.data.Runes;
                         break;
                     default:
                         int slot = int.Parse(tabControl1.SelectedTab.Text);
-                        ff.runes = Main.data.Runes.Where(r => r.Slot == slot);
+                        ff.runes = Program.data.Runes.Where(r => r.Slot == slot);
                         break;
                 }
 
@@ -1620,7 +1620,7 @@ namespace RuneApp
         long CalcPerms()
         {
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Main.data, false, Main.useEquipped);
+            build.GenRunes(Program.data, false, Program.useEquipped);
 
             // figure stuff out
             long perms = 0;

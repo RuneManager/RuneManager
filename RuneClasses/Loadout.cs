@@ -73,6 +73,11 @@ namespace RuneOptim
         private Stats leader = new Stats();
 
         private bool changed = false;
+        public int runesNew;
+        public int runesChanged;
+        public int upgrades;
+        public int powerup;
+
         [JsonIgnore]
         public bool Changed { get { return changed; } }
 

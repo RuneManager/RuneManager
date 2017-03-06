@@ -100,7 +100,7 @@ namespace RuneApp
 
                 
                 // Disregard locked, but honor equippedness checking
-                build.GenRunes(Main.data, noLocked, Main.useEquipped);
+                build.GenRunes(Program.data, noLocked, Program.useEquipped);
 
 				int timeout = 20;
 				if (Main.config.AppSettings.Settings.AllKeys.Contains("testTime"))

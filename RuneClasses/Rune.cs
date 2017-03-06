@@ -52,71 +52,7 @@ namespace RuneOptim
         Broken
     }
 
-    // Allows me to steal the JSON values into Enum
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum Attr
-    {
-        [EnumMember(Value = "-")]
-        Neg = -1,
-
-        [EnumMember(Value = "")]
-        Null = 0,
-
-        [EnumMember(Value = "HP flat")]
-        HealthFlat = 1,
-
-        [EnumMember(Value = "HP%")]
-        HealthPercent = 2,
-
-        [EnumMember(Value = "ATK flat")]
-        AttackFlat = 3,
-
-        [EnumMember(Value = "ATK%")]
-        AttackPercent = 4,
-
-        [EnumMember(Value = "DEF flat")]
-        DefenseFlat = 5,
-
-        [EnumMember(Value = "DEF%")]
-        DefensePercent = 6,
-
-        // Thanks Swift -_-
-        SpeedPercent = 7,
-
-        [EnumMember(Value = "SPD")]
-        Speed = 8,
-
-        [EnumMember(Value = "CRate")]
-        CritRate = 9,
-
-        [EnumMember(Value = "CDmg")]
-        CritDamage = 10,
-
-        [EnumMember(Value = "ACC")]
-        Accuracy = 11,
-
-        [EnumMember(Value = "RES")]
-        Resistance = 12,
-        
-        // Flag for below
-        ExtraStat = 16,
-
-        [EnumMember(Value = "EHP")]
-        EffectiveHP = 1 | ExtraStat,
-
-        [EnumMember(Value = "EHPDB")]
-        EffectiveHPDefenseBreak = 2 | ExtraStat,
-
-        [EnumMember(Value = "DPS")]
-        DamagePerSpeed = 3 | ExtraStat,
-
-        [EnumMember(Value = "AvD")]
-        AverageDamage = 4 | ExtraStat,
-
-        [EnumMember(Value = "MxD")]
-        MaxDamage = 5 | ExtraStat
-    }
-
+    
     [JsonConverter(typeof(StringEnumConverter))]
     public enum SlotIndex
     {
@@ -173,17 +109,17 @@ namespace RuneOptim
         [JsonProperty("monster_n")]
         public string AssignedName;
 
-        [JsonProperty("m_t")]
-        public Attr MainType;
-
-        [JsonProperty("m_v")]
-        public int MainValue;
-
         [JsonProperty("i_t")]
         public Attr InnateType;
 
         [JsonProperty("i_v")]
         public int? InnateValue;
+
+        [JsonProperty("m_t")]
+        public Attr MainType;
+
+        [JsonProperty("m_v")]
+        public int MainValue;
 
         [JsonProperty("s1_t")]
         public Attr Sub1Type;
@@ -214,7 +150,10 @@ namespace RuneOptim
         #region Nicer getters for stats by type
 
         [JsonIgnore]
-        public int[] Accuracy = new int[32];
+        public int[] HealthFlat = new int[32];
+
+        [JsonIgnore]
+        public int[] HealthPercent = new int[32];
 
         [JsonIgnore]
         public int[] AttackFlat = new int[32];
@@ -223,29 +162,29 @@ namespace RuneOptim
         public int[] AttackPercent = new int[32];
 
         [JsonIgnore]
-        public int[] CritDamage = new int[32];
-
-        [JsonIgnore]
-        public int[] CritRate = new int[32];
-
-        [JsonIgnore]
         public int[] DefenseFlat = new int[32];
 
         [JsonIgnore]
         public int[] DefensePercent = new int[32];
 
         [JsonIgnore]
-        public int[] HealthFlat = new int[32];
-
-        [JsonIgnore]
-        public int[] HealthPercent = new int[32];
-
-        [JsonIgnore]
-        public int[] Resistance = new int[32];
-
-        [JsonIgnore]
         public int[] Speed = new int[32];
 
+        [JsonIgnore]
+        public int[] SpeedPercent = new int[32];
+
+        [JsonIgnore]
+        public int[] CritRate = new int[32];
+
+        [JsonIgnore]
+        public int[] CritDamage = new int[32];
+
+        [JsonIgnore]
+        public int[] Accuracy = new int[32];
+        
+        [JsonIgnore]
+        public int[] Resistance = new int[32];
+        
         #endregion
         
         [JsonIgnore]
@@ -1121,6 +1060,40 @@ namespace RuneOptim
                 vs[i + 16] = GetValue(a, i, true);
             }
             return vs;
+        }
+
+        public void SetValue(int p, Attr a, int v)
+        {
+            switch (p)
+            {
+                case -1:
+                    InnateType = a;
+                    InnateValue = v;
+                    break;
+                case 0:
+                    MainType = a;
+                    MainValue = v;
+                    break;
+                case 1:
+                    Sub1Type = a;
+                    Sub1Value = v;
+                    break;
+                case 2:
+                    Sub2Type = a;
+                    Sub2Value = v;
+                    break;
+                case 3:
+                    Sub3Type = a;
+                    Sub3Value = v;
+                    break;
+                case 4:
+                    Sub4Type = a;
+                    Sub4Value = v;
+                    break;
+                default:
+                    break;
+            }
+            FixShit();
         }
 
         #endregion

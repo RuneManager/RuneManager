@@ -1,8 +1,75 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace RuneOptim
 {
+    // Allows me to steal the JSON values into Enum
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum Attr
+    {
+        [EnumMember(Value = "-")]
+        Neg = -1,
+
+        [EnumMember(Value = "")]
+        Null = 0,
+
+        [EnumMember(Value = "HP flat")]
+        HealthFlat = 1,
+
+        [EnumMember(Value = "HP%")]
+        HealthPercent = 2,
+
+        [EnumMember(Value = "ATK flat")]
+        AttackFlat = 3,
+
+        [EnumMember(Value = "ATK%")]
+        AttackPercent = 4,
+
+        [EnumMember(Value = "DEF flat")]
+        DefenseFlat = 5,
+
+        [EnumMember(Value = "DEF%")]
+        DefensePercent = 6,
+
+        // Thanks Swift -_-
+        SpeedPercent = 7,
+
+        [EnumMember(Value = "SPD")]
+        Speed = 8,
+
+        [EnumMember(Value = "CRate")]
+        CritRate = 9,
+
+        [EnumMember(Value = "CDmg")]
+        CritDamage = 10,
+
+        [EnumMember(Value = "ACC")]
+        Accuracy = 11,
+
+        [EnumMember(Value = "RES")]
+        Resistance = 12,
+
+        // Flag for below
+        ExtraStat = 16,
+
+        [EnumMember(Value = "EHP")]
+        EffectiveHP = 1 | ExtraStat,
+
+        [EnumMember(Value = "EHPDB")]
+        EffectiveHPDefenseBreak = 2 | ExtraStat,
+
+        [EnumMember(Value = "DPS")]
+        DamagePerSpeed = 3 | ExtraStat,
+
+        [EnumMember(Value = "AvD")]
+        AverageDamage = 4 | ExtraStat,
+
+        [EnumMember(Value = "MxD")]
+        MaxDamage = 5 | ExtraStat
+    }
+
     public class Stats
     {
         // allows mapping save.json into the program via Monster

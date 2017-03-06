@@ -537,7 +537,7 @@ namespace RuneApp
                 {
                     // stop cancelling
                     monSetsCancelled = false;
-                    build.GenRunes(Main.data, noLocked, Main.useEquipped);
+                    build.GenRunes(Program.data, noLocked, Program.useEquipped);
 
                     long num = 0;
                     long total = getTotal();

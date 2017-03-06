@@ -13,7 +13,7 @@ namespace RuneApp
         {
             InitializeComponent();
 
-            foreach (Monster mon in Main.data.Monsters)
+            foreach (Monster mon in Program.data.Monsters)
             {
                 string pri = "";
                 if (mon.priority != 0)
