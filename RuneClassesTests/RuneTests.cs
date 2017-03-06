@@ -6,6 +6,32 @@ namespace RuneOptim.Tests
     public class RuneTests
     {
         [TestMethod()]
+        public void SetValue()
+        {
+            Rune r = new Rune();
+            r.Level = 6;
+            r.Grade = 5;
+            r.Slot = 2;
+            r.Set = RuneSet.Swift;
+            r.SetValue(-1, Attr.Resistance, 3);
+            r.SetValue(0, Attr.AttackPercent, 22);
+            r.SetValue(1, Attr.CritRate, 9);
+            r.SetValue(2, Attr.Speed, 5);
+
+            Assert.AreEqual(22, r.AttackPercent[0]);
+            Assert.AreEqual(r.AttackPercent[0], r.GetValue(Attr.AttackPercent));
+            Assert.AreEqual(r.AttackPercent[12 + 16], r.GetValue(Attr.AttackPercent, 12, true));
+            Assert.AreEqual(r.AttackPercent[15], r.GetValue(Attr.AttackPercent, 15));
+
+            Assert.AreEqual(0, r.HealthPercent[0]);
+            Assert.AreEqual(r.GetValue(Attr.HealthPercent), r.HealthPercent[0]);
+            Assert.AreEqual(1, r.HealthPercent[12 + 16]);
+            Assert.AreEqual(r.GetValue(Attr.HealthPercent, 12, true), r.HealthPercent[12 + 16]);
+            Assert.AreEqual(0, r.HealthPercent[15]);
+            Assert.AreEqual(r.GetValue(Attr.HealthPercent, 15), r.HealthPercent[15]);
+        }
+
+        [TestMethod()]
         public void FlatCountTest()
         {
             Assert.AreEqual(0, TestData.Rune1().FlatCount());
@@ -28,7 +54,26 @@ namespace RuneOptim.Tests
         {
             var rune = TestData.Rune1();
             Assert.AreEqual(78, rune.GetValue(Attr.AttackFlat));
+            Assert.AreEqual(99, rune.GetValue(Attr.AttackFlat, 12, true));
             Assert.AreEqual(135, rune.GetValue(Attr.AttackFlat, 15));
+
+            Assert.AreEqual(0, rune.GetValue(Attr.HealthPercent));
+            Assert.AreEqual(1, rune.GetValue(Attr.HealthPercent, 12, true));
+            Assert.AreEqual(0, rune.GetValue(Attr.HealthPercent, 15));
+        }
+
+        [TestMethod()]
+        public void FixShitTest()
+        {
+            var rune = TestData.Rune1();
+            rune.FixShit();
+            Assert.AreEqual(78, rune.AttackFlat[0]);
+            Assert.AreEqual(99, rune.AttackFlat[12 + 16]);
+            Assert.AreEqual(135, rune.AttackFlat[15]);
+
+            Assert.AreEqual(0, rune.HealthPercent[0]);
+            Assert.AreEqual(1, rune.HealthPercent[12 + 16]);
+            Assert.AreEqual(0, rune.HealthPercent[15]);
         }
 
         [TestMethod()]

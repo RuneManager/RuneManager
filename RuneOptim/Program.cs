@@ -72,7 +72,7 @@ namespace RuneOptim
             
             best = MakeBuild(veromos, MakeSets(data.Runes, 
                 r => r.MainType == Attr.HealthPercent || r.MainType == Attr.Speed || r.MainType == Attr.Accuracy, 
-                r => r.HealthPercent > 0 && r.Speed > 0, 
+                r => r.HealthPercent[0] > 0 && r.Speed[0] > 0, 
                 new RuneSet[]{RuneSet.Swift, RuneSet.Energy}),
                 s => s.Health, 
                 s => s.Contains(RuneSet.Swift) && s.Contains(RuneSet.Energy), 
@@ -83,7 +83,7 @@ namespace RuneOptim
             
             best = MakeBuild(belladeon, MakeSets(data.Runes, 
                 Attr.Speed, Attr.HealthPercent, Attr.Accuracy, 
-                r => r.HealthPercent > 10 || r.Accuracy > 5, 
+                r => r.HealthPercent[0] > 10 || r.Accuracy[0] > 5, 
                 new RuneSet[]{RuneSet.Swift, RuneSet.Focus}),
                 s => s.Speed / 3 + s.Defense / 50 + s.Health / 300 - s.CritRate + s.Accuracy / 2, 
                 s => s.Contains(RuneSet.Swift) && s.Contains(RuneSet.Focus), 
@@ -94,7 +94,7 @@ namespace RuneOptim
 
             best = MakeBuild(sath, MakeSets(data.Runes,
                 Attr.AttackPercent, Attr.CritRate, Attr.AttackPercent,
-                r => r.Speed > 0 && (r.AttackPercent > 0 || r.CritRate > 0),
+                r => r.Speed[0] > 0 && (r.AttackPercent[0] > 0 || r.CritRate[0] > 0),
                 new RuneSet[] { RuneSet.Swift, RuneSet.Blade }),
                 s => s.Speed + s.CritDamage * 2 + s.Attack / 10 + s.CritRate * 3 - Math.Max(0, s.CritRate - 100) * 3,
                 s => s.Contains(RuneSet.Swift) && s.Contains(RuneSet.Blade),
@@ -105,7 +105,7 @@ namespace RuneOptim
             
             best = MakeBuild(verdehile, MakeSets(data.Runes,
                 Attr.Speed, Attr.CritRate, Attr.AttackPercent,
-                r => r.Speed > 0 && (r.HealthPercent > 0 || r.CritRate > 0),
+                r => r.Speed[0] > 0 && (r.HealthPercent[0] > 0 || r.CritRate[0] > 0),
                 new RuneSet[] { RuneSet.Violent, RuneSet.Blade }),
                 s => s.Speed + s.Health / 500 + s.CritRate + s.Attack / 50 + s.Defense / 50,
                 s => s.Contains(RuneSet.Violent) && s.Contains(RuneSet.Blade),
@@ -116,7 +116,7 @@ namespace RuneOptim
 
             best = MakeBuild(acasis, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.Accuracy,
-                r => r.Accuracy > 0,
+                r => r.Accuracy[0] > 0,
                 new RuneSet[] { RuneSet.Despair, RuneSet.Focus }),
                 s => s.Speed + s.Health / 500 + s.Accuracy,
                 s => s.Contains(RuneSet.Despair) && s.Contains(RuneSet.Focus),
@@ -127,7 +127,7 @@ namespace RuneOptim
 
             best = MakeBuild(shannon, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.Accuracy,
-                r => r.Accuracy > 0,
+                r => r.Accuracy[0] > 0,
                 new RuneSet[] { RuneSet.Energy, RuneSet.Focus, RuneSet.Focus }),
                 s => s.Defense / 40 + s.Health / 100 + s.Accuracy,
                 s => s.Contains(RuneSet.Energy) && s.Count(r => r == RuneSet.Focus) == 2,
@@ -138,7 +138,7 @@ namespace RuneOptim
 
             best = MakeBuild(bernard, MakeSets(data.Runes,
                 Attr.Speed, Attr.HealthPercent, Attr.Accuracy,
-                r => r.Accuracy + r.Speed / 2 > 6,
+                r => r.Accuracy[0] + r.Speed[0] / 2 > 6,
                 new RuneSet[] { RuneSet.Energy, RuneSet.Swift }),
                 s => s.Defense / 40 + s.Health / 100 + s.Accuracy + s.Speed,
                 s => s.Contains(RuneSet.Energy) && s.Contains(RuneSet.Swift),
@@ -149,7 +149,7 @@ namespace RuneOptim
 
             best = MakeBuild(chasun, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.HealthPercent,
-                r => r.HealthPercent >= 10,
+                r => r.HealthPercent[0] >= 10,
                 new RuneSet[] { RuneSet.Energy, RuneSet.Energy, RuneSet.Guard }),
                 s => s.Health / 300 + s.Resistance + s.Speed / 2 - s.CritRate / 2 + s.Accuracy / 2,
                 s => s.Contains(RuneSet.Guard) && s.Count(r => r == RuneSet.Energy) == 2,
@@ -160,7 +160,7 @@ namespace RuneOptim
 
             best = MakeBuild(arnold, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.HealthPercent,
-                r => r.HealthPercent * 2 + r.DefensePercent + r.Speed / 2 >= 8,
+                r => r.HealthPercent[0] * 2 + r.DefensePercent[0] + r.Speed[0] / 2 >= 8,
                 new RuneSet[] { RuneSet.Guard, RuneSet.Shield, RuneSet.Energy}),
                 s => s.Health / 300 + s.Resistance + s.Speed / 2 - s.CritRate / 2 + s.Accuracy / 2,
                 s => true,//s.Contains(RuneSet.Guard) && s.Contains(RuneSet.Shield),
@@ -171,7 +171,7 @@ namespace RuneOptim
 
             best = MakeBuild(fuco, MakeSets(data.Runes,
                 Attr.Speed, Attr.AttackPercent, Attr.AttackPercent,
-                r => r.Speed > 6 | r.AttackPercent > 6,
+                r => r.Speed[0] > 6 | r.AttackPercent[0] > 6,
                 new RuneSet[] { RuneSet.Swift, RuneSet.Guard }),
                 s => s.Health / 300 + s.Defense + s.Speed + s.Defense / 20 + s.Accuracy / 2,
                 s => s.Contains(RuneSet.Guard) && s.Contains(RuneSet.Swift),
@@ -182,7 +182,7 @@ namespace RuneOptim
 
             best = MakeBuild(ahman, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.CritRate, Attr.HealthPercent,
-                r => r.HealthPercent > 0 | r.CritRate > 0,
+                r => r.HealthPercent[0] > 0 | r.CritRate[0] > 0,
                 new RuneSet[] { RuneSet.Energy, RuneSet.Blade, RuneSet.Blade }),
                 s => s.CritRate + s.Health / 250 + s.Speed / 3,
                 s => s.Contains(RuneSet.Energy) && s.Count(r => r == RuneSet.Blade) == 2,
@@ -193,7 +193,7 @@ namespace RuneOptim
 
             best = MakeBuild(orochi, MakeSets(data.Runes,
                 Attr.Speed, Attr.CritRate, Attr.Accuracy,
-                r => r.Accuracy + r.CritRate + r.AttackPercent / 2 + r.HealthPercent / 2 >= 10,
+                r => r.Accuracy[0] + r.CritRate[0] + r.AttackPercent[0] / 2 + r.HealthPercent[0] / 2 >= 10,
                 new RuneSet[] { RuneSet.Focus, RuneSet.Blade }),
                 s => s.CritRate + s.Health / 500 + s.Speed / 2 + s.Accuracy,
                 s => s.Contains(RuneSet.Focus) && s.Contains(RuneSet.Blade),
@@ -204,7 +204,7 @@ namespace RuneOptim
 
             best = MakeBuild(theomars, MakeSets(data.Runes,
                 Attr.Speed, Attr.CritDamage, Attr.AttackPercent,
-                r => r.Speed + r.CritRate + r.CritDamage + r.AttackPercent >= 10,
+                r => r.Speed[0] + r.CritRate[0] + r.CritDamage[0] + r.AttackPercent[0] >= 10,
                 new RuneSet[] { RuneSet.Violent, RuneSet.Blade }),
                 s => s.CritRate + s.Health / 500 + s.Speed + s.CritDamage - Math.Max(0, s.CritRate - 61),
                 s => s.Contains(RuneSet.Violent) && s.Contains(RuneSet.Blade),
@@ -215,7 +215,7 @@ namespace RuneOptim
 
             best = MakeBuild(basalt, MakeSets(data.Runes,
                 Attr.DefensePercent, Attr.DefensePercent, Attr.DefensePercent,
-                r => r.Speed + r.CritRate + r.CritDamage + r.Accuracy + r.DefensePercent >= 10,
+                r => r.Speed[0] + r.CritRate[0] + r.CritDamage[0] + r.Accuracy[0] + r.DefensePercent[0] >= 10,
                 new RuneSet[] { RuneSet.Violent, RuneSet.Energy }),
                 s => s.Defense / 20 + s.Health / 500 + s.Speed + s.CritDamage,
                 s => s.Contains(RuneSet.Violent) && s.Contains(RuneSet.Energy),
@@ -226,7 +226,7 @@ namespace RuneOptim
 
             best = MakeBuild(baretta, MakeSets(data.Runes,
                 Attr.AttackPercent, Attr.HealthPercent, Attr.Accuracy,
-                r => r.Speed + r.Accuracy + r.HealthPercent >= 10,
+                r => r.Speed[0] + r.Accuracy[0] + r.HealthPercent[0] >= 10,
                 new RuneSet[] { RuneSet.Swift, RuneSet.Energy }),
                 s => s.Health / 500 + s.Speed + s.Accuracy,
                 s => s.Contains(RuneSet.Swift) && s.Contains(RuneSet.Energy),
@@ -237,7 +237,7 @@ namespace RuneOptim
 
             best = MakeBuild(briand, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.Null, Attr.Null,
-                r => r.Speed + r.Resistance + r.HealthPercent + r.Accuracy >= 5,
+                r => r.Speed[0] + r.Resistance[0] + r.HealthPercent[0] + r.Accuracy[0] >= 5,
                 new RuneSet[] { RuneSet.Despair, RuneSet.Energy }),
                 s => s.Health / 400 + s.Speed / 3 + s.Accuracy / 2,
                 s => s.Contains(RuneSet.Despair) && s.Contains(RuneSet.Energy),
@@ -248,7 +248,7 @@ namespace RuneOptim
 
             best = MakeBuild(lapis, MakeSets(data.Runes,
                 Attr.AttackPercent, Attr.AttackPercent, Attr.AttackPercent,
-                r => r.Speed + r.AttackPercent * 2 + r.CritRate / 2 + r.CritDamage / 2 >= 5,
+                r => r.Speed[0] + r.AttackPercent[0] * 2 + r.CritRate[0] / 2 + r.CritDamage[0] / 2 >= 5,
                 new RuneSet[] { RuneSet.Vampire, RuneSet.Revenge }),
                 s => s.Attack / 40 + s.Speed / 2,
                 s => s.Contains(RuneSet.Vampire) && s.Contains(RuneSet.Revenge),
@@ -260,7 +260,7 @@ namespace RuneOptim
 
             best = MakeBuild(megan, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.Null,
-                r => r.Speed + r.HealthPercent + r.Accuracy >= 5,
+                r => r.Speed[0] + r.HealthPercent[0] + r.Accuracy[0] >= 5,
                 new RuneSet[] { RuneSet.Swift, RuneSet.Energy }),
                 s => s.Health / 400 + s.Speed / 2 + s.Accuracy,
                 s => s.Contains(RuneSet.Swift) && s.Contains(RuneSet.Energy));/*,
@@ -271,7 +271,7 @@ namespace RuneOptim
 
             best = MakeBuild(lyn, MakeSets(data.Runes,
                Attr.Null, Attr.CritDamage, Attr.Null,
-               r => r.CritRate + r.CritDamage + r.HealthPercent + r.Speed >= 10,
+               r => r.CritRate[0] + r.CritDamage[0] + r.HealthPercent[0] + r.Speed[0] >= 10,
                new RuneSet[] { RuneSet.Violent, RuneSet.Blade }),
                s => s.Health / 200 + s.Speed / 2 + s.CritRate * 3 + s.CritDamage * 2  + s.Attack / 80 + s.Defense / 30,
                s => s.Contains(RuneSet.Violent) && s.Count(r => r == RuneSet.Null) == 1);/*,
@@ -282,7 +282,7 @@ namespace RuneOptim
             
             best = MakeBuild(garoche, MakeSets(data.Runes,
                 Attr.HealthPercent, Attr.HealthPercent, Attr.HealthPercent,
-                r => r.HealthFlat + r.HealthPercent + r.Accuracy + r.Speed >= 12,
+                r => r.HealthFlat[0] + r.HealthPercent[0] + r.Accuracy[0] + r.Speed[0] >= 12,
                 new RuneSet[] { RuneSet.Focus, RuneSet.Blade, RuneSet.Shield }),
                 s => s.Health / 400 + s.Speed / 2 + s.Accuracy,
                 s => s.Count(q => q == RuneSet.Null) == 0,
@@ -300,7 +300,7 @@ namespace RuneOptim
 
             best = MakeBuild(lushen1, MakeSets(data.Runes,
                 Attr.Null, Attr.Null, Attr.Null,
-                r => r.Speed + r.AttackPercent + r.CritRate + r.CritDamage >= 5,
+                r => r.Speed[0] + r.AttackPercent[0] + r.CritRate[0] + r.CritDamage[0] >= 5,
                 new RuneSet[] { RuneSet.Fatal, RuneSet.Blade }),
                 s => s.Health / 300 + s.Attack / 20 + s.Speed + s.CritRate * 3 + s.CritDamage * 2,
                 s => s.Contains(RuneSet.Fatal) && s.Contains(RuneSet.Blade));/*,
@@ -311,7 +311,7 @@ namespace RuneOptim
 
             best = MakeBuild(lushen2, MakeSets(data.Runes,
                 Attr.Null, Attr.Null, Attr.Null,
-                r => r.Speed + r.AttackPercent + r.CritRate + r.CritDamage >= 5,
+                r => r.Speed[0] + r.AttackPercent[0] + r.CritRate[0] + r.CritDamage[0] >= 5,
                 new RuneSet[] { RuneSet.Fatal, RuneSet.Blade }),
                 s => s.Health / 300 + s.Attack / 20 + s.Speed + s.CritRate * 3 + s.CritDamage * 2,
                 s => s.Contains(RuneSet.Fatal) && s.Contains(RuneSet.Blade));/*,
@@ -322,7 +322,7 @@ namespace RuneOptim
             
             best = MakeBuild(xing, MakeSets(data.Runes,
                 Attr.Null, Attr.Null, Attr.Null,
-                r => r.Speed + r.AttackPercent + r.CritRate + r.CritDamage + r.HealthPercent >= 10,
+                r => r.Speed[0] + r.AttackPercent[0] + r.CritRate[0] + r.CritDamage[0] + r.HealthPercent[0] >= 10,
                 new RuneSet[] { RuneSet.Energy}),
                 s => s.Health / 100 + s.Attack / 8 + s.Speed + s.CritRate * 4 + s.CritDamage * 3 + s.Defense / 10,
                 s => !s.Contains(RuneSet.Null));/*,
@@ -333,7 +333,7 @@ namespace RuneOptim
 
             best = MakeBuild(darion, MakeSets(data.Runes,
                 Attr.Null, Attr.Null, Attr.Null,
-                r => r.Speed / 2 + r.DefensePercent + r.AttackPercent + r.HealthFlat + r.HealthPercent * 2 >= 10,
+                r => r.Speed[0] / 2 + r.DefensePercent[0] + r.AttackPercent[0] + r.HealthFlat[0] + r.HealthPercent[0] * 2 >= 10,
                 new RuneSet[] { RuneSet.Energy }),
                 s => s.Health / 200 + s.Attack / 40 + s.Speed / 2 + s.Defense / 30,
                 s => true,

@@ -14,7 +14,7 @@
                 MainType = Attr.AttackFlat,
                 MainValue = 78,
                 InnateType = Attr.Null,
-                InnateValue = 0,
+                InnateValue = null,
                 Sub1Type = Attr.AttackPercent,
                 Sub1Value = 18,
                 Sub2Type = Attr.Speed,
@@ -22,7 +22,7 @@
                 Sub3Type = Attr.CritRate,
                 Sub3Value = 4,
                 Sub4Type = Attr.Null,
-                Sub4Value = 0,
+                Sub4Value = null,
             };
         }
 
@@ -43,9 +43,9 @@
                 Sub2Type = Attr.Speed,
                 Sub2Value = 5,
                 Sub3Type = Attr.Null,
-                Sub3Value = 0,
+                Sub3Value = null,
                 Sub4Type = Attr.Null,
-                Sub4Value = 0,
+                Sub4Value = null,
             };
         }
 
@@ -66,9 +66,9 @@
                 Sub2Type = Attr.CritDamage,
                 Sub2Value = 12,
                 Sub3Type = Attr.Null,
-                Sub3Value = 0,
+                Sub3Value = null,
                 Sub4Type = Attr.Null,
-                Sub4Value = 0,
+                Sub4Value = null,
             };
         }
 
@@ -83,7 +83,7 @@
                 MainType = Attr.CritRate,
                 MainValue = 27,
                 InnateType = Attr.Null,
-                InnateValue = 0,
+                InnateValue = null,
                 Sub1Type = Attr.Speed,
                 Sub1Value = 10,
                 Sub2Type = Attr.Accuracy,

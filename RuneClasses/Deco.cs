@@ -39,6 +39,9 @@ namespace RuneOptim
 
     public class Deco
     {
+        public readonly static string[] ShrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
+        public readonly static double[] ShrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
+
         [JsonProperty("pos_x")]
         public int X = 0;
 

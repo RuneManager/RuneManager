@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace RuneApp
@@ -21,6 +22,15 @@ namespace RuneApp
                 url = Environment.CurrentDirectory + "\\User Manual\\index.html";
 
             webBrowser1.Navigate(url);
+
+            if (Main.config.AppSettings.Settings.AllKeys.Contains("startuphelp"))
+            {
+                bool startuphelp;
+                if (bool.TryParse(Main.config.AppSettings.Settings["startuphelp"].Value, out startuphelp))
+                {
+                    showOnStartupToolStripMenuItem.Checked = startuphelp;
+                }
+            }
         }
 
         private void WebBrowser1_Navigated(object sender, WebBrowserNavigatedEventArgs e)
@@ -42,6 +52,20 @@ namespace RuneApp
         private void closeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        private void showOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            bool startuphelp = !showOnStartupToolStripMenuItem.Checked;
+            Main.config.AppSettings.Settings.Remove("startuphelp");
+            Main.config.AppSettings.Settings.Add("startuphelp", startuphelp.ToString());
+            Main.config.Save(System.Configuration.ConfigurationSaveMode.Modified);
+            showOnStartupToolStripMenuItem.Checked = startuphelp;
+        }
+
+        public void SetStartupCheck(bool state)
+        {
+            showOnStartupToolStripMenuItem.Checked = state;
         }
     }
 }
