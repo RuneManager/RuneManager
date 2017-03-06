@@ -467,11 +467,11 @@ namespace RuneOptim
         /// <param name="progTo">Periodically gives the progress% as a double</param>
         /// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
         /// <param name="saveStats">If to write stats to rune stats</param>
-        public void GenBuilds(int top = 0, int time = 0, Action<string> printTo = null, Action<double, int> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
+        public void GenBuilds(int top = 0, int time = 0, Action<Build, string> printTo = null, Action<double, int> progTo = null, bool dumpBads = false, bool saveStats = false, bool goodRunes = false)
         {
             if (runes.Any(r => r == null))
             {
-                printTo?.Invoke("Null rune");
+                printTo?.Invoke(this, "Null rune");
                 return;
             }
             if (!saveStats)
@@ -487,27 +487,27 @@ namespace RuneOptim
                 // if to get awakened
                 if (DownloadAwake && !mon.downloaded)
                 {
-                    printTo?.Invoke("Downloading Awake def");
+                    printTo?.Invoke(this, "Downloading Awake def");
                     var mref = MonsterStat.FindMon(mon);
                     if (mref != null)
                     {
                         // download the current (unawakened monster)
                         var mstat = mref.Download();
-                        printTo?.Invoke("Reading stats");
+                        printTo?.Invoke(this, "Reading stats");
                         // if the retrieved mon is unawakened, get the awakened
                         if (!mstat.Awakened && mstat.AwakenRef != null)
                         {
-                            printTo?.Invoke("Awakening");
+                            printTo?.Invoke(this, "Awakening");
                             mon = mstat.AwakenRef.Download().GetMon(mon, false);
                         }
                     }
-                    printTo?.Invoke("Downloaded");
+                    printTo?.Invoke(this, "Downloaded");
                 }
                 // getting awakened also gets level 40, so...
                 // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
                 else if (mon.level < 40 && DownloadStats && !mon.downloaded)
                 {
-                    printTo?.Invoke("Downloading 40 def");
+                    printTo?.Invoke(this, "Downloading 40 def");
                     var mref = MonsterStat.FindMon(mon);
                     if (mref != null)
                         mon = mref.Download().GetMon(mon, false);
@@ -515,7 +515,7 @@ namespace RuneOptim
             }
             catch (Exception e)
             {
-                printTo?.Invoke("Failed downloading def: " + e.Message + Environment.NewLine + e.StackTrace);
+                printTo?.Invoke(this, "Failed downloading def: " + e.Message + Environment.NewLine + e.StackTrace);
             }
 
             try
@@ -531,11 +531,11 @@ namespace RuneOptim
                 total *= runes[5].Length;
                 long complete = total;
 
-                printTo?.Invoke("...");
+                printTo?.Invoke(this, "...");
 
                 if (total == 0)
                 {
-                    printTo?.Invoke("0 perms");
+                    printTo?.Invoke(this, "0 perms");
                     Console.WriteLine("Zero permuations");
                     return;
                 }
@@ -551,7 +551,7 @@ namespace RuneOptim
                 }
                 if (top == 0 && !hasSort)
                 {
-                    printTo?.Invoke("No sort");
+                    printTo?.Invoke(this, "No sort");
                     Console.WriteLine("No method of determining best");
                     return;
                 }
@@ -699,9 +699,10 @@ namespace RuneOptim
                                                     {
                                                         Best = new Monster(test, true);
                                                         bstats = Best.GetStats();
+                                                        tests.Add(Best);
                                                     }
                                                 }
-                                                if (tests.Count < MaxBuilds32 && (saveStats || Best == test))
+                                                if (tests.Count < MaxBuilds32 && saveStats)
                                                 {
                                                     // keep it for spreadsheeting
                                                     tests.Add(new Monster(test, true));
@@ -714,14 +715,14 @@ namespace RuneOptim
                                         {
                                             timer = DateTime.Now;
                                             Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
-                                            printTo?.Invoke(string.Format("{0:P2}", (count + complete - total) / (double)complete));
+                                            printTo?.Invoke(this, string.Format("{0:P2}", (count + complete - total) / (double)complete));
                                             progTo?.Invoke((count + complete - total) / (double)complete, tests.Count);
 
                                             if (time <= 0) continue;
                                             if (DateTime.Now > begin.AddSeconds(time))
                                             {
                                                 Console.WriteLine("Timeout");
-                                                printTo?.Invoke("Timeout");
+                                                printTo?.Invoke(this, "Timeout");
                                                 progTo?.Invoke(1, tests.Count);
 
                                                 isRun = false;
@@ -772,7 +773,7 @@ namespace RuneOptim
 
                 // write out completion
                 Console.WriteLine(isRun + " " + count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
-                printTo?.Invoke("100%");
+                printTo?.Invoke(this, "100%");
                 progTo?.Invoke(1, tests.Count);
 
                 // sort *all* the builds
@@ -784,7 +785,7 @@ namespace RuneOptim
 
                 loads = tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take(takeAmount).ToList();
 
-                printTo?.Invoke("Found a load " + loads.Count());
+                printTo?.Invoke(this, "Found a load " + loads.Count());
 
                 if (!goodRunes)
                     buildUsage.loads = tests.ToList();
@@ -802,13 +803,13 @@ namespace RuneOptim
                 {
                     Console.WriteLine("No builds :(");
                     if (printTo != null)
-                        printTo.Invoke("Zero :(");
+                        printTo.Invoke(this, "Zero :(");
                 }
                 else
                 {
                     // remember the good one
                     Best = loads.First();
-                    printTo?.Invoke("best " + (Best?.score ?? -1));
+                    printTo?.Invoke(this, "best " + (Best?.score ?? -1));
                     //Best.Current.runeUsage = usage.runeUsage;
                     //Best.Current.buildUsage = usage.buildUsage;
                     foreach (var bb in loads)
@@ -841,12 +842,12 @@ namespace RuneOptim
                 //loads = null;
                 tests.Clear();
                 tests = null;
-                printTo?.Invoke("Test cleared");
+                printTo?.Invoke(this, "Test cleared");
             }
             catch (Exception e)
             {
                 Console.WriteLine("Error " + e);
-                printTo?.Invoke(e.ToString());
+                printTo?.Invoke(this, e.ToString());
             }
         }
 

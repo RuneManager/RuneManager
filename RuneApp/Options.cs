@@ -78,7 +78,7 @@ namespace RuneApp
 
         private void Options_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Main.UpdateMakeStats();
+            Program.UpdateMakeStats();
         }
 
         private void button1_Click(object sender, EventArgs e)

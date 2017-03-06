@@ -186,6 +186,7 @@ namespace RuneOptim
 					(runes[3]?.HealthPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.HealthPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.HealthPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.Health + 
                     (int)leader.Health + 
 					SetStat(Attr.HealthPercent);
             }
@@ -218,6 +219,7 @@ namespace RuneOptim
                     (runes[3]?.AttackPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.Attack + 
                     (int)leader.Attack + 
                     SetStat(Attr.AttackPercent);
             }
@@ -250,6 +252,7 @@ namespace RuneOptim
                     (runes[3]?.DefensePercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.DefensePercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.DefensePercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.Defense + 
                     (int)leader.Defense + 
                     SetStat(Attr.DefensePercent);
             }
@@ -293,6 +296,7 @@ namespace RuneOptim
                     (runes[3]?.CritRate[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.CritRate[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.CritRate[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.CritRate + 
                     (int)leader.CritRate + 
                     SetStat(Attr.CritRate);
             }
@@ -310,6 +314,7 @@ namespace RuneOptim
                     (runes[3]?.CritDamage[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.CritDamage[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.CritDamage[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.CritDamage + 
                     (int)leader.CritDamage + 
                     SetStat(Attr.CritDamage);
             }
@@ -327,6 +332,7 @@ namespace RuneOptim
                     (runes[3]?.Accuracy[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.Accuracy[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.Accuracy[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.Accuracy + 
                     (int)leader.Accuracy + 
                     SetStat(Attr.Accuracy);
             }
@@ -344,6 +350,7 @@ namespace RuneOptim
                     (runes[3]?.Resistance[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
                     (runes[4]?.Resistance[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.Resistance[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
+                    (int)shrines.Resistance + 
                     (int)leader.Resistance + 
                     SetStat(Attr.Resistance);
             }

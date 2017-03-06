@@ -30,7 +30,6 @@ namespace RuneApp
         bool isRunning = false;
         public static Help help = null;
 
-        public static bool makeStats = true;
         public static bool goodRunes = false;
 
         public static Main currentMain = null;
@@ -48,23 +47,6 @@ namespace RuneApp
         public static Configuration config {  get { return Program.config; } }
         public static log4net.ILog Log { get { return Program.log; } }
 
-        public static bool MakeStats
-        {
-            get
-            {
-                if (config == null || !config.AppSettings.Settings.AllKeys.Contains("nostats")) return makeStats;
-                return UpdateMakeStats();
-            }
-        }
-
-        public static bool UpdateMakeStats()
-        {
-            bool tstats;
-            if (bool.TryParse(config.AppSettings.Settings["nostats"].Value, out tstats))
-                makeStats = !tstats;
-            return makeStats;
-        }
-
         public Main()
         {
             InitializeComponent();
@@ -73,32 +55,11 @@ namespace RuneApp
 
             currentMain = this;
 
-            #region Config
-            bool dontupdate = false;
-            if (config != null)
-            {
-                // it's stored as string, what is fasted yescompare?
-                if (config.AppSettings.Settings.AllKeys.Contains("useEquipped") && config.AppSettings.Settings["useEquipped"].Value == true.ToString())
-                {
-                    useRunesCheck.Checked = true;
-                    Program.useEquipped = true;
-                }
-                // this?
-                if (config.AppSettings.Settings.AllKeys.Contains("noupdate"))
-                    bool.TryParse(config.AppSettings.Settings["noupdate"].Value, out dontupdate);
-                if (config.AppSettings.Settings.AllKeys.Contains("nostats"))
-                {
-                    bool tstats;
-                    if (bool.TryParse(config.AppSettings.Settings["nostats"].Value, out tstats))
-                        makeStats = !tstats;
-                }
-            }
+            useRunesCheck.Checked = Program.useEquipped;
 
-            findGoodRunes.Enabled = MakeStats;
-            if (!MakeStats)
+            findGoodRunes.Enabled = Program.MakeStats;
+            if (!Program.MakeStats)
                 findGoodRunes.Checked = false;
-
-            #endregion
 
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
 
@@ -116,7 +77,7 @@ namespace RuneApp
 
             #region Update
 
-            if (!dontupdate)
+            if (!Program.dontupdate)
             {
                 Task.Factory.StartNew(() =>
                 {
@@ -241,6 +202,7 @@ namespace RuneApp
             #region Watch collections and try loading
             Program.builds.CollectionChanged += Builds_CollectionChanged;
             Program.loads.CollectionChanged += Loads_CollectionChanged;
+            Program.BuildsProgressTo += Program_BuildsProgressTo;
 
             try {
                 LoadSaveResult loadResult = 0;
@@ -295,6 +257,7 @@ namespace RuneApp
             #endregion
 
             buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
+            
 
             foreach (ToolStripItem ii in menu_buildlist.Items)
             {
@@ -340,6 +303,11 @@ namespace RuneApp
                         OpenHelp();
                 }
             }
+        }
+
+        private void Program_BuildsProgressTo(object sender, BuildProgressArgs e)
+        {
+            ProgressToList(e.b, e.str);
         }
 
         private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -401,7 +369,9 @@ namespace RuneApp
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
                     throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
+                    loadoutList.Items.Clear();
+                    break;
+                    //throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }
@@ -874,7 +844,7 @@ namespace RuneApp
                 var li = lis[0];
                 Task.Factory.StartNew(() =>
                 {
-                    RunBuild(li, makeStats);
+                    RunBuild(li, Program.makeStats);
                 });
             }
         }
@@ -936,9 +906,21 @@ namespace RuneApp
             checkLocked();
         }
 
+        public void ProgressToList(Build b, string str)
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+                if (!IsDisposed)
+                {
+                    var lvi = buildList.Items.Cast<ListViewItem>().Where(ll => (ll.Tag as Build).ID == b.ID).FirstOrDefault();
+                    lvi.SubItems[3].Text = str;
+                }
+            });
+        }
+
         private void tsBtnBuildsRunAll_Click(object sender, EventArgs e)
         {
-            RunBuilds(false);
+            Program.RunBuilds(false, -1);
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e)
@@ -1143,8 +1125,8 @@ namespace RuneApp
             using (var f = new Options())
             {
                 f.ShowDialog();
-                findGoodRunes.Enabled = MakeStats;
-                if (!MakeStats)
+                findGoodRunes.Enabled = Program.MakeStats;
+                if (!Program.MakeStats)
                     findGoodRunes.Checked = false;
             }
         }
@@ -1262,15 +1244,15 @@ namespace RuneApp
 
         private void tsBtnBuildsResume_Click(object sender, EventArgs e)
         {
-            RunBuilds(true);
+            Program.RunBuilds(true, -1);
         }
 
         private void tsBtnBuildsRunUpTo_Click(object sender, EventArgs e)
         {
             int selected = -1;
             if (buildList.SelectedItems.Count > 0)
-                selected = (buildList.SelectedItems[0].Tag as Build).ID;
-            RunBuilds(true, selected);
+                selected = (buildList.SelectedItems[0].Tag as Build).priority;
+            Program.RunBuilds(true, selected);
         }
         
         static int VersionCompare(string v1, string v2)
@@ -1481,12 +1463,12 @@ namespace RuneApp
             if ((pli?.Tag as Build) == null)
                 return;
 
-            Program.RunBuild((Build)pli.Tag, saveStats, (s) => Invoke((MethodInvoker) delegate
+            Program.RunBuild((Build)pli.Tag, saveStats);/*, (bb, s) => Invoke((MethodInvoker) delegate
             {
                 Log.Info(s);
                 if (!this.IsDisposed)
                     pli.SubItems[3].Text = s;
-            }));
+            }));*/
         }
 
         [Obsolete("Please run this on Program, not Main", true)]
@@ -1561,7 +1543,7 @@ namespace RuneApp
 
                 isRunning = true;
 
-                b.GenBuilds(0, 0, (str) =>
+                b.GenBuilds(0, 0, (bb, str) =>
                 {
                     if (!IsDisposed && IsHandleCreated)
                     {
@@ -1752,7 +1734,7 @@ namespace RuneApp
 
             b.GenRunes(Program.data, false, Program.useEquipped, true, goodRunes);
 
-            b.GenBuilds(0, 0, (str) =>
+            b.GenBuilds(0, 0, (bb, str) =>
             {
                 Log.Info(str);
                 if (!IsDisposed && IsHandleCreated)
@@ -1765,20 +1747,11 @@ namespace RuneApp
 
         private void ClearLoadouts()
         {
-            foreach (ListViewItem li in loadoutList.Items)
-            {
-                Loadout l = (Loadout)li.Tag;
-
-                foreach (Rune r in l.Runes)
-                {
-                    r.Locked = false;
-                }
-
-                loadoutList.Items.Remove(li);
-            }
+            Program.ClearLoadouts();
             checkLocked();
         }
 
+        [Obsolete("Use Program. not Main.")]
         private void RunBuilds(bool skipLoaded, int runTo = -1)
         {
             if (Program.data == null)
@@ -1861,10 +1834,10 @@ namespace RuneApp
                     foreach (ListViewItem li in list5)
                     {
                         if (plsDie) break;
-                        RunBuild(li, makeStats);
+                        RunBuild(li, Program.makeStats);
                     }
 
-                    if (makeStats)
+                    if (Program.makeStats)
                     {
                         Invoke((MethodInvoker)delegate
                         {

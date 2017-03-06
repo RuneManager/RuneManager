@@ -110,6 +110,7 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="Master.cs" />
     <Compile Include="MonSelect.cs">
       <SubType>Form</SubType>
     </Compile>

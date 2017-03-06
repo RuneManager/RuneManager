@@ -109,7 +109,7 @@ namespace RuneApp
 				}
 
 				// generate 5000 builds
-				build.GenBuilds(buildsGen, timeout, (s) => { }, (d,i) =>
+				build.GenBuilds(buildsGen, timeout, (b, s) => { }, (d,i) =>
 				{
                     if (!IsDisposed && IsHandleCreated)
                     {
