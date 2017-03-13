@@ -14,9 +14,9 @@ namespace RuneOptim
 
     public class Loadout
     {
-        private Rune[] runes = new Rune[6];
+        private readonly Rune[] runes = new Rune[6];
         private int runeCount = 0;
-        private RuneSet[] sets = new RuneSet[3];
+        private readonly RuneSet[] sets = new RuneSet[3];
         private bool setsFull = false;
 
         private int[] fakeLevel = new int[6];

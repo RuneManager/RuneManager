@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -70,6 +71,14 @@ namespace RuneOptim
         MaxDamage = 5 | ExtraStat
     }
 
+    public enum AttributeCategory
+    {
+        Neutral,
+        Offensive,
+        Defensive,
+        Support
+    }
+
     public class Stats
     {
         // allows mapping save.json into the program via Monster
@@ -99,7 +108,7 @@ namespace RuneOptim
 
         public Stats() { }
         // copy constructor, amrite?
-        public Stats(Stats rhs)
+        public Stats(Stats rhs, bool copyExtra = false)
         {
             Health = rhs.Health;
             Attack = rhs.Attack;
@@ -109,6 +118,14 @@ namespace RuneOptim
             CritDamage = rhs.CritDamage;
             Resistance = rhs.Resistance;
             Accuracy = rhs.Accuracy;
+            if (copyExtra)
+            {
+                EffectiveHP = rhs.EffectiveHP;
+                EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
+                DamagePerSpeed = rhs.DamagePerSpeed;
+                AverageDamage = rhs.AverageDamage;
+                MaxDamage = rhs.MaxDamage;
+            }
         }
 
         // fake "stats", need to be stored for scoring
@@ -459,26 +476,41 @@ namespace RuneOptim
             return lhs.GreaterEqual(rhs);
         }
 
+        /// <summary>
+        /// Compares this to rhs returning if any non-zero attribute on RHS is exceeded by this.
+        /// </summary>
+        /// <param name="rhs">Stats to compare to</param>
+        /// <returns>If any values in this Stats are greater than rhs</returns>
         public bool CheckMax(Stats rhs)
         {
-            if (rhs.Accuracy > 0 && Accuracy > rhs.Accuracy)
+            return Build.statEnums.Any(s => rhs[s] > 0 && this[s] > rhs[s]);
+
+            /*
+            foreach (var stat in Build.statEnums)
+            {
+                if (rhs[stat] > 0 && this[stat] > rhs[stat])
+                    return true;
+            }
+
+            if (rhs.Health > 0 && Health > rhs.Health)
                 return true;
             if (rhs.Attack > 0 && Attack > rhs.Attack)
                 return true;
-            if (rhs.CritDamage > 0 && CritDamage > rhs.CritDamage)
-                return true;
-            if (rhs.CritRate > 0 && CritRate > rhs.CritRate)
-                return true;
             if (rhs.Defense > 0 && Defense > rhs.Defense)
-                return true;
-            if (rhs.Health > 0 && Health > rhs.Health)
-                return true;
-            if (rhs.Resistance > 0 && Resistance > rhs.Resistance)
                 return true;
             if (rhs.Speed > 0 && Speed > rhs.Speed)
                 return true;
+            if (rhs.CritRate > 0 && CritRate > rhs.CritRate)
+                return true;
+            if (rhs.CritDamage > 0 && CritDamage > rhs.CritDamage)
+                return true;
+            if (rhs.Resistance > 0 && Resistance > rhs.Resistance)
+                return true;
+            if (rhs.Accuracy > 0 && Accuracy > rhs.Accuracy)
+                return true;
 
             return false;
+            */
         }
 
         public bool GreaterEqual(Stats rhs, bool extraGet = false)
@@ -518,7 +550,7 @@ namespace RuneOptim
 
         public static Stats operator +(Stats lhs, Stats rhs)
         {
-            Stats ret = new Stats(lhs);
+            Stats ret = new Stats(lhs, true);
             ret.Health += rhs.Health;
             ret.Attack += rhs.Attack;
             ret.Defense += rhs.Defense;
@@ -537,7 +569,7 @@ namespace RuneOptim
 
         public static Stats operator -(Stats lhs, Stats rhs)
         {
-            Stats ret = new Stats(lhs);
+            Stats ret = new Stats(lhs, true);
             ret.Health -= rhs.Health;
             ret.Attack -= rhs.Attack;
             ret.Defense -= rhs.Defense;
@@ -556,7 +588,7 @@ namespace RuneOptim
 
         public static Stats operator /(Stats lhs, double rhs)
         {
-            Stats ret = new Stats(lhs);
+            Stats ret = new Stats(lhs, true);
             ret.Health /= rhs;
             ret.Attack /= rhs;
             ret.Defense /= rhs;
@@ -575,11 +607,11 @@ namespace RuneOptim
 
         public static Stats operator /(Stats lhs, Stats rhs)
         {
-            Stats ret = new Stats(lhs);
+            Stats ret = new Stats(lhs, true);
             
             foreach (var a in Build.statEnums)
             {
-                if (rhs[a] == 0)
+                if (rhs[a].EqualTo(0))
                     ret[a] = 0;
                 else
                     ret[a] /= rhs[a];
@@ -587,7 +619,7 @@ namespace RuneOptim
 
             foreach (var a in Build.extraEnums)
             {
-                if (rhs[a] == 0)
+                if (rhs[a].EqualTo(0))
                     ret[a] = 0;
                 else
                     ret[a] /= rhs[a];
@@ -633,32 +665,32 @@ namespace RuneOptim
 
         public bool NonZero()
         {
-            if (Accuracy != 0)
+            if (!Accuracy.EqualTo(0))
                 return true;
-            if (Attack != 0)
+            if (!Attack.EqualTo(0))
                 return true;
-            if (CritDamage != 0)
+            if (!CritDamage.EqualTo(0))
                 return true;
-            if (CritRate != 0)
+            if (!CritRate.EqualTo(0))
                 return true;
-            if (Defense != 0)
+            if (!Defense.EqualTo(0))
                 return true;
-            if (Health != 0)
+            if (!Health.EqualTo(0))
                 return true;
-            if (Resistance != 0)
+            if (!Resistance.EqualTo(0))
                 return true;
-            if (Speed != 0)
+            if (!Speed.EqualTo(0))
                 return true;
 
-            if (EffectiveHP != 0)
+            if (!EffectiveHP.EqualTo(0))
                 return true;
-            if (EffectiveHPDefenseBreak != 0)
+            if (!EffectiveHPDefenseBreak.EqualTo(0))
                 return true;
-            if (DamagePerSpeed != 0)
+            if (!DamagePerSpeed.EqualTo(0))
                 return true;
-            if (AverageDamage != 0)
+            if (!AverageDamage.EqualTo(0))
                 return true;
-            if (MaxDamage != 0)
+            if (!MaxDamage.EqualTo(0))
                 return true;
 
             return false;
@@ -666,21 +698,21 @@ namespace RuneOptim
 
         public Attr FirstNonZero()
         {
-            if (Accuracy != 0)
+            if (!Accuracy.EqualTo(0))
                 return Attr.Accuracy;
-            if (Attack != 0)
+            if (!Attack.EqualTo(0))
                 return Attr.AttackPercent;
-            if (CritDamage != 0)
+            if (!CritDamage.EqualTo(0))
                 return Attr.CritDamage;
-            if (CritRate != 0)
+            if (!CritRate.EqualTo(0))
                 return Attr.CritRate;
-            if (Defense != 0)
+            if (!Defense.EqualTo(0))
                 return Attr.DefensePercent;
-            if (Health != 0)
+            if (!Health.EqualTo(0))
                 return Attr.HealthPercent;
-            if (Resistance != 0)
+            if (!Resistance.EqualTo(0))
                 return Attr.Resistance;
-            if (Speed != 0)
+            if (!Speed.EqualTo(0))
                 return Attr.SpeedPercent;
 
             return Attr.Null;

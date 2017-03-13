@@ -305,9 +305,9 @@ namespace RuneApp
             }
         }
 
-        private void Program_BuildsProgressTo(object sender, BuildProgressArgs e)
+        private void Program_BuildsProgressTo(object sender, PrintToEventArgs e)
         {
-            ProgressToList(e.b, e.str);
+            ProgressToList(e.build, e.Message);
         }
 
         private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -908,11 +908,12 @@ namespace RuneApp
 
         public void ProgressToList(Build b, string str)
         {
+            Program.log.Info(str);
             this.Invoke((MethodInvoker)delegate
             {
                 if (!IsDisposed)
                 {
-                    var lvi = buildList.Items.Cast<ListViewItem>().Where(ll => (ll.Tag as Build).ID == b.ID).FirstOrDefault();
+                    var lvi = buildList.Items.Cast<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build).ID == b.ID);
                     lvi.SubItems[3].Text = str;
                 }
             });
@@ -1523,7 +1524,10 @@ namespace RuneApp
                     }
                 }
 
-                b.GenRunes(Program.data, false, Program.useEquipped, saveStats);
+                b.RunesUseLocked = false;
+                b.RunesUseEquipped = Program.useEquipped;
+                b.BuildSaveStats = saveStats;
+                b.GenRunes(Program.data);
                 b.shrines = Program.data.shrines;
 
                 #region Check enough runes
@@ -1543,13 +1547,15 @@ namespace RuneApp
 
                 isRunning = true;
 
-                b.GenBuilds(0, 0, (bb, str) =>
-                {
-                    if (!IsDisposed && IsHandleCreated)
-                    {
-                        printTo?.Invoke(str);
-                    }
-                }, null, true, saveStats);
+                b.BuildTimeout = 0;
+                b.BuildTake = 0;
+                b.BuildGenerate = 0;
+                b.BuildPrintTo += this.Program_BuildsProgressTo;
+                b.BuildDumpBads = true;
+
+                b.GenBuilds();
+
+                b.BuildPrintTo -= this.Program_BuildsProgressTo;
 
                 #region Save null build
                 if (b.Best == null)
@@ -1732,16 +1738,19 @@ namespace RuneApp
             Log.Info("Running ban");
             b.BanEmTemp(doneIds);
 
-            b.GenRunes(Program.data, false, Program.useEquipped, true, goodRunes);
+            b.RunesUseLocked = false;
+            b.RunesUseEquipped = Program.useEquipped;
+            b.BuildSaveStats = true;
+            b.BuildGoodRunes = goodRunes;
+            b.GenRunes(Program.data);
 
-            b.GenBuilds(0, 0, (bb, str) =>
-            {
-                Log.Info(str);
-                if (!IsDisposed && IsHandleCreated)
-                {
-                    printTo?.Invoke(c + " " + str);
-                }
-            }, null, true, true, goodRunes);
+            b.BuildTimeout = 0;
+            b.BuildTake = 0;
+            b.BuildGenerate = 0;
+            b.BuildPrintTo += this.Program_BuildsProgressTo;
+            b.BuildDumpBads = true;
+            b.GenBuilds();
+            b.BuildPrintTo -= this.Program_BuildsProgressTo;
             Log.Info("Ban finished");
         }
 

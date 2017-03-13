@@ -194,7 +194,7 @@ namespace RuneOptim
         public bool Swapped = false;
 
         [JsonIgnore]
-        public static int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
+        public static readonly int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
 
         private bool? setIs4;
 
@@ -228,17 +228,6 @@ namespace RuneOptim
 
         public Rune()
         {
-            /*Accuracy = new RuneStat(this, Attr.Accuracy);
-            AttackFlat = new RuneStat(this, Attr.AttackFlat);
-            AttackPercent = new RuneStat(this, Attr.AttackPercent);
-            CritDamage = new RuneStat(this, Attr.CritDamage);
-            CritRate = new RuneStat(this, Attr.CritRate);
-            DefenseFlat = new RuneStat(this, Attr.DefenseFlat);
-            DefensePercent = new RuneStat(this, Attr.DefensePercent);
-            HealthFlat = new RuneStat(this, Attr.HealthFlat);
-            HealthPercent = new RuneStat(this, Attr.HealthPercent);
-            Resistance = new RuneStat(this, Attr.Resistance);
-            Speed = new RuneStat(this, Attr.Speed);*/
         }
 
         public Rune(Rune rhs)
@@ -272,30 +261,31 @@ namespace RuneOptim
         {
             get
             {
+                int ind = pred ? fake + 16 : fake;
                 switch (stat)
                 {
                     case "HPflat":
-                        return HealthFlat[pred ? fake + 16 : fake];
+                        return HealthFlat[ind];
                     case "HPperc":
-                        return HealthPercent[pred ? fake + 16 : fake];
+                        return HealthPercent[ind];
                     case "ATKflat":
-                        return AttackFlat[pred ? fake + 16 : fake];
+                        return AttackFlat[ind];
                     case "ATKperc":
-                        return AttackPercent[pred ? fake + 16 : fake];
+                        return AttackPercent[ind];
                     case "DEFflat":
-                        return DefenseFlat[pred ? fake + 16 : fake];
+                        return DefenseFlat[ind];
                     case "DEFperc":
-                        return DefensePercent[pred ? fake + 16 : fake];
+                        return DefensePercent[ind];
                     case "SPDflat":
-                        return Speed[pred ? fake + 16 : fake];
+                        return Speed[ind];
                     case "CDperc":
-                        return CritDamage[pred ? fake + 16 : fake];
+                        return CritDamage[ind];
                     case "CRperc":
-                        return CritRate[pred ? fake + 16 : fake];
+                        return CritRate[ind];
                     case "ACCperc":
-                        return Accuracy[pred ? fake + 16 : fake];
+                        return Accuracy[ind];
                     case "RESperc":
-                        return Resistance[pred ? fake + 16 : fake];
+                        return Resistance[ind];
                     default:
                         return 0;
                 }
@@ -307,31 +297,32 @@ namespace RuneOptim
         {
             get
             {
+                int ind = pred ? fake + 16 : fake;
                 switch (stat)
                 {
                     case Attr.HealthFlat:
-                        return HealthFlat[pred ? fake + 16 : fake];
+                        return HealthFlat[ind];
                     case Attr.HealthPercent:
-                        return HealthPercent[pred ? fake + 16 : fake];
+                        return HealthPercent[ind];
                     case Attr.AttackFlat:
-                        return AttackFlat[pred ? fake + 16 : fake];
+                        return AttackFlat[ind];
                     case Attr.AttackPercent:
-                        return AttackPercent[pred ? fake + 16 : fake];
+                        return AttackPercent[ind];
                     case Attr.DefenseFlat:
-                        return DefenseFlat[pred ? fake + 16 : fake];
+                        return DefenseFlat[ind];
                     case Attr.DefensePercent:
-                        return DefensePercent[pred ? fake + 16 : fake];
+                        return DefensePercent[ind];
                     case Attr.Speed:
                     case Attr.SpeedPercent:
-                        return Speed[pred ? fake + 16 : fake];
+                        return Speed[ind];
                     case Attr.CritDamage:
-                        return CritDamage[pred ? fake + 16 : fake];
+                        return CritDamage[ind];
                     case Attr.CritRate:
-                        return CritRate[pred ? fake + 16 : fake];
+                        return CritRate[ind];
                     case Attr.Accuracy:
-                        return Accuracy[pred ? fake + 16 : fake];
+                        return Accuracy[ind];
                     case Attr.Resistance:
-                        return Resistance[pred ? fake + 16 : fake];
+                        return Resistance[ind];
                 }
                 return 0;
             }
@@ -378,104 +369,141 @@ namespace RuneOptim
             return count;
         }
 
-        [JsonIgnore]
-        public double RatingScore
+        public AttributeCategory getSetType()
         {
-            get
+            var neutral = new RuneSet[] { RuneSet.Violent, RuneSet.Swift, RuneSet.Focus, RuneSet.Nemesis };
+            if (new RuneSet[] { RuneSet.Fatal, RuneSet.Blade, RuneSet.Rage, RuneSet.Vampire, RuneSet.Revenge }.Contains(Set)) // o
+                return AttributeCategory.Offensive;
+            else if (new RuneSet[] { RuneSet.Energy, RuneSet.Endure, RuneSet.Guard, RuneSet.Shield, RuneSet.Will }.Contains(Set)) // d
+                return AttributeCategory.Defensive;
+            else if (new RuneSet[] { RuneSet.Despair, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight, RuneSet.Accuracy, RuneSet.Tolerance }.Contains(Set)) // s
+                return AttributeCategory.Support;
+
+            return AttributeCategory.Neutral;
+        }
+
+        [JsonIgnore]
+        private static readonly Attr[] attackSubs = new Attr[] { Attr.AttackPercent, Attr.CritDamage, Attr.CritRate };
+        [JsonIgnore]
+        private static readonly Attr[] defenseSubs = new Attr[] { Attr.HealthPercent, Attr.DefensePercent };
+        [JsonIgnore]
+        private static readonly Attr[] supportSubs = new Attr[] { Attr.Accuracy, Attr.Resistance };
+
+        public double ComputeRating()
+        {
+            double r = 0;
+            var type = getSetType();
+
+            // for each sub (if flat = 0, null = 0.3, else 1)
+
+            // set types
+            // stat types
+            // offense/defense/support/neutral
+            
+            var subs = new Attr[] { Sub1Type, Sub2Type, Sub3Type, Sub4Type };
+
+            foreach (var sub in subs)
             {
-                double r = 0;
-
-                // for each sub (if flat = 0, null = 0.3, else 1)
-
-                // set types
-                // stat types
-                // offense/defense/support/neutral
-                var neutral = new RuneSet[] { RuneSet.Violent, RuneSet.Swift, RuneSet.Focus, RuneSet.Nemesis };
-                var type = 0; // n
-                if (new RuneSet[] { RuneSet.Fatal, RuneSet.Blade, RuneSet.Rage, RuneSet.Vampire, RuneSet.Revenge }.Contains(Set)) // o
-                    type = 1;
-                else if (new RuneSet[] { RuneSet.Energy, RuneSet.Endure, RuneSet.Guard, RuneSet.Shield, RuneSet.Will }.Contains(Set)) // d
-                    type = 2;
-                else if (new RuneSet[] { RuneSet.Despair, RuneSet.Determination, RuneSet.Enhance, RuneSet.Fight, RuneSet.Accuracy, RuneSet.Tolerance }.Contains(Set)) // s
-                    type = 3;
-
-                var subs = new Attr[] { Sub1Type, Sub2Type, Sub3Type, Sub4Type };
-
-                foreach (var sub in subs)
+                // if null
+                if (sub == Attr.Null)
                 {
-                    // if null
-                    if (sub == Attr.Null)
-                    {
-                        r += 1 / (double)3;
-                        continue;
-                    }
-
-                    // if not flat
-                    if (!new Attr[] { Attr.AttackFlat, Attr.DefenseFlat, Attr.HealthFlat }.Contains(sub))
-                        r += 1;
-
-                    if (new Attr[] { Attr.HealthPercent, Attr.Speed }.Contains(sub))
-                        r += 0.5;
-
-                    var subt = 0;
-
-                    var attackSubs = new Attr[] { Attr.AttackPercent, Attr.CritDamage, Attr.CritRate };
-                    var defenseSubs = new Attr[] { Attr.HealthPercent, Attr.DefensePercent };
-                    var supportSubs = new Attr[] { Attr.Accuracy, Attr.Resistance };
-
-                    if (attackSubs.Contains(sub))
-                    {
-                        if (type == 1)
-                            r += 1;
-                        if (type == 2)
-                            r += 0.25;
-                        if (type == 3)
-                            r += 0.25;
-                        subt = 1;
-                    }
-                    if (defenseSubs.Contains(sub))
-                    {
-                        if (type == 1)
-                            r += 0.25;
-                        if (type == 2)
-                            r += 1;
-                        if (type == 3)
-                            r += 0.5;
-                        subt = 2;
-                    }
-                    if (supportSubs.Contains(sub))
-                    {
-                        if (type == 1)
-                            r += 0.25;
-                        if (type == 2)
-                            r += 0.5;
-                        if (type == 3)
-                            r += 1;
-                        subt = 3;
-                    }
-                    foreach (var sub2 in subs)
-                    {
-                        if (sub == sub2)
-                            continue;
-                        if (sub2 == Attr.Null)
-                            continue;
-
-                        if (subt == 1 && attackSubs.Contains(sub))
-                            r += 1;
-                        if (subt == 2 && defenseSubs.Contains(sub))
-                            r += 1;
-                        if (subt == 3 && supportSubs.Contains(sub))
-                            r += 1;
-                    }
+                    r += 1 / (double)3;
+                    continue;
                 }
 
-                if (Grade == 5)
-                    r += 1;
-                else if (Grade == 6)
+                // if not flat
+                if (!new Attr[] { Attr.AttackFlat, Attr.DefenseFlat, Attr.HealthFlat }.Contains(sub))
                     r += 1;
 
-                return r;
+                if (new Attr[] { Attr.HealthPercent, Attr.Speed }.Contains(sub))
+                    r += 0.5;
+
+                AttributeCategory subt;
+                r += computeSubTypeRating(type, sub, out subt);
+                r += computeSubRating(sub, subs, subt);
             }
+
+            if (Grade == 5)
+                r += 4;
+            else if (Grade == 6)
+                r += 7;
+
+            return r;
+        }
+
+
+        private double computeSubTypeRating(AttributeCategory type, Attr sub, out AttributeCategory subt)
+        {
+            subt = AttributeCategory.Neutral;
+            if (attackSubs.Contains(sub))
+                subt = AttributeCategory.Offensive;
+            else if (defenseSubs.Contains(sub))
+                subt = AttributeCategory.Defensive;
+            else if (supportSubs.Contains(sub))
+                subt = AttributeCategory.Support;
+
+            double r = 0;
+
+            switch (type)
+            {
+                case AttributeCategory.Offensive:
+                    switch (subt)
+                    {
+                        case AttributeCategory.Offensive:
+                            return 1;
+                        default:
+                            return 0.25;
+                    }
+                case AttributeCategory.Defensive:
+                    switch (subt)
+                    {
+                        case AttributeCategory.Offensive:
+                            return 0.25;
+                        case AttributeCategory.Defensive:
+                            return 1;
+                        default:
+                            return 0.5;
+                    }
+                case AttributeCategory.Support:
+                    switch (subt)
+                    {
+                        case AttributeCategory.Defensive:
+                            return 0.5;
+                        case AttributeCategory.Support:
+                            return 1;
+                        default:
+                            return 0.25;
+                    }
+                case AttributeCategory.Neutral:
+                    switch (subt)
+                    {
+                        case AttributeCategory.Offensive:
+                        case AttributeCategory.Defensive:
+                            return 0.5;
+                        default:
+                            return 0.25;
+                    }
+                default:
+                    break;
+            }
+
+            return r;
+        }
+
+        private double computeSubRating(Attr sub, Attr[] subs, AttributeCategory subt)
+        {
+            double r = 0;
+            foreach (var sub2 in subs)
+            {
+                if (sub == sub2 || sub2 == Attr.Null)
+                    continue;
+
+                if ((subt == AttributeCategory.Offensive && attackSubs.Contains(sub2))
+                    || (subt == AttributeCategory.Defensive && defenseSubs.Contains(sub2))
+                    || (subt == AttributeCategory.Support && supportSubs.Contains(sub2)))
+                    r += 1;
+            }
+            return r;
         }
 
         [JsonIgnore]
@@ -484,163 +512,151 @@ namespace RuneOptim
         [JsonIgnore]
 		private Attr[] hpStats = new Attr[] { Attr.HealthPercent, Attr.DefensePercent, Attr.Resistance, Attr.HealthFlat, Attr.DefenseFlat };
 
-		[JsonIgnore]
-        public double ScoringHP
+        public double ScoreHP()
         {
-            get
-            {
-                double v = 0;
+            double v = 0;
 
-                v += HealthPercent[0] / (double)subMaxes[Attr.HealthPercent];
-                v += DefensePercent[0] / (double)subMaxes[Attr.DefensePercent];
-                v += Resistance[0] / (double)subMaxes[Attr.Resistance];
-                v += 0.5 * HealthFlat[0] / subMaxes[Attr.HealthFlat];
-                v += 0.5 * DefenseFlat[0] / subMaxes[Attr.DefenseFlat];
+            v += HealthPercent[0] / (double)subMaxes[Attr.HealthPercent];
+            v += DefensePercent[0] / (double)subMaxes[Attr.DefensePercent];
+            v += Resistance[0] / (double)subMaxes[Attr.Resistance];
+            v += 0.5 * HealthFlat[0] / subMaxes[Attr.HealthFlat];
+            v += 0.5 * DefenseFlat[0] / subMaxes[Attr.DefenseFlat];
 
-				if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
-				{
-					v -= MainValue / (double)subMaxes[MainType];
-					if (Slot % 2 == 0)
-						v += Grade /(double) 6;
-				}
-				else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
-				{
-					v -= 0.5 * MainValue / subMaxes[MainType];
-					if (Slot % 2 == 0)
-						v += Grade / (double) 6;
-				}
-
-				double d = 0.5;
-				if (Slot == 3 || Slot == 5)
-					d += 0.2;
-
+			if (MainType == Attr.HealthPercent || MainType == Attr.DefensePercent || MainType == Attr.Resistance)
+			{
+				v -= MainValue / (double)subMaxes[MainType];
 				if (Slot % 2 == 0)
-					d += 1;
-				
-				d += 0.2 * (
-					Rarity
-					- (
-						Rarity
-						- Math.Floor(Level / (double)3)
-					) * (
-						hpStats.Contains(Sub1Type) ? 1 :
-						hpStats.Contains(Sub2Type) ? 1 :
-						hpStats.Contains(Sub3Type) ? 1 :
-						hpStats.Contains(Sub4Type) ? 1 : 0
-					)
-				);
+					v += Grade /(double) 6;
+			}
+			else if (MainType == Attr.DefenseFlat || MainType == Attr.HealthFlat)
+			{
+				v -= 0.5 * MainValue / subMaxes[MainType];
+				if (Slot % 2 == 0)
+					v += Grade / (double) 6;
+			}
 
-				return v/d;
-            }
+			double d = 0.5;
+			if (Slot == 3 || Slot == 5)
+				d += 0.2;
+
+			if (Slot % 2 == 0)
+				d += 1;
+				
+			d += 0.2 * (
+				Rarity
+				- (
+					Rarity
+					- Math.Floor(Level / (double)3)
+				) * (
+					hpStats.Contains(Sub1Type) ? 1 :
+					hpStats.Contains(Sub2Type) ? 1 :
+					hpStats.Contains(Sub3Type) ? 1 :
+					hpStats.Contains(Sub4Type) ? 1 : 0
+				)
+			);
+
+			return v/d;
         }
 
 		[JsonIgnore]
 		private readonly Attr[] atkStats = new Attr[] { Attr.AttackFlat, Attr.AttackPercent, Attr.CritRate, Attr.CritDamage };
 
-        [JsonIgnore]
-        public double ScoringATK
+        public double ScoreATK()
         {
-            get
-            {
-                double v = 0;
+            double v = 0;
 
-                v += AttackPercent[0] / (double)subMaxes[Attr.AttackPercent];
-                v += CritRate[0] / (double)subMaxes[Attr.CritRate];
-                v += CritDamage[0] / (double)subMaxes[Attr.CritDamage];
-                v += 0.5 * AttackFlat[0] / subMaxes[Attr.AttackFlat];
+            v += AttackPercent[0] / (double)subMaxes[Attr.AttackPercent];
+            v += CritRate[0] / (double)subMaxes[Attr.CritRate];
+            v += CritDamage[0] / (double)subMaxes[Attr.CritDamage];
+            v += 0.5 * AttackFlat[0] / subMaxes[Attr.AttackFlat];
 
-				if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
-				{
-					v -= MainValue / (double)subMaxes[MainType];
-					if (Slot % 2 == 0)
-						v += Grade / (double)6;
-				}
-				else if (MainType == Attr.AttackFlat)
-				{
-					v -= 0.5 * MainValue / subMaxes[MainType];
-					if (Slot % 2 == 0)
-						v += Grade / (double)6;
-				}
-
-                double d = 0.4;
-
-				if (Slot == 1)
-					d += 0.2;
-
+			if (MainType == Attr.AttackPercent || MainType == Attr.CritRate || MainType == Attr.CritDamage)
+			{
+				v -= MainValue / (double)subMaxes[MainType];
 				if (Slot % 2 == 0)
-					d += 1.1;
+					v += Grade / (double)6;
+			}
+			else if (MainType == Attr.AttackFlat)
+			{
+				v -= 0.5 * MainValue / subMaxes[MainType];
+				if (Slot % 2 == 0)
+					v += Grade / (double)6;
+			}
 
-				d += 0.2 * (
+            double d = 0.4;
+
+			if (Slot == 1)
+				d += 0.2;
+
+			if (Slot % 2 == 0)
+				d += 1.1;
+
+			d += 0.2 * (
+				Rarity
+				- (
 					Rarity
-					- (
-						Rarity
-						- Math.Floor(Level / (double)3)
-					) * (
-						atkStats.Contains(Sub1Type) ? 1 :
-						atkStats.Contains(Sub2Type) ? 1 :
-						atkStats.Contains(Sub3Type) ? 1 :
-						atkStats.Contains(Sub4Type) ? 1 : 0
-					)
-				);
+					- Math.Floor(Level / (double)3)
+				) * (
+					atkStats.Contains(Sub1Type) ? 1 :
+					atkStats.Contains(Sub2Type) ? 1 :
+					atkStats.Contains(Sub3Type) ? 1 :
+					atkStats.Contains(Sub4Type) ? 1 : 0
+				)
+			);
 
-                return v/d;
-            }
+            return v/d;
         }
 
-        [JsonIgnore]
-        public double ScoringRune
+        public double ScoreRune()
         {
-            get
-            {
-                double v = 0;
+            double v = 0;
 				
-				if (InnateValue.HasValue && InnateValue.Value > 0)
-				{
-					if (InnateType == Attr.AttackFlat || InnateType == Attr.HealthFlat || InnateType == Attr.DefenseFlat)
-						v += 0.5 * InnateValue.Value / subMaxes[InnateType];
-					else
-						v += InnateValue.Value / (double)subMaxes[InnateType];
-				}
+			if (InnateValue.HasValue && InnateValue.Value > 0)
+			{
+				if (InnateType == Attr.AttackFlat || InnateType == Attr.HealthFlat || InnateType == Attr.DefenseFlat)
+					v += 0.5 * InnateValue.Value / subMaxes[InnateType];
+				else
+					v += InnateValue.Value / (double)subMaxes[InnateType];
+			}
 
-				if (Sub1Value.HasValue && Sub1Value.Value > 0)
-				{
-					if (Sub1Type == Attr.AttackFlat || Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat)
-						v += 0.5 * Sub1Value.Value / subMaxes[Sub1Type];
-					else
-						v += Sub1Value.Value / (double)subMaxes[Sub1Type];
-				}
+			if (Sub1Value.HasValue && Sub1Value.Value > 0)
+			{
+				if (Sub1Type == Attr.AttackFlat || Sub1Type == Attr.HealthFlat || Sub1Type == Attr.DefenseFlat)
+					v += 0.5 * Sub1Value.Value / subMaxes[Sub1Type];
+				else
+					v += Sub1Value.Value / (double)subMaxes[Sub1Type];
+			}
 
-				if (Sub2Value.HasValue && Sub2Value.Value > 0)
-				{
-					if (Sub2Type == Attr.AttackFlat || Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat)
-						v += 0.5 * Sub2Value.Value / subMaxes[Sub2Type];
-					else
-						v += Sub2Value.Value / (double)subMaxes[Sub2Type];
-				}
+			if (Sub2Value.HasValue && Sub2Value.Value > 0)
+			{
+				if (Sub2Type == Attr.AttackFlat || Sub2Type == Attr.HealthFlat || Sub2Type == Attr.DefenseFlat)
+					v += 0.5 * Sub2Value.Value / subMaxes[Sub2Type];
+				else
+					v += Sub2Value.Value / (double)subMaxes[Sub2Type];
+			}
 
-				if (Sub3Value.HasValue && Sub3Value.Value > 0)
-				{
-					if (Sub3Type == Attr.AttackFlat || Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat)
-						v += 0.5 * Sub3Value.Value / subMaxes[Sub3Type];
-					else
-						v += Sub3Value.Value / (double)subMaxes[Sub3Type];
-				}
+			if (Sub3Value.HasValue && Sub3Value.Value > 0)
+			{
+				if (Sub3Type == Attr.AttackFlat || Sub3Type == Attr.HealthFlat || Sub3Type == Attr.DefenseFlat)
+					v += 0.5 * Sub3Value.Value / subMaxes[Sub3Type];
+				else
+					v += Sub3Value.Value / (double)subMaxes[Sub3Type];
+			}
 
-				if (Sub4Value.HasValue && Sub4Value.Value > 0)
-				{
-					if (Sub4Type == Attr.AttackFlat || Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat)
-						v += 0.5 * Sub4Value.Value / subMaxes[Sub4Type];
-					else
-						v += Sub4Value.Value / (double)subMaxes[Sub4Type];
-				}
+			if (Sub4Value.HasValue && Sub4Value.Value > 0)
+			{
+				if (Sub4Type == Attr.AttackFlat || Sub4Type == Attr.HealthFlat || Sub4Type == Attr.DefenseFlat)
+					v += 0.5 * Sub4Value.Value / subMaxes[Sub4Type];
+				else
+					v += Sub4Value.Value / (double)subMaxes[Sub4Type];
+			}
 
-                v += Grade / (double)6;
+            v += Grade / (double)6;
 
-                double d = 2;
-                d += 0.2 * Math.Min(4, Math.Floor(Level / (double)3));
+            double d = 2;
+            d += 0.2 * Math.Min(4, Math.Floor(Level / (double)3));
 
-                return v/d;
-            }
+            return v/d;
         }
 
         public double GetEfficiency(Attr a, int val)
@@ -659,7 +675,7 @@ namespace RuneOptim
         }
 
         // Number of sets
-        public static int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
+        public static readonly int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
 
         // Number of runes required for set to be complete
         public static int SetRequired(RuneSet set)
@@ -667,13 +683,7 @@ namespace RuneOptim
             if (set == RuneSet.Swift || set == RuneSet.Fatal || set == RuneSet.Violent || set == RuneSet.Vampire || set == RuneSet.Despair || set == RuneSet.Rage)
                 return 4;
             // Not a 4 set => is a 2 set
-            /*if (set == RuneSet.Energy || set == RuneSet.Blade || set == RuneSet.Focus || set == RuneSet.Guard || set == RuneSet.Shield
-               || set == RuneSet.Revenge || set == RuneSet.Nemesis || set == RuneSet.Will || set == RuneSet.Endure || set == RuneSet.Destroy
-               || set == RuneSet.Fight || set == RuneSet.Determination || set == RuneSet.Enhance || set == RuneSet.Accuracy || set == RuneSet.Tolerance)*/
-                return 2;
-            
-            // Unknown set will never be complete!
-            //return 7;
+            return 2;
         }
 
         // Format rune values okayish
@@ -762,26 +772,20 @@ namespace RuneOptim
         public int GetValue(Attr stat, int FakeLevel = -1, bool PredictSubs = false)
         {
             // the stat can only be present once per rune, early exit
-            if (MainType == stat)
-            {
-                if (FakeLevel <= Level || FakeLevel > 15 || Grade < 3)
-                {
-                    return MainValue;
-                }
-                else
-                {
-                    return MainValues[MainType][Grade - 3][FakeLevel];
-                }
-            }
+            if (MainType == stat && Grade >= 3 && FakeLevel <= 15 && FakeLevel > Level)
+                return MainValues[MainType][Grade - 3][FakeLevel];
+            else if (MainType == stat)
+                return MainValue;
+
             // Need to be able to load in null values (requiring int?) but xType shouldn't be a Type if xValue is null
             if (InnateType == stat) return InnateValue ?? 0;
             // Here, if a subs type is null, there is not further subs (it's how runes work), so we quit early.
-            if (PredictSubs == false)
+            if (!PredictSubs)
             {
                 if (Sub1Type == stat || Sub1Type == Attr.Null) return Sub1Value ?? 0;
-                if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value ?? 0;
-                if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value ?? 0;
-                if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value ?? 0;
+                else if (Sub2Type == stat || Sub2Type == Attr.Null) return Sub2Value ?? 0;
+                else if (Sub3Type == stat || Sub3Type == Attr.Null) return Sub3Value ?? 0;
+                else if (Sub4Type == stat || Sub4Type == Attr.Null) return Sub4Value ?? 0;
             }
             else
             {
@@ -795,9 +799,9 @@ namespace RuneOptim
                 int subVal = (subNew > 0 ? 1 : 0);
 
                 if (Sub1Type == stat || Sub1Type == Attr.Null) return (Sub1Value + subEx) ?? subVal;
-                if (Sub2Type == stat || Sub2Type == Attr.Null) return (Sub2Value + subEx) ?? subVal;
-                if (Sub3Type == stat || Sub3Type == Attr.Null) return (Sub3Value + subEx) ?? subVal;
-                if (Sub4Type == stat || Sub4Type == Attr.Null) return (Sub4Value + subEx) ?? subVal;
+                else if (Sub2Type == stat || Sub2Type == Attr.Null) return (Sub2Value + subEx) ?? subVal;
+                else if (Sub3Type == stat || Sub3Type == Attr.Null) return (Sub3Value + subEx) ?? subVal;
+                else if (Sub4Type == stat || Sub4Type == Attr.Null) return (Sub4Value + subEx) ?? subVal;
             }
         
             return 0;
@@ -818,14 +822,12 @@ namespace RuneOptim
 #if !OLDOR
             foreach (Attr attr in Build.statEnums)
             {
-                if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / rPerc[attr] >= rTest[attr])
+                if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] >= rTest[attr])
                         return true;
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
-                if (rFlat[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / rFlat[attr] >= rTest[attr])
+                if (!rFlat[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rFlat[attr] >= rTest[attr])
                         return true;
             }
 #else
@@ -849,14 +851,12 @@ namespace RuneOptim
 #if !OLDAND
             foreach (Attr attr in Build.statEnums)
             {
-                if (attr != Attr.Speed && rPerc[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / rPerc[attr] < rTest[attr])
+                if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] < rTest[attr])
                         return false;
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
-                if (rFlat[attr] != 0 && rTest[attr] != 0)
-                    if (this[attr, fake, pred] / rFlat[attr] < rTest[attr])
+                if (!rFlat[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rFlat[attr] < rTest[attr])
                         return false;
             }
 #else
@@ -881,13 +881,13 @@ namespace RuneOptim
 #if !OLDTEST
             foreach (Attr attr in Build.statEnums)
             {
-                if (attr != Attr.Speed && rPerc[attr] != 0)
+                if (attr != Attr.Speed && !rPerc[attr].EqualTo(0))
                     val += this[attr, fake, pred] / rPerc[attr];
 
             }
             foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
             {
-                if (rFlat[attr] != 0)
+                if (!rFlat[attr].EqualTo(0))
                     val += this[attr, fake, pred] / rFlat[attr];
             }
 #else
@@ -970,55 +970,55 @@ namespace RuneOptim
             {Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },
         };
 
-        public static int[][] MainValues_Speed = new int[][] {
+        public static readonly int[][] MainValues_Speed = new int[][] {
             new int[]{3,4,5,6,8,9,10,12,13,14,16,17,18,19,21,25},
             new int[]{4,5,7,8,10,11,13,14,16,17,19,20,22,23,25,30},
             new int[]{5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,39},
             new int[]{7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,42}
         };
 
-        public static int[][] MainValues_Flat = new int[][] {
+        public static readonly int[][] MainValues_Flat = new int[][] {
             new int[]{7,12,17,22,27,32,37,42,47,52,57,62,67,72,77,92},
             new int[]{10,16,22,28,34,40,46,52,58,64,70,76,82,88,94,112},
             new int[]{15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,135},
             new int[]{22,30,38,46,54,62,70,78,86,94,102,110,118,126,134,160}
         };
 
-        public static int[][] MainValues_HPflat = new int[][] {
+        public static readonly int[][] MainValues_HPflat = new int[][] {
             new int[]{100,175,250,325,400,475,550,625,700,775,850,925,1000,1075,1150,1380},
             new int[]{160,250,340,430,520,610,700,790,880,970,1060,1150,1240,1330,1420,1704},
             new int[]{270,375,480,585,690,795,900,1005,1110,1215,1320,1425,1530,1635,1740,2088},
             new int[]{360,480,600,720,840,960,1080,1200,1320,1440,1560,1680,1800,1920,2040,2448}
         };
 
-        public static int[][] MainValues_Percent = new int[][] {
+        public static readonly int[][] MainValues_Percent = new int[][] {
             new int[]{4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
             new int[]{5,7,9,11,13,16,18,20,22,23,27,29,31,33,36,43},
             new int[]{8,10,12,15,17,20,22,24,27,29,32,34,37,40,43,51},
             new int[]{11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,63}
         };
-        public static int[][] MainValues_CRate = new int[][] {
+        public static readonly int[][] MainValues_CRate = new int[][] {
             new int[]{3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,37},
             new int[]{4,6,8,11,13,15,17,19,22,24,26,28,30,33,35,41},
             new int[]{5,7,10,12,15,17,19,22,24,27,29,31,34,36,39,47},
             new int[]{7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,58}
         };
 
-        public static int[][] MainValues_CDmg = new int[][] {
+        public static readonly int[][] MainValues_CDmg = new int[][] {
             new int[]{4,6,9,11,13,16,18,20,22,25,27,29,32,34,36,43},
             new int[]{6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,57},
             new int[]{8,11,15,18,21,25,28,31,34,38,41,44,48,51,54,65},
             new int[]{11,15,19,23,27,31,35,39,43,47,51,55,59,63,67,80}
         };
 
-        public static int[][] MainValues_ResAcc = new int[][] {
+        public static readonly int[][] MainValues_ResAcc = new int[][] {
             new int[] {4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
             new int[] {6,8,10,13,15,17,19,21,24,26,28,30,32,35,37,44},
             new int[] {9,11,14,16,19,21,23,26,28,31,33,35,38,40,43,51},
             new int[] {12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,64}
         };
 
-        public static Dictionary<Attr, int[][]> MainValues = new Dictionary<Attr, int[][]>
+        public static readonly Dictionary<Attr, int[][]> MainValues = new Dictionary<Attr, int[][]>
         {
             {Attr.HealthFlat, MainValues_HPflat },
             {Attr.AttackFlat, MainValues_Flat },

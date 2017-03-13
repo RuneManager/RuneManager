@@ -14,7 +14,7 @@ namespace RuneApp
         public Build build = null;
 
         // controls builds version numbers
-        public static int VERSIONNUM = 1;
+        public static readonly int VERSIONNUM = 1;
         
         // Keep track of the runeset groups for speed swaps
         private ListViewGroup rsInc;
@@ -104,13 +104,13 @@ namespace RuneApp
             rsExc = setList.Groups[2];
             setList.Groups[0].Tag = false;
             rsReq = setList.Groups[0];
-            
+
             if (leadTypes != null)
                 leaderTypeBox.Items.AddRange(leadTypes);
 
             // for each runeset, put it in the list as excluded
             foreach (var rs in Enum.GetNames(typeof(RuneSet)))
-			{
+            {
                 if (rs != "Null" && rs != "Broken" && rs != "Unknown" && rs[0] != '_')
                 {
                     ListViewItem li = new ListViewItem(rs);
@@ -119,7 +119,7 @@ namespace RuneApp
                     li.Group = setList.Groups[2];
                     setList.Items.Add(li);
                 }
-			}
+            }
 
             // track all the clickable rune things
             runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
@@ -129,71 +129,15 @@ namespace RuneApp
             }
 
             toolStripButton1.Tag = 0;
-
-            // there are lists on the rune filter tabs 2,4, and 6
-            var lists = new ListView[]{ priStat2, priStat4, priStat6};
-            for(int j = 0; j < lists.Length; j++)
-            {
-                // mess 'em up
-                var lv = lists[j];
-
-                // for all the attributes that may appears as primaries on runes
-                for (int i = 0; i < Build.statNames.Length; i++)
-                {
-					ListViewItem li;
-
-                    string stat = Build.statNames[i];
-                    if (i < 3)
-                    {
-                        li = new ListViewItem(stat);
-                        li.Name = stat + "flat";
-                        li.Text = stat;
-                        li.Tag = stat + "flat";
-                        li.Group = lv.Groups[1];
-                        
-                        lv.Items.Add(li);
-                        
-                        li = new ListViewItem(stat);
-                        li.Name = stat + "perc";
-                        li.Text = stat + "%";
-                        li.Tag = stat + "perc";
-                        li.Group = lv.Groups[1];
-
-                        lv.Items.Add(li);
-                        
-                    }
-                    else
-                    {
-                        // only allow cool stats on the right slots
-                        if (j == 0 && stat != "SPD")
-                            continue;
-                        if (j == 1 && (stat != "CR" && stat != "CD"))
-                            continue;
-                        if (j == 2 && (stat != "ACC" && stat != "RES"))
-                            continue;
-
-                        li = new ListViewItem(stat);
-                        // put the right type on it
-                        li.Name = stat + (stat == "SPD" ? "flat" : "perc");
-                        li.Text = stat;
-                        li.Tag = stat + (stat == "SPD" ? "flat" : "perc");
-                        li.Group = lv.Groups[1];
-                        
-                        lv.Items.Add(li);
-                    }
-					 
-                }
-            }
+            addAttrsToEvens();
 
             Control textBox;
             Label label;
 
             // make a grid for the monsters base, min/max stats and the scoring
-            
-            int x;
-            int y;
 
-            y = 94;
+            int x = 0;
+            int y = 94;
 
             int colWidth = 50;
             int rowHeight = 24;
@@ -202,8 +146,8 @@ namespace RuneApp
 
             int genX = 0;
 
-			int dlCheckX = 0;
-			int dlBtnX = 0;
+            int dlCheckX = 0;
+            int dlBtnX = 0;
 
             #region Statbox
             foreach (var stat in comb)
@@ -213,7 +157,7 @@ namespace RuneApp
                 x += colWidth;
 
                 groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, stat);
-				dlCheckX = x;
+                dlCheckX = x;
                 x += colWidth;
 
                 groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, stat);
@@ -222,7 +166,7 @@ namespace RuneApp
                 textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
                 textBox.TextChanged += global_TextChanged;
                 textBox.TextChanged += Total_TextChanged;
-				dlBtnX = x;
+                dlBtnX = x;
                 x += colWidth;
 
 
@@ -252,14 +196,21 @@ namespace RuneApp
 
             testBuildButton.Location = new Point(genX, y);
 
-			btnDL6star.Location = new Point(dlBtnX, y);
-			checkDL6star.Location = new Point(dlCheckX, y + 2);
+            btnDL6star.Location = new Point(dlBtnX, y);
+            checkDL6star.Location = new Point(dlCheckX, y + 2);
 
-			btnDLawake.Location = new Point(dlBtnX, y + rowHeight);
-			checkDLawake.Location = new Point(dlCheckX, y + rowHeight + 2);
+            btnDLawake.Location = new Point(dlBtnX, y + rowHeight);
+            checkDLawake.Location = new Point(dlCheckX, y + rowHeight + 2);
 
-			// put the grid on all the tabs
-			foreach (var tab in tabNames)
+            genTabRuneGrid(ref x, ref y, ref colWidth, ref rowHeight);
+        }
+
+        private void genTabRuneGrid(ref int x, ref int y, ref int colWidth, ref int rowHeight)
+        {
+            Label label;
+            Control textBox;
+            // put the grid on all the tabs
+            foreach (var tab in tabNames)
             {
                 TabPage page = tabControl1.TabPages["tab" + tab];
                 page.Tag = tab;
@@ -271,7 +222,7 @@ namespace RuneApp
                 ComboBox filterJoin = new ComboBox();
                 filterJoin.DropDownStyle = ComboBoxStyle.DropDownList;
                 filterJoin.FormattingEnabled = true;
-                filterJoin.Items.AddRange(new object[] {"Or", "And", "Sum"});
+                filterJoin.Items.AddRange(new object[] { "Or", "And", "Sum" });
                 filterJoin.Location = new Point(298, 6);
                 filterJoin.Name = tab + "join";
                 filterJoin.Size = new Size(72, 21);
@@ -281,11 +232,11 @@ namespace RuneApp
                 filterJoin.Tag = tab;
                 page.Controls.Add(filterJoin);
 
-                bool first = true;
 
                 rowHeight = 25;
                 colWidth = 42;
 
+                bool first = true;
                 int predX = 0;
                 y = 45;
                 foreach (var stat in Build.statNames)
@@ -305,7 +256,7 @@ namespace RuneApp
                                 if (type == "perc")
                                     label.Text = "Percent";
                             }
-                            
+
                             if (type == "perc" && stat == "SPD")
                             {
                                 x += colWidth;
@@ -319,7 +270,7 @@ namespace RuneApp
 
                             if (pref == "")
                             {
-                                textBox = page.Controls.MakeControl<TextBox>(tab + pref + stat, type, x, y-2);
+                                textBox = page.Controls.MakeControl<TextBox>(tab + pref + stat, type, x, y - 2);
                                 textBox.TextChanged += global_TextChanged;
                             }
                             else
@@ -334,7 +285,7 @@ namespace RuneApp
                     page.Controls.MakeControl<Label>(tab + stat, "gt", x, y, 30, 20, ">=");
                     x += colWidth;
 
-                    textBox = page.Controls.MakeControl<TextBox>(tab + stat, "test", x, y-2);
+                    textBox = page.Controls.MakeControl<TextBox>(tab + stat, "test", x, y - 2);
                     textBox.TextChanged += global_TextChanged;
                     x += colWidth;
 
@@ -381,7 +332,7 @@ namespace RuneApp
                 x += 17;
 
                 label = page.Controls.MakeControl<Label>(tab, "bonusLabel", x, y, 67, 20, "Predict Subs");
-                label.Click += (s,e) => { check.Checked = !check.Checked; };
+                label.Click += (s, e) => { check.Checked = !check.Checked; };
                 x += colWidth;
 
                 x += colWidth - 17;
@@ -391,35 +342,95 @@ namespace RuneApp
             }
 
         }
-        
+
+        private void addAttrsToEvens()
+        {
+            // there are lists on the rune filter tabs 2,4, and 6
+            foreach (var lv in new ListView[] { priStat2, priStat4, priStat6 })
+            {
+                // mess 'em up
+                ListViewItem li;
+
+                addRuneMainToList(lv, "HP", "flat");
+                li = addRuneMainToList(lv, "HP", "perc");
+                li.Text = "HP%";
+                addRuneMainToList(lv, "ATK", "flat");
+                li = addRuneMainToList(lv, "ATK", "perc");
+                li.Text = "ATK%";
+                addRuneMainToList(lv, "DEF", "flat");
+                li = addRuneMainToList(lv, "DEF", "perc");
+                li.Text = "DEF%";
+
+                if (lv == priStat2)
+                    addRuneMainToList(lv, "SPD", "flat");
+                if (lv == priStat4)
+                {
+                    addRuneMainToList(lv, "CR", "perc");
+                    addRuneMainToList(lv, "CD", "perc");
+                }
+                if (lv == priStat6)
+                {
+                    addRuneMainToList(lv, "RES", "perc");
+                    addRuneMainToList(lv, "ACC", "perc");
+                }
+            }
+        }
+
+        private static ListViewItem addRuneMainToList(ListView lv, string stat, string suff)
+        {
+            ListViewItem li = new ListViewItem(stat);
+            // put the right type on it
+            li.Name = stat + suff;
+            li.Text = stat;
+            li.Tag = stat + suff;
+            li.Group = lv.Groups[1];
+
+            lv.Items.Add(li);
+            return li;
+        }
+
         private TabPage GetTab(string tabName)
         {
             // figure out which tab it's on
             int tabId;
             if (!int.TryParse(tabName, out tabId))
             {
-                if (tabName == "g" || tabName == "Global")
-                    tabId = 0;
-                else if (tabName == "e" || tabName == "Even")
-                    tabId = -2;
-                else if (tabName == "o" || tabName == "Odd")
-                    tabId = -1;
-                else if (tabName == "One")
-                    tabId = 1;
-                else if (tabName == "Two")
-                    tabId = 2;
-                else if (tabName == "Three")
-                    tabId = 3;
-                else if (tabName == "Four")
-                    tabId = 4;
-                else if (tabName == "Five")
-                    tabId = 5;
-                else if (tabName == "Six")
-                    tabId = 6;
-                else
-                    throw new Exception();
+                switch (tabName)
+                {
+                    case "g":
+                    case "Global":
+                        tabId = 0;
+                        break;
+                    case "e":
+                    case "Even":
+                        tabId = -2;
+                        break;
+                    case "o":
+                    case "Odd":
+                        tabId = -1;
+                        break;
+                    case "One":
+                        tabId = 1;
+                        break;
+                    case "Two":
+                        tabId = 2;
+                        break;
+                    case "Three":
+                        tabId = 3;
+                        break;
+                    case "Four":
+                        tabId = 4;
+                        break;
+                    case "Five":
+                        tabId = 5;
+                        break;
+                    case "Six":
+                        tabId = 6;
+                        break;
+                    default:
+                        throw new ArgumentException($"{tabName} is invalid as a tabName");
+                }
             }
-            //= tabName == "g" ? 0 : tabName == "e" ? -2 : tabName == "o" ? -1 : int.Parse(tabName);
 
             TabPage tab = null;
             if (tabId <= 0)
@@ -444,15 +455,6 @@ namespace RuneApp
 
             foreach (var stat in Build.statNames)
             {
-                foreach (var type in new string[] { "flat", "perc" })
-                {
-                    if (type == "perc" && stat == "SPD")
-                        continue;
-                    if (type == "flat" && (stat == "ACC" || stat == "RES" || stat == "CD" || stat == "CR"))
-                        continue;
-                    ctrl = tab.Controls.Find(tabName + stat + type, false).FirstOrDefault();
-                    //ctrl.Enabled = (box.SelectedIndex == 2);
-                }
                 ctrl = tab.Controls.Find(tabName + stat + "test", false).FirstOrDefault();
                 if (ctrl != null) ctrl.Enabled = (box.SelectedIndex != 2);
                 ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
@@ -531,6 +533,10 @@ namespace RuneApp
 					li.Text = s.ToString() + " x" + num;
 				
             }
+
+            build.BuildSets.CollectionChanged += BuildSets_CollectionChanged;
+
+            build.RequiredSets.CollectionChanged += RequiredSets_CollectionChanged;
 
             // for 2,4,6 - make sure that the Attrs are set up
             var lists = new ListView[]{ priStat2, priStat4, priStat6};
@@ -648,7 +654,69 @@ namespace RuneApp
             CalcPerms();
         }
 
-		private void refreshStats(Monster mon, Stats cur)
+        private void RequiredSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (var set in e.NewItems.Cast<RuneSet>())
+                    {
+                        var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+                        lvi.Group = rsReq;
+                        var num = (sender as IEnumerable<RuneSet>).Count(s => s == set);
+                        lvi.Text = set.ToString();
+                        if (num > 1)
+                            lvi.Text = $"{set.ToString()} x{num}";
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var set in e.OldItems.Cast<RuneSet>())
+                    {
+                        var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+                        lvi.Group = rsExc;
+                        var num = (sender as IEnumerable<RuneSet>).Count(s => s == set);
+                        lvi.Text = set.ToString();
+                        if (num > 0)
+                            lvi.Group = rsReq;
+                        if (num > 1)
+                            lvi.Text = $"{set.ToString()} x{num}";
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void BuildSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (var set in e.NewItems.Cast<RuneSet>())
+                    {
+                        var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+                        lvi.Group = rsInc;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var set in e.OldItems.Cast<RuneSet>())
+                    {
+                        var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+                        lvi.Group = rsExc;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void refreshStats(Monster mon, Stats cur)
 		{
             statName.Text = mon.Name;
 			statID.Text = mon.ID.ToString();
@@ -676,11 +744,11 @@ namespace RuneApp
 
 				if (build.Minimum[stat] > 0)
 					ctrlTotal.Text = build.Minimum[stat].ToString();
-				if (build.Sort[stat] != 0)
+				if (!build.Sort[stat].EqualTo(0))
 					ctrlWorth.Text = build.Sort[stat].ToString();
-				if (build.Maximum[stat] != 0)
+				if (!build.Maximum[stat].EqualTo(0))
 					ctrlMax.Text = build.Maximum[stat].ToString();
-				if (build.Threshold[stat] != 0)
+				if (!build.Threshold[stat].EqualTo(0))
 					ctrlThresh.Text = build.Threshold[stat].ToString();
 
 			}
@@ -706,14 +774,13 @@ namespace RuneApp
 
 				if (build.Minimum.ExtraGet(extra) > 0)
 					ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
-				if (build.Sort.ExtraGet(extra) != 0)
+				if (!build.Sort.ExtraGet(extra).EqualTo(0))
 					ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
-				if (build.Maximum.ExtraGet(extra) != 0)
+				if (!build.Maximum.ExtraGet(extra).EqualTo(0))
 					ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
-				if (build.Threshold.ExtraGet(extra) != 0)
+				if (!build.Threshold.ExtraGet(extra).EqualTo(0))
 					ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
 			}
-
 		}
 
 		// switch the cool icon on the button (and the bool in the build)
@@ -835,7 +902,8 @@ namespace RuneApp
             foreach (ListViewItem item in items)
             {
                 var set = (RuneSet)item.Tag;
-                if (build.BuildSets.Contains(set))
+                build.toggleIncludedSet(set);
+                /*if (build.BuildSets.Contains(set))
                 {
                     build.BuildSets.Remove(set);
                     item.Group = rsExc;
@@ -844,7 +912,7 @@ namespace RuneApp
                 {
                     build.BuildSets.Add(set);
                     item.Group = rsInc;
-                }
+                }*/
             }
 
             var ind = items[0].Index;
@@ -890,19 +958,23 @@ namespace RuneApp
             foreach (ListViewItem item in items)
             {
                 var set = (RuneSet)item.Tag;
+
+                if (build.removeRequiredSet(set) > 0)
+                {
+                    build.addIncludedSet(set);
+                }
+                else
+                {
+                    build.addRequiredSet(set);
+                }
+
                 if (build.RequiredSets.Contains(set))
                 {
-                    build.RequiredSets.RemoveAll(s => s == set);
-                    if (!build.BuildSets.Contains(set))
-                        build.BuildSets.Add(set);
                     item.Group = rsInc;
 					item.Text = set.ToString();
                 }
                 else
                 {
-                    build.RequiredSets.Add(set);
-                    if (!build.BuildSets.Contains(set))
-                        build.BuildSets.Add(set);
                     item.Group = rsReq;
                 }
             }
@@ -949,8 +1021,10 @@ namespace RuneApp
             // redraw that
             tc.Refresh();
 
+            build.RunesUseEquipped = Program.useEquipped;
+            build.RunesUseLocked = false;
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Program.data, false, Program.useEquipped);
+            build.GenRunes(Program.data);
 
             using (RuneSelect rs = new RuneSelect())
             {
@@ -1340,7 +1414,9 @@ namespace RuneApp
 
         void button1_Click(object sender, EventArgs e)
         {
-            build.GenRunes(Program.data, false, true);
+            build.RunesUseLocked = false;
+            build.RunesUseEquipped = true;
+            build.GenRunes(Program.data);
             using (var ff = new RuneSelect())
             {
                 ff.returnedRune = runeTest;
@@ -1524,66 +1600,71 @@ namespace RuneApp
                 // sort live on change
                 // copy weights back to here
 
-#if true
-                var ff = new Generate(build);
-                var res = ff.ShowDialog();
-                if (res == DialogResult.OK)
+                build.loads.Clear();
+                if (!Program.config.AppSettings.Settings.AllKeys.Contains("generateLive"))
                 {
-                    loading = true;
-                    foreach (var stat in Build.statNames)
+                    var ff = new Generate(build);
+                    var backupSort = new Stats(build.Sort);
+                    var res = ff.ShowDialog();
+                    if (res == DialogResult.OK)
                     {
-                        var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                        if (ctrlWorth == null)
-                            continue;
+                        loading = true;
+                        foreach (var stat in Build.statNames)
+                        {
+                            var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+                            if (ctrlWorth == null)
+                                continue;
 
-                        ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
+                            ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
+                        }
+                        foreach (var extra in Build.extraNames)
+                        {
+                            var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+                            if (ctrlWorth == null)
+                                continue;
+
+                            ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
+                        }
+                        loading = false;
                     }
-					foreach (var extra in Build.extraNames)
+                    else
                     {
-						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-                        if (ctrlWorth == null)
-                            continue;
+                        foreach (var stat in Build.statNames)
+                        {
+                            var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+                            if (ctrlWorth == null)
+                                continue;
 
-                        ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
+                            int val;
+                            int.TryParse(ctrlWorth.Text, out val);
+                            build.Sort[stat] = val;
+                        }
+
+                        foreach (var extra in Build.extraNames)
+                        {
+                            var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+                            if (ctrlWorth == null)
+                                continue;
+
+                            int val;
+                            int.TryParse(ctrlWorth.Text, out val);
+                            build.Sort.ExtraSet(extra, val);
+                        }
+
                     }
-					loading = false;
+                    UpdateGlobal();
                 }
                 else
                 {
-                    foreach (var stat in Build.statNames)
+                    if (testWindow == null || testWindow.IsDisposed)
                     {
-                        var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                        if (ctrlWorth == null)
-                            continue;
-
-                        int val;
-                        int.TryParse(ctrlWorth.Text, out val);
-                        build.Sort[stat] = val;
+                        testWindow = new GenerateLive(build);
+                        testWindow.Owner = this;
                     }
-
-					foreach (var extra in Build.extraNames)
-                    {
-						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-                        if (ctrlWorth == null)
-                            continue;
-
-                        int val;
-						int.TryParse(ctrlWorth.Text, out val);
-						build.Sort.ExtraSet(extra, val);
-                    }
-
+                    if (!testWindow.Visible)
+                        testWindow.Show();
+                    testWindow.Location = new Point(Location.X + Width, Location.Y);
                 }
-                UpdateGlobal();
-#else
-                if (testWindow == null || testWindow.IsDisposed)
-                {
-                    testWindow = new GenerateLive(build);
-                    testWindow.Owner = this;
-                }
-                if (!testWindow.Visible)
-                    testWindow.Show();
-                testWindow.Location = new Point(Location.X + Width, Location.Y);
-#endif
             }
         }
 
@@ -1620,7 +1701,9 @@ namespace RuneApp
         long CalcPerms()
         {
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Program.data, false, Program.useEquipped);
+            build.RunesUseLocked = false;
+            build.RunesUseEquipped = Program.useEquipped;
+            build.GenRunes(Program.data);
 
             // figure stuff out
             long perms = 0;
@@ -1780,28 +1863,12 @@ namespace RuneApp
 			{
 				var li = setList.SelectedItems[0];
 				RuneSet set = (RuneSet)li.Tag;
-				// whatever, just add it to required if not
-				if (li.Group != rsReq)
-				{
-					li.Group = rsReq;
-					build.RequiredSets.Add(set);
-					if (!build.BuildSets.Contains(set))
-						build.BuildSets.Add(set);
-				}
-				else
-				{
-					build.RequiredSets.Add(set);
-					int num = build.RequiredSets.Count(s => s == set);
-					if (num > 3)
-					{
-						build.RequiredSets.RemoveAll(s => s == set);
-						build.RequiredSets.Add(set);
-					}
-					if (num > 1)
-						li.Text = set.ToString() + " x" + num;
-					if (num > 3 || num <= 1)
-						li.Text = set.ToString();
-				}
+                // whatever, just add it to required if not
+                int num = build.addRequiredSet(set);
+				/*if (num > 1)
+					li.Text = set.ToString() + " x" + num;
+				if (num > 3 || num <= 1)
+					li.Text = set.ToString();*/
 			}
 		}
 
@@ -1828,13 +1895,15 @@ namespace RuneApp
         void check_autoBuild_CheckedChanged(object sender, EventArgs e)
         {
             MessageBox.Show("NYI");
-           // sampletext
+           // automatically adjust the minimum and runefilters during the build?
         }
 
         private void Create_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (testWindow != null && !testWindow.IsDisposed)
                 testWindow.Close();
+            build.RequiredSets.CollectionChanged -= RequiredSets_CollectionChanged;
+            build.BuildSets.CollectionChanged -= BuildSets_CollectionChanged;
         }
     }
 }

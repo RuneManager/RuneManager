@@ -91,103 +91,51 @@ namespace RuneApp
 
 			toolStripStatusLabel1.Text = "Generating...";
 			building = true;
-            toolStripProgressBar1.Maximum = buildsShow * 2;
-            
+            toolStripProgressBar1.Maximum = buildsShow;
+
+            build.loads.CollectionChanged += Loads_CollectionChanged;
+
+            foreach (var b in build.loads)
+            {
+                loadoutList.Items.Add(renderLoadoutTest(b));
+            }
+
             Task.Factory.StartNew(() =>
             {
                 // Allow the window to draw before destroying the CPU
                 Thread.Sleep(100);
 
-                
                 // Disregard locked, but honor equippedness checking
-                build.GenRunes(Program.data, noLocked, Program.useEquipped);
+                build.RunesUseLocked = noLocked;
+                build.RunesUseEquipped = Program.useEquipped;
+                build.GenRunes(Program.data);
+                build.shrines = Program.data.shrines;
 
-				int timeout = 20;
+                int timeout = 20;
 				if (Main.config.AppSettings.Settings.AllKeys.Contains("testTime"))
 				{
 					int.TryParse(Main.config.AppSettings.Settings["testTime"].Value, out timeout);
 				}
 
+                build.BuildPrintTo += Build_BuildPrintTo;
+                build.BuildProgTo += Build_BuildProgTo;
+                build.BuildTimeout = timeout;
+                build.BuildGenerate = buildsGen;
+                // pick the top 100
+                // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
+                build.BuildTake = buildsShow;
+                build.BuildDumpBads = false;
+
 				// generate 5000 builds
-				build.GenBuilds(buildsGen, timeout, (b, s) => { }, (d,i) =>
-				{
-                    if (!IsDisposed && IsHandleCreated)
-                    {
-                        Invoke((MethodInvoker)delegate
-                        {
-                            toolStripProgressBar1.Value = (int)(d * buildsShow);
-                            toolStripStatusLabel1.Text = "Generated " + i + " so far...";
-                        });
-                    }
-                    else
-                    {
-                        build.isRun = false;
-                    }
-				});
-				if (build.loads == null)
+				build.GenBuilds();
+
+                build.BuildPrintTo -= Build_BuildPrintTo;
+                build.BuildProgTo -= Build_BuildProgTo;
+
+                if (build.loads == null)
 				{
 					toolStripStatusLabel1.Text = "Error: no builds";
 					return;
-				}
-
-                int num = 0;
-                var takenLoads = build.loads.Take(buildsShow).ToList();
-                int tbuilds = takenLoads.Count;
-                // pick the top 100
-                // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
-                foreach (var b in takenLoads)
-				{
-					ListViewItem li = new ListViewItem();
-					var Cur = b.GetStats();
-
-                    
-                    int underSpec = 0;
-                    int under12 = 0;
-                    foreach (var r in b.Current.Runes)
-                    {
-                        if (r.Level < 12)
-                            under12 += 12 - r.Level;
-                        if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
-                            underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
-                    }
-
-                    li.SubItems.Add(underSpec + "/" + under12);
-                    double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-                    b.score = pts;
-
-                    // put the sum points into the first item
-                    li.SubItems[0].Text = pts.ToString("0.##");
-
-                    li.Tag = b;
-                    if (grayLocked && b.Current.Runes.Any(r => r.Locked))
-                        li.ForeColor = Color.Gray;
-                    else
-                    {
-                        if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-                            b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-                        {
-                            li.ForeColor = Color.Green;
-                        }
-                        else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
-                        {
-                            li.ForeColor = Color.Goldenrod;
-                        }
-                        else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-                        {
-                            li.ForeColor = Color.DarkBlue;
-                        }
-                    }
-
-                    if (!IsDisposed && IsHandleCreated)
-                    {
-                        Invoke((MethodInvoker)delegate
-                        {
-                            // put the thing in on the main thread and bump the progress bar
-                            loadoutList.Items.Add(li);
-                            num++;
-                            toolStripProgressBar1.Value = buildsShow + (int)(buildsShow * num / (double)tbuilds);
-                        });
-                    }
 				}
 
                 if (!IsDisposed && IsHandleCreated)
@@ -199,6 +147,108 @@ namespace RuneApp
                     });
                 }
 			});
+        }
+
+        private void Build_BuildProgTo(object sender, ProgToEventArgs e)
+        {
+            if (!IsDisposed && IsHandleCreated)
+            {
+                Invoke((MethodInvoker)delegate
+                {
+                    toolStripProgressBar1.Value = (int)(e.Percent * buildsShow);
+                    toolStripStatusLabel1.Text = "Generated " + e.Progress + " so far...";
+                });
+            }
+            else
+            {
+                build.isRun = false;
+            }
+        }
+
+        private void Build_BuildPrintTo(object sender, PrintToEventArgs e)
+        {
+            
+        }
+
+        private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (var b in e.NewItems.Cast<Monster>())
+                    {
+                        if (!IsDisposed && IsHandleCreated)
+                        {
+                            // put the thing in on the main thread and bump the progress bar
+                            Invoke((MethodInvoker)delegate {
+                                var ll = renderLoadoutTest(b);
+                                loadoutList.Items.Add(ll);
+                            });
+                        }
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var b in e.OldItems.Cast<Monster>())
+                    {
+                        Invoke((MethodInvoker)delegate
+                        {
+                            var lvi = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(l => l.Tag == b);
+                            lvi.Remove();
+                        });
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                        Invoke((MethodInvoker)delegate { loadoutList.Items.Clear(); });
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private ListViewItem renderLoadoutTest(Monster b)
+        {
+            ListViewItem li = new ListViewItem();
+            var Cur = b.GetStats();
+
+            int underSpec = 0;
+            int under12 = 0;
+            foreach (var r in b.Current.Runes)
+            {
+                if (r.Level < 12)
+                    under12 += 12 - r.Level;
+                if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
+                    underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
+            }
+
+            li.SubItems.Add(underSpec + "/" + under12);
+            double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
+            b.score = pts;
+
+            // put the sum points into the first item
+            li.SubItems[0].Text = pts.ToString("0.##");
+
+            li.Tag = b;
+            if (grayLocked && b.Current.Runes.Any(r => r.Locked))
+                li.ForeColor = Color.Gray;
+            else
+            {
+                if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+                    b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+                {
+                    li.ForeColor = Color.Green;
+                }
+                else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+                {
+                    li.ForeColor = Color.Goldenrod;
+                }
+                else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+                {
+                    li.ForeColor = Color.DarkBlue;
+                }
+            }
+            return li;
         }
 
         void textBox_TextChanged(object sender, EventArgs e)
@@ -243,7 +293,7 @@ namespace RuneApp
             {
                 if (!stat.HasFlag(Attr.ExtraStat))
                 {
-                    string str = Cur[stat].ToString();
+                    string str = Cur[stat].ToString(System.Globalization.CultureInfo.CurrentUICulture);
                     if (build.Sort[stat] != 0)
                     {
                         p = Cur[stat] / build.Sort[stat];
@@ -257,7 +307,7 @@ namespace RuneApp
                 }
                 else
                 {
-                    string str = Cur.ExtraValue(stat).ToString();
+                    string str = Cur.ExtraValue(stat).ToString(System.Globalization.CultureInfo.CurrentUICulture);
                     if (build.Sort.ExtraGet(stat) != 0)
                     {
                         p = Cur.ExtraValue(stat) / build.Sort.ExtraGet(stat);
@@ -360,14 +410,14 @@ namespace RuneApp
                             build.Sort[stat] = (int)(amount * (mY.GetStats()[stat] / totalstats));
                             TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
                             if (tb != null)
-                                tb.Text = build.Sort[stat].ToString();
+                                tb.Text = build.Sort[stat].ToString(System.Globalization.CultureInfo.CurrentUICulture);
                         }
                         else
                         {
                             build.Sort.ExtraSet(stat, (int)(amount * (mY.GetStats().ExtraValue(stat) / totalstats)));
                             TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
                             if (tb != null)
-                                tb.Text = build.Sort.ExtraGet(stat).ToString();
+                                tb.Text = build.Sort.ExtraGet(stat).ToString(System.Globalization.CultureInfo.CurrentUICulture);
                         }
                     }
                 }
@@ -458,24 +508,23 @@ namespace RuneApp
         
         private void ShowSets(Loadout load)
         {
-            if (load.Sets != null)
-            {
-                if (load.Sets.Length > 0)
-                    Set1Label.Text = load.Sets[0] == RuneSet.Null ? "" : load.Sets[0].ToString();
-                if (load.Sets.Length > 1)
-                    Set2Label.Text = load.Sets[1] == RuneSet.Null ? "" : load.Sets[1].ToString();
-                if (load.Sets.Length > 2)
-                    Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
+            if (load.Sets == null)
+                return;
+            if (load.Sets.Length > 0)
+                Set1Label.Text = load.Sets[0] == RuneSet.Null ? "" : load.Sets[0].ToString();
+            if (load.Sets.Length > 1)
+                Set2Label.Text = load.Sets[1] == RuneSet.Null ? "" : load.Sets[1].ToString();
+            if (load.Sets.Length > 2)
+                Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
 
-                if (load.SetsFull) return;
+            if (load.SetsFull) return;
 
-                if (load.Sets[0] == RuneSet.Null)
-                    Set1Label.Text = "Broken";
-                else if (load.Sets[1] == RuneSet.Null)
-                    Set2Label.Text = "Broken";
-                else if (load.Sets[2] == RuneSet.Null)
-                    Set3Label.Text = "Broken";
-            }
+            if (load.Sets[0] == RuneSet.Null)
+                Set1Label.Text = "Broken";
+            else if (load.Sets[1] == RuneSet.Null)
+                Set2Label.Text = "Broken";
+            else if (load.Sets[2] == RuneSet.Null)
+                Set3Label.Text = "Broken";
         }
         
         private void ShowRunes(Rune[] rune)
@@ -506,22 +555,18 @@ namespace RuneApp
             {
                 var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
                 List<Rune> lrunes = new List<Rune>();
-                foreach (var g in mons)
+                foreach (var r in mons.SelectMany(m => m.Current.Runes))
                 {
-                    foreach (var r in g.Current.Runes)
-                    {
-                        r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
-                    }
+                    r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
                 }
+
                 foreach (var g in mons)
                 {
                     foreach (var r in g.Current.Runes)
                     {
                         r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
-
-                        if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
-                            lrunes.Add(r);
                     }
+                    lrunes.AddRange(g.Current.Runes.Where(r => !lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r))));
                 }
 
                 using (var qq = new RuneSelect())
@@ -532,6 +577,11 @@ namespace RuneApp
                     qq.ShowDialog();
                 }
             }
+        }
+
+        private void Generate_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            build.loads.CollectionChanged -= Loads_CollectionChanged;
         }
     }
 }

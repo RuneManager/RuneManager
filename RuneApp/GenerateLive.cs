@@ -65,7 +65,7 @@ namespace RuneApp
 
             public override bool Equals(object obj)
             {
-                RuneKey rk = null;
+                RuneKey rk;
                 if ((rk = obj as RuneKey) != null)
                     return !(rk.rs[0].ID != rs[0].ID ||
                             rk.rs[1].ID != rs[1].ID ||
@@ -74,7 +74,7 @@ namespace RuneApp
                             rk.rs[4].ID != rs[4].ID ||
                             rk.rs[5].ID != rs[5].ID);
 
-                return base.Equals(obj);
+                return (GetHashCode() == obj.GetHashCode());
             }
 
             public override int GetHashCode()
@@ -537,7 +537,9 @@ namespace RuneApp
                 {
                     // stop cancelling
                     monSetsCancelled = false;
-                    build.GenRunes(Program.data, noLocked, Program.useEquipped);
+                    build.RunesUseLocked = noLocked;
+                    build.RunesUseEquipped = Program.useEquipped;
+                    build.GenRunes(Program.data);
 
                     long num = 0;
                     long total = getTotal();
