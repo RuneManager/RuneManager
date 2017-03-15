@@ -53,13 +53,9 @@ namespace RuneOptim
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }
@@ -94,13 +90,9 @@ namespace RuneOptim
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }

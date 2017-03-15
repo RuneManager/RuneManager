@@ -79,7 +79,7 @@ namespace RuneApp
 
         private static void Program_BuildsProgressTo(object sender, PrintToEventArgs e)
         {
-            log.Info(e.Message);
+            log.Info("@" + e.Message);
         }
 
         public static void ReadConfig()
@@ -192,7 +192,7 @@ namespace RuneApp
         {
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
 
-            if (files.Count() > 0)
+            if (files.Any())
             {
                 var firstFile = files.First();
                 return LoadSave(firstFile, "swarfarm");
@@ -512,6 +512,58 @@ namespace RuneApp
             loads.Clear();
         }
 
+        public static void RunTest(Build build, Action<Build> onFinish = null)
+        {
+            if (build.IsRunning)
+                throw new InvalidOperationException("This build is already running");
+
+            Task.Factory.StartNew(() =>
+            {
+                // Allow the window to draw before destroying the CPU
+                Thread.Sleep(100);
+
+                int buildsGen = 5000;
+                int buildsShow = 100;
+                bool noLocked = false;
+
+                if (Program.config.AppSettings.Settings.AllKeys.Contains("locktest"))
+                    bool.TryParse(Program.config.AppSettings.Settings["locktest"].Value, out noLocked);
+                if (Program.config.AppSettings.Settings.AllKeys.Contains("testGen"))
+                    int.TryParse(Program.config.AppSettings.Settings["testGen"].Value, out buildsGen);
+                if (Program.config.AppSettings.Settings.AllKeys.Contains("testShow"))
+                    int.TryParse(Program.config.AppSettings.Settings["testShow"].Value, out buildsShow);
+
+                build.RunesUseLocked = noLocked;
+                build.BuildGenerate = buildsGen;
+                build.BuildTake = buildsShow;
+                
+                // Disregard locked, but honor equippedness checking
+                build.RunesUseLocked = noLocked;
+                build.BuildGenerate = buildsGen;
+                build.BuildTake = buildsShow;
+                build.RunesUseEquipped = Program.useEquipped;
+                build.GenRunes(Program.data);
+                build.shrines = Program.data.shrines;
+
+                int timeout = 20;
+                if (Program.config.AppSettings.Settings.AllKeys.Contains("testTime"))
+                {
+                    int.TryParse(Program.config.AppSettings.Settings["testTime"].Value, out timeout);
+                }
+
+                build.BuildTimeout = timeout;
+                // pick the top 100
+                // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
+                build.BuildDumpBads = false;
+
+                // generate 5000 builds
+                build.GenBuilds();
+
+                onFinish?.Invoke(build);
+                
+            });
+        }
+
         public static void RunBuild(Build b, bool saveStats = false)
         {
             try
@@ -522,7 +574,9 @@ namespace RuneApp
                     return;
                 }
                 if (currentBuild != null)
-                    throw new Exception("Already running a build");
+                    throw new InvalidOperationException("Already running a build");
+                if (b.IsRunning)
+                    throw new InvalidOperationException("This build is already running");
                 currentBuild = b;
                 /*
                 if (plsDie)
@@ -694,7 +748,7 @@ namespace RuneApp
 
                 log.Info("Cleaning up");
                 currentBuild = null;
-                b.isRun = false;
+                //b.isRun = false;
                 //currentBuild = null;
                 log.Info("Cleaned");
             }
@@ -718,8 +772,8 @@ namespace RuneApp
                 if (runTask != null && runTask.Status == TaskStatus.Running)
                 {
                     runSource.Cancel();
-                    if (currentBuild != null)
-                        currentBuild.isRun = false;
+                    //if (currentBuild != null)
+                     //   currentBuild.isRun = false;
                     //plsDie = true;
                     isRunning = false;
                     return;

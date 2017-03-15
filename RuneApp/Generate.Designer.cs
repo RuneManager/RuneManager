@@ -61,6 +61,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.btn_runtest = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.runeBuild.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -99,6 +100,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.btn_runtest);
             this.groupBox1.Controls.Add(this.btn_powerrunes);
             this.groupBox1.Controls.Add(this.runeBuild);
             this.groupBox1.Controls.Add(this.runeControl6);
@@ -123,7 +125,7 @@
             // 
             // btn_powerrunes
             // 
-            this.btn_powerrunes.Location = new System.Drawing.Point(179, 48);
+            this.btn_powerrunes.Location = new System.Drawing.Point(179, 77);
             this.btn_powerrunes.Name = "btn_powerrunes";
             this.btn_powerrunes.Size = new System.Drawing.Size(75, 23);
             this.btn_powerrunes.TabIndex = 101;
@@ -488,6 +490,16 @@
             this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
             this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
             // 
+            // btn_runtest
+            // 
+            this.btn_runtest.Location = new System.Drawing.Point(179, 48);
+            this.btn_runtest.Name = "btn_runtest";
+            this.btn_runtest.Size = new System.Drawing.Size(75, 23);
+            this.btn_runtest.TabIndex = 102;
+            this.btn_runtest.Text = "Run";
+            this.btn_runtest.UseVisualStyleBackColor = true;
+            this.btn_runtest.Click += new System.EventHandler(this.btn_runtest_Click);
+            // 
             // Generate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -548,5 +560,6 @@
         private System.Windows.Forms.Label SRuneMain;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Button btn_powerrunes;
+        private System.Windows.Forms.Button btn_runtest;
     }
 }

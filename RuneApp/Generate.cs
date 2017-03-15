@@ -9,17 +9,14 @@ using System.Threading;
 
 namespace RuneApp
 {
+
     // Generates a bunch of builds to preview the stats
     public partial class Generate : Form
     {
-		//private static string[] statNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
-        //private static string[] extraNames = { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
-
-        public static int buildsGen = 5000;
-        public static int buildsShow = 100;
-
         // the build to use
-		public Build build;
+        public Build build;
+
+        int buildsShow = 100;
 
         private RuneControl lastclicked;
 
@@ -27,20 +24,13 @@ namespace RuneApp
 		bool building;
 
         bool grayLocked;
-        bool noLocked;
 		
 		public Generate(Build bb)
         {
             InitializeComponent();
-            if (Main.config.AppSettings.Settings.AllKeys.Contains("locktest"))
-                bool.TryParse(Main.config.AppSettings.Settings["locktest"].Value, out noLocked);
             if (Main.config.AppSettings.Settings.AllKeys.Contains("testgray"))
                 bool.TryParse(Main.config.AppSettings.Settings["testgray"].Value, out grayLocked);
-            if (Main.config.AppSettings.Settings.AllKeys.Contains("testGen"))
-                int.TryParse(Main.config.AppSettings.Settings["testGen"].Value, out buildsGen);
-            if (Main.config.AppSettings.Settings.AllKeys.Contains("testShow"))
-                int.TryParse(Main.config.AppSettings.Settings["testShow"].Value, out buildsShow);
-
+            
             // master has given Gener a Build?
             build = bb;
 			Label label;
@@ -89,7 +79,10 @@ namespace RuneApp
                 loadoutList.Columns.Add(extra).Width = 80;
             }
 
-			toolStripStatusLabel1.Text = "Generating...";
+            if (Main.config.AppSettings.Settings.AllKeys.Contains("testShow"))
+                int.TryParse(Main.config.AppSettings.Settings["testShow"].Value, out buildsShow);
+
+            toolStripStatusLabel1.Text = "Press 'Run' to begin.";
 			building = true;
             toolStripProgressBar1.Maximum = buildsShow;
 
@@ -100,53 +93,9 @@ namespace RuneApp
                 loadoutList.Items.Add(renderLoadoutTest(b));
             }
 
-            Task.Factory.StartNew(() =>
-            {
-                // Allow the window to draw before destroying the CPU
-                Thread.Sleep(100);
-
-                // Disregard locked, but honor equippedness checking
-                build.RunesUseLocked = noLocked;
-                build.RunesUseEquipped = Program.useEquipped;
-                build.GenRunes(Program.data);
-                build.shrines = Program.data.shrines;
-
-                int timeout = 20;
-				if (Main.config.AppSettings.Settings.AllKeys.Contains("testTime"))
-				{
-					int.TryParse(Main.config.AppSettings.Settings["testTime"].Value, out timeout);
-				}
-
-                build.BuildPrintTo += Build_BuildPrintTo;
-                build.BuildProgTo += Build_BuildProgTo;
-                build.BuildTimeout = timeout;
-                build.BuildGenerate = buildsGen;
-                // pick the top 100
-                // Believe it or not, putting 100 into the list takes a *lot* longer than making 5000
-                build.BuildTake = buildsShow;
-                build.BuildDumpBads = false;
-
-				// generate 5000 builds
-				build.GenBuilds();
-
-                build.BuildPrintTo -= Build_BuildPrintTo;
-                build.BuildProgTo -= Build_BuildProgTo;
-
-                if (build.loads == null)
-				{
-					toolStripStatusLabel1.Text = "Error: no builds";
-					return;
-				}
-
-                if (!IsDisposed && IsHandleCreated)
-                {
-                    Invoke((MethodInvoker)delegate
-                    {
-                        toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
-                        building = false;
-                    });
-                }
-			});
+            // Disregard locked, but honor equippedness checking
+            build.BuildPrintTo += Build_BuildPrintTo;
+            build.BuildProgTo += Build_BuildProgTo;
         }
 
         private void Build_BuildProgTo(object sender, ProgToEventArgs e)
@@ -161,7 +110,7 @@ namespace RuneApp
             }
             else
             {
-                build.isRun = false;
+                //build.isRun = false;
             }
         }
 
@@ -553,25 +502,9 @@ namespace RuneApp
         {
             if (!building)
             {
-                var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
-                List<Rune> lrunes = new List<Rune>();
-                foreach (var r in mons.SelectMany(m => m.Current.Runes))
-                {
-                    r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
-                }
-
-                foreach (var g in mons)
-                {
-                    foreach (var r in g.Current.Runes)
-                    {
-                        r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
-                    }
-                    lrunes.AddRange(g.Current.Runes.Where(r => !lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r))));
-                }
-
                 using (var qq = new RuneSelect())
                 {
-                    qq.runes = lrunes;
+                    qq.runes = build.GetPowerupRunes();
                     qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
                     qq.runeStatKey = "besttestscore";
                     qq.ShowDialog();
@@ -581,7 +514,31 @@ namespace RuneApp
 
         private void Generate_FormClosing(object sender, FormClosingEventArgs e)
         {
-            build.loads.CollectionChanged -= Loads_CollectionChanged;
+            //build.loads.CollectionChanged -= Loads_CollectionChanged;
+            build.BuildPrintTo -= Build_BuildPrintTo;
+            build.BuildProgTo -= Build_BuildProgTo;
+        }
+
+        private void btn_runtest_Click(object sender, EventArgs e)
+        {
+            this.toolStripStatusLabel1.Text = "Generating...";
+            Program.RunTest(build, (b) =>
+            {
+                if (b.loads == null)
+                {
+                    toolStripStatusLabel1.Text = "Error: no builds";
+                    return;
+                }
+
+                if (!IsDisposed && IsHandleCreated)
+                {
+                    Invoke((MethodInvoker)delegate
+                    {
+                        toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
+                        building = false;
+                    });
+                }
+            });
         }
     }
 }

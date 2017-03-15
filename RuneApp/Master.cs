@@ -30,7 +30,7 @@ namespace RuneApp
                 IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
 
                 Log.Info($"Starting TCP listener on {ipAddress}");
-                TcpListener listener = new TcpListener(ipAddress, 500);
+                TcpListener listener = new TcpListener(ipAddress, 7676);
                 listener.Start();
                 Log.Info("Server is listening on " + listener.LocalEndpoint);
 
@@ -72,6 +72,8 @@ namespace RuneApp
                                 {
                                     resp = (RRMResponse)meth.Invoke(this, new object[] { comm });
                                 }
+                                sw.WriteLine(JsonConvert.SerializeObject(resp));
+                                sw.Flush();
                             }
                             catch (Exception ex)
                             {
@@ -106,7 +108,37 @@ namespace RuneApp
             if (req is RunBuildsRequest)
             {
                 var request = req as RunBuildsRequest;
-                Program.RunBuilds(request.Skip, request.RunTo);
+                Program.RunBuilds(request.Skip, (int)request.RunTo);
+            }
+            return null;
+        }
+
+        [RRM(RRMAction.RunTest)]
+        public RRMResponse RunTest(RRMRequest req)
+        {
+            if (req is RunTestRequest)
+            {
+                var request = req as RunTestRequest;
+                var build = Program.builds.FirstOrDefault(b => b.ID == request.buildID);
+                if (build != null)
+                {
+                    Program.RunTest(build);
+                }
+            }
+            return null;
+        }
+
+        [RRM(RRMAction.GetPowerups)]
+        public RRMResponse GetPowerups(RRMRequest req)
+        {
+            if (req is GetPowerupsRequest)
+            {
+                var request = req as GetPowerupsRequest;
+                var build = Program.builds.FirstOrDefault(b => b.ID == request.buildID);
+                if (build != null)
+                {
+                    return new GetPowerupsResponse() { Runes = build.GetPowerupRunes() };
+                }
             }
             return null;
         }
@@ -166,31 +198,57 @@ namespace RuneApp
     public enum RRMAction
     {
         RunBuilds = 1,
+        RunTest,
         UpdateBuild,
+        GetPowerups,
     }
 
     public class RRMRequest
     {
+        public RRMRequest(RRMRequest rq = null)
+        {
+            var attr = this.GetType().GetCustomAttributes(typeof(RRMAttribute), false).FirstOrDefault();
+            if (attr != null)
+                this.action = (attr as RRMAttribute).action;
+            if (rq != null)
+                data = rq.data;
+        }
         public RRMAction action;
         public Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
     public class RRMResponse
     {
-        public Dictionary<string, object> data;
+        public Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
     [RRM(RRMAction.RunBuilds)]
     public class RunBuildsRequest : RRMRequest
     {
-        public RunBuildsRequest(RRMRequest rq = null)
-        {
-            if (rq != null)
-                data = rq.data;
-        }
         [JsonIgnore]
         public bool Skip { get { return (bool)data["skip"]; } set { data["skip"] = value; } }
         [JsonIgnore]
-        public int RunTo { get { return (int)(long)data["runTo"]; } set { data["runTo"] = value; } }
+        public long RunTo { get { return (long)data["runTo"]; } set { data["runTo"] = value; } }
+    }
+
+    [RRM(RRMAction.RunTest)]
+    public class RunTestRequest : RRMRequest
+    {
+        [JsonIgnore]
+        public long buildID { get { return (long)data["buildID"]; } set { data["buildID"] = value; } }
+    }
+
+    [RRM(RRMAction.GetPowerups)]
+    public class GetPowerupsRequest : RRMRequest
+    {
+        [JsonIgnore]
+        public long buildID { get { return (long)data["buildID"]; } set { data["buildID"] = value; } }
+    }
+
+    [RRM(RRMAction.GetPowerups)]
+    public class GetPowerupsResponse : RRMResponse
+    {
+        [JsonIgnore]
+        public IEnumerable<RuneOptim.Rune> Runes { get { return (List<RuneOptim.Rune>)data["runes"]; } set { data["runes"] = value; } }
     }
 }

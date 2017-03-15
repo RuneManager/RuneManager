@@ -1593,78 +1593,74 @@ namespace RuneApp
 
             if (AnnoyUser()) return;
 
-            if (MessageBox.Show("This will generate builds", "Continue?", MessageBoxButtons.OKCancel) == DialogResult.OK)
+            // make a new form that generates builds into it
+            // have a weight panel near the stats
+            // sort live on change
+            // copy weights back to here
+
+            if (!Program.config.AppSettings.Settings.AllKeys.Contains("generateLive"))
             {
-                // make a new form that generates builds into it
-                // have a weight panel near the stats
-                // sort live on change
-                // copy weights back to here
-
-                build.loads.Clear();
-                if (!Program.config.AppSettings.Settings.AllKeys.Contains("generateLive"))
+                var ff = new Generate(build);
+                var backupSort = new Stats(build.Sort);
+                var res = ff.ShowDialog();
+                if (res == DialogResult.OK)
                 {
-                    var ff = new Generate(build);
-                    var backupSort = new Stats(build.Sort);
-                    var res = ff.ShowDialog();
-                    if (res == DialogResult.OK)
+                    loading = true;
+                    foreach (var stat in Build.statNames)
                     {
-                        loading = true;
-                        foreach (var stat in Build.statNames)
-                        {
-                            var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                            if (ctrlWorth == null)
-                                continue;
+                        var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+                        if (ctrlWorth == null)
+                            continue;
 
-                            ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
-                        }
-                        foreach (var extra in Build.extraNames)
-                        {
-                            var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-                            if (ctrlWorth == null)
-                                continue;
-
-                            ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
-                        }
-                        loading = false;
+                        ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
                     }
-                    else
+                    foreach (var extra in Build.extraNames)
                     {
-                        foreach (var stat in Build.statNames)
-                        {
-                            var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-                            if (ctrlWorth == null)
-                                continue;
+                        var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+                        if (ctrlWorth == null)
+                            continue;
 
-                            int val;
-                            int.TryParse(ctrlWorth.Text, out val);
-                            build.Sort[stat] = val;
-                        }
-
-                        foreach (var extra in Build.extraNames)
-                        {
-                            var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-                            if (ctrlWorth == null)
-                                continue;
-
-                            int val;
-                            int.TryParse(ctrlWorth.Text, out val);
-                            build.Sort.ExtraSet(extra, val);
-                        }
-
+                        ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
                     }
-                    UpdateGlobal();
+                    loading = false;
                 }
                 else
                 {
-                    if (testWindow == null || testWindow.IsDisposed)
+                    foreach (var stat in Build.statNames)
                     {
-                        testWindow = new GenerateLive(build);
-                        testWindow.Owner = this;
+                        var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+                        if (ctrlWorth == null)
+                            continue;
+
+                        int val;
+                        int.TryParse(ctrlWorth.Text, out val);
+                        build.Sort[stat] = val;
                     }
-                    if (!testWindow.Visible)
-                        testWindow.Show();
-                    testWindow.Location = new Point(Location.X + Width, Location.Y);
+
+                    foreach (var extra in Build.extraNames)
+                    {
+                        var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
+                        if (ctrlWorth == null)
+                            continue;
+
+                        int val;
+                        int.TryParse(ctrlWorth.Text, out val);
+                        build.Sort.ExtraSet(extra, val);
+                    }
+
                 }
+                UpdateGlobal();
+            }
+            else
+            {
+                if (testWindow == null || testWindow.IsDisposed)
+                {
+                    testWindow = new GenerateLive(build);
+                    testWindow.Owner = this;
+                }
+                if (!testWindow.Visible)
+                    testWindow.Show();
+                testWindow.Location = new Point(Location.X + Width, Location.Y);
             }
         }
 

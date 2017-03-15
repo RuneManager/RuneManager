@@ -908,7 +908,7 @@ namespace RuneApp
 
         public void ProgressToList(Build b, string str)
         {
-            Program.log.Info(str);
+            Program.log.Info("_" + str);
             this.Invoke((MethodInvoker)delegate
             {
                 if (!IsDisposed)
@@ -1493,7 +1493,8 @@ namespace RuneApp
                 if (currentBuild != null)
                 {
                     Log.Info("Force stopping " + currentBuild.ID + " " + currentBuild.MonName);
-                    currentBuild.isRun = false;
+                    // TODO: consider things
+                    //currentBuild.IsRunning = false;
                 }
 
                 if (isRunning)
@@ -1502,7 +1503,8 @@ namespace RuneApp
                 while (isRunning)
                 {
                     plsDie = true;
-                    b.isRun = false;
+                    // TODO: consider things
+                    //b.isRun = false;
                     Thread.Sleep(100);
                 }
 
@@ -1694,7 +1696,7 @@ namespace RuneApp
 
                 Log.Info("Cleaning up");
                 isRunning = false;
-                b.isRun = false;
+                //b.isRun = false;
                 currentBuild = null;
                 Log.Info("Cleaned");
             }
@@ -1771,8 +1773,8 @@ namespace RuneApp
                 if (runTask != null && runTask.Status == TaskStatus.Running)
                 {
                     runSource.Cancel();
-                    if (currentBuild != null)
-                        currentBuild.isRun = false;
+                    //if (currentBuild != null)
+                    //    currentBuild.isRun = false;
                     plsDie = true;
                     isRunning = false;
                     return;
