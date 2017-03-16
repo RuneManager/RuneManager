@@ -66,7 +66,7 @@ namespace RuneApp
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
-                if ((rune.IsUnassigned) && !Program.useEquipped)
+                if ((rune.IsUnassigned) && !Program.Settings.UseEquipped)
                     item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
@@ -117,7 +117,7 @@ namespace RuneApp
                             if (rt.ID < r.ID)
                                 continue;
 
-                            if (rt.ID == r.ID && (Program.useEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName))
+                            if (rt.ID == r.ID && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName))
                             {
                                 li.ForeColor = Color.Black;
 
