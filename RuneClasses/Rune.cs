@@ -196,6 +196,7 @@ namespace RuneOptim
         [JsonIgnore]
         public static readonly int[] UnequipCosts = { 1000, 2500, 5000, 10000, 25000, 50000 };
 
+        [JsonIgnore]
         private bool? setIs4;
 
         public bool SetIs4
@@ -206,6 +207,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int UnequipCost
         {
             get
@@ -214,6 +216,7 @@ namespace RuneOptim
             }
         }
 
+        [JsonIgnore]
         public int Rarity
         {
             get

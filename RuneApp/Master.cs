@@ -19,7 +19,7 @@ namespace RuneApp
     public class Master
     {
         public log4net.ILog Log { get { return Program.log; } }
-        
+
         /// <summary>
         /// Dispatches a thread to listen for the incoming Remote App connection
         /// </summary>
@@ -27,7 +27,7 @@ namespace RuneApp
         {
             Task.Factory.StartNew(() =>
             {
-                IPAddress ipAddress = IPAddress.Parse("127.0.0.1");
+                IPAddress ipAddress = IPAddress.Any;// Parse("[::]");
 
                 Log.Info($"Starting TCP listener on {ipAddress}");
                 TcpListener listener = new TcpListener(ipAddress, 7676);
@@ -48,7 +48,7 @@ namespace RuneApp
             if (_client is TcpClient)
             {
                 TcpClient client = _client as TcpClient;
-                Log.Info("Connection TCP accepted.");
+                Log.Info("TCP Connection accepted.");
 
                 bool isRunning = true;
                 var stream = client.GetStream();
@@ -58,22 +58,33 @@ namespace RuneApp
                     using (StreamReader sr = new StreamReader(stream))
                     using (StreamWriter sw = new StreamWriter(stream))
                     {
-                        while (isRunning && client.Connected)
+                        while (isRunning && client.Connected && client.Client.IsConnected())
                         {
-                            Log.Info("Reading data...");
+                            Log.Info($"Reading data...{((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()}");
                             var data = sr.ReadLine();
                             Log.Info($"Recieved data: {data}");
                             try
                             {
-                                var comm = JsonConvert.DeserializeObject<RRMRequest>(data, new DeserialCommand());
-                                var meth = GetTypes(comm.action).FirstOrDefault();
-                                RRMResponse resp = null;
-                                if (meth != null)
+                                if (data == null)
                                 {
-                                    resp = (RRMResponse)meth.Invoke(this, new object[] { comm });
+                                    sw.WriteLine(new RRMResponse() { data = { { "Error", "received message was null" } } });
                                 }
-                                sw.WriteLine(JsonConvert.SerializeObject(resp));
+                                else
+                                {
+                                    var comm = JsonConvert.DeserializeObject<RRMRequest>(data, new DeserialCommand());
+                                    var meth = GetTypes(comm.action).FirstOrDefault();
+                                    RRMResponse resp = null;
+                                    if (meth != null)
+                                    {
+                                        resp = (RRMResponse)meth.Invoke(this, new object[] { comm });
+                                    }
+                                    sw.WriteLine(JsonConvert.SerializeObject(resp));
+                                }
                                 sw.Flush();
+                            }
+                            catch (IOException ioex)
+                            {
+                                Log.Error($"IO :( {ioex.GetType()}", ioex);
                             }
                             catch (Exception ex)
                             {
@@ -87,6 +98,7 @@ namespace RuneApp
                     Log.Error($"Client failed with {e.GetType()}", e);
                 }
 
+                Log.Info("TCP Connection closed.");
                 client.Close();
                 return;
             }
@@ -142,14 +154,16 @@ namespace RuneApp
             }
             return null;
         }
-    }
 
-    public class RRMAttribute : Attribute
-    {
-        public RRMAction action;
-        public RRMAttribute(RRMAction a)
+        [RRM(RRMAction.GetLoads)]
+        public RRMResponse GetLoads(RRMRequest req)
         {
-            action = a;
+            if (req is GetLoadsRequest)
+            {
+                var request = req as GetLoadsRequest;
+                return new GetLoadsResponse() { Loads = Program.loads };
+            }
+            return null;
         }
     }
 
@@ -157,19 +171,27 @@ namespace RuneApp
     {
         public override bool CanConvert(Type objectType)
         {
-            return typeof(RRMRequest).IsAssignableFrom(objectType);
+            return typeof(RRMMessage).IsAssignableFrom(objectType);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject item = JObject.Load(reader);
-            var t = GetTypes((RRMAction)item["action"].Value<Int64>()).FirstOrDefault();
+            var action = (RRMAction)item["action"].Value<Int64>();
+            var ts = GetTypes(action);
+            bool? isRequest = item["request"]?.Value<bool?>();
+            if (isRequest ?? true)
+                ts = ts.Where(q => typeof(RRMRequest).IsAssignableFrom(q));
+            else
+                ts = ts.Where(q => typeof(RRMResponse).IsAssignableFrom(q));
+
+            var t = ts.FirstOrDefault();
             if (t != null)
             {
                 return item.ToObject(t);
             }
 
-            return item.ToObject<RRMRequest>();
+            return item.ToObject<RRMMessage>();
         }
 
         public override bool CanWrite
@@ -195,31 +217,53 @@ namespace RuneApp
         }
     }
 
+    public class RRMAttribute : Attribute
+    {
+        public RRMAction action;
+        public RRMAttribute(RRMAction a)
+        {
+            action = a;
+        }
+    }
+
     public enum RRMAction
     {
         RunBuilds = 1,
         RunTest,
         UpdateBuild,
+        GetLoads,
         GetPowerups,
     }
 
-    public class RRMRequest
+    public class RRMMessage
     {
-        public RRMRequest(RRMRequest rq = null)
+        public bool request;
+        public RRMMessage(RRMMessage rm = null)
         {
             var attr = this.GetType().GetCustomAttributes(typeof(RRMAttribute), false).FirstOrDefault();
             if (attr != null)
                 this.action = (attr as RRMAttribute).action;
-            if (rq != null)
-                data = rq.data;
+            if (rm != null)
+                data = rm.data;
         }
         public RRMAction action;
         public Dictionary<string, object> data = new Dictionary<string, object>();
     }
 
-    public class RRMResponse
+    public class RRMRequest : RRMMessage
     {
-        public Dictionary<string, object> data = new Dictionary<string, object>();
+        public RRMRequest(RRMRequest rq = null) : base(rq)
+        {
+            request = true;
+        }
+    }
+
+    public class RRMResponse : RRMMessage
+    {
+        public RRMResponse(RRMRequest rq = null) : base(rq)
+        {
+            request = false;
+        }
     }
 
     [RRM(RRMAction.RunBuilds)]
@@ -250,5 +294,17 @@ namespace RuneApp
     {
         [JsonIgnore]
         public IEnumerable<RuneOptim.Rune> Runes { get { return (List<RuneOptim.Rune>)data["runes"]; } set { data["runes"] = value; } }
+    }
+
+    [RRM(RRMAction.GetLoads)]
+    public class GetLoadsRequest : RRMRequest
+    {
+    }
+
+    [RRM(RRMAction.GetLoads)]
+    public class GetLoadsResponse : RRMResponse
+    {
+        [JsonIgnore]
+        public IEnumerable<RuneOptim.Loadout> Loads { get { return (List<RuneOptim.Loadout>)data["runes"]; } set { data["runes"] = value; } }
     }
 }

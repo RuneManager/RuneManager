@@ -514,7 +514,7 @@ namespace RuneApp
 
         private void Generate_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //build.loads.CollectionChanged -= Loads_CollectionChanged;
+            build.loads.CollectionChanged -= Loads_CollectionChanged;
             build.BuildPrintTo -= Build_BuildPrintTo;
             build.BuildProgTo -= Build_BuildProgTo;
         }

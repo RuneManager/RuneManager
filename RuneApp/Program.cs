@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -865,6 +866,15 @@ namespace RuneApp
 
 
         #region Extension Methods
+        public static bool IsConnected(this Socket socket)
+        {
+            try
+            {
+                return !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
+            }
+            catch (SocketException) { return false; }
+        }
+
         public static double StandardDeviation<T>(this IEnumerable<T> src, Func<T, double> selector)
         {
             double av = src.Where(p => Math.Abs(selector(p)) > 0.00000001).Average(selector);

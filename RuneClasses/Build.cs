@@ -1436,6 +1436,8 @@ namespace RuneOptim
 
         public IEnumerable<Rune> GetPowerupRunes()
         {
+            if (!loads.Any())
+                return new Rune[] { };
             double max = loads.Max(g => g.score);
             foreach (var r in loads.SelectMany(m => m.Current.Runes))
             {
