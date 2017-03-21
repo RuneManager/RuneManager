@@ -91,9 +91,20 @@ namespace RuneApp
 		}
 		#endregion
 
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				var cp = base.CreateParams;
+				cp.ExStyle |= 0x02000000;    // Turn on WS_EX_COMPOSITED
+				return cp;
+			}
+		}
+
 		public Create()
 		{
 			InitializeComponent();
+			this.SetDoubleBuffered();
 			// when show, check we have stuff
 			Shown += Create_Shown;
 

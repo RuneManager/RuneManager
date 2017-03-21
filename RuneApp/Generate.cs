@@ -24,6 +24,8 @@ namespace RuneApp
 		public Generate(Build bb)
 		{
 			InitializeComponent();
+
+			loadoutList.SetDoubleBuffered();
 			
 			// master has given Gener a Build?
 			build = bb;

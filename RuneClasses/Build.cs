@@ -575,13 +575,17 @@ namespace RuneOptim
 			// if there are required sets, ensure we have them
 			isBad |= (RequiredSets != null && RequiredSets.Count > 0
 				// this Linq adds no overhead compared to GetStats() and ApplyRune()
-				&& !RequiredSets.All(s => test.Current.Sets.Contains(s)));
-			//    && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
+				&& !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
 
 			if (isBad)
 				return null;
 
 			return test;
+		}
+
+		public void Cancel()
+		{
+			IsRunning = false;
 		}
 
 		/// <summary>

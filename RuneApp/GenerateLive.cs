@@ -92,8 +92,6 @@ namespace RuneApp
 		{
 
 			bool isBad = false;
-			//if (test.Current.Runes.All(r => mon.Current.Runes.Contains(r)))
-			//	isBad = false;
 
 			var cstats = test.GetStats();
 
@@ -105,7 +103,6 @@ namespace RuneApp
 			isBad |= (build.RequiredSets != null && build.RequiredSets.Count > 0
 				// this Linq adds no overhead compared to GetStats() and ApplyRune()
 				&& !build.RequiredSets.All(s => test.Current.Sets.Contains(s)));
-			//    && !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
 
 			return !isBad;
 		}

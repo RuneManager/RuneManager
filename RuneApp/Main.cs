@@ -140,7 +140,6 @@ namespace RuneApp
 				xx += 50;
 
 				groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, 400 + yy, 50, 14, "");
-				xx += 50;
 
 				if (s == "SPD")
 					yy += 4;
@@ -163,7 +162,7 @@ namespace RuneApp
 			if (!shrineMap.ContainsKey(stat))
 				shrineMap.Add(stat, new List<ToolStripMenuItem>());
 			shrineMap[stat].Add(it);
-			if (value == Program.data.shrines[stat])
+			if (Program.data.shrines[stat].EqualTo(value))
 				it.Checked = true;
 		}
 
@@ -259,11 +258,6 @@ namespace RuneApp
 			{
 				if (ii.Text == "Team")
 				{
-					/*{ "Farmer", "Dungeon", "Giant", "Dragon", "Necro", "Secret",
-						"Elemental", "Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D",
-						"ToA", "ToAN", "ToAH", "Raid", "Normal", "Light R", "Dark R", "Fire R", "Water R", "Wind R",
-						"PvP", "AO", "AD", "GWO", "GWD", "World Boss"}*/
-
 					toolmap = new Dictionary<string, List<string>>()
 					{
 						{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
@@ -346,16 +340,12 @@ namespace RuneApp
 						});
 					}
 					break;
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					throw new NotImplementedException();
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-					throw new NotImplementedException();
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-					throw new NotImplementedException();
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 					loadoutList.Items.Clear();
 					break;
-				//throw new NotImplementedException();
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				default:
 					throw new NotImplementedException();
 			}
@@ -804,11 +794,11 @@ namespace RuneApp
 							item.SubItems[4].Text = bb.mon.ID.ToString();
 							if (bb.mon != before)
 							{
-								var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == before.Name).Count() > 0).FirstOrDefault();
+								var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.Name));
 								if (lv1li != null)
 									lv1li.ForeColor = before.inStorage ? Color.Gray : Color.Black;
 
-								lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == ff.build.mon.Name).Count() > 0).FirstOrDefault();
+								lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.Name));
 								if (lv1li != null)
 									lv1li.ForeColor = Color.Green;
 
@@ -826,10 +816,7 @@ namespace RuneApp
 			if (lis.Count > 0)
 			{
 				var li = lis[0];
-				Task.Factory.StartNew(() =>
-				{
-					RunBuild(li, Program.Settings.MakeStats);
-				});
+				RunBuild(li, Program.Settings.MakeStats);
 			}
 		}
 
@@ -852,7 +839,7 @@ namespace RuneApp
 					Build b = (Build)li.Tag;
 					if (b != null)
 					{
-						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Name).Count() > 0).FirstOrDefault();
+						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.Name));
 						if (lv1li != null)
 						{
 							lv1li.ForeColor = Color.Black;
@@ -910,6 +897,7 @@ namespace RuneApp
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			Program.BuildsProgressTo -= Program_BuildsProgressTo;
 			Program.SaveBuilds();
 		}
 
@@ -1440,15 +1428,8 @@ namespace RuneApp
 
 		private void RunBuild(ListViewItem pli, bool saveStats = false)
 		{
-			if ((pli?.Tag as Build) == null)
-				return;
-
-			Program.RunBuild((Build)pli.Tag, saveStats);/*, (bb, s) => Invoke((MethodInvoker) delegate
-			{
-				Log.Info(s);
-				if (!this.IsDisposed)
-					pli.SubItems[3].Text = s;
-			}));*/
+			if (pli?.Tag is Build)
+				Program.RunBuild((Build)pli.Tag, saveStats);
 		}
 
 		[Obsolete("Please run this on Program, not Main", true)]
