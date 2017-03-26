@@ -4,9 +4,14 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RunePlugin;
 using Titanium.Web.Proxy;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Models;
@@ -17,23 +22,124 @@ namespace RuneService
 	{
 		ProxyServer proxyServer;
 
+		private Dictionary<Guid, string> trackedRequests = new Dictionary<Guid, string>();
+
+		public EventHandler<SWEventArgs> SWResponse;
+
+		private ICollection<SWPlugin> plugins;
+
+		private List<string> skipHosts = new List<string>() { "216.58.199.46", // Wifi check
+			"pasta.esfile.duapps.com", "analytics.app-adforce.jp", "push.qpyou.cn", "activeuser.qpyou.cn", "mlog.appguard.co.kr" // SW init
+		};
+
 		public SWProxy()
 		{
 			proxyServer = new ProxyServer();
 		}
+
 		public void StartProxy()
 		{
 			proxyServer.BeforeRequest += OnRequest;
 			proxyServer.BeforeResponse += OnResponse;
 
 			// TODO: allow rebinding / more endpoints
-			var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, 8080, false);
-			proxyServer.AddEndPoint(explicitEndPoint);
+			var endpoint = new TransparentProxyEndPoint(IPAddress.Any, 8080, false);
+			proxyServer.AddEndPoint(endpoint);
 			proxyServer.Start();
+
+			LoadPlugins("plugins");
+		}
+
+		private void LoadPlugins(string path)
+		{
+			if (!Directory.Exists(path))
+			{
+				Console.WriteLine("No plugin directory");
+				return;
+			}
+
+			try
+			{
+				string monData = File.ReadAllText(path + "/monsterNames.json");
+				SWReference.MonsterNameMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(monData);
+			}
+			catch { };
+
+			string[] dllFileNames = Directory.GetFiles(path, "*.dll");
+
+			ICollection<Assembly> assemblies = new List<Assembly>(dllFileNames.Length);
+			foreach (string dllFile in dllFileNames)
+			{
+				AssemblyName an = AssemblyName.GetAssemblyName(dllFile);
+				Assembly assembly = Assembly.Load(an);
+				assemblies.Add(assembly);
+			}
+
+			Type pluginType = typeof(SWPlugin);
+			ICollection<Type> pluginTypes = new List<Type>();
+			foreach (Assembly assembly in assemblies)
+			{
+				if (assembly != null)
+				{
+					Type[] types = assembly.GetTypes();
+					foreach (Type type in types)
+					{
+						if (type.IsInterface || type.IsAbstract)
+						{
+							continue;
+						}
+						else
+						{
+							//if (type.GetInterface(pluginType.FullName) != null)
+							if (pluginType.IsAssignableFrom(type))
+							{
+								pluginTypes.Add(type);
+							}
+						}
+					}
+				}
+			}
+			plugins = new List<SWPlugin>(pluginTypes.Count);
+			foreach (Type type in pluginTypes)
+			{
+				try
+				{
+					SWPlugin plugin = (SWPlugin)Activator.CreateInstance(type);
+					plugins.Add(plugin);
+					plugin.OnLoad();
+					this.SWResponse += plugin.ProcessRequest;
+					Console.WriteLine($"Successfully loaded plugin: {plugin.GetType().Name}");
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine($"Failed loading plugin: {type.Name} with exception: {e.GetType().Name}");
+					// TODO: log stacktrace?
+				}
+			}
+		}
+
+		public void UnloadPlugins()
+		{
+			foreach (var p in plugins)
+			{
+				try
+				{
+					this.SWResponse -= p.ProcessRequest;
+					p.OnUnload();
+				}
+				catch (Exception e)
+				{
+					Console.WriteLine($"Failed unloading plugin: {p.GetType().Name} with exception: {e.GetType().Name}");
+					// TODO: log stacktrace?
+				}
+			}
+			plugins.Clear();
 		}
 
 		public void Stop()
 		{
+			UnloadPlugins();
+
 			proxyServer.BeforeRequest -= OnRequest;
 			proxyServer.BeforeResponse -= OnResponse;
 
@@ -47,23 +153,27 @@ namespace RuneService
 			var method = e.WebSession.Request.Method.ToUpper();
 			if ((method == "POST" || method == "PUT" || method == "PATCH"))
 			{
-				//Get/Set request body bytes
-				byte[] bodyBytes = await e.GetRequestBody();
-				await e.SetRequestBody(bodyBytes);
-
-				//Get/Set request body as string
 				string bodyString = await e.GetRequestBodyAsString();
-				await e.SetRequestBodyString(bodyString);
+
+				if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
+					return;
 
 				// Typical requests endpoint:
 				//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
-				if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar"))
+				if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 				{
 					Console.WriteLine("Request " + e.WebSession.Request.RequestUri.AbsoluteUri);
 
 					var dec = decryptRequest(bodyString, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
+					try
+					{
+						var json = JsonConvert.DeserializeObject<JObject>(dec);
+						File.WriteAllText($"Json\\{json["command"]}.req.json", dec);
+						Console.WriteLine($"Wrote {json["command"]}");
+					}
+					catch { };
 
-					Console.WriteLine(dec);
+					trackedRequests.Add(e.Id, dec);
 				}
 			}
 		}
@@ -74,21 +184,47 @@ namespace RuneService
 			{
 				if (e.WebSession.Response.ResponseStatusCode == "200")
 				{
-					if (e.WebSession.Response.ContentType != null && e.WebSession.Response.ContentType.Trim().ToLower().Contains("text/html"))
+					if (e.WebSession.Response.ContentType != null)
 					{
-						byte[] bodyBytes = await e.GetResponseBody();
-						await e.SetResponseBody(bodyBytes);
 
 						string body = await e.GetResponseBodyAsString();
-						await e.SetResponseBodyString(body);
 
-						if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar"))
+						if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
+							return;
+						
+						if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 						{
 							Console.WriteLine("Response " + e.WebSession.Request.RequestUri.AbsoluteUri);
 
 							var dec = decryptResponse(body, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 
-							Console.WriteLine(dec);
+							try
+							{
+								var json = JsonConvert.DeserializeObject<JObject>(dec);
+								File.WriteAllText($"Json\\{json["command"]}.resp.json", dec);
+								Console.WriteLine($"Wrote {json["command"]}");
+							}
+							catch { };
+
+							if (trackedRequests.ContainsKey(e.Id))
+							{
+								SWEventArgs args = null;
+								try
+								{
+									args = new SWEventArgs(trackedRequests[e.Id], dec);
+								}
+								catch { }
+								try
+								{
+									SWResponse?.Invoke(this, args);
+								}
+								catch (Exception ex)
+								{
+									Console.WriteLine($"Failed triggering plugins with exception: {ex.GetType().Name}");
+									// TODO: log stacktrace?
+								}
+								trackedRequests.Remove(e.Id);
+							}
 						}
 					}
 				}
