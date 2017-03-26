@@ -82,9 +82,9 @@ public:
 	int* speed;
 	int* critRate;
 	int* critDamage;
-	int* accuracy;
 	int* resistance;
-	
+	int* accuracy;
+
 	int* healthFlat;
 	int* attackFlat;
 	int* defenseFlat;

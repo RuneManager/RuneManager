@@ -83,7 +83,7 @@ namespace RuneOptim
 
                         if (mon.priority == 0 && mon.Current.RuneCount > 0)
                         {
-                            mon.priority = priority++;
+                            //mon.priority = priority++;
                         }
 
                         var stats = mon.GetStats();

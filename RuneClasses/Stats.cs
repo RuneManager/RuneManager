@@ -46,14 +46,14 @@ namespace RuneOptim
         [EnumMember(Value = "CDmg")]
         CritDamage = 10,
 
-        [EnumMember(Value = "ACC")]
-        Accuracy = 11,
-
         [EnumMember(Value = "RES")]
-        Resistance = 12,
+        Resistance = 11,
 
-        // Flag for below
-        ExtraStat = 16,
+		[EnumMember(Value = "ACC")]
+		Accuracy = 12,
+
+		// Flag for below
+		ExtraStat = 16,
 
         [EnumMember(Value = "EHP")]
         EffectiveHP = 1 | ExtraStat,

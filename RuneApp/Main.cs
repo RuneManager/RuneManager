@@ -288,6 +288,22 @@ namespace RuneApp
 				OpenHelp();
 		}
 
+		private void ColorMonsWithBuilds()
+		{
+			foreach (ListViewItem lvim in dataMonsterList.Items)
+			{
+				var mtag = lvim.Tag as Monster;
+				if (mtag != null)
+				{
+					var lvib = buildList.Items.Cast<ListViewItem>().FirstOrDefault(i => (i.Tag as Build)?.mon == mtag);
+					if (lvib != null)
+					{
+						lvim.ForeColor = Color.Green;
+					}
+				}
+			}
+		}
+
 		private void Program_BuildsProgressTo(object sender, PrintToEventArgs e)
 		{
 			ProgressToList(e.build, e.Message);
@@ -373,13 +389,9 @@ namespace RuneApp
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					throw new NotImplementedException();
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-					throw new NotImplementedException();
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-					throw new NotImplementedException();
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-					throw new NotImplementedException();
 				default:
 					throw new NotImplementedException();
 			}
@@ -572,32 +584,29 @@ namespace RuneApp
 
 		private void toolStripButton1_Click(object sender, EventArgs e)
 		{
-			if (dataMonsterList.FocusedItem != null)
+			if (dataMonsterList.FocusedItem != null && dataMonsterList.FocusedItem.Tag != null)
 			{
-				if (dataMonsterList.FocusedItem.Tag != null)
+				Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
+				int maxPri = Program.data.Monsters.Max(x => x.priority);
+				if (mon.priority == 0)
 				{
-					Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
-					int maxPri = Program.data.Monsters.Max(x => x.priority);
-					if (mon.priority == 0)
-					{
-						mon.priority = maxPri + 1;
-						dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
-					}
-					else if (mon.priority != 1)
-					{
-						int pri = mon.priority;
-						Monster mon2 = Program.data.Monsters.Where(x => x.priority == pri - 1).FirstOrDefault();
-						if (mon2 != null)
-						{
-							ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
-							mon2.priority += 1;
-							listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
-						}
-						mon.priority -= 1;
-						dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
-					}
-					dataMonsterList.Sort();
+					mon.priority = maxPri + 1;
+					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
 				}
+				else if (mon.priority != 1)
+				{
+					int pri = mon.priority;
+					Monster mon2 = Program.data.Monsters.FirstOrDefault(x => x.priority == pri - 1);
+					if (mon2 != null)
+					{
+						ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
+						mon2.priority += 1;
+						listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
+					}
+					mon.priority -= 1;
+					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
+				}
+				dataMonsterList.Sort();
 			}
 		}
 
@@ -1377,6 +1386,9 @@ namespace RuneApp
 			foreach (Monster mon in Program.data.Monsters)
 			{
 				string pri = "";
+				mon.priority = 0;
+				if (Program.builds.FirstOrDefault(b => b.mon == mon) != null)
+					mon.priority = Program.builds.FirstOrDefault(b => b.mon == mon).priority;
 				if (mon.priority != 0)
 					pri = mon.priority.ToString();
 
@@ -1390,6 +1402,19 @@ namespace RuneApp
 
 				item.Tag = mon;
 				dataMonsterList.Items.Add(item);
+			}
+
+			foreach (Monster mon in Program.data.Monsters.Where(m => m.priority == 0))
+			{
+				if (mon.Current.RuneCount > 0)
+				{
+					mon.priority = Program.data.Monsters.Max(m => m.priority) + 1;
+					var lvi = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => (i.Tag as Monster).ID == mon.ID);
+					if (lvi != null)
+					{
+						lvi.SubItems[2].Text = mon.priority.ToString();
+					}
+				}
 			}
 
 			foreach (Rune rune in Program.data.Runes)
@@ -1407,6 +1432,7 @@ namespace RuneApp
 				dataRuneList.Items.Add(item);
 			}
 			checkLocked();
+			ColorMonsWithBuilds();
 		}
 
 		public void checkLocked()

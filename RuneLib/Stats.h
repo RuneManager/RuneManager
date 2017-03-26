@@ -14,8 +14,8 @@ namespace STATATTR
 		Speed = 3,
 		CritRate = 4,
 		CritDamage = 5,
-		Accuracy = 6,
-		Resistance = 7,
+		Resistance = 6,
+		Accuracy = 7,
 
 		// superfast hax
 		HealthFlat = 8,
@@ -45,8 +45,8 @@ public:
 	double Speed;
 	double CritRate;
 	double CritDamage;
-	double Accuracy;
 	double Resistance;
+	double Accuracy;
 
 	double operator[](STATATTR::Attr a);
 
