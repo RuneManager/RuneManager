@@ -36,7 +36,7 @@ namespace RuneOptim
 	public class ProgToEventArgs : EventArgs
 	{
 		public Build build;
-		public int Progress;
+		public int Progress; 
 		public double Percent;
 		public ProgToEventArgs(Build b, double d, int p) { build = b; Percent = d; Progress = p; }
 	}
@@ -597,7 +597,7 @@ namespace RuneOptim
 		/// <param name="progTo">Periodically gives the progress% as a double</param>
 		/// <param name="dumpBads">If true, will only track new builds if they score higher than an other found builds</param>
 		/// <param name="saveStats">If to write stats to rune stats</param>
-		public void GenBuilds()
+		public void GenBuilds(string prefix = "")
 		{
 			if (runes.Any(r => r == null))
 			{
@@ -848,14 +848,14 @@ namespace RuneOptim
 										{
 											timer = DateTime.Now;
 											Console.WriteLine(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
-											BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, string.Format("{0:P2}", (count + complete - total) / (double)complete)));
+											BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + string.Format("{0:P2}", (count + complete - total) / (double)complete)));
 											BuildProgTo?.Invoke(this, new ProgToEventArgs(this, (count + complete - total) / (double)complete, tests.Count));
 
 											if (BuildTimeout <= 0) continue;
 											if (DateTime.Now > begin.AddSeconds(BuildTimeout))
 											{
 												Console.WriteLine("Timeout");
-												BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Timeout"));
+												BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Timeout"));
 												BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
 
 												IsRunning = false;
@@ -906,7 +906,7 @@ namespace RuneOptim
 
 				// write out completion
 				Console.WriteLine(IsRunning + " " + count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "100%"));
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "100%"));
 				BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
 
 				// sort *all* the builds
@@ -937,13 +937,13 @@ namespace RuneOptim
 				if (!loads.Any())
 				{
 					Console.WriteLine("No builds :(");
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Zero :("));
+					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Zero :("));
 				}
 				else
 				{
 					// remember the good one
 					Best = loads.First();
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "best " + (Best?.score ?? -1)));
+					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "best " + (Best?.score ?? -1)));
 					//Best.Current.runeUsage = usage.runeUsage;
 					//Best.Current.buildUsage = usage.buildUsage;
 					foreach (var bb in loads)
@@ -976,13 +976,13 @@ namespace RuneOptim
 				//loads = null;
 				tests.Clear();
 				tests = null;
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Test cleared"));
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Test cleared"));
 				IsRunning = false;
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine("Error " + e);
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, e.ToString()));
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + e.ToString()));
 			}
 		}
 

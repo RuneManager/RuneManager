@@ -30,7 +30,7 @@ namespace RuneApp
 		bool isRunning = false;
 		public static Help help = null;
 
-		public static bool goodRunes = false;
+		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
 
 		public static Main currentMain = null;
 		public static RuneDial runeDial = null;
@@ -2019,6 +2019,34 @@ namespace RuneApp
 			else
 				findGoodRunes.Checked = false;
 			goodRunes = findGoodRunes.Checked;
+		}
+
+		private void tsBtnFindSpeed_Click(object sender, EventArgs e)
+		{
+			foreach (var li in buildList.Items.Cast<ListViewItem>())
+			{
+				var b = li.Tag as Build;
+				if (b != null)
+				{
+					b.RunesUseLocked = false;
+					b.RunesUseEquipped = Program.Settings.UseEquipped;
+					b.BuildSaveStats = false;
+					b.GenRunes(Program.data);
+					int c = b.runes[0].Length;
+					c *= b.runes[1].Length;
+					c *= b.runes[2].Length;
+					c *= b.runes[3].Length;
+					c *= b.runes[4].Length;
+					c *= b.runes[5].Length;
+
+					// I get about 4mil/sec, and can be bothered to wait 10 - 25 seconds
+					li.SubItems[0].ForeColor = Color.Black;
+					if (c > 4000000 * 25)
+						li.SubItems[0].ForeColor = Color.Red;
+					else if (c > 4000000 * 10)
+						li.SubItems[0].ForeColor = Color.Orange;
+				}
+			}
 		}
 	}
 

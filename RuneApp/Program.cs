@@ -67,6 +67,7 @@ namespace RuneApp
 		public static readonly RuneSheet runeSheet = new RuneSheet();
 
 		public static readonly Master master = new Master();
+		public static bool goodRunes;
 
 		/// <summary>
 		/// The main entry point for the application.
@@ -641,7 +642,9 @@ namespace RuneApp
 
 				b.GenBuilds();
 
-				b.BuildPrintTo -= BuildsProgressTo;
+				buildTime.Stop();
+				b.Time = buildTime.ElapsedMilliseconds;
+				log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
 
 				if (b.Best != null)
 				{
@@ -675,14 +678,10 @@ namespace RuneApp
 					#endregion
 
 					//currentBuild = null;
-					buildTime.Stop();
-					b.Time = buildTime.ElapsedMilliseconds;
-					log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
 					b.Best.Current.Time = b.Time;
 
 					loads.Add(b.Best.Current);
 
-					/*
 					// if we are on the hunt of good runes.
 					if (goodRunes && saveStats)
 					{
@@ -690,25 +689,21 @@ namespace RuneApp
 						int count = 0;
 						// we must progressively ban more runes from the build to find second-place runes.
 						//GenDeep(b, 0, printTo, ref count);
-						RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
-						RunBanned(b, printTo, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
-						RunBanned(b, printTo, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
 
 						// after messing all that shit up
 						b.Best = theBest;
 					}
-					*/
+					
 
 					#region Save Build stats
-					/* TODO: put Excel on Program
+					
+					/* TODO: put Excel on Program */
 					if (saveStats)
 					{
-						if (StatsExcelBind(true))
-						{
-							StatsExcelBuild(b, b.mon, b.Best.Current);
-							StatsExcelSave();
-						}
-						StatsExcelBind(true);
+						runeSheet.StatsExcelBuild(b, b.mon, b.Best.Current, true);
 					}
 
 					// clean up for GC
@@ -721,9 +716,11 @@ namespace RuneApp
 					}
 					b.runeUsage = null;
 					b.buildUsage = null;
-					*/
+					/**/
 					#endregion
 				}
+
+				b.BuildPrintTo -= BuildsProgressTo;
 
 				//if (plsDie)
 				//    printTo?.Invoke("Canned");
@@ -743,6 +740,29 @@ namespace RuneApp
 			{
 				log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
 			}
+		}
+
+		private static void RunBanned(Build b, int c, params int[] doneIds)
+		{
+			log.Info("Running ban");
+			b.BanEmTemp(doneIds);
+
+			b.RunesUseLocked = false;
+			b.RunesUseEquipped = Program.Settings.UseEquipped;
+			b.BuildSaveStats = true;
+			b.BuildGoodRunes = goodRunes;
+			b.GenRunes(Program.data);
+
+			b.BuildTimeout = 0;
+			b.BuildTake = 0;
+			b.BuildGenerate = 0;
+			b.BuildDumpBads = true;
+			b.GenBuilds($"{c} ");
+			log.Info("Ban finished");
+
+			b.BanEmTemp(new int[] { });
+			b.BuildSaveStats = false;
+			b.GenRunes(Program.data);
 		}
 
 		public static void RunBuilds(bool skipLoaded, int runTo = -1)

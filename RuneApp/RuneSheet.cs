@@ -212,8 +212,17 @@ namespace RuneApp
                     runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
                 }
 
-            }
-            else
+				int combinations = build.runes[0].Length;
+				combinations *= build.runes[1].Length;
+				combinations *= build.runes[2].Length;
+				combinations *= build.runes[3].Length;
+				combinations *= build.runes[4].Length;
+				combinations *= build.runes[5].Length;
+
+				runeSheet.Cells[build.priority + 1, linkCol + 2].Value = combinations;
+
+			}
+			else
             {
                 Console.WriteLine("No Home sheet");
             }
@@ -414,7 +423,7 @@ namespace RuneApp
                 if (ws != null)
                 {
                     int pid;
-                    string pids = ws.Cells[1, 9].Value as string;
+                    string pids = ws.Cells[1, 9].Value.ToString();
                     if ((!string.IsNullOrWhiteSpace(pids) && int.TryParse(pids, out pid) && pid == mon.ID))
                     {
                         ind = ws.Index;
