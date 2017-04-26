@@ -168,8 +168,10 @@ namespace RuneService
 					try
 					{
 						var json = JsonConvert.DeserializeObject<JObject>(dec);
-						File.WriteAllText($"Json\\{json["command"]}.req.json", dec);
-						Console.WriteLine($"Wrote {json["command"]}");
+						if (!Directory.Exists("Json"))
+							Directory.CreateDirectory("Json");
+						File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", dec);
+						Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
 					}
 					catch { };
 
@@ -201,8 +203,10 @@ namespace RuneService
 							try
 							{
 								var json = JsonConvert.DeserializeObject<JObject>(dec);
-								File.WriteAllText($"Json\\{json["command"]}.resp.json", dec);
-								Console.WriteLine($"Wrote {json["command"]}");
+								if (!Directory.Exists("Json"))
+									Directory.CreateDirectory("Json");
+								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
+								Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
 							}
 							catch { };
 
