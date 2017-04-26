@@ -28,39 +28,10 @@ namespace OptimizerJsonPlugin
 			if (!new string[] { "HubUserLogin", "GuestLogin" }.Contains((string)args.ResponseJson["command"]))
 				return;
 
-			JObject wizard;
-			try
-			{
-				wizard = (JObject)args.ResponseJson["wizard_info"];
-			}
-			catch
-			{
-				wizard = JsonConvert.DeserializeObject<JObject>("{'wizard_id':0}");
-			};
-
-			
-			List<object> inventory = new List<object>();
-
-			List<JObject> monsters = new List<JObject>();
-			try
-			{
-				monsters = ((JArray)args.ResponseJson["unit_list"]).Cast<JObject>().ToList();
-			}
-			catch { }
-
-			List<JObject> runes = new List<JObject>();
-			try
-			{
-				runes = ((JArray)args.ResponseJson["runes"]).Cast<JObject>().ToList();
-			}
-			catch { }
-
-			List<JObject> crafts = new List<JObject>();
-			try
-			{
-				crafts = ((JArray)args.ResponseJson["rune_craft_item_list"]).Cast<JObject>().ToList();
-			}
-			catch { }
+			JObject wizard = (JObject)args.ResponseJson["wizard_info"];
+			List<JObject> monsters = ((JArray)args.ResponseJson["unit_list"]).Cast<JObject>().ToList();
+			List<JObject> runes = ((JArray)args.ResponseJson["runes"]).Cast<JObject>().ToList();
+			List<JObject> crafts = ((JArray)args.ResponseJson["rune_craft_item_list"]).Cast<JObject>().ToList();
 
 			Optimizer optimizer = new Optimizer();
 			optimizer.tvalue = args.Response.tvalue;
@@ -154,15 +125,7 @@ namespace OptimizerJsonPlugin
 			}
 
 			File.WriteAllText($"{(int)wizard["wizard_id"]}-optimizer.json", JsonConvert.SerializeObject(optimizer));
-
-		}
-
-		public void OnLoad()
-		{
-		}
-
-		public void OnUnload()
-		{
+			Console.WriteLine("Generated optimizer.json");
 		}
 	}
 	
