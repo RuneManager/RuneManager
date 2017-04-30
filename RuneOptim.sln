@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneOptim", "RuneOptim\RuneOptim.csproj", "{657ABF4B-06BD-4F67-A94F-304F7F155E7D}"
 EndProject
@@ -16,10 +16,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneClassesTests", "RuneClassesTests\RuneClassesTests.csproj", "{CDD463D7-E57D-4EEB-BCBE-8569F1A724E3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWarFarmUpdater", "SWarFarmUpdater\SWarFarmUpdater.csproj", "{426BCDC3-40D3-49B3-887F-93C3E66725E3}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -37,6 +36,10 @@ Global
 		{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CDD463D7-E57D-4EEB-BCBE-8569F1A724E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CDD463D7-E57D-4EEB-BCBE-8569F1A724E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{426BCDC3-40D3-49B3-887F-93C3E66725E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{426BCDC3-40D3-49B3-887F-93C3E66725E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{426BCDC3-40D3-49B3-887F-93C3E66725E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{426BCDC3-40D3-49B3-887F-93C3E66725E3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
