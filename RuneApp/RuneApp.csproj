@@ -64,6 +64,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -110,6 +111,7 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
+    <Compile Include="Master.cs" />
     <Compile Include="MonSelect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -150,6 +152,8 @@
     <Compile Include="RuneSelect.Designer.cs">
       <DependentUpon>RuneSelect.cs</DependentUpon>
     </Compile>
+    <Compile Include="RuneSheet.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="TransparentControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -200,10 +204,15 @@
     <EmbeddedResource Include="RuneSelect.resx">
       <DependentUpon>RuneSelect.cs</DependentUpon>
     </EmbeddedResource>
-    <None Include="basestats.json" />
+    <None Include="basestats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="monsters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <Compile Include="Properties\Settings.Designer.cs">
@@ -376,30 +385,126 @@
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />
     <Content Include="Resources\upto.png" />
-    <Content Include="User Manual\build.html" />
-    <Content Include="User Manual\images\builds_list.png" />
-    <Content Include="User Manual\images\build_leader.png" />
-    <Content Include="User Manual\images\build_runes.png" />
-    <Content Include="User Manual\images\build_sets.png" />
-    <Content Include="User Manual\images\build_stats.png" />
-    <Content Include="User Manual\images\equipped.png" />
-    <Content Include="User Manual\images\loadouts_list.png" />
-    <Content Include="User Manual\images\loadout_stats.png" />
-    <Content Include="User Manual\images\menu_load.png" />
-    <Content Include="User Manual\images\options.png" />
-    <Content Include="User Manual\images\rune_evens.png" />
-    <Content Include="User Manual\images\rune_loadout.png" />
-    <Content Include="User Manual\images\rune_points.png" />
-    <Content Include="User Manual\images\rune_tabs.png" />
-    <Content Include="User Manual\images\sample_run.png" />
-    <Content Include="User Manual\images\save_monsters.png" />
-    <Content Include="User Manual\images\shrines.png" />
-    <Content Include="User Manual\images\test_points.png" />
-    <Content Include="User Manual\images\test_score.png" />
-    <Content Include="User Manual\images\update.png" />
-    <Content Include="User Manual\index.html" />
-    <Content Include="User Manual\options.html" />
-    <Content Include="User Manual\test.html" />
+    <Content Include="User Manual\build.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\add.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\broken.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\builds_list.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\build_leader.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\build_runes.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\build_score.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\build_sets.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\build_stats.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\down.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\equipped.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\fromMon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\go.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\left.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\loadouts_list.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\loadout_stats.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\menu_load.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\options.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\refresh.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\resume.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\right.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\rune_evens.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\rune_loadout.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\rune_points.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\rune_tabs.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\sample_run.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\save.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\save_monsters.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\shrines.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\subtract.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\test_points.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\test_score.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\up.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\update.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\upto.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\images\whole.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\options.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\styles.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\test.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
@@ -407,14 +512,10 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-      xcopy "$(ProjectDir)User Manual" "$(TargetDir)User Manual" /D /E /C /I /H /R /Y
-      xcopy "$(ProjectDir)basestats.json" "$(TargetDir)" /D /Y
-      if exist "$(DevEnvDir)..\tools\vsvars32.bat" (
+    <PostBuildEvent>if exist "$(DevEnvDir)..\tools\vsvars32.bat" (
       call "$(DevEnvDir)..\tools\vsvars32.bat"
       editbin /largeaddressaware "$(TargetPath)"
-      )
-    </PostBuildEvent>
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

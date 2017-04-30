@@ -171,22 +171,22 @@ namespace RuneApp
 
             _imageBack = Runes.bg_normal;
             coolness = 0;
-            if (rune.Sub4Type != RuneOptim.Attr.Null)
+            if (rune.Subs.Count == 4)
             {
                 _imageBack = Runes.bg_legend;
                 coolness = 4;
             }
-            else if (rune.Sub3Type != RuneOptim.Attr.Null)
+            else if (rune.Subs.Count == 3)
             {
                 _imageBack = Runes.bg_hero;
                 coolness = 3;
             }
-            else if (rune.Sub2Type != RuneOptim.Attr.Null)
+            else if (rune.Subs.Count == 2)
             {
                 _imageBack = Runes.bg_rare;
                 coolness = 2;
             }
-            else if (rune.Sub1Type != RuneOptim.Attr.Null)
+            else if (rune.Subs.Count == 1)
             {
                 _imageBack = Runes.bg_magic;
                 coolness = 1;

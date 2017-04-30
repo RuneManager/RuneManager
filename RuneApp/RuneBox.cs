@@ -12,14 +12,14 @@ namespace RuneApp
 
         public void SetRune(Rune rune)
         {
-            lbMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
-            lbInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
-            lb1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
-            lb2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
-            lb3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
-            lb4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
+            lbMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
+            lbInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
+            lb1.Text = Rune.StringIt(rune.Subs, 0);
+            lb2.Text = Rune.StringIt(rune.Subs, 1);
+            lb3.Text = Rune.StringIt(rune.Subs, 2);
+            lb4.Text = Rune.StringIt(rune.Subs, 3);
             lbLevel.Text = rune.Level.ToString();
-            lbMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
+            lbMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
             runeControl1.SetRune(rune);
         }
     }

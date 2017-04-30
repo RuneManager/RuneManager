@@ -16,7 +16,7 @@ namespace RuneApp
 
         public Build build = null;
 
-        public Func<Rune, int> sortFunc = r => r.ID;
+        public Func<Rune, long> sortFunc = r => (long)r.Id;
         public string runeStatKey = null;
 
         public string slot = "";
@@ -49,7 +49,7 @@ namespace RuneApp
                     {
                         if (build.slotStats[rune.Slot - 1].Count > 0)
                         {
-                            if (!build.slotStats[rune.Slot - 1].Contains(rune.MainType.ToForms()))
+                            if (!build.slotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
                                 continue;
                         }
                     }
@@ -57,16 +57,16 @@ namespace RuneApp
 
                 ListViewItem item = new ListViewItem(new string[]{
                     rune.Set.ToString(),
-                    rune.ID.ToString(),
+                    rune.Id.ToString(),
                     rune.Grade.ToString(),
-                    Rune.StringIt(rune.MainType, true),
-                    rune.MainValue.ToString(),
+                    Rune.StringIt(rune.Main.Type, true),
+                    rune.Main.Value.ToString(),
                     points.ToString(),
                     runeStatKey == null ? null : rune.manageStats.GetOrAdd(runeStatKey, 0).ToString()
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;
-                if ((rune.IsUnassigned) && !Main.useEquipped)
+                if ((rune.IsUnassigned) && !Program.Settings.UseEquipped)
                     item.ForeColor = Color.Red;
                 // stash the rune into the tag
                 item.Tag = rune;
@@ -114,10 +114,10 @@ namespace RuneApp
                         Rune rt = (Rune)li.Tag;
                         if (rt != null)
                         {
-                            if (rt.ID < r.ID)
+                            if (rt.Id < r.Id)
                                 continue;
 
-                            if (rt.ID == r.ID && (Main.useEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName))
+                            if (rt.Id == r.Id && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName))
                             {
                                 li.ForeColor = Color.Black;
 
@@ -160,17 +160,6 @@ namespace RuneApp
         {
             runeBox1.Show();
             runeBox1.SetRune(rune);
-            /*
-            runeBox2.Show();
-            runeInventory.SetRune(rune);
-
-            IRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
-            IRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
-            IRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
-            IRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
-            IRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
-            IRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
-            IRuneMon.Text = rune.AssignedName;*/
         }
 
         // return the highlighted rune

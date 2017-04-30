@@ -107,7 +107,7 @@ namespace RuneOptim
             {
                 return new Monster()
                 {
-                    ID = mon.ID,
+                    Id = mon.Id,
                     priority = mon.priority,
                     Current = mon.Current,
                     Accuracy = Accuracy,

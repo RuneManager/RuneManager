@@ -13,7 +13,7 @@ namespace RuneApp
         {
             InitializeComponent();
 
-            foreach (Monster mon in Main.data.Monsters)
+            foreach (Monster mon in Program.data.Monsters)
             {
                 string pri = "";
                 if (mon.priority != 0)
@@ -21,7 +21,7 @@ namespace RuneApp
 
                 ListViewItem item = new ListViewItem(new string[]{
                     mon.Name,
-                    mon.ID.ToString(),
+                    mon.Id.ToString(),
                     pri,
                 });
                 if (mon.inStorage)

@@ -92,13 +92,13 @@
             // runesMType
             // 
             this.runesMType.DisplayIndex = 4;
-            this.runesMType.Text = "MainType";
+            this.runesMType.Text = "Main.Type";
             this.runesMType.Width = 80;
             // 
             // runesMValue
             // 
             this.runesMValue.DisplayIndex = 5;
-            this.runesMValue.Text = "MainValue";
+            this.runesMValue.Text = "Main.Value";
             // 
             // runesPoints
             // 

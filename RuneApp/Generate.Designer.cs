@@ -33,16 +33,24 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btn_powerrunes = new System.Windows.Forms.Button();
             this.runeBuild = new System.Windows.Forms.GroupBox();
             this.SRuneLevel = new System.Windows.Forms.Label();
             this.SRuneMon = new System.Windows.Forms.Label();
             this.hideBuildRune = new System.Windows.Forms.Label();
+            this.runeShown = new RuneApp.RuneControl();
             this.SRuneSub4 = new System.Windows.Forms.Label();
             this.SRuneSub3 = new System.Windows.Forms.Label();
             this.SRuneSub2 = new System.Windows.Forms.Label();
             this.SRuneSub1 = new System.Windows.Forms.Label();
             this.SRuneInnate = new System.Windows.Forms.Label();
             this.SRuneMain = new System.Windows.Forms.Label();
+            this.runeControl6 = new RuneApp.RuneControl();
+            this.runeControl5 = new RuneApp.RuneControl();
+            this.runeControl4 = new RuneApp.RuneControl();
+            this.runeControl3 = new RuneApp.RuneControl();
+            this.runeControl2 = new RuneApp.RuneControl();
+            this.runeControl1 = new RuneApp.RuneControl();
             this.Set3Label = new System.Windows.Forms.Label();
             this.Set2Label = new System.Windows.Forms.Label();
             this.Set1Label = new System.Windows.Forms.Label();
@@ -53,14 +61,7 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
-            this.btn_powerrunes = new System.Windows.Forms.Button();
-            this.runeShown = new RuneApp.RuneControl();
-            this.runeControl6 = new RuneApp.RuneControl();
-            this.runeControl5 = new RuneApp.RuneControl();
-            this.runeControl4 = new RuneApp.RuneControl();
-            this.runeControl3 = new RuneApp.RuneControl();
-            this.runeControl2 = new RuneApp.RuneControl();
-            this.runeControl1 = new RuneApp.RuneControl();
+            this.btn_runtest = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.runeBuild.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -99,6 +100,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.btn_runtest);
             this.groupBox1.Controls.Add(this.btn_powerrunes);
             this.groupBox1.Controls.Add(this.runeBuild);
             this.groupBox1.Controls.Add(this.runeControl6);
@@ -120,6 +122,16 @@
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Scoring";
+            // 
+            // btn_powerrunes
+            // 
+            this.btn_powerrunes.Location = new System.Drawing.Point(179, 77);
+            this.btn_powerrunes.Name = "btn_powerrunes";
+            this.btn_powerrunes.Size = new System.Drawing.Size(75, 23);
+            this.btn_powerrunes.TabIndex = 101;
+            this.btn_powerrunes.Text = "Powerups";
+            this.btn_powerrunes.UseVisualStyleBackColor = true;
+            this.btn_powerrunes.Click += new System.EventHandler(this.btn_powerrunes_Click);
             // 
             // runeBuild
             // 
@@ -174,6 +186,25 @@
             this.hideBuildRune.TabIndex = 10;
             this.hideBuildRune.Text = "X";
             this.hideBuildRune.Click += new System.EventHandler(this.hideRuneBox);
+            // 
+            // runeShown
+            // 
+            this.runeShown.BackColor = System.Drawing.Color.Transparent;
+            this.runeShown.BackImage = global::RuneApp.Runes.bg_normal;
+            this.runeShown.Coolness = 0;
+            this.runeShown.Gamma = 1F;
+            this.runeShown.Grade = 2;
+            this.runeShown.Location = new System.Drawing.Point(4, 17);
+            this.runeShown.Margin = new System.Windows.Forms.Padding(2);
+            this.runeShown.Name = "runeShown";
+            this.runeShown.SetImage = global::RuneApp.Runes.despair;
+            this.runeShown.ShowBack = true;
+            this.runeShown.ShowStars = true;
+            this.runeShown.Size = new System.Drawing.Size(58, 58);
+            this.runeShown.SlotImage = global::RuneApp.Runes.rune2;
+            this.runeShown.StarImage = global::RuneApp.Runes.star_unawakened;
+            this.runeShown.TabIndex = 11;
+            this.runeShown.Text = "runeControl2";
             // 
             // SRuneSub4
             // 
@@ -235,132 +266,6 @@
             this.SRuneMain.Size = new System.Drawing.Size(40, 18);
             this.SRuneMain.TabIndex = 12;
             this.SRuneMain.Text = "Main";
-            // 
-            // Set3Label
-            // 
-            this.Set3Label.AutoSize = true;
-            this.Set3Label.Location = new System.Drawing.Point(167, 376);
-            this.Set3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.Set3Label.Name = "Set3Label";
-            this.Set3Label.Size = new System.Drawing.Size(63, 13);
-            this.Set3Label.TabIndex = 92;
-            this.Set3Label.Text = "SampleText";
-            // 
-            // Set2Label
-            // 
-            this.Set2Label.AutoSize = true;
-            this.Set2Label.Location = new System.Drawing.Point(167, 362);
-            this.Set2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.Set2Label.Name = "Set2Label";
-            this.Set2Label.Size = new System.Drawing.Size(40, 13);
-            this.Set2Label.TabIndex = 91;
-            this.Set2Label.Text = "Energy";
-            // 
-            // Set1Label
-            // 
-            this.Set1Label.AutoSize = true;
-            this.Set1Label.Location = new System.Drawing.Point(167, 348);
-            this.Set1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-            this.Set1Label.Name = "Set1Label";
-            this.Set1Label.Size = new System.Drawing.Size(30, 13);
-            this.Set1Label.TabIndex = 90;
-            this.Set1Label.Text = "Swift";
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::RuneApp.Runes.runes;
-            this.pictureBox1.Location = new System.Drawing.Point(5, 325);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(138, 151);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 93;
-            this.pictureBox1.TabStop = false;
-            // 
-            // btnHelp
-            // 
-            this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnHelp.Location = new System.Drawing.Point(209, 19);
-            this.btnHelp.Name = "btnHelp";
-            this.btnHelp.Size = new System.Drawing.Size(45, 23);
-            this.btnHelp.TabIndex = 89;
-            this.btnHelp.Text = "Help?";
-            this.btnHelp.UseVisualStyleBackColor = true;
-            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
-            // 
-            // button2
-            // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(179, 664);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 0;
-            this.button2.Text = "Cancel";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(98, 664);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Save";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
-            // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripProgressBar1,
-            this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 708);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1008, 22);
-            this.statusStrip1.TabIndex = 2;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // toolStripProgressBar1
-            // 
-            this.toolStripProgressBar1.Maximum = 1000;
-            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
-            this.toolStripProgressBar1.Size = new System.Drawing.Size(300, 16);
-            // 
-            // toolStripStatusLabel1
-            // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
-            // 
-            // btn_powerrunes
-            // 
-            this.btn_powerrunes.Location = new System.Drawing.Point(179, 48);
-            this.btn_powerrunes.Name = "btn_powerrunes";
-            this.btn_powerrunes.Size = new System.Drawing.Size(75, 23);
-            this.btn_powerrunes.TabIndex = 101;
-            this.btn_powerrunes.Text = "Powerups";
-            this.btn_powerrunes.UseVisualStyleBackColor = true;
-            this.btn_powerrunes.Click += new System.EventHandler(this.btn_powerrunes_Click);
-            // 
-            // runeShown
-            // 
-            this.runeShown.BackColor = System.Drawing.Color.Transparent;
-            this.runeShown.BackImage = global::RuneApp.Runes.bg_normal;
-            this.runeShown.Coolness = 0;
-            this.runeShown.Gamma = 1F;
-            this.runeShown.Grade = 2;
-            this.runeShown.Location = new System.Drawing.Point(4, 17);
-            this.runeShown.Margin = new System.Windows.Forms.Padding(2);
-            this.runeShown.Name = "runeShown";
-            this.runeShown.SetImage = global::RuneApp.Runes.despair;
-            this.runeShown.ShowBack = true;
-            this.runeShown.ShowStars = true;
-            this.runeShown.Size = new System.Drawing.Size(58, 58);
-            this.runeShown.SlotImage = global::RuneApp.Runes.rune2;
-            this.runeShown.StarImage = global::RuneApp.Runes.star_unawakened;
-            this.runeShown.TabIndex = 11;
-            this.runeShown.Text = "runeControl2";
             // 
             // runeControl6
             // 
@@ -488,6 +393,113 @@
             this.runeControl1.Visible = false;
             this.runeControl1.Click += new System.EventHandler(this.rune_Click);
             // 
+            // Set3Label
+            // 
+            this.Set3Label.AutoSize = true;
+            this.Set3Label.Location = new System.Drawing.Point(167, 376);
+            this.Set3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.Set3Label.Name = "Set3Label";
+            this.Set3Label.Size = new System.Drawing.Size(63, 13);
+            this.Set3Label.TabIndex = 92;
+            this.Set3Label.Text = "SampleText";
+            // 
+            // Set2Label
+            // 
+            this.Set2Label.AutoSize = true;
+            this.Set2Label.Location = new System.Drawing.Point(167, 362);
+            this.Set2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.Set2Label.Name = "Set2Label";
+            this.Set2Label.Size = new System.Drawing.Size(40, 13);
+            this.Set2Label.TabIndex = 91;
+            this.Set2Label.Text = "Energy";
+            // 
+            // Set1Label
+            // 
+            this.Set1Label.AutoSize = true;
+            this.Set1Label.Location = new System.Drawing.Point(167, 348);
+            this.Set1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.Set1Label.Name = "Set1Label";
+            this.Set1Label.Size = new System.Drawing.Size(30, 13);
+            this.Set1Label.TabIndex = 90;
+            this.Set1Label.Text = "Swift";
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = global::RuneApp.Runes.runes;
+            this.pictureBox1.Location = new System.Drawing.Point(5, 325);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(138, 151);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 93;
+            this.pictureBox1.TabStop = false;
+            // 
+            // btnHelp
+            // 
+            this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnHelp.Location = new System.Drawing.Point(209, 19);
+            this.btnHelp.Name = "btnHelp";
+            this.btnHelp.Size = new System.Drawing.Size(45, 23);
+            this.btnHelp.TabIndex = 89;
+            this.btnHelp.Text = "Help?";
+            this.btnHelp.UseVisualStyleBackColor = true;
+            this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
+            // 
+            // button2
+            // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(179, 664);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 0;
+            this.button2.Text = "Cancel";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(98, 664);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "Save";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripProgressBar1,
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 708);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1008, 22);
+            this.statusStrip1.TabIndex = 2;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripProgressBar1
+            // 
+            this.toolStripProgressBar1.Maximum = 1000;
+            this.toolStripProgressBar1.Name = "toolStripProgressBar1";
+            this.toolStripProgressBar1.Size = new System.Drawing.Size(300, 16);
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            // 
+            // btn_runtest
+            // 
+            this.btn_runtest.Location = new System.Drawing.Point(179, 48);
+            this.btn_runtest.Name = "btn_runtest";
+            this.btn_runtest.Size = new System.Drawing.Size(75, 23);
+            this.btn_runtest.TabIndex = 102;
+            this.btn_runtest.Text = "Run";
+            this.btn_runtest.UseVisualStyleBackColor = true;
+            this.btn_runtest.Click += new System.EventHandler(this.btn_runtest_Click);
+            // 
             // Generate
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -500,6 +512,7 @@
             this.Name = "Generate";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Generate";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Generate_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.runeBuild.ResumeLayout(false);
@@ -547,5 +560,6 @@
         private System.Windows.Forms.Label SRuneMain;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Button btn_powerrunes;
+        private System.Windows.Forms.Button btn_runtest;
     }
 }

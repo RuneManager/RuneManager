@@ -22,6 +22,11 @@ namespace RuneOptim
 
     public static class ExtensionMethods
     {
+        public static bool EqualTo(this double a, double b, double within = 0.00000001)
+        {
+            return (Math.Abs(a - b) < within);
+        }
+
         public static bool IsA(this Type type, Type typeToBe)
         {
             if (!typeToBe.IsGenericTypeDefinition)

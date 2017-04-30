@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
@@ -9,7 +10,7 @@ namespace RuneOptim
     // Deserializes the .json into this
     public class Save
     {
-        [JsonProperty("mons")]
+        [JsonProperty("unit_list")]
         public readonly ObservableCollection<Monster> Monsters = new ObservableCollection<Monster>();
 
         [JsonProperty("deco_list")]
@@ -31,11 +32,15 @@ namespace RuneOptim
 
         public bool isModified = false;
 
-        [JsonIgnore]
+		[JsonIgnore]
+		Dictionary<int, string> monIdNames;
+
+		[JsonIgnore]
         int priority = 1;
 
         public Save()
         {
+            monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText("monsters.json"));
             Runes.CollectionChanged += Runes_CollectionChanged;
             Monsters.CollectionChanged += Monsters_CollectionChanged;
             Decorations.CollectionChanged += Decorations_CollectionChanged;
@@ -53,13 +58,9 @@ namespace RuneOptim
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }
@@ -72,12 +73,24 @@ namespace RuneOptim
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems.Cast<Monster>())
                     {
-                        var equipedRunes = Runes.Where(r => r.AssignedId == mon.ID);
+						mon.Name = monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId).Value;
+						if (mon.Name == null)
+						{
+							mon.Name = mon._attribute + " " + monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;
+						}
+						foreach (var r in mon.Runes)
+						{
+							r.Assigned = mon;
+							Runes.Add(r);
+						}
+						var equipedRunes = Runes.Where(r => r.AssignedId == mon.Id);
+
+						/*
 
                         mon.inStorage = (mon.Name.IndexOf("In Storage") >= 0);
                         mon.Name = mon.Name.Replace(" (In Storage)", "");
-
-                        mon.Current.Shrines = shrines;
+						*/
+						mon.Current.Shrines = shrines;
 
                         foreach (Rune rune in equipedRunes)
                         {
@@ -87,20 +100,16 @@ namespace RuneOptim
 
                         if (mon.priority == 0 && mon.Current.RuneCount > 0)
                         {
-                            mon.priority = priority++;
+                            //mon.priority = priority++;
                         }
 
                         var stats = mon.GetStats();
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }
@@ -114,17 +123,18 @@ namespace RuneOptim
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var r in e.NewItems.Cast<Rune>())
                     {
-                        r.FixShit();
+						foreach (var s in r.Subs)
+						{
+							if (s.__int2 != 0)
+								throw new Exception("What is this?");
+						}
+						r.FixShit();
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                    throw new NotImplementedException();
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                    throw new NotImplementedException();
                 default:
                     throw new NotImplementedException();
             }
@@ -144,17 +154,17 @@ namespace RuneOptim
 
         private Monster getMonster(string name, int num)
         {
-            Monster mon = Monsters.Where(m => m.Name == name).Skip(num - 1).FirstOrDefault();
+            Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.Name == name);
             if (mon == null)
-                mon = Monsters.Where(m => m.Name == name).FirstOrDefault();
+                mon = Monsters.FirstOrDefault(m => m.Name == name);
             if (mon != null)
                 return mon;
             return new Monster();
         }
 
-        public Monster GetMonster(int id)
+        public Monster GetMonster(ulong id)
         {
-            return Monsters.Where(m => m.ID == id).FirstOrDefault();
+            return Monsters.FirstOrDefault(m => m.Id == id);
         }
     }
 }

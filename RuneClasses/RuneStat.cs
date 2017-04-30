@@ -20,7 +20,7 @@
                 if (isMain == null)
                 {
                     val = parent.GetValue(stat);
-                    isMain = parent.MainType == stat;
+                    isMain = parent.Main.Type == stat;
                 }
 
                 if ((isMain ?? true) || pred) 
@@ -36,7 +36,7 @@
                 if (isMain == null)
                 {
                     val = parent.GetValue(stat);
-                    isMain = parent.MainType == stat;
+                    isMain = parent.Main.Type == stat;
                 }
                 
                 return val.Value;
