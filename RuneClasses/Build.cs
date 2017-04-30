@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define BUILD_PRECHECK_BUILDS
+//#define BUILD_PRECHECK_BUILDS_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -569,6 +572,9 @@ namespace RuneOptim
 
                 // set to running
                 isRun = true;
+#if BUILD_PRECHECK_BUILDS_DEBUG
+				SynchronizedCollection<string> outstrs = new SynchronizedCollection<string>();
+#endif
 
                 // Parallel the outer loop
                 SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
@@ -595,28 +601,170 @@ namespace RuneOptim
                     test.Current.PredictSubs = slotPred;
                     test.ApplyRune(r0, 6);
 
+					RuneSet set4 = r0.SetIs4 ? r0.Set : RuneSet.Null;
+					RuneSet set2 = r0.SetIs4 ? RuneSet.Null : r0.Set;
+					int pop4 = 0;
+					int pop2 = 0;
+
                     foreach (Rune r1 in runes[1])
                     {
                         if (!isRun) // Can't break to a label, don't want to goto
                             break;
+#if BUILD_PRECHECK_BUILDS
+						if (!this.AllowBroken)
+						{
+							if (r1.SetIs4)
+							{
+								if (set4 == RuneSet.Null || pop4 >= 2)
+								{
+									set4 = r1.Set;
+									pop4 = 2;
+								}
+								else if (set4 != r1.Set)
+								{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+									outstrs.Add($"bad4@2 {set4} {set2} | {r0.Set} {r1.Set}");
+#endif
+									kill += runes[2].Length * runes[3].Length * runes[4].Length * runes[5].Length;
+									continue;
+								}
+							}
+							else if (set2 == RuneSet.Null || pop2 >= 2)
+							{
+								set2 = r1.Set;
+								pop2 = 2;
+							}
+						}
+#endif
                         test.ApplyRune(r1, 6);
 
                         foreach (Rune r2 in runes[2])
                         {
                             if (!isRun)
                                 break;
+#if BUILD_PRECHECK_BUILDS
+							if (!this.AllowBroken)
+							{
+								if (r2.SetIs4)
+								{
+									if (set4 == RuneSet.Null || pop4 >= 3)
+									{
+										set4 = r2.Set;
+										pop4 = 3;
+									}
+									else if (set4 != r2.Set)
+									{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"bad4@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
+#endif
+										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										continue;
+									}
+								}
+								else
+								{
+									if (set2 == RuneSet.Null || pop2 >= 3)
+									{
+										set2 = r2.Set;
+										pop2 = 3;
+									}
+									else if (set4 != RuneSet.Null && set2 != r2.Set)
+									{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"bad2@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
+#endif
+										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										continue;
+									}
+								}
+							}
+#endif
                             test.ApplyRune(r2, 6);
 
                             foreach (Rune r3 in runes[3])
                             {
                                 if (!isRun)
                                     break;
+#if BUILD_PRECHECK_BUILDS
+								if (!this.AllowBroken)
+								{
+									if (r3.SetIs4)
+									{
+										if (set4 == RuneSet.Null || pop4 >= 4)
+										{
+											set4 = r3.Set;
+											pop4 = 4;
+										}
+										else if (set4 != r3.Set)
+										{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+											outstrs.Add($"bad4@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
+#endif
+											kill += runes[4].Length * runes[5].Length;
+											continue;
+										}
+									}
+									else
+									{
+										if (set2 == RuneSet.Null || pop2 >= 4)
+										{
+											set2 = r3.Set;
+											pop2 = 4;
+										}
+										else if (set4 != RuneSet.Null && set2 != r3.Set)
+										{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+											outstrs.Add($"bad2@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
+#endif
+											kill += runes[4].Length * runes[5].Length;
+											continue;
+										}
+									}
+								}
+#endif
                                 test.ApplyRune(r3, 6);
 
                                 foreach (Rune r4 in runes[4])
                                 {
                                     if (!isRun)
                                         break;
+#if BUILD_PRECHECK_BUILDS
+									if (!this.AllowBroken)
+									{
+										if (r4.SetIs4)
+										{
+											if (set4 == RuneSet.Null || pop4 >= 5)
+											{
+												set4 = r4.Set;
+												pop4 = 5;
+											}
+											else if (set4 != r4.Set)
+											{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+												outstrs.Add($"bad4@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
+#endif
+												kill += runes[5].Length;
+												continue;
+											}
+										}
+										else
+										{
+											if (set2 == RuneSet.Null || pop2 >= 5)
+											{
+												set2 = r4.Set;
+												pop2 = 5;
+											}
+											else if (set4 != RuneSet.Null && set2 != r4.Set)
+											{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+												outstrs.Add($"bad2@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
+#endif
+												kill += runes[5].Length;
+												continue;
+											}
+										}
+									}
+#endif
                                     test.ApplyRune(r4, 6);
                                     foreach (Rune r5 in runes[5])
                                     {
@@ -624,6 +772,10 @@ namespace RuneOptim
                                             break;
 
                                         test.ApplyRune(r5, 6);
+
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
+#endif
 
 										isBad = false;
 
