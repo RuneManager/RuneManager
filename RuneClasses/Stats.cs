@@ -6,8 +6,25 @@ using Newtonsoft.Json.Converters;
 
 namespace RuneOptim
 {
-    // Allows me to steal the JSON values into Enum
-    [JsonConverter(typeof(StringEnumConverter))]
+	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+	sealed class SkillAttrAttribute : Attribute
+	{
+		readonly string attrName;
+
+		public SkillAttrAttribute(string name)
+		{
+			this.attrName = name;
+		}
+
+		public string Attr
+		{
+			get { return attrName; }
+		}
+
+	}
+
+	// Allows me to steal the JSON values into Enum
+	[JsonConverter(typeof(StringEnumConverter))]
     public enum Attr
     {
         [EnumMember(Value = "-")]
@@ -23,9 +40,10 @@ namespace RuneOptim
         HealthPercent = 2,
 
         [EnumMember(Value = "ATK flat")]
+		[SkillAttr("ATK")]
         AttackFlat = 3,
 
-        [EnumMember(Value = "ATK%")]
+		[EnumMember(Value = "ATK%")]
         AttackPercent = 4,
 
         [EnumMember(Value = "DEF flat")]
@@ -38,9 +56,10 @@ namespace RuneOptim
         SpeedPercent = 7,
 
         [EnumMember(Value = "SPD")]
+		[SkillAttr("ATTACK_SPEED")]
         Speed = 8,
 
-        [EnumMember(Value = "CRate")]
+		[EnumMember(Value = "CRate")]
         CritRate = 9,
 
         [EnumMember(Value = "CDmg")]
@@ -113,6 +132,9 @@ namespace RuneOptim
 		[JsonProperty("accuracy")]
 		public double Accuracy = 0;
 
+		[JsonIgnore]
+		public double SkillupDamage = 0;
+
 		public Stats() { }
         // copy constructor, amrite?
         public Stats(Stats rhs, bool copyExtra = false)
@@ -125,6 +147,7 @@ namespace RuneOptim
             CritDamage = rhs.CritDamage;
             Resistance = rhs.Resistance;
             Accuracy = rhs.Accuracy;
+			damageFormula = rhs.damageFormula;
             if (copyExtra)
             {
                 EffectiveHP = rhs.EffectiveHP;
@@ -150,6 +173,9 @@ namespace RuneOptim
 
         [JsonProperty("fake_mxd")]
         public double MaxDamage = 0;
+
+		[JsonIgnore]
+		public MonsterDefinitions.MultiplierBase damageFormula = new MonsterDefinitions.MultiplierValue(Attr.AttackFlat);
 
         // Gets the Extra stat manually stored (for scoring)
         public double ExtraGet(string extra)
@@ -196,15 +222,15 @@ namespace RuneOptim
             switch (extra)
             {
                 case "EHP":
-                    return (Health / ((1000 / (1000 + Defense * 3))));
+					return ExtraValue(Attr.EffectiveHP);
                 case "EHPDB":
-                    return (Health / ((1000 / (1000 + Defense * 3 * 0.3))));
+					return ExtraValue(Attr.EffectiveHPDefenseBreak);
                 case "DPS":
-                    return (ExtraValue("AvD") * (Speed / 100));
+					return ExtraValue(Attr.DamagePerSpeed);
                 case "AvD":
-                    return Attack + (Attack * CritDamage / 100 * (Math.Min(CritRate, 100) / 100));
+					return ExtraValue(Attr.AverageDamage);
                 case "MxD":
-                    return (Attack * (1 + CritDamage / 100));
+					return ExtraValue(Attr.MaxDamage);
                 default:
                     return 0;
             }
@@ -215,17 +241,17 @@ namespace RuneOptim
             switch (extra)
             {
                 case Attr.EffectiveHP:
-                    return (Health / ((1000 / (1000 + Defense * 3))));
+                    return Health / ((1000 / (1000 + Defense * 3)));
                 case Attr.EffectiveHPDefenseBreak:
-                    return (Health / ((1000 / (1000 + Defense * 3 * 0.3))));
+                    return Health / ((1000 / (1000 + Defense * 3 * 0.3)));
                 case Attr.DamagePerSpeed:
-                    return (ExtraValue("AvD") * (Speed / 100));
+                    return ExtraValue(Attr.AverageDamage) * Speed / 100;
                 case Attr.AverageDamage:
-                    return Attack + (Attack * CritDamage / 100 * (Math.Min(CritRate, 100) / 100));
+                    return damageFormula.GetValue(this) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
                 case Attr.MaxDamage:
-                    return (Attack * (1 + CritDamage / 100));
+                    return damageFormula.GetValue(this) * (1 + SkillupDamage + CritDamage / 100);
                 default:
-                return 0;
+					return 0;
             }
         }
 

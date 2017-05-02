@@ -193,15 +193,6 @@ namespace RuneOptim
 	}
 	#endregion
 
-	public class Skill : ListProp
-	{
-		// TODO: name
-		[ListProperty(0)]
-		public int SkillId = -1;
-		[ListProperty(1)]
-		public int Level = -1;
-	}
-
 	public class RuneAttr : ListProp
 	{
 		[ListProperty(0)]
