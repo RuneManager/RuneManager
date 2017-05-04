@@ -3,6 +3,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using System.Linq.Expressions;
 
 namespace RuneOptim
 {
@@ -17,6 +18,23 @@ namespace RuneOptim
 		}
 
 		public string Attr
+		{
+			get { return attrName; }
+		}
+
+	}
+
+	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+	sealed class AttrFieldAttribute : Attribute
+	{
+		readonly Attr attrName;
+
+		public AttrFieldAttribute(Attr attr)
+		{
+			this.attrName = attr;
+		}
+
+		public Attr attr
 		{
 			get { return attrName; }
 		}
@@ -148,6 +166,7 @@ namespace RuneOptim
             Resistance = rhs.Resistance;
             Accuracy = rhs.Accuracy;
 			damageFormula = rhs.damageFormula;
+			_damageFormula = rhs._damageFormula;
             if (copyExtra)
             {
                 EffectiveHP = rhs.EffectiveHP;
@@ -175,7 +194,24 @@ namespace RuneOptim
         public double MaxDamage = 0;
 
 		[JsonIgnore]
-		public MonsterDefinitions.MultiplierBase damageFormula = new MonsterDefinitions.MultiplierValue(Attr.AttackFlat);
+		public MonsterDefinitions.MultiplierBase damageFormula = null;// new MonsterDefinitions.MultiplierValue(Attr.AttackFlat);
+
+		[JsonIgnore]
+		private static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
+
+		[JsonIgnore]
+		private Func<Stats, double> _damageFormula = null;
+
+		[JsonIgnore]
+		public Func<Stats, double> DamageFormula 
+		{
+			get
+			{
+				if (_damageFormula == null)
+					_damageFormula = Expression.Lambda<Func<Stats, double>>(damageFormula.AsExpression(statType), statType).Compile();
+				return _damageFormula;
+			}
+		}
 
         // Gets the Extra stat manually stored (for scoring)
         public double ExtraGet(string extra)
@@ -247,9 +283,9 @@ namespace RuneOptim
                 case Attr.DamagePerSpeed:
                     return ExtraValue(Attr.AverageDamage) * Speed / 100;
                 case Attr.AverageDamage:
-                    return damageFormula.GetValue(this) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
+                    return DamageFormula(this) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
                 case Attr.MaxDamage:
-                    return damageFormula.GetValue(this) * (1 + SkillupDamage + CritDamage / 100);
+                    return DamageFormula(this) * (1 + SkillupDamage + CritDamage / 100);
                 default:
 					return 0;
             }

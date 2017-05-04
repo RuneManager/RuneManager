@@ -7,6 +7,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using System.Linq.Expressions;
 
 namespace RuneOptim
 {
@@ -127,7 +128,7 @@ namespace RuneOptim
 							monDefs.Add(item.Com2usId, item);
 					}
 				}
-				if (monDefs.ContainsKey(_monsterTypeId))
+				if (monDefs.ContainsKey(_monsterTypeId) && this.damageFormula == null)
 				{
 					MonsterDefinitions.MultiplierGroup kek = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(monDefs[_monsterTypeId].Skills.First().MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
 					int i = 1;
@@ -143,6 +144,7 @@ namespace RuneOptim
 
 							this.SkillupDamage = 0;
 						}
+						this.damageFormula = df;
 					}
 				}
 
@@ -288,14 +290,15 @@ namespace MonsterDefinitions
 		[EnumMember(Value = "/")]
 		Div,
 		[EnumMember(Value = "=")]
-		End
+		End,
+		[EnumMember(Value = "FIXED")]
+		Fixed
 	}
 
 	abstract public class MultiplierBase
 	{
 		abstract public double GetValue(RuneOptim.Stats vals);
-		//public MultiplierBase() { }
-		//public MultiplierBase(MultiplierBase rhs) { }
+		abstract public Expression AsExpression(ParameterExpression statType);
 	}
 
 	public class MultiplierValue : MultiplierBase
@@ -327,19 +330,23 @@ namespace MonsterDefinitions
 			key = a;
 			op = o;
 		}
-		/*
-		public MultiplierValue(MultiplierBase rhs)
+
+		public override Expression AsExpression(ParameterExpression statType)
 		{
-			if (rhs is MultiplierValue)
+			if (inner != null)
 			{
-				var vv = rhs as MultiplierValue;
-				value = vv.value;
-				inner = vv.inner;
-				key = vv.key;
-				op = vv.op;
+				return inner.AsExpression(statType);
+			}
+			else if (key != RuneOptim.Attr.Null)
+			{//Expression.Parameter(typeof(RuneOptim.Stats), "stats")
+				return Expression.Property(statType, "Item", Expression.Constant(key));
+			}
+			else
+			{
+				return Expression.Constant(value);
 			}
 		}
-		*/
+
 		public override string ToString()
 		{
 			StringBuilder sb = new StringBuilder();
@@ -450,6 +457,43 @@ namespace MonsterDefinitions
 			}
 
 			return ret;
+		}
+
+		public override Expression AsExpression(ParameterExpression statType)
+		{
+			if (props.Count == 0)
+				return Expression.Constant(0.0);
+
+			var express = props.First().AsExpression(statType);
+			var operate = props.First().op;
+
+			foreach (var prop in props.Skip(1))
+			{
+				switch (operate)
+				{
+					case MultiplierOperator.Add:
+						express = Expression.Add(express, prop.AsExpression(statType));
+						break;
+					case MultiplierOperator.Sub:
+						express = Expression.Subtract(express, prop.AsExpression(statType));
+						break;
+					case MultiplierOperator.Mult:
+						express = Expression.Multiply(express, prop.AsExpression(statType));
+						break;
+					case MultiplierOperator.Div:
+						express = Expression.Divide(express, prop.AsExpression(statType));
+						break;
+					case MultiplierOperator.End:
+						return express;
+					default:
+						break;
+				}
+				operate = prop.op;
+			}
+			//var expp = Expression.Lambda<Func<RuneOptim.Stats, double>>(express, Expression.Parameter(typeof(RuneOptim.Stats), "stats")).Compile();
+
+			return express;
+
 		}
 	}
 
