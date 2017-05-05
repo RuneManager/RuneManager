@@ -15,9 +15,14 @@ namespace RuneApp
         public bool orderPrimary = true;
         public bool orderSecondary = true;
 
+		public bool ShouldSort = true;
+
         // Compare two ListViewItems
         public int Compare(object a, object b)
         {
+			if (!ShouldSort)
+				return 0;
+
             ListViewItem lhs = (ListViewItem)a;
             ListViewItem rhs = (ListViewItem)b;
 

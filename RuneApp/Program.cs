@@ -202,82 +202,7 @@ namespace RuneApp
 			try
 			{
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
-				/*
-				// TODO: pick a format maybe
-				switch (format)
-				{
-					case "optimizer":
-						break;
-					case "swarfarm":
-						Program.data = new Save();
-						var qq = JsonConvert.DeserializeObject<SWarFarmSave>(text);
 
-						foreach (var r in qq.Runes)
-						{
-							var rr = new Rune()
-							{
-								Id = (int)r.Id,
-								Main.Type = r.Main.Type,
-								Main.Value = r.Main.Value,
-								Innate.Type = r.Innate.Type,
-								Innate.Value = r.Innate.Value,
-								Slot = r.Slot,
-								Set = (RuneSet)r._set,
-								Level = r.Level,
-								Grade = r.Grade,
-							};
-
-							if (r.AssignedTo != null)
-								rr.AssignedId = (int)r.AssignedTo.Id;
-							else
-								rr.AssignedName = "Inventory";
-
-							if (r.Subs.Count > 0)
-							{
-								rr.Sub1Type = r.Subs[0].Type;
-								rr.Sub1Value = r.Subs[0].Value;
-							}
-							if (r.Subs.Count > 1)
-							{
-								rr.Sub2Type = r.Subs[1].Type;
-								rr.Sub2Value = r.Subs[1].Value;
-							}
-							if (r.Subs.Count > 2)
-							{
-								rr.Sub3Type = r.Subs[2].Type;
-								rr.Sub3Value = r.Subs[2].Value;
-							}
-							if (r.Subs.Count > 3)
-							{
-								rr.Sub4Type = r.Subs[3].Type;
-								rr.Sub4Value = r.Subs[3].Value;
-							}
-
-							Program.data.Runes.Add(rr);
-						}
-
-						foreach (var m in qq.Monsters.Select(m => new Monster()
-						{
-							Id = (int)m.Id,
-							level = m.Level,
-							Health = m.Health,
-							Attack = m.Attack,
-							Defense = m.Defense,
-							Speed = m.Speed,
-							CritRate = m.CritRate,
-							CritDamage = m.CritDamage,
-							Resistance = m.Resistance,
-							Accuracy = m.Accuracy,
-							Name = m.Name,
-						}))
-						{
-							Program.data.Monsters.Add(m);
-						}
-						foreach (var dec in qq.Decorations)
-							Program.data.Decorations.Add(dec);
-						break;
-				}*/
-				
 				// TODO: trash
 				for (int i = 0; i < Deco.ShrineStats.Length; i++)
 				{
@@ -324,7 +249,7 @@ namespace RuneApp
 				bstr = bstr.Replace("\"b_res\"", "\"res\"");
 
 				var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
-				foreach (var b in bs)
+				foreach (var b in bs.OrderBy(b => b.priority))
 				{
 					builds.Add(b);
 				}
@@ -476,9 +401,15 @@ namespace RuneApp
 			{
 				string text = File.ReadAllText(filename);
 				var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
+				loads.Clear();
 
 				foreach (var load in lloads)
 				{
+					for (int i = 0; i < 6; i++)
+					{
+						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
+					}
+					load.Shrines = data.shrines;
 					loads.Add(load);
 				}
 				return LoadSaveResult.Success;

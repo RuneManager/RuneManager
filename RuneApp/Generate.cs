@@ -74,7 +74,11 @@ namespace RuneApp
 
 				loadoutList.Columns.Add(extra).Width = 80;
 			}
-			
+			loadoutList.Columns.Add("Skill1").Width = 80;
+			loadoutList.Columns.Add("Skill2").Width = 80;
+			loadoutList.Columns.Add("Skill3").Width = 80;
+			loadoutList.Columns.Add("Skill4").Width = 80;
+
 			toolStripStatusLabel1.Text = "Press 'Run' to begin.";
 			building = true;
 			toolStripProgressBar1.Maximum = Program.Settings.TestShow;
@@ -235,12 +239,11 @@ namespace RuneApp
 			{
 				if (!stat.HasFlag(Attr.ExtraStat))
 				{
-					string str = Cur[stat].ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					double vv = Cur[stat];
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort[stat] != 0)
 					{
-						p = Cur[stat] / build.Sort[stat];
-						if (build.Threshold[stat] != 0)
-							p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
+						p = (vv - build.Threshold[stat]) / build.Sort[stat];
 						str = p.ToString("0.#") + " (" + Cur[stat] + ")";
 						pts += p;
 					}
@@ -249,20 +252,36 @@ namespace RuneApp
 				}
 				else
 				{
-					string str = Cur.ExtraValue(stat).ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					double vv = Cur.ExtraValue(stat);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.ExtraGet(stat) != 0)
 					{
-						p = Cur.ExtraValue(stat) / build.Sort.ExtraGet(stat);
-						if (build.Threshold.ExtraGet(stat) != 0)
-							p -= Math.Max(0, Cur.ExtraValue(stat) - build.Threshold.ExtraGet(stat)) /
-								 build.Sort.ExtraGet(stat);
-						str = p.ToString("0.#") + " (" + Cur.ExtraValue(stat) + ")";
+						p = (vv - build.Threshold.ExtraGet(stat)) / build.Sort.ExtraGet(stat);
+						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}
 					w?.Invoke(str, i);
 					i++;
 				}
 			}
+			for (int j = 0; j < 4; j++)
+			{
+				if (Cur.SkillFunc[j] != null)
+				{
+					double vv = Cur.SkillFunc[j](Cur);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (build.Sort.DamageSkillups[j] != 0)
+					{
+						p = (vv - build.Threshold.DamageSkillups[j]) / build.Sort.DamageSkillups[j];
+						str = p.ToString("0.#") + " (" + vv + ")";
+						pts += p;
+					}
+
+					w?.Invoke(str, i);
+					i++;
+				}
+			}
+
 			return pts;
 		}
 
@@ -413,9 +432,9 @@ namespace RuneApp
 			SRuneMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
 			SRuneInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
 			SRuneSub1.Text = Rune.StringIt(rune.Subs, 0);
-			SRuneSub1.Text = Rune.StringIt(rune.Subs, 1);
-			SRuneSub1.Text = Rune.StringIt(rune.Subs, 2);
-			SRuneSub1.Text = Rune.StringIt(rune.Subs, 3);
+			SRuneSub2.Text = Rune.StringIt(rune.Subs, 1);
+			SRuneSub3.Text = Rune.StringIt(rune.Subs, 2);
+			SRuneSub4.Text = Rune.StringIt(rune.Subs, 3);
 			SRuneLevel.Text = rune.Level.ToString();
 			SRuneMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
 		}

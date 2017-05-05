@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Linq.Expressions;
 using Newtonsoft.Json;
 
 namespace RuneOptim
@@ -15,27 +16,39 @@ namespace RuneOptim
 	public class Loadout
 	{
 		private readonly Rune[] runes = new Rune[6];
+
 		private int runeCount = 0;
+
+		[JsonProperty("Sets")]
 		private readonly RuneSet[] sets = new RuneSet[3];
+
 		private bool setsFull = false;
 
 		private int[] fakeLevel = new int[6];
+
 		private bool[] predictSubs = new bool[6];
 
 		private int buildID;
+
 		public int BuildID { get { return buildID; } set { buildID = value; } }
 
 		[JsonIgnore]
 		public Rune[] Runes { get { return runes; } }
+
 		[JsonIgnore]
 		public int RuneCount { get { return runeCount; } }
+
+		[JsonIgnore]
 		public RuneSet[] Sets { get { return sets; } }
+
 		[JsonIgnore]
 		public bool SetsFull { get { return setsFull; } }
 
 		public double Time;
 
+		[JsonIgnore]
 		public ConcurrentDictionary<string, double>[] manageStats;
+
 		public ConcurrentDictionary<string, double>[] ManageStats
 		{
 			get
@@ -516,9 +529,19 @@ namespace RuneOptim
 			}
 		}
 
+		private static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
+		private static Func<Stats, Stats> _getStats = null;
+
 		// Using the given stats as a base, apply the modifiers
 		public Stats GetStats(Stats baseStats)
 		{
+			/*if (_getStats == null)
+			{
+				Expression.
+				var expr = ;
+				_getStats = Expression.Lambda<Func<Stats, Stats>>(expr, statType).Compile();
+			}*/
+
 			Stats value = new Stats(baseStats);
 			
 			// Apply percent before flat

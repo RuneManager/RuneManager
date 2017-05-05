@@ -93,6 +93,23 @@ namespace RuneOptim
 	public abstract class ListProp
 		: IList<int>
 	{
+		int maxind = -1;
+
+		virtual protected int MaxInd
+		{
+			get
+			{
+				if (maxind == -1)
+				{
+					var type = this.GetType();
+					maxind = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)))
+						.Max(p => ((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index) + 1;
+
+				}
+				return maxind;
+			}
+		}
+
 		virtual protected void OnSet(int i, int val) { }
 
 		private void _onSet(int i, int v)
@@ -107,53 +124,58 @@ namespace RuneOptim
 		{
 			get
 			{
-				var type = this.GetType();
-				var maxind = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)))
-					.Max(p => ((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index) + 1;
-				for (int i = 0; i < maxind; i++)
+				for (int i = 0; i < MaxInd; i++)
 				{
 					if (this[i] == -1)
 						return i;
 				}
-				return maxind;
+				return MaxInd;
 			}
 		}
 
-		public bool IsReadOnly
+		virtual public bool IsReadOnly
 		{
 			get
 			{
-				var type = this.GetType();
-				var props = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)));
-				foreach (var p in props)
+				foreach (var p in Props)
 				{
-					if (this[((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index] == -1)
+					if (this[p.Key] == -1)
 						return false;
 				}
 				return true;
 			}
 		}
 
-		public int this[int index]
+		Dictionary<int, System.Reflection.FieldInfo> props = null;
+
+		Dictionary<int, System.Reflection.FieldInfo> Props
 		{
 			get
 			{
-				var type = this.GetType();
-				var props = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)));
-				var prop = props.Where(p => ((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index == index).FirstOrDefault();
-				if (prop == null)
+				if (props == null)
+				{
+					var type = this.GetType();
+					var pros = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)));
+					props = pros.ToDictionary(p => ((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index);
+				}
+				return props;
+			}
+		}
+
+		virtual public int this[int index]
+		{
+			get
+			{
+				if (Props[index] == null)
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
-				return (int)prop.GetValue(this);
+				return (int)props[index].GetValue(this);
 			}
 			set
 			{
-				var type = this.GetType();
-				var props = type.GetFields().Where(p => Attribute.IsDefined(p, typeof(ListPropertyAttribute)));
-				var prop = props.Where(p => ((ListPropertyAttribute)p.GetCustomAttributes(typeof(ListPropertyAttribute), false).First()).Index == index).FirstOrDefault();
-				if (prop == null)
+				if (Props[index] == null)
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
 
-				prop.SetValue(this, (int)value);
+				props[index].SetValue(this, (int)value);
 				_onSet(index, value);
 			}
 		}
@@ -176,7 +198,7 @@ namespace RuneOptim
 
 		IEnumerator IEnumerable.GetEnumerator() { throw new NotImplementedException(); }
 
-		public void Add(int item)
+		virtual public void Add(int item)
 		{
 			this[Count] = item;
 		}
@@ -208,7 +230,7 @@ namespace RuneOptim
 		public int GrindBonus = -1;
 
 		[JsonIgnore]
-		private int _calcVal = 0;
+		private int _calcVal = -1;
 
 		protected override void OnSet(int i, int val)
 		{
@@ -225,6 +247,8 @@ namespace RuneOptim
 		{
 			get
 			{
+				if (_calcVal == -1)
+					OnSet(0, 0);
 				return _calcVal;
 			}
 			set
@@ -238,6 +262,64 @@ namespace RuneOptim
 		public override string ToString()
 		{
 			return Type + " +" + Value;
+		}
+
+		protected override int MaxInd
+		{
+			get
+			{
+				return 4;
+			}
+		}
+
+		public override bool IsReadOnly
+		{
+			get
+			{
+				return false;
+			}
+		}
+
+		public override int this[int index]
+		{
+			get
+			{
+				if (index == 0)
+					return (int)Type;
+				else if (index == 1)
+					return BaseValue;
+				else if (index == 2)
+					return __int2;
+				else if (index == 3)
+					return GrindBonus;
+				return -1;
+			}
+
+			set
+			{
+				if (index == 0)
+					Type = (Attr)value;
+				else if (index == 1)
+					BaseValue = value;
+				else if (index == 2)
+					__int2 = value;
+				else if (index == 3)
+					GrindBonus = value;
+			}
+		}
+
+		public override void Add(int item)
+		{
+			if (Type == Attr.Neg)
+				Type = (Attr)item;
+			else if (BaseValue == -1)
+				BaseValue = item;
+			else if (__int2 == -1)
+				__int2 = item;
+			else if (GrindBonus == -1)
+				GrindBonus = item;
+			else
+				throw new IndexOutOfRangeException();
 		}
 	}
 
@@ -504,10 +586,14 @@ namespace RuneOptim
 			{
 				double num = 0;
 				num += GetEfficiency(Innate.Type, Innate.Value);
-				num += GetEfficiency(Subs[0].Type, Subs[0].Value);
-				num += GetEfficiency(Subs[1].Type, Subs[1].Value);
-				num += GetEfficiency(Subs[2].Type, Subs[2].Value);
-				num += GetEfficiency(Subs[3].Type, Subs[3].Value);
+				if (Subs.Count > 0)
+					num += GetEfficiency(Subs[0].Type, Subs[0].Value);
+				if (Subs.Count > 1)
+					num += GetEfficiency(Subs[1].Type, Subs[1].Value);
+				if (Subs.Count > 2)
+					num += GetEfficiency(Subs[2].Type, Subs[2].Value);
+				if (Subs.Count > 3)
+					num += GetEfficiency(Subs[3].Type, Subs[3].Value);
 
 				num /= 1.8;
 				return num;
@@ -517,13 +603,13 @@ namespace RuneOptim
 		public int FlatCount()
 		{
 			int count = 0;
-			if (Subs[0].Type == Attr.Null) return count;
+			if (Subs.Count == 0 || Subs[0].Type == Attr.Null) return count;
 			count += (Subs[0].Type == Attr.HealthFlat || Subs[0].Type == Attr.DefenseFlat || Subs[0].Type == Attr.AttackFlat) ? 1 : 0;
-			if (Subs[1].Type == Attr.Null) return count;
+			if (Subs.Count == 1 || Subs[1].Type == Attr.Null) return count;
 			count += (Subs[1].Type == Attr.HealthFlat || Subs[1].Type == Attr.DefenseFlat || Subs[1].Type == Attr.AttackFlat) ? 1 : 0;
-			if (Subs[2].Type == Attr.Null) return count;
+			if (Subs.Count == 2 || Subs[2].Type == Attr.Null) return count;
 			count += (Subs[2].Type == Attr.HealthFlat || Subs[2].Type == Attr.DefenseFlat || Subs[2].Type == Attr.AttackFlat) ? 1 : 0;
-			if (Subs[3].Type == Attr.Null) return count;
+			if (Subs.Count == 3 || Subs[3].Type == Attr.Null) return count;
 			count += (Subs[3].Type == Attr.HealthFlat || Subs[3].Type == Attr.DefenseFlat || Subs[3].Type == Attr.AttackFlat) ? 1 : 0;
 
 			return count;
@@ -559,8 +645,16 @@ namespace RuneOptim
 			// set types
 			// stat types
 			// offense/defense/support/neutral
-			
-			var subs = new Attr[] { Subs[0].Type, Subs[1].Type, Subs[2].Type, Subs[3].Type };
+
+			var subs = new Attr[4];
+			if (Subs.Count > 0)
+				subs[0] = Subs[0].Type;
+			if (Subs.Count > 1)
+				subs[1] = Subs[1].Type;
+			if (Subs.Count > 2)
+				subs[2] = Subs[2].Type;
+			if (Subs.Count > 3)
+				subs[3] = Subs[3].Type;
 
 			foreach (var sub in subs)
 			{
@@ -701,18 +795,23 @@ namespace RuneOptim
 
 			if (Slot % 2 == 0)
 				d += 1;
-				
+
+			var stt = 0;
+			if (Subs.Count > 0 && hpStats.Contains(Subs[0].Type))
+				stt++;
+			if (Subs.Count > 1 && hpStats.Contains(Subs[1].Type))
+				stt++;
+			if (Subs.Count > 2 && hpStats.Contains(Subs[2].Type))
+				stt++;
+			if (Subs.Count > 3 && hpStats.Contains(Subs[3].Type))
+				stt++;
+
 			d += 0.2 * (
 				Rarity
 				- (
 					Rarity
 					- Math.Floor(Level / (double)3)
-				) * (
-					hpStats.Contains(Subs[0].Type) ? 1 :
-					hpStats.Contains(Subs[1].Type) ? 1 :
-					hpStats.Contains(Subs[2].Type) ? 1 :
-					hpStats.Contains(Subs[3].Type) ? 1 : 0
-				)
+				) * stt
 			);
 
 			return v/d;
@@ -751,17 +850,22 @@ namespace RuneOptim
 			if (Slot % 2 == 0)
 				d += 1.1;
 
+			var stt = 0;
+			if (Subs.Count > 0 && atkStats.Contains(Subs[0].Type))
+				stt++;
+			if (Subs.Count > 1 && atkStats.Contains(Subs[1].Type))
+				stt++;
+			if (Subs.Count > 2 && atkStats.Contains(Subs[2].Type))
+				stt++;
+			if (Subs.Count > 3 && atkStats.Contains(Subs[3].Type))
+				stt++;
+
 			d += 0.2 * (
 				Rarity
 				- (
 					Rarity
 					- Math.Floor(Level / (double)3)
-				) * (
-					atkStats.Contains(Subs[0].Type) ? 1 :
-					atkStats.Contains(Subs[1].Type) ? 1 :
-					atkStats.Contains(Subs[2].Type) ? 1 :
-					atkStats.Contains(Subs[3].Type) ? 1 : 0
-				)
+				) * stt
 			);
 
 			return v/d;
@@ -1203,6 +1307,15 @@ namespace RuneOptim
 
 			{Attr.Accuracy, MainValues_ResAcc },
 			{Attr.Resistance, MainValues_ResAcc },
+		};
+		internal static readonly Rune[] StaticNone = new Rune[]
+		{
+			new Rune() {Slot = 1 },
+			new Rune() {Slot = 2 },
+			new Rune() {Slot = 3 },
+			new Rune() {Slot = 4 },
+			new Rune() {Slot = 5 },
+			new Rune() {Slot = 6 },
 		};
 
 		public void FixShit()

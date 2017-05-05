@@ -111,6 +111,11 @@ namespace RuneOptim
 			}
 		}
 
+		public override string ToString()
+		{
+			return ID + " " + MonName;
+		}
+
 		[JsonProperty("id")]
 		public int ID = 0;
 
@@ -431,6 +436,18 @@ namespace RuneOptim
 					}
 				}
 			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				if (mon?.SkillFunc?[i] != null)
+				{
+					var ff = mon.SkillFunc[i];
+					double aa = ff(m);
+					if (!Sort.DamageSkillups[i].EqualTo(0))
+						pts += (aa - Threshold.DamageSkillups[i]) / Sort.DamageSkillups[i];
+				}
+			}
+
 			return pts;
 		}
 
@@ -704,6 +721,8 @@ namespace RuneOptim
 				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
 				loads.Clear();
+				mon.GetStats();
+				mon.DamageFormula(mon);
 
 				// set to running
 				IsRunning = true;
@@ -750,6 +769,8 @@ namespace RuneOptim
 						{
 							if (r1.SetIs4)
 							{
+								if (pop2 == 2)
+									pop2 = 7;
 								if (set4 == RuneSet.Null || pop4 >= 2)
 								{
 									set4 = r1.Set;
@@ -764,14 +785,19 @@ namespace RuneOptim
 									continue;
 								}
 							}
-							else if (set2 == RuneSet.Null || pop2 >= 2)
+							else
 							{
-								set2 = r1.Set;
-								pop2 = 2;
+								if (pop4 == 2)
+									pop4 = 7;
+								if (set2 == RuneSet.Null || pop2 >= 2)
+								{
+									set2 = r1.Set;
+									pop2 = 2;
+								}
 							}
 						}
 #endif
-									test.ApplyRune(r1, 6);
+						test.ApplyRune(r1, 6);
 
 						foreach (Rune r2 in runes[2])
 						{
@@ -782,6 +808,8 @@ namespace RuneOptim
 							{
 								if (r2.SetIs4)
 								{
+									if (pop2 == 3)
+										pop2 = 7;
 									if (set4 == RuneSet.Null || pop4 >= 3)
 									{
 										set4 = r2.Set;
@@ -798,6 +826,8 @@ namespace RuneOptim
 								}
 								else
 								{
+									if (pop4 == 3)
+										pop4 = 7;
 									if (set2 == RuneSet.Null || pop2 >= 3)
 									{
 										set2 = r2.Set;
@@ -825,6 +855,8 @@ namespace RuneOptim
 								{
 									if (r3.SetIs4)
 									{
+										if (pop2 == 4)
+											pop2 = 7;
 										if (set4 == RuneSet.Null || pop4 >= 4)
 										{
 											set4 = r3.Set;
@@ -841,6 +873,8 @@ namespace RuneOptim
 									}
 									else
 									{
+										if (pop4 == 4)
+											pop4 = 7;
 										if (set2 == RuneSet.Null || pop2 >= 4)
 										{
 											set2 = r3.Set;
@@ -870,6 +904,8 @@ namespace RuneOptim
 									{
 										if (r4.SetIs4)
 										{
+											if (pop2 == 5)
+												pop2 = 7;
 											if (set4 == RuneSet.Null || pop4 >= 5)
 											{
 												set4 = r4.Set;
@@ -886,10 +922,13 @@ namespace RuneOptim
 										}
 										else
 										{
+											if (pop4 == 5)
+												pop4 = 7;
 											if (set2 == RuneSet.Null || pop2 >= 5)
 											{
 												set2 = r4.Set;
 												pop2 = 5;
+												
 											}
 											else if (set4 != RuneSet.Null && set2 != r4.Set)
 											{
@@ -910,11 +949,9 @@ namespace RuneOptim
 											break;
 
 										test.ApplyRune(r5, 6);
-
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
-
 										isBad = false;
 
 										cstats = test.GetStats();
@@ -1510,7 +1547,7 @@ namespace RuneOptim
 
 				}
 			}
-
+			
 			int?[] slotFakes = new int?[6];
 			bool[] slotPred = new bool[6];
 			GetPrediction(slotFakes, slotPred);

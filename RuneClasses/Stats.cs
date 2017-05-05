@@ -49,12 +49,23 @@ namespace RuneOptim
         Neg = -1,
 
         [EnumMember(Value = "")]
-        Null = 0,
+		// TODO: FIXME:
+		[SkillAttr("DIE_RATE")]
+		[SkillAttr("ATTACK_CUR_HP_RATE")]
+		[SkillAttr("TARGET_CUR_HP_RATE")]
+		[SkillAttr("ATTACK_LV")]
+		Null = 0,
 
-        [EnumMember(Value = "HP flat")]
+		[EnumMember(Value = "HP flat")]
+		[SkillAttr("HP")]
+		[SkillAttr("ATTACK_CUR_HP")]
+		[SkillAttr("ATTACK_TOT_HP")]
+		[SkillAttr("ATTACK_LOSS_HP")]
+		[SkillAttr("TARGET_TOT_HP")]
+		[SkillAttr("LIFE_SHARE_ALL")]
         HealthFlat = 1,
 
-        [EnumMember(Value = "HP%")]
+		[EnumMember(Value = "HP%")]
         HealthPercent = 2,
 
         [EnumMember(Value = "ATK flat")]
@@ -65,9 +76,10 @@ namespace RuneOptim
         AttackPercent = 4,
 
         [EnumMember(Value = "DEF flat")]
+		[SkillAttr("DEF")]
         DefenseFlat = 5,
 
-        [EnumMember(Value = "DEF%")]
+		[EnumMember(Value = "DEF%")]
         DefensePercent = 6,
 
         // Thanks Swift -_-
@@ -105,10 +117,22 @@ namespace RuneOptim
         AverageDamage = 4 | ExtraStat,
 
         [EnumMember(Value = "MxD")]
-        MaxDamage = 5 | ExtraStat
-    }
+        MaxDamage = 5 | ExtraStat,
 
-    public enum AttributeCategory
+		[EnumMember(Value = "Skill1")]
+		Skill1 = 6 | ExtraStat,
+
+		[EnumMember(Value = "Skill2")]
+		Skill2 = 7 | ExtraStat,
+
+		[EnumMember(Value = "Skill3")]
+		Skill3 = 8 | ExtraStat,
+
+		[EnumMember(Value = "Skill4")]
+		Skill4 = 9 | ExtraStat,
+	}
+
+	public enum AttributeCategory
     {
         Neutral,
         Offensive,
@@ -153,6 +177,12 @@ namespace RuneOptim
 		[JsonIgnore]
 		public double SkillupDamage = 0;
 
+		[JsonProperty("skillup_damage")]
+		public double[] DamageSkillups = new double[8];
+
+		[JsonProperty("skill_cooltime")]
+		public int[] SkillTimes = new int[8];
+
 		public Stats() { }
         // copy constructor, amrite?
         public Stats(Stats rhs, bool copyExtra = false)
@@ -167,15 +197,19 @@ namespace RuneOptim
             Accuracy = rhs.Accuracy;
 			damageFormula = rhs.damageFormula;
 			_damageFormula = rhs._damageFormula;
-            if (copyExtra)
+
+			rhs._skillsFormula.CopyTo(_skillsFormula, 0);
+			rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
+
+			if (copyExtra)
             {
                 EffectiveHP = rhs.EffectiveHP;
                 EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
                 DamagePerSpeed = rhs.DamagePerSpeed;
                 AverageDamage = rhs.AverageDamage;
                 MaxDamage = rhs.MaxDamage;
-            }
-        }
+			}
+		}
 
         // fake "stats", need to be stored for scoring
         [JsonProperty("fake_ehp")]
@@ -193,28 +227,75 @@ namespace RuneOptim
         [JsonProperty("fake_mxd")]
         public double MaxDamage = 0;
 
+
 		[JsonIgnore]
 		public MonsterDefinitions.MultiplierBase damageFormula = null;// new MonsterDefinitions.MultiplierValue(Attr.AttackFlat);
 
 		[JsonIgnore]
-		private static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
+		protected static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
 
 		[JsonIgnore]
 		private Func<Stats, double> _damageFormula = null;
 
 		[JsonIgnore]
-		public Func<Stats, double> DamageFormula 
+		protected Func<Stats, double>[] _skillsFormula = new Func<Stats, double>[8];
+
+		[JsonIgnore]
+		private Expression __form = null;
+
+		[JsonIgnore]
+		public Func<Stats, double> DamageFormula
 		{
 			get
 			{
 				if (_damageFormula == null)
-					_damageFormula = Expression.Lambda<Func<Stats, double>>(damageFormula.AsExpression(statType), statType).Compile();
+				{
+					__form = damageFormula.AsExpression(statType);
+					_damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
+				}
 				return _damageFormula;
 			}
 		}
 
-        // Gets the Extra stat manually stored (for scoring)
-        public double ExtraGet(string extra)
+		public Func<Stats, double>[] SkillFunc
+		{
+			get
+			{
+				return _skillsFormula;
+			}
+		}
+
+		public double GetSkillMultiplier(int skillNum, Stats applyTo = null)
+		{
+			if (_skillsFormula.Length < skillNum || _skillsFormula[skillNum] == null)
+				return 0;
+			if (applyTo == null)
+				applyTo = this;
+			return this._skillsFormula[skillNum](applyTo);
+		}
+
+		public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null)
+		{
+			var mult = GetSkillMultiplier(skillNum, applyTo);
+
+			if (type == Attr.MaxDamage)
+			{
+				return mult * (1 + CritDamage + DamageSkillups[skillNum] * 0.01);
+			}
+			else if (type == Attr.AverageDamage)
+			{
+				return mult * (1 + CritDamage * CritRate + DamageSkillups[skillNum] * 0.01);
+			}
+			else if (type == Attr.DamagePerSpeed)
+			{
+				return mult * (1 + CritDamage * CritRate + DamageSkillups[skillNum] * 0.01) * Speed / SkillTimes[skillNum];
+			}
+
+			return mult;
+		}
+
+		// Gets the Extra stat manually stored (for scoring)
+		public double ExtraGet(string extra)
         {
             switch (extra)
             {
@@ -229,7 +310,7 @@ namespace RuneOptim
                 case "MxD":
                     return MaxDamage;
                 default:
-                    return 0;
+					throw new NotImplementedException();
             }
         }
 
@@ -247,9 +328,14 @@ namespace RuneOptim
                     return AverageDamage;
                 case Attr.MaxDamage:
                     return MaxDamage;
+				case Attr.Skill1:
+				case Attr.Skill2:
+				case Attr.Skill3:
+				case Attr.Skill4:
+					return DamageSkillups[(int)(extra - Attr.Skill1)];
                 default:
-                    return 0;
-            }
+					throw new NotImplementedException();
+			}
         }
 
         // Computes and returns the Extra stat
@@ -268,8 +354,8 @@ namespace RuneOptim
                 case "MxD":
 					return ExtraValue(Attr.MaxDamage);
                 default:
-                    return 0;
-            }
+					throw new NotImplementedException();
+			}
         }
 
         public double ExtraValue(Attr extra)
@@ -287,8 +373,8 @@ namespace RuneOptim
                 case Attr.MaxDamage:
                     return DamageFormula(this) * (1 + SkillupDamage + CritDamage / 100);
                 default:
-					return 0;
-            }
+					throw new NotImplementedException();
+			}
         }
 
         // manually sets the Extra stat (used for scoring)
@@ -312,8 +398,8 @@ namespace RuneOptim
                     MaxDamage = value;
                     break;
                 default:
-                    return;
-            }
+					throw new NotImplementedException();
+			}
         }
 
         // manually sets the Extra stat (used for scoring)
@@ -336,9 +422,15 @@ namespace RuneOptim
                 case Attr.MaxDamage:
                     MaxDamage = value;
                     break;
-                default:
-                    return;
-            }
+				case Attr.Skill1:
+				case Attr.Skill2:
+				case Attr.Skill3:
+				case Attr.Skill4:
+					DamageSkillups[(int)(extra - Attr.Skill1)] = value;
+					break;
+				default:
+					throw new NotImplementedException();
+			}
         }
         
         public void SetZero()
@@ -357,6 +449,7 @@ namespace RuneOptim
             DamagePerSpeed = 0;
             AverageDamage = 0;
             MaxDamage = 0;
+			DamageSkillups = new double[8];
         }
 
         public double Sum()
@@ -373,7 +466,8 @@ namespace RuneOptim
                 + EffectiveHPDefenseBreak
                 + DamagePerSpeed
                 + AverageDamage
-                + MaxDamage;
+                + MaxDamage
+				+ DamageSkillups.Sum();
         }
 
         // Allows speedy iteration through the entity
@@ -401,7 +495,8 @@ namespace RuneOptim
                     case "RES":
                         return Resistance;
                     default:
-                        return 0;
+						return 0;
+						//throw new NotImplementedException();
                 }
             }
 
@@ -434,8 +529,9 @@ namespace RuneOptim
                         Resistance = value;
                         break;
                     default:
-                        return;
-                }
+						break;
+						//throw new NotImplementedException();
+				}
             }
 
         }
@@ -478,8 +574,8 @@ namespace RuneOptim
                         return MaxDamage;
 
                 }
-                return 0;
-            }
+				throw new NotImplementedException();
+			}
 
             set
             {
@@ -528,11 +624,12 @@ namespace RuneOptim
                     case Attr.MaxDamage:
                         MaxDamage = value;
                         break;
+					default:
+						throw new NotImplementedException();
+				}
+			}
 
-                }
-            }
-
-        }
+		}
 
         // Perfectly legit operator overloading to compare builds/minimum
         public static bool operator <(Stats lhs, Stats rhs)
@@ -553,33 +650,6 @@ namespace RuneOptim
         public bool CheckMax(Stats rhs)
         {
             return Build.statEnums.Any(s => rhs[s] > 0 && this[s] > rhs[s]);
-
-            /*
-            foreach (var stat in Build.statEnums)
-            {
-                if (rhs[stat] > 0 && this[stat] > rhs[stat])
-                    return true;
-            }
-
-            if (rhs.Health > 0 && Health > rhs.Health)
-                return true;
-            if (rhs.Attack > 0 && Attack > rhs.Attack)
-                return true;
-            if (rhs.Defense > 0 && Defense > rhs.Defense)
-                return true;
-            if (rhs.Speed > 0 && Speed > rhs.Speed)
-                return true;
-            if (rhs.CritRate > 0 && CritRate > rhs.CritRate)
-                return true;
-            if (rhs.CritDamage > 0 && CritDamage > rhs.CritDamage)
-                return true;
-            if (rhs.Resistance > 0 && Resistance > rhs.Resistance)
-                return true;
-            if (rhs.Accuracy > 0 && Accuracy > rhs.Accuracy)
-                return true;
-
-            return false;
-            */
         }
 
         public bool GreaterEqual(Stats rhs, bool extraGet = false)
@@ -614,7 +684,16 @@ namespace RuneOptim
             if (ExtraValue(Attr.MaxDamage) < rhs.MaxDamage)
                 return false;
 
-            return true;
+			if (_skillsFormula[0] != null && _skillsFormula[0](this) < rhs.DamageSkillups[0])
+				return false;
+			if (_skillsFormula[1] != null && _skillsFormula[1](this) < rhs.DamageSkillups[1])
+				return false;
+			if (_skillsFormula[2] != null && _skillsFormula[2](this) < rhs.DamageSkillups[2])
+				return false;
+			if (_skillsFormula[3] != null && _skillsFormula[3](this) < rhs.DamageSkillups[3])
+				return false;
+
+			return true;
         }
 
         public static Stats operator +(Stats lhs, Stats rhs)

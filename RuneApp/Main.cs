@@ -290,13 +290,15 @@ namespace RuneApp
 
 		private void ColorMonsWithBuilds()
 		{
+			//var items = buildList.Items.Cast<ListViewItem>();
 			foreach (ListViewItem lvim in dataMonsterList.Items)
 			{
 				var mtag = lvim.Tag as Monster;
 				if (mtag != null)
 				{
-					var lvib = buildList.Items.Cast<ListViewItem>().FirstOrDefault(i => (i.Tag as Build)?.mon == mtag);
-					if (lvib != null)
+					//var lvib = items.FirstOrDefault(i => (i.Tag as Build)?.mon == mtag);
+					//if (lvib != null)
+					if (Program.builds.Any(b => b.mon == mtag))
 					{
 						lvim.ForeColor = Color.Green;
 					}
@@ -336,15 +338,15 @@ namespace RuneApp
 							while (nli.SubItems.Count < 6)
 								nli.SubItems.Add("");
 							nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
-							nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.Best.Name);
-							nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Best.Id.ToString());
+							nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
+							nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.Id.ToString());
 							nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.runesNew + l.runesChanged).ToString());
 							if (l.runesNew > 0 && b.mon.Current.RuneCount < 6)
 								nli.SubItems[3].ForeColor = Color.Green;
 							if (Program.Settings.SplitAssign)
 								nli.SubItems[3].Text = l.runesNew.ToString() + "/" + l.runesChanged.ToString();
-							nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, b.Best.Current.powerup.ToString());
-							nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (b.Time / (double)1000).ToString("0.##"));
+							nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
+							nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
 							nli.UseItemStyleForSubItems = false;
 							if (b.Time / (double)1000 > 60)
 								nli.SubItems[5].BackColor = Color.Red;
@@ -381,7 +383,7 @@ namespace RuneApp
 						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon.Name, "", b.mon.Id.ToString(), teamstr });
 						li.Tag = b;
 						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
-						var lv1li = tempMons.Where(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Where(s => s.Text == b.mon.Id.ToString()).Count() > 0).FirstOrDefault();
+						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.Id.ToString()));
 						if (lv1li != null)
 						{
 							lv1li.ForeColor = Color.Green;
@@ -674,13 +676,18 @@ namespace RuneApp
 			filterRunesList(x => true);
 		}
 
-		private void loadout_list_select(object sender, EventArgs e)
+		private ListViewItem lastFocused = null;
+
+		private void loadoutlist_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (loadoutList.FocusedItem != null)
+			if (loadoutList.SelectedItems.Count == 0)
+				lastFocused = null;
+			if (loadoutList.FocusedItem != null && lastFocused != loadoutList.FocusedItem)
 			{
 				var item = loadoutList.FocusedItem;
 				if (item.Tag != null)
 				{
+					Console.WriteLine(loadoutList.FocusedItem.Index);
 					Loadout load = (Loadout)item.Tag;
 
 					var monid = ulong.Parse(item.SubItems[2].Text);
@@ -694,7 +701,7 @@ namespace RuneApp
 					else
 						mon = build.mon;
 
-					ShowMon(mon);
+					ShowMon(mon, false);
 
 					ShowStats(load.GetStats(mon), mon);
 
@@ -725,6 +732,9 @@ namespace RuneApp
 					ShowSets(load);
 				}
 			}
+
+			lastFocused = loadoutList.FocusedItem;
+
 			int cost = 0;
 			foreach (ListViewItem li in loadoutList.SelectedItems)
 			{
@@ -751,13 +761,13 @@ namespace RuneApp
 			if (mon == null)
 				return;
 
-			using (var ff = new Create())
+			Build bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
 			{
-				var bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
-				{
-					New = true,
-					ID = buildList.Items.Count + 1
-				};
+				New = true,
+				ID = buildList.Items.Count + 1
+			};
+			using (var ff = new Create(bb))
+			{
 				while (Program.builds.Any(b => b.ID == bb.ID))
 				{
 					bb.ID++;
@@ -793,9 +803,8 @@ namespace RuneApp
 				{
 					Build bb = (Build)item.Tag;
 					Monster before = bb.mon;
-					using (var ff = new Create())
+					using (var ff = new Create(bb))
 					{
-						ff.build = bb;
 						var res = ff.ShowDialog();
 						if (res == DialogResult.OK)
 						{
@@ -1260,7 +1269,7 @@ namespace RuneApp
 			help.Location = new Point(Location.X + Width, Location.Y);
 		}
 
-		private void ShowMon(Monster mon)
+		private void ShowMon(Monster mon, bool showRunes = true)
 		{
 			displayMon = mon;
 			var cur = mon.GetStats();
@@ -1270,7 +1279,8 @@ namespace RuneApp
 			statLevel.Text = mon.level.ToString();
 
 			ShowStats(cur, mon);
-			ShowRunes(mon.Current.Runes);
+			if (showRunes)
+				ShowRunes(mon.Current.Runes);
 			ShowSets(mon.Current);
 
 		}
@@ -1300,20 +1310,24 @@ namespace RuneApp
 				runeDial.UpdateSets(load.Sets, !load.SetsFull);
 		}
 
+		private static string[] statCtrlNames = {"", "HP", "", "ATK", "", "DEF", "", "", "SPD", "CR", "CD", "RES", "ACC" };
+		private static Control[] statCtrls = new Control[37];
+
 		private void ShowStats(Stats cur, Stats mon)
 		{
-			foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" })
+			foreach (Attr a in new Attr[] { Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy })
 			{
-				groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat].ToString();
-				groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat].ToString();
-				groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]);
-			}
+				if (statCtrls[(int)a] == null)
+					statCtrls[(int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Base", false).FirstOrDefault();
+				statCtrls[(int)a].Text = mon[a] + (((int)a) > 8 ? "%" : "");
 
-			foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" })
-			{
-				groupBox1.Controls.Find(stat + "Base", false).FirstOrDefault().Text = mon[stat] + "%";
-				groupBox1.Controls.Find(stat + "Total", false).FirstOrDefault().Text = cur[stat] + "%";
-				groupBox1.Controls.Find(stat + "Bonus", false).FirstOrDefault().Text = "+" + (cur[stat] - mon[stat]);
+				if (statCtrls[2 * (int)a] == null)
+					statCtrls[2 * (int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Total", false).FirstOrDefault();
+				statCtrls[2 * (int)a].Text = cur[a] + (((int)a) > 8 ? "%" : "");
+
+				if (statCtrls[3 * (int)a] == null)
+					statCtrls[3 * (int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Bonus", false).FirstOrDefault();
+				statCtrls[3 * (int)a].Text = "+" + (cur[a] - mon[a]);
 			}
 		}
 
@@ -1377,45 +1391,25 @@ namespace RuneApp
 
 		public void RegenLists()
 		{
+			// TODO: comment it up a little?
+			((ListViewSort)dataMonsterList.ListViewItemSorter).ShouldSort = false;
+			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = false;
+
 			dataMonsterList.Items.Clear();
 			dataRuneList.Items.Clear();
 			listView4.Items.Clear();
 			if (Program.data == null)
 				return;
-
-			foreach (Monster mon in Program.data.Monsters)
-			{
-				string pri = "";
-				mon.priority = 0;
-				if (Program.builds.FirstOrDefault(b => b.mon == mon) != null)
-					mon.priority = Program.builds.FirstOrDefault(b => b.mon == mon).priority;
-				if (mon.priority != 0)
-					pri = mon.priority.ToString();
-
-				ListViewItem item = new ListViewItem(new string[]{
-					mon.Name,
+			int maxPri = Program.builds.Max(b => b.priority) + 1;
+			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => new ListViewItem() {
+				ForeColor = mon.inStorage ? Color.Gray : Color.Black,
+				Text = mon.Name,
+				SubItems = {
 					mon.Id.ToString(),
-					pri,
-				});
-				if (mon.inStorage)
-					item.ForeColor = Color.Gray;
-
-				item.Tag = mon;
-				dataMonsterList.Items.Add(item);
-			}
-
-			foreach (Monster mon in Program.data.Monsters.Where(m => m.priority == 0))
-			{
-				if (mon.Current.RuneCount > 0)
-				{
-					mon.priority = Program.data.Monsters.Max(m => m.priority) + 1;
-					var lvi = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => (i.Tag as Monster).Id == mon.Id);
-					if (lvi != null)
-					{
-						lvi.SubItems[2].Text = mon.priority.ToString();
-					}
-				}
-			}
+					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
+				},
+				Tag = mon,
+			}).ToArray());
 
 			foreach (Rune rune in Program.data.Runes)
 			{
@@ -1433,6 +1427,12 @@ namespace RuneApp
 			}
 			checkLocked();
 			ColorMonsWithBuilds();
+
+			((ListViewSort)dataMonsterList.ListViewItemSorter).ShouldSort = true;
+			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
+
+			dataMonsterList.Sort();
+			dataRuneList.Sort();
 		}
 
 		public void checkLocked()

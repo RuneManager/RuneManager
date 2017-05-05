@@ -96,14 +96,19 @@ namespace RuneOptim
                         {
                             mon.ApplyRune(rune);
                             rune.AssignedName = mon.Name;
-                        }
+                        }/*
+						for (int i = 0; i < 6; i++)
+						{
+							if (mon.Current.Runes[i] == null)
+								mon.ApplyRune(Rune.StaticNone[i]);
+						}*/
 
                         if (mon.priority == 0 && mon.Current.RuneCount > 0)
                         {
                             //mon.priority = priority++;
                         }
 
-                        var stats = mon.GetStats();
+                        //var stats = mon.GetStats();
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
