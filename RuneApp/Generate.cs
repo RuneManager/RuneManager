@@ -74,6 +74,10 @@ namespace RuneApp
 
 				loadoutList.Columns.Add(extra).Width = 80;
 			}
+			loadoutList.Columns.Add("Skill1").Width = 80;
+			loadoutList.Columns.Add("Skill2").Width = 80;
+			loadoutList.Columns.Add("Skill3").Width = 80;
+			loadoutList.Columns.Add("Skill4").Width = 80;
 			
 			toolStripStatusLabel1.Text = "Press 'Run' to begin.";
 			building = true;
@@ -85,7 +89,7 @@ namespace RuneApp
 			{
 				loadoutList.Items.Add(renderLoadoutTest(b));
 			}
-
+			
 			// Disregard locked, but honor equippedness checking
 			build.BuildPrintTo += Build_BuildPrintTo;
 			build.BuildProgTo += Build_BuildProgTo;
@@ -235,12 +239,11 @@ namespace RuneApp
 			{
 				if (!stat.HasFlag(Attr.ExtraStat))
 				{
-					string str = Cur[stat].ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					double vv = Cur[stat];
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort[stat] != 0)
 					{
-						p = Cur[stat] / build.Sort[stat];
-						if (build.Threshold[stat] != 0)
-							p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
+						p = (build.Threshold[stat].EqualTo(0) ? vv : vv - build.Threshold[stat]) / build.Sort[stat];
 						str = p.ToString("0.#") + " (" + Cur[stat] + ")";
 						pts += p;
 					}
@@ -249,16 +252,31 @@ namespace RuneApp
 				}
 				else
 				{
-					string str = Cur.ExtraValue(stat).ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					double vv = Cur.ExtraValue(stat);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.ExtraGet(stat) != 0)
 					{
-						p = Cur.ExtraValue(stat) / build.Sort.ExtraGet(stat);
-						if (build.Threshold.ExtraGet(stat) != 0)
-							p -= Math.Max(0, Cur.ExtraValue(stat) - build.Threshold.ExtraGet(stat)) /
-								 build.Sort.ExtraGet(stat);
-						str = p.ToString("0.#") + " (" + Cur.ExtraValue(stat) + ")";
+						p = (build.Threshold.ExtraGet(stat).EqualTo(0) ? vv : vv - build.Threshold.ExtraGet(stat)) / build.Sort.ExtraGet(stat);
+						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}
+					w?.Invoke(str, i);
+					i++;
+				}
+			}
+			for (int j = 0; j < 4; j++)
+			{
+				if (Cur.SkillFunc[j] != null)
+				{
+					double vv = Cur.SkillFunc[j](Cur);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (build.Sort.DamageSkillups[j] != 0)
+					{
+						p = (build.Threshold.DamageSkillups[j].EqualTo(0) ? vv : vv - build.Threshold.DamageSkillups[j]) / build.Sort.DamageSkillups[j];
+						str = p.ToString("0.#") + " (" + vv + ")";
+						pts += p;
+					}
+
 					w?.Invoke(str, i);
 					i++;
 				}
@@ -410,14 +428,14 @@ namespace RuneApp
 
 		private void rune_Stats(Rune rune)
 		{
-			SRuneMain.Text = Rune.StringIt(rune.MainType, rune.MainValue);
-			SRuneInnate.Text = Rune.StringIt(rune.InnateType, rune.InnateValue);
-			SRuneSub1.Text = Rune.StringIt(rune.Sub1Type, rune.Sub1Value);
-			SRuneSub2.Text = Rune.StringIt(rune.Sub2Type, rune.Sub2Value);
-			SRuneSub3.Text = Rune.StringIt(rune.Sub3Type, rune.Sub3Value);
-			SRuneSub4.Text = Rune.StringIt(rune.Sub4Type, rune.Sub4Value);
+			SRuneMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
+			SRuneInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
+			SRuneSub1.Text = Rune.StringIt(rune.Subs, 0);
+			SRuneSub2.Text = Rune.StringIt(rune.Subs, 1);
+			SRuneSub3.Text = Rune.StringIt(rune.Subs, 2);
+			SRuneSub4.Text = Rune.StringIt(rune.Subs, 3);
 			SRuneLevel.Text = rune.Level.ToString();
-			SRuneMon.Text = "[" + rune.ID + "] " + rune.AssignedName;
+			SRuneMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
 		}
 
 		private void hideRuneBox(object sender, EventArgs e)

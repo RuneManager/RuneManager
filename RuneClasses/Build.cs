@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define BUILD_PRECHECK_BUILDS
+//#define BUILD_PRECHECK_BUILDS_DEBUG
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -107,7 +110,12 @@ namespace RuneOptim
 				}
 			}
 		}
-
+		
+		public override string ToString()
+		{
+			return ID + " " + MonName;
+		}
+		
 		[JsonProperty("id")]
 		public int ID = 0;
 
@@ -300,10 +308,10 @@ namespace RuneOptim
 		public bool autoAdjust = false;
 
 		// Save to JSON
-		public List<int> BannedRuneId = new List<int>();
+		public List<ulong> BannedRuneId = new List<ulong>();
 
 		[JsonIgnore]
-		public List<int> bannedRunesTemp = new List<int>();
+		public List<ulong> bannedRunesTemp = new List<ulong>();
 
 		/// ---------------
 
@@ -336,7 +344,7 @@ namespace RuneOptim
 
 		[JsonIgnore]
 		private object isRunLock = new object();
-
+		
 		[JsonIgnore]
 		public bool IsRunning
 		{
@@ -386,8 +394,8 @@ namespace RuneOptim
 
 		// Seems to out-of-mem if too many
 		private static readonly int MaxBuilds32 = 500000;
-
-		public void BanEmTemp(params int[] brunes)
+		
+		public void BanEmTemp(params ulong[] brunes)
 		{
 			bannedRunesTemp.Clear();
 			foreach (var r in brunes)
@@ -428,6 +436,18 @@ namespace RuneOptim
 					}
 				}
 			}
+
+			for (int i = 0; i < 4; i++)
+			{
+				if (mon?.SkillFunc?[i] != null)
+				{
+					var ff = mon.SkillFunc[i];
+					double aa = ff(m);
+					if (!Sort.DamageSkillups[i].EqualTo(0))
+						pts += (Threshold.DamageSkillups[i].EqualTo(0) ? aa : aa - Threshold.DamageSkillups[i]) / Sort.DamageSkillups[i];
+				}
+			}
+			
 			return pts;
 		}
 
@@ -673,15 +693,7 @@ namespace RuneOptim
 					return;
 				}
 
-				bool hasSort = false;
-				foreach (Attr stat in statAll)
-				{
-					if (!(stat.HasFlag((Attr.ExtraStat)) ? Sort.ExtraGet(stat) : Sort[stat]).EqualTo(0))
-					{
-						hasSort = true;
-						break;
-					}
-				}
+				bool hasSort = Sort.NonZero();
 				if (BuildTake == 0 && !hasSort)
 				{
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "No sort"));
@@ -701,9 +713,15 @@ namespace RuneOptim
 				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
 				loads.Clear();
+				mon.GetStats();
+				mon.DamageFormula(mon);
 
 				// set to running
 				IsRunning = true;
+
+#if BUILD_PRECHECK_BUILDS_DEBUG
+				SynchronizedCollection<string> outstrs = new SynchronizedCollection<string>();
+#endif
 
 				// Parallel the outer loop
 				SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
@@ -729,36 +747,203 @@ namespace RuneOptim
 					test.Current.PredictSubs = slotPred;
 					test.ApplyRune(r0, 6);
 
+					RuneSet set4 = r0.SetIs4 ? r0.Set : RuneSet.Null;
+					RuneSet set2 = r0.SetIs4 ? RuneSet.Null : r0.Set;
+					int pop4 = 0;
+					int pop2 = 0;
+
 					foreach (Rune r1 in runes[1])
 					{
 						if (!IsRunning) // Can't break to a label, don't want to goto
 							break;
+#if BUILD_PRECHECK_BUILDS
+						if (!this.AllowBroken)
+						{
+							if (r1.SetIs4)
+							{
+								if (pop2 == 2)
+									pop2 = 7;
+								if (set4 == RuneSet.Null || pop4 >= 2)
+								{
+									set4 = r1.Set;
+									pop4 = 2;
+								}
+								else if (set4 != r1.Set)
+								{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+									outstrs.Add($"bad4@2 {set4} {set2} | {r0.Set} {r1.Set}");
+#endif
+									kill += runes[2].Length * runes[3].Length * runes[4].Length * runes[5].Length;
+									continue;
+								}
+							}
+							else
+							{
+								if (pop4 == 2)
+									pop4 = 7;
+								if (set2 == RuneSet.Null || pop2 >= 2)
+								{
+									set2 = r1.Set;
+									pop2 = 2;
+								}
+							}
+						}
+#endif
 						test.ApplyRune(r1, 6);
 
 						foreach (Rune r2 in runes[2])
 						{
 							if (!IsRunning)
 								break;
-							test.ApplyRune(r2, 6);
+#if BUILD_PRECHECK_BUILDS
+							if (!this.AllowBroken)
+							{
+								if (r2.SetIs4)
+								{
+									if (pop2 == 3)
+										pop2 = 7;
+									if (set4 == RuneSet.Null || pop4 >= 3)
+									{
+										set4 = r2.Set;
+										pop4 = 3;
+									}
+									else if (set4 != r2.Set)
+									{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"bad4@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
+#endif
+										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										continue;
+									}
+								}
+								else
+								{
+									if (pop4 == 3)
+										pop4 = 7;
+									if (set2 == RuneSet.Null || pop2 >= 3)
+									{
+										set2 = r2.Set;
+										pop2 = 3;
+									}
+									else if (set4 != RuneSet.Null && set2 != r2.Set)
+									{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"bad2@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
+#endif
+										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										continue;
+									}
+								}
+							}
+#endif
+										test.ApplyRune(r2, 6);
 
 							foreach (Rune r3 in runes[3])
 							{
 								if (!IsRunning)
 									break;
+#if BUILD_PRECHECK_BUILDS
+								if (!this.AllowBroken)
+								{
+									if (r3.SetIs4)
+									{
+										if (pop2 == 4)
+											pop2 = 7;
+										if (set4 == RuneSet.Null || pop4 >= 4)
+										{
+											set4 = r3.Set;
+											pop4 = 4;
+										}
+										else if (set4 != r3.Set)
+										{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+											outstrs.Add($"bad4@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
+#endif
+											kill += runes[4].Length * runes[5].Length;
+											continue;
+										}
+									}
+									else
+									{
+										if (pop4 == 4)
+											pop4 = 7;
+										if (set2 == RuneSet.Null || pop2 >= 4)
+										{
+											set2 = r3.Set;
+											pop2 = 4;
+										}
+										else if (set4 != RuneSet.Null && set2 != r3.Set)
+										{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+											outstrs.Add($"bad2@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
+#endif
+											kill += runes[4].Length * runes[5].Length;
+											continue;
+										}
+									}
+								}
+#endif
 								test.ApplyRune(r3, 6);
 
 								foreach (Rune r4 in runes[4])
 								{
 									if (!IsRunning)
+									{
 										break;
+									}
+#if BUILD_PRECHECK_BUILDS
+									if (!this.AllowBroken)
+									{
+										if (r4.SetIs4)
+										{
+											if (pop2 == 5)
+												pop2 = 7;
+											if (set4 == RuneSet.Null || pop4 >= 5)
+											{
+												set4 = r4.Set;
+												pop4 = 5;
+											}
+											else if (set4 != r4.Set)
+											{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+												outstrs.Add($"bad4@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
+#endif
+												kill += runes[5].Length;
+												continue;
+											}
+										}
+										else
+										{
+											if (pop4 == 5)
+												pop4 = 7;
+											if (set2 == RuneSet.Null || pop2 >= 5)
+											{
+												set2 = r4.Set;
+												pop2 = 5;
+												
+											}
+											else if (set4 != RuneSet.Null && set2 != r4.Set)
+											{
+#if BUILD_PRECHECK_BUILDS_DEBUG
+												outstrs.Add($"bad2@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
+#endif
+												kill += runes[5].Length;
+												continue;
+											}
+										}
+									}
+#endif
 									test.ApplyRune(r4, 6);
+
 									foreach (Rune r5 in runes[5])
 									{
 										if (!IsRunning)
 											break;
 
 										test.ApplyRune(r5, 6);
-
+#if BUILD_PRECHECK_BUILDS_DEBUG
+										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
+#endif
 										isBad = false;
 
 										cstats = test.GetStats();
@@ -882,7 +1067,10 @@ namespace RuneOptim
 						}
 					}
 				});
-
+				
+#if BUILD_PRECHECK_BUILDS_DEBUG
+				System.IO.File.WriteAllLines("_into_the_bridge.txt", outstrs.ToArray());
+#endif
 				if (BuildSaveStats)
 				{
 					foreach (var ra in runes)
@@ -968,7 +1156,7 @@ namespace RuneOptim
 					}
 					for (int i = 0; i < 6; i++)
 					{
-						if (!BuildGoodRunes && mon.Current.Runes[i] != null && mon.Current.Runes[i].ID != Best.Current.Runes[i].ID)
+						if (!BuildGoodRunes && mon.Current.Runes[i] != null && mon.Current.Runes[i].Id != Best.Current.Runes[i].Id)
 							mon.Current.Runes[i].Swapped = true;
 					}
 				}
@@ -1228,15 +1416,15 @@ namespace RuneOptim
 			Attr[] evenSlots = new Attr[] { Attr.Null, Attr.Null, Attr.Null };
 
 			// get the average MainStats for slots
-			var avSel = runes[1].Where(r => r.MainType == Attr.Speed).ToArray();
+			var avSel = runes[1].Where(r => r.Main.Type == Attr.Speed).ToArray();
 			var avmSpeed = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Speed, (slotFakes[1] ?? 0), slotPred[1]));
-			avSel = runes[3].Where(r => r.MainType == Attr.CritRate).ToArray();
+			avSel = runes[3].Where(r => r.Main.Type == Attr.CritRate).ToArray();
 			var avmCRate = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritRate, (slotFakes[3] ?? 0), slotPred[3]));
-			avSel = runes[3].Where(r => r.MainType == Attr.CritDamage).ToArray();
+			avSel = runes[3].Where(r => r.Main.Type == Attr.CritDamage).ToArray();
 			var avmCDam = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritDamage, (slotFakes[3] ?? 0), slotPred[3]));
-			avSel = runes[5].Where(r => r.MainType == Attr.Accuracy).ToArray();
+			avSel = runes[5].Where(r => r.Main.Type == Attr.Accuracy).ToArray();
 			var avmAcc = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Accuracy, (slotFakes[5] ?? 0), slotPred[5]));
-			avSel = runes[5].Where(r => r.MainType == Attr.Resistance).ToArray();
+			avSel = runes[5].Where(r => r.Main.Type == Attr.Resistance).ToArray();
 			var avmRes = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Resistance, (slotFakes[5] ?? 0), slotPred[5]));
 
 			if (avmSpeed > 20 && ret.Speed > avmSpeed + 10)
@@ -1323,7 +1511,7 @@ namespace RuneOptim
 				// only if the rune isn't currently locked for another purpose
 				if (!RunesUseLocked)
 					rsGlobal = rsGlobal.Where(r => r.Locked == false);
-				rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.ID) && !bannedRunesTemp.Any(b => b == r.ID));
+				rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !bannedRunesTemp.Any(b => b == r.Id));
 			}
 
 
@@ -1347,10 +1535,9 @@ namespace RuneOptim
 						r.manageStats.AddOrUpdate("Set", 1, (s, d) => { return d + 1; });
 					else
 						r.manageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
-
 				}
 			}
-
+			
 			int?[] slotFakes = new int?[6];
 			bool[] slotPred = new bool[6];
 			GetPrediction(slotFakes, slotPred);
@@ -1364,7 +1551,7 @@ namespace RuneOptim
 				// makes sure that the primary stat type is in the selection
 				if (i % 2 == 1 && slotStats[i].Count > 0) // actually evens because off by 1
 				{
-					runes[i] = runes[i].Where(r => slotStats[i].Contains(r.MainType.ToForms())).ToArray();
+					runes[i] = runes[i].Where(r => slotStats[i].Contains(r.Main.Type.ToForms())).ToArray();
 				}
 
 				if (BuildSaveStats)

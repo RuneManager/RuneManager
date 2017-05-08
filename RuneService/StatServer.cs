@@ -59,7 +59,7 @@ namespace RuneService
 	{
 		static SQLiteConnection connection = null;
 
-		static SQLTable<SWFRune> runeTable = null;
+		static SQLTable<Rune> runeTable = null;
 
 		public static void Init()
 		{
@@ -69,18 +69,18 @@ namespace RuneService
 			connection = new SQLiteConnection("stats.sqlite");
 			connection.Open();
 
-			runeTable = new SQLTable<SWFRune>(connection, "runes");
+			runeTable = new SQLTable<Rune>(connection, "runes");
 			runeTable.Create();
 		}
 
-		public static void LogRune(SWFRune rune)
+		public static void LogRune(Rune rune)
 		{
 			if (!hasTable("runeUpgrades"))
 			{
 				SQLiteCommand com = new SQLiteCommand("CREATE TABLE runes (rune_id BIGINT, wizard_id BIGINT, slot_no SMALLINT, );");
 
 			}
-			if (hasIdInTable("runes", "rune_id", rune.RuneId))
+			if (hasIdInTable("runes", "rune_id", rune.Id))
 			{
 
 			}
@@ -99,7 +99,7 @@ namespace RuneService
 			return ((int?)com.ExecuteScalar() ?? 0) != 0;
 		}
 
-		private static bool hasIdInTable(string tname, string col, long id)
+		private static bool hasIdInTable(string tname, string col, ulong id)
 		{
 			SQLiteCommand com = new SQLiteCommand("SELECT count(*) FROM @0 WHERE @1=@2;");
 			com.Parameters.AddWithValue("@0", tname);

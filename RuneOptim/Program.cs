@@ -19,7 +19,7 @@ namespace RuneOptim
             Save data = JsonConvert.DeserializeObject<Save>(save);
             foreach (Monster mon in data.Monsters)
             {
-                var equipedRunes = data.Runes.Where(r => r.AssignedId == mon.ID);
+                var equipedRunes = data.Runes.Where(r => r.AssignedId == mon.Id);
 
                 foreach (Rune rune in equipedRunes)
                 {
@@ -293,9 +293,9 @@ namespace RuneOptim
 
             var qq = data.Runes.Where(r => r.Locked == false && r.MainType == Attr.CritDamage && (r.Set == RuneSet.Fatal || r.Set == RuneSet.Blade)).OrderByDescending(r => r.CritDamage).ToArray();
             if (qq.Length > 0)
-                Console.WriteLine(qq[0].ID);
+                Console.WriteLine(qq[0].Id);
             if (qq.Length > 1)
-                Console.WriteLine(qq[1].ID);
+                Console.WriteLine(qq[1].Id);
 
 
             best = MakeBuild(lushen1, MakeSets(data.Runes,

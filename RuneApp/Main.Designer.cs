@@ -1345,7 +1345,7 @@
 			this.loadoutList.TabIndex = 12;
 			this.loadoutList.UseCompatibleStateImageBehavior = false;
 			this.loadoutList.View = System.Windows.Forms.View.Details;
-			this.loadoutList.SelectedIndexChanged += new System.EventHandler(this.loadout_list_select);
+			this.loadoutList.SelectedIndexChanged += new System.EventHandler(this.loadoutlist_SelectedIndexChanged);
 			// 
 			// buildIDCol
 			// 

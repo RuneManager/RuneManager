@@ -101,11 +101,14 @@ namespace RuneApp
 			}
 		}
 
-		public Create()
+		public Create(Build bb)
 		{
 			InitializeComponent();
 			this.SetDoubleBuffered();
 			// when show, check we have stuff
+
+			build = bb;
+
 			Shown += Create_Shown;
 
 			// declare the truthyness of the groups and track them
@@ -205,13 +208,68 @@ namespace RuneApp
 			}
 			#endregion
 
+			build.mon.GetStats();
+
+			for (int i = 0; i < 4; i++)
+			{
+				if (build?.mon?.SkillFunc?[i] != null)
+				{
+					var ff = build.mon.SkillFunc[i];
+					string stat = "monskill" + i;
+					x = 4;
+					groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i+1));
+					x += colWidth;
+
+					double aa = ff(build.mon);
+					double cc = ff(build.mon.GetStats());
+
+					groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, aa.ToString());
+					x += colWidth;
+
+					groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, (cc - aa).ToString());
+					x += colWidth;
+
+					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
+					textBox.TextChanged += global_TextChanged;
+					textBox.TextChanged += Total_TextChanged;
+					//textBox.Enabled = false;
+					x += colWidth;
+
+					groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, cc.ToString());
+					x += colWidth;
+
+					genX = x;
+
+					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
+					textBox.TextChanged += global_TextChanged;
+					//textBox.Enabled = false;
+					x += colWidth;
+
+					groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, "0");
+					x += (int)(colWidth * 0.8);
+
+					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
+					textBox.TextChanged += global_TextChanged;
+					//textBox.Enabled = false;
+					x += colWidth;
+
+					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
+					textBox.TextChanged += global_TextChanged;
+					//textBox.Enabled = false;
+
+					y += rowHeight;
+				}
+			}
+
 			testBuildButton.Location = new Point(genX, y);
 
+			/*
 			btnDL6star.Location = new Point(dlBtnX, y);
 			checkDL6star.Location = new Point(dlCheckX, y + 2);
 
 			btnDLawake.Location = new Point(dlBtnX, y + rowHeight);
 			checkDLawake.Location = new Point(dlCheckX, y + rowHeight + 2);
+			*/
 
 			genTabRuneGrid(ref x, ref y, ref colWidth, ref rowHeight);
 		}
@@ -503,10 +561,10 @@ namespace RuneApp
 			Monster mon = build.mon;
 			mon.Current.Leader = build.leader;
 			Stats cur = mon.GetStats();
-			if (mon.ID != -1)
-				monLabel.Text = "Build for " + mon.Name + " (" + mon.ID + ")";
+			if (mon.Id != 0)
+				monLabel.Text = "Build for " + mon.Name + " (" + mon.Id + ")";
 			else
-				monLabel.Text = "Build for " + build.MonName + " (" + mon.ID + ")";
+				monLabel.Text = "Build for " + build.MonName + " (" + mon.Id + ")";
 
 			build.VERSIONNUM = VERSIONNUM;
 
@@ -730,7 +788,7 @@ namespace RuneApp
 		private void refreshStats(Monster mon, Stats cur)
 		{
 			statName.Text = mon.Name;
-			statID.Text = mon.ID.ToString();
+			statID.Text = mon.Id.ToString();
 			statLevel.Text = mon.level.ToString();
 
 			// read a bunch of numbers
@@ -791,6 +849,44 @@ namespace RuneApp
 					ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
 				if (!build.Threshold.ExtraGet(extra).EqualTo(0))
 					ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
+			}
+			for (int i = 0; i < 4; i++)
+			{
+				if (build?.mon?.SkillFunc?[i] != null)
+				{
+					var ff = build.mon.SkillFunc[i];
+					string stat = "monskill" + i;
+					Attr aaa = Attr.Skill1 + i;
+
+					double aa = ff(build.mon);
+					double cc = ff(build.mon.GetStats());
+
+					var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
+					ctrlBase.Text = aa.ToString();
+					var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
+					var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
+
+					ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
+
+					var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
+					ctrlCurrent.Text = cc.ToString();
+
+					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+
+					var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+
+					var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+
+					if (build.Minimum.DamageSkillups[i] > 0)
+						ctrlTotal.Text = build.Minimum.DamageSkillups[i].ToString();
+					if (!build.Sort.DamageSkillups[i].EqualTo(0))
+						ctrlWorth.Text = build.Sort.DamageSkillups[i].ToString();
+					if (!build.Maximum.DamageSkillups[i].EqualTo(0))
+						ctrlMax.Text = build.Maximum.DamageSkillups[i].ToString();
+					if (!build.Threshold.DamageSkillups[i].EqualTo(0))
+						ctrlThresh.Text = build.Threshold.DamageSkillups[i].ToString();
+
+				}
 			}
 		}
 
@@ -1192,6 +1288,57 @@ namespace RuneApp
 				}
 			}
 
+			for (int i = 0; i < 4; i++)
+			{
+				if (build?.mon?.SkillFunc?[i] != null)
+				{
+					var ff = build.mon.SkillFunc[i];
+					string stat = "monskill" + i;
+					Attr aaa = Attr.Skill1 + i;
+
+					var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
+					double val;
+					double total = 0;
+					if (double.TryParse(ctrlTotal.Text, out val))
+						total = val;
+					build.Minimum.ExtraSet(aaa, val);
+					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
+					double worth = 0;
+					if (double.TryParse(ctrlWorth.Text, out val))
+						worth = val;
+					build.Sort.ExtraSet(aaa, val);
+
+					var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+					double max = 0;
+					if (double.TryParse(ctrlMax.Text, out val))
+						max = val;
+					build.Maximum.ExtraSet(aaa, val);
+
+					var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+					double thr = 0;
+					if (double.TryParse(ctrlThresh.Text, out val))
+						thr = val;
+					build.Threshold.ExtraSet(aaa, val);
+
+					var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
+					double current = 0;
+					if (double.TryParse(ctrlCurrent.Text, out val))
+						current = val;
+					var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
+					if (worth != 0 && current != 0)
+					{
+						double pts = current;
+						if (max != 0)
+							pts = Math.Min(max, current);
+						ctrlWorthPts.Text = (pts / worth).ToString("0.##");
+					}
+					else
+					{
+						ctrlWorthPts.Text = "";
+					}
+				}
+			}
+
 			var lists = new ListView[]{ priStat2, priStat4, priStat6};
 			for (int j = 0; j < lists.Length; j++)
 			{
@@ -1438,9 +1585,9 @@ namespace RuneApp
 					case "Evens":
 						ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 0);
 						List<Rune> fr = new List<Rune>();
-						fr.AddRange(ff.runes.Where(r => r.Slot == 2 && build.slotStats[1].Contains(r.MainType.ToForms())));
-						fr.AddRange(ff.runes.Where(r => r.Slot == 4 && build.slotStats[3].Contains(r.MainType.ToForms())));
-						fr.AddRange(ff.runes.Where(r => r.Slot == 6 && build.slotStats[5].Contains(r.MainType.ToForms())));
+						fr.AddRange(ff.runes.Where(r => r.Slot == 2 && build.slotStats[1].Contains(r.Main.Type.ToForms())));
+						fr.AddRange(ff.runes.Where(r => r.Slot == 4 && build.slotStats[3].Contains(r.Main.Type.ToForms())));
+						fr.AddRange(ff.runes.Where(r => r.Slot == 6 && build.slotStats[5].Contains(r.Main.Type.ToForms())));
 						ff.runes = fr;
 						break;
 					case "Odds":
@@ -1886,7 +2033,7 @@ namespace RuneApp
 				if (ms.ShowDialog() == DialogResult.OK)
 				{
 					build.mon = ms.retMon;
-					monLabel.Text = "Build for " + build.mon.Name + " (" + build.mon.ID + ")";
+					monLabel.Text = "Build for " + build.mon.Name + " (" + build.mon.Id + ")";
 					refreshStats(build.mon, build.mon.GetStats());
 				}
 			}

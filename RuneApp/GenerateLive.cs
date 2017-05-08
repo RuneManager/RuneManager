@@ -48,24 +48,24 @@ namespace RuneApp
 			
 			public bool Equals(RuneKey other)
 			{
-				return !(other.rs[0].ID != rs[0].ID ||
-					other.rs[1].ID != rs[1].ID ||
-					other.rs[2].ID != rs[2].ID ||
-					other.rs[3].ID != rs[3].ID ||
-					other.rs[4].ID != rs[4].ID ||
-					other.rs[5].ID != rs[5].ID);
+				return !(other.rs[0].Id != rs[0].Id ||
+					other.rs[1].Id != rs[1].Id ||
+					other.rs[2].Id != rs[2].Id ||
+					other.rs[3].Id != rs[3].Id ||
+					other.rs[4].Id != rs[4].Id ||
+					other.rs[5].Id != rs[5].Id);
 			}
 
 			public override bool Equals(object obj)
 			{
 				RuneKey rk;
 				if ((rk = obj as RuneKey) != null)
-					return !(rk.rs[0].ID != rs[0].ID ||
-							rk.rs[1].ID != rs[1].ID ||
-							rk.rs[2].ID != rs[2].ID ||
-							rk.rs[3].ID != rs[3].ID ||
-							rk.rs[4].ID != rs[4].ID ||
-							rk.rs[5].ID != rs[5].ID);
+					return !(rk.rs[0].Id != rs[0].Id ||
+							rk.rs[1].Id != rs[1].Id ||
+							rk.rs[2].Id != rs[2].Id ||
+							rk.rs[3].Id != rs[3].Id ||
+							rk.rs[4].Id != rs[4].Id ||
+							rk.rs[5].Id != rs[5].Id);
 
 				return (GetHashCode() == obj.GetHashCode());
 			}
@@ -73,18 +73,18 @@ namespace RuneApp
 			public override int GetHashCode()
 			{
 				var res = 0;
-				res = (res * 397) ^ rs[0].ID;
-				res = (res * 397) ^ rs[1].ID;
-				res = (res * 397) ^ rs[2].ID;
-				res = (res * 397) ^ rs[3].ID;
-				res = (res * 397) ^ rs[4].ID;
-				res = (res * 397) ^ rs[5].ID;
+				res = (res * 397) ^ (int)rs[0].Id;
+				res = (res * 397) ^ (int)rs[1].Id;
+				res = (res * 397) ^ (int)rs[2].Id;
+				res = (res * 397) ^ (int)rs[3].Id;
+				res = (res * 397) ^ (int)rs[4].Id;
+				res = (res * 397) ^ (int)rs[5].Id;
 				return res;
 			}
 
 			public override string ToString()
 			{
-				return rs[0].ID + "," + rs[1].ID + "," + rs[2].ID + "," + rs[3].ID + "," + rs[4].ID + "," + rs[5].ID;
+				return rs[0].Id + "," + rs[1].Id + "," + rs[2].Id + "," + rs[3].Id + "," + rs[4].Id + "," + rs[5].Id;
 			}
 		}
 
@@ -141,12 +141,12 @@ namespace RuneApp
 						Parallel.ForEach(partitioner, (batch, state) =>
 						{
 							//string compKey = batch;// buildsToGen.Take();
-							if (batch.rs[0].ID == 638 &&
-								batch.rs[1].ID == 465 &&
-								batch.rs[2].ID == 763 &&
-								batch.rs[3].ID == 467 &&
-								batch.rs[4].ID == 612 &&
-								batch.rs[5].ID == 487)
+							if (batch.rs[0].Id == 638 &&
+								batch.rs[1].Id == 465 &&
+								batch.rs[2].Id == 763 &&
+								batch.rs[3].Id == 467 &&
+								batch.rs[4].Id == 612 &&
+								batch.rs[5].Id == 487)
 								total -= 1;
 
 
@@ -237,9 +237,9 @@ namespace RuneApp
 						var mon = li.Tag as Monster;
 						if (mon == null)
 							continue;
-
-						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.ID.ToString()));
-						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.ID.ToString())) == compKey))
+						
+						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.Id.ToString()));
+						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey))
 						{
 							// new list doen't contain old build
 							Invoke((MethodInvoker) delegate 
@@ -251,7 +251,7 @@ namespace RuneApp
 						{
 							currentList.Add(mon);
 							// new list does contain old build
-							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.ID.ToString())) == compKey));
+							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey));
 						}
 					}
 
@@ -717,9 +717,8 @@ namespace RuneApp
 						var mon = li.Tag as Monster;
 						if (mon == null)
 							continue;
-
-						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.ID.ToString()));
-						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.ID.ToString())) == compKey))
+						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.Id.ToString()));
+						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey))
 						{
 							// new list doen't contain old build
 							li.Remove();
@@ -727,7 +726,7 @@ namespace RuneApp
 						else
 						{
 							// new list does contain old build
-							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.ID.ToString())) == compKey));
+							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey));
 							total--;
 						}
 						Invoke((MethodInvoker)delegate

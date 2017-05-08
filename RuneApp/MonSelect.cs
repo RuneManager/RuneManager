@@ -21,7 +21,7 @@ namespace RuneApp
 
                 ListViewItem item = new ListViewItem(new string[]{
                     mon.Name,
-                    mon.ID.ToString(),
+                    mon.Id.ToString(),
                     pri,
                 });
                 if (mon.inStorage)

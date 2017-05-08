@@ -201,81 +201,7 @@ namespace RuneApp
 
 			try
 			{
-				// TODO: pick a format maybe
-				switch (format)
-				{
-					case "optimizer":
-						Program.data = JsonConvert.DeserializeObject<Save>(text);
-						break;
-					case "swarfarm":
-						Program.data = new Save();
-						var qq = JsonConvert.DeserializeObject<SWarFarmSave>(text);
-
-						foreach (var r in qq.Runes)
-						{
-							var rr = new Rune()
-							{
-								ID = (int)r.Id,
-								MainType = r.Main.Type,
-								MainValue = r.Main.Value,
-								InnateType = r.Innate.Type,
-								InnateValue = r.Innate.Value,
-								Slot = r.Slot,
-								Set = (RuneSet)r._set,
-								Level = r.Level,
-								Grade = r.Grade,
-							};
-
-							if (r.AssignedTo != null)
-								rr.AssignedId = (int)r.AssignedTo.Id;
-							else
-								rr.AssignedName = "Inventory";
-
-							if (r.Subs.Count > 0)
-							{
-								rr.Sub1Type = r.Subs[0].Type;
-								rr.Sub1Value = r.Subs[0].Value;
-							}
-							if (r.Subs.Count > 1)
-							{
-								rr.Sub2Type = r.Subs[1].Type;
-								rr.Sub2Value = r.Subs[1].Value;
-							}
-							if (r.Subs.Count > 2)
-							{
-								rr.Sub3Type = r.Subs[2].Type;
-								rr.Sub3Value = r.Subs[2].Value;
-							}
-							if (r.Subs.Count > 3)
-							{
-								rr.Sub4Type = r.Subs[3].Type;
-								rr.Sub4Value = r.Subs[3].Value;
-							}
-
-							Program.data.Runes.Add(rr);
-						}
-
-						foreach (var m in qq.Monsters.Select(m => new Monster()
-						{
-							ID = (int)m.Id,
-							level = m.Level,
-							Health = m.Health,
-							Attack = m.Attack,
-							Defense = m.Defense,
-							Speed = m.Speed,
-							CritRate = m.CritRate,
-							CritDamage = m.CritDamage,
-							Resistance = m.Resistance,
-							Accuracy = m.Accuracy,
-							Name = m.Name,
-						}))
-						{
-							Program.data.Monsters.Add(m);
-						}
-						foreach (var dec in qq.Decorations)
-							Program.data.Decorations.Add(dec);
-						break;
-				}
+				Program.data = JsonConvert.DeserializeObject<Save>(text);
 				
 				// TODO: trash
 				for (int i = 0; i < Deco.ShrineStats.Length; i++)
@@ -309,8 +235,21 @@ namespace RuneApp
 
 			try
 			{
-				var bs = JsonConvert.DeserializeObject<List<Build>>(File.ReadAllText(filename));
-				foreach (var b in bs)
+				var bstr = File.ReadAllText(filename);
+
+				// upgrade:
+
+				bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
+				bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
+				bstr = bstr.Replace("\"b_def\"", "\"def\"");
+				bstr = bstr.Replace("\"b_spd\"", "\"spd\"");
+				bstr = bstr.Replace("\"b_crate\"", "\"critical_rate\"");
+				bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
+				bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
+				bstr = bstr.Replace("\"b_res\"", "\"res\"");
+
+				var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
+				foreach (var b in bs.OrderBy(b => b.priority))
 				{
 					builds.Add(b);
 				}
@@ -401,8 +340,8 @@ namespace RuneApp
 						bb.MonName = bb.mon.Name;
 					else
 					{
-						if (Program.data.GetMonster(bb.mon.ID).Name != "Missingno")
-							bb.MonName = Program.data.GetMonster(bb.mon.ID).Name;
+						if (Program.data.GetMonster(bb.mon.Id).Name != "Missingno")
+							bb.MonName = Program.data.GetMonster(bb.mon.Id).Name;
 					}
 				}
 				//Program.builds.Add(bb);
@@ -462,9 +401,16 @@ namespace RuneApp
 			{
 				string text = File.ReadAllText(filename);
 				var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
+				loads.Clear();
 
 				foreach (var load in lloads)
 				{
+					for (int i = 0; i < 6; i++)
+					{
+						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
+						load.Runes[i].Locked = true;
+					}
+					load.Shrines = data.shrines;
 					loads.Add(load);
 				}
 				return LoadSaveResult.Success;
@@ -689,9 +635,9 @@ namespace RuneApp
 						int count = 0;
 						// we must progressively ban more runes from the build to find second-place runes.
 						//GenDeep(b, 0, printTo, ref count);
-						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.ID).ToArray());
-						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.ID).ToArray());
-						RunBanned(b, ++count, theBest.Current.Runes.Select(r => r.ID).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.Id).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.Id).ToArray());
+						RunBanned(b, ++count, theBest.Current.Runes.Select(r => r.Id).ToArray());
 
 						// after messing all that shit up
 						b.Best = theBest;
@@ -741,8 +687,8 @@ namespace RuneApp
 				log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
 			}
 		}
-
-		private static void RunBanned(Build b, int c, params int[] doneIds)
+		
+		private static void RunBanned(Build b, int c, params ulong[] doneIds)
 		{
 			log.Info("Running ban");
 			b.BanEmTemp(doneIds);
@@ -759,8 +705,8 @@ namespace RuneApp
 			b.BuildDumpBads = true;
 			b.GenBuilds($"{c} ");
 			log.Info("Ban finished");
-
-			b.BanEmTemp(new int[] { });
+			
+			b.BanEmTemp(new ulong[] { });
 			b.BuildSaveStats = false;
 			b.GenRunes(Program.data);
 		}
