@@ -408,6 +408,7 @@ namespace RuneApp
 					for (int i = 0; i < 6; i++)
 					{
 						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
+						load.Runes[i].Locked = true;
 					}
 					load.Shrines = data.shrines;
 					loads.Add(load);

@@ -243,7 +243,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort[stat] != 0)
 					{
-						p = (vv - build.Threshold[stat]) / build.Sort[stat];
+						p = (build.Threshold[stat].EqualTo(0) ? vv : vv - build.Threshold[stat]) / build.Sort[stat];
 						str = p.ToString("0.#") + " (" + Cur[stat] + ")";
 						pts += p;
 					}
@@ -256,7 +256,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.ExtraGet(stat) != 0)
 					{
-						p = (vv - build.Threshold.ExtraGet(stat)) / build.Sort.ExtraGet(stat);
+						p = (build.Threshold.ExtraGet(stat).EqualTo(0) ? vv : vv - build.Threshold.ExtraGet(stat)) / build.Sort.ExtraGet(stat);
 						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}
@@ -272,7 +272,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.DamageSkillups[j] != 0)
 					{
-						p = (vv - build.Threshold.DamageSkillups[j]) / build.Sort.DamageSkillups[j];
+						p = (build.Threshold.DamageSkillups[j].EqualTo(0) ? vv : vv - build.Threshold.DamageSkillups[j]) / build.Sort.DamageSkillups[j];
 						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}

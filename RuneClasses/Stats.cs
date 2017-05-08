@@ -841,7 +841,16 @@ namespace RuneOptim
             if (!MaxDamage.EqualTo(0))
                 return true;
 
-            return false;
+			if (!DamageSkillups[0].EqualTo(0))
+				return true;
+			if (!DamageSkillups[1].EqualTo(0))
+				return true;
+			if (!DamageSkillups[2].EqualTo(0))
+				return true;
+			if (!DamageSkillups[3].EqualTo(0))
+				return true;
+
+			return false;
         }
 
         public Attr FirstNonZero()

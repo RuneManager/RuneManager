@@ -139,7 +139,7 @@ namespace RuneApp
 				groupBox1.Controls.MakeControl<Label>(s, "compAfter", 4 + xx, 400 + yy, 50, 14, "");
 				xx += 50;
 
-				groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, 400 + yy, 50, 14, "");
+				groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, 400 + yy, 150, 14, "");
 
 				if (s == "SPD")
 					yy += 4;
@@ -719,12 +719,11 @@ namespace RuneApp
 						{
 							var beforeScore = build.sort(dmon.GetStats());
 							var afterScore = build.sort(load.GetStats(mon));
-							groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString();
-							groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString();
-							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = (afterScore - beforeScore).ToString();
+							groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
+							groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
+							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = (afterScore - beforeScore).ToString("0.##");
 						}
-
-						ShowDiff(dmon.GetStats(), load.GetStats(mon));
+						ShowDiff(dmon.GetStats(), load.GetStats(mon), build);
 
 						dmon.Current.Leader = dmonld;
 						dmon.Current.Shrines = dmonsh;
@@ -1331,27 +1330,47 @@ namespace RuneApp
 			}
 		}
 
-		private void ShowDiff(Stats old, Stats load)
+		private void ShowDiff(Stats old, Stats load, Build build = null)
 		{
 			foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" })
 			{
 				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
 				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
-				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = (load[stat] - old[stat]).ToString();
+				string pts = (load[stat] - old[stat]).ToString();
+				if (build != null && !build.Sort[stat].EqualTo(0))
+				{
+					pts += " (" + ((load[stat] - old[stat]) / build.Sort[stat]).ToString("0.##") + ")";
+				}
+				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text =  pts;
 			}
 
 			foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" })
 			{
 				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
 				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
-				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = (load[stat] - old[stat]).ToString();
+				string pts = (load[stat] - old[stat]).ToString();
+				if (build != null && !build.Sort[stat].EqualTo(0))
+				{
+					pts += " (" + ((load[stat] - old[stat]) / build.Sort[stat]).ToString("0.##") + ")";
+				}
+				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
 
 			foreach (string extra in Build.extraNames)
 			{
-				groupBox1.Controls.Find(extra + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString();
-				groupBox1.Controls.Find(extra + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString();
-				groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString();
+				groupBox1.Controls.Find(extra + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString("0");
+				groupBox1.Controls.Find(extra + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString("0");
+				string pts = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString("0");
+				if (build != null && !build.Sort.ExtraGet(extra).EqualTo(0))
+				{
+					var aa = load.ExtraValue(extra);
+					var cc = old.ExtraValue(extra);
+					var ss = build.Sort.ExtraGet(extra);
+
+					pts += " (" + ((aa - cc) / ss).ToString("0.##") + ")";
+				}
+				
+				groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = pts;
 
 			}
 		}

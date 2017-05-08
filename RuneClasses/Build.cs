@@ -444,7 +444,7 @@ namespace RuneOptim
 					var ff = mon.SkillFunc[i];
 					double aa = ff(m);
 					if (!Sort.DamageSkillups[i].EqualTo(0))
-						pts += (aa - Threshold.DamageSkillups[i]) / Sort.DamageSkillups[i];
+						pts += (Threshold.DamageSkillups[i].EqualTo(0) ? aa : aa - Threshold.DamageSkillups[i]) / Sort.DamageSkillups[i];
 				}
 			}
 
@@ -693,15 +693,15 @@ namespace RuneOptim
 					return;
 				}
 
-				bool hasSort = false;
-				foreach (Attr stat in statAll)
+				bool hasSort = Sort.NonZero();
+				/*foreach (Attr stat in statAll)
 				{
 					if (!(stat.HasFlag((Attr.ExtraStat)) ? Sort.ExtraGet(stat) : Sort[stat]).EqualTo(0))
 					{
 						hasSort = true;
 						break;
 					}
-				}
+				}*/
 				if (BuildTake == 0 && !hasSort)
 				{
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "No sort"));
