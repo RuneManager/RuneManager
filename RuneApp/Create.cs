@@ -720,7 +720,7 @@ namespace RuneApp
 			build.New = false;
 			// oh yeah, update everything now that it's finally loaded
 			UpdateGlobal();
-			CalcPerms();
+			//CalcPerms();
 		}
 
 		private void RequiredSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -1857,6 +1857,7 @@ namespace RuneApp
 			// good idea, generate right now whenever the user clicks a... whatever
 			build.RunesUseLocked = false;
 			build.RunesUseEquipped = Program.Settings.UseEquipped;
+			build.BuildSaveStats = false;
 			build.GenRunes(Program.data);
 
 			// figure stuff out

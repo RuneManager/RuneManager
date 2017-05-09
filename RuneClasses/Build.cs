@@ -1300,38 +1300,38 @@ namespace RuneOptim
 			// TODO: check what inheriting AND/OR then SUM (or visa versa)
 
 			// find the most significant operatand of joining checks
-			if (runeScoring.ContainsKey(SlotIndex.Global) && runeFilters.ContainsKey(SlotIndex.Global))// && runeFilters["g"].Any(r => r.Value.NonZero))
+			if (runeScoring.ContainsKey(SlotIndex.Global))
 			{
 				var kv = runeScoring[SlotIndex.Global];
-				and = kv.Key;
-				if (kv.Key == 2)
+				if (runeFilters.ContainsKey(SlotIndex.Global))
+					and = kv.Key;
+				if (kv.Key == 2 && kv.Value != null)
 				{
-					if (kv.Value != null)
-						testVal = kv.Value;
+					testVal = kv.Value;
 				}
 			}
 			// is it and odd or even slot?
 			var tmk = (slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd);
-			if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
+			if (runeScoring.ContainsKey(tmk))
 			{
 				var kv = runeScoring[tmk];
-				and = kv.Key;
-				if (kv.Key == 2)
+				if (runeFilters.ContainsKey(tmk))
+					and = kv.Key;
+				if (kv.Key == 2 && kv.Value != null)
 				{
-					if (kv.Value != null)
-						testVal = kv.Value;
+					testVal = kv.Value;
 				}
 			}
 			// turn the 0-5 to a 1-6
 			tmk = (SlotIndex)slot;
-			if (runeScoring.ContainsKey(tmk) && runeFilters.ContainsKey(tmk))// && runeFilters[tmk].Any(r => r.Value.NonZero))
+			if (runeScoring.ContainsKey(tmk))
 			{
 				var kv = runeScoring[tmk];
-				and = kv.Key;
-				if (kv.Key == 2)
+				if (runeFilters.ContainsKey(tmk))
+					and = kv.Key;
+				if (kv.Key == 2 && kv.Value != null)
 				{
-					if (kv.Value != null)
-						testVal = kv.Value;
+					testVal = kv.Value;
 				}
 			}
 
@@ -1373,7 +1373,12 @@ namespace RuneOptim
 				}
 				else if (and == 2)
 				{
-					slotTest = r => r.Test(rFlat, rPerc, raiseTo, predictSubs) >= testVal;
+					slotTest = r => {
+						Console.Out.WriteLine("[" + slot + "] Checking " + r.Id + " {");
+						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
+						Console.Out.WriteLine("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
+						return vv >= testVal;
+					};
 				}
 			}
 			return slotTest;
@@ -1510,7 +1515,7 @@ namespace RuneOptim
 					rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedName == mon.Name) || r.Swapped);
 				// only if the rune isn't currently locked for another purpose
 				if (!RunesUseLocked)
-					rsGlobal = rsGlobal.Where(r => r.Locked == false);
+					rsGlobal = rsGlobal.Where(r => !r.Locked);
 				rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !bannedRunesTemp.Any(b => b == r.Id));
 			}
 
@@ -1603,6 +1608,8 @@ namespace RuneOptim
 			}
 			if (!autoRuneSelect)
 			{
+				var tmp = Console.Out;
+				Console.SetOut(new System.IO.StreamWriter(new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create)));
 				// Filter each runeslot
 				for (int i = 0; i < 6; i++)
 				{

@@ -359,6 +359,14 @@ namespace RuneApp
 					loadoutList.Items.Clear();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var l in e.OldItems.Cast<Loadout>())
+					{
+						Invoke((MethodInvoker)delegate
+						{
+							loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => li.Tag == l).Remove();
+						});
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				default:
@@ -879,12 +887,8 @@ namespace RuneApp
 			{
 				Loadout l = (Loadout)li.Tag;
 
-				foreach (Rune r in l.Runes)
-				{
-					r.Locked = false;
-				}
-
-				loadoutList.Items.Remove(li);
+				Program.loads.Remove(l);
+				//loadoutList.Items.Remove(li);
 			}
 			checkLocked();
 		}
@@ -2046,7 +2050,7 @@ namespace RuneApp
 					b.RunesUseEquipped = Program.Settings.UseEquipped;
 					b.BuildSaveStats = false;
 					b.GenRunes(Program.data);
-					int c = b.runes[0].Length;
+					long c = b.runes[0].Length;
 					c *= b.runes[1].Length;
 					c *= b.runes[2].Length;
 					c *= b.runes[3].Length;

@@ -143,17 +143,17 @@ namespace RuneOptim
 		// Debugging niceness
 		public override string ToString()
 		{
-			string str = "";
+			System.Text.StringBuilder str = new System.Text.StringBuilder("");
 			foreach (Rune r in runes)
 			{
-				str += r.Id + "  ";
+				str.Append(r.Id).Append("  ");
 			}
-			str += "|  ";
+			str.Append("|  ");
 			foreach (RuneSet s in sets)
 			{
-				str += s + " ";
+				str.Append(s).Append(" ");
 			}
-			return str;
+			return str.ToString();
 		}
 
 		// Lock all the runes on the build
@@ -167,7 +167,6 @@ namespace RuneOptim
 
 		#region AttrGetters
 
-		// Could have used runes.Where(x => x != null).Sum(x => x.STAT) + SetStat(Attr.STAT), but it was a bottleneck
 		[JsonIgnore]
 		public int HealthFlat
 		{
@@ -379,7 +378,7 @@ namespace RuneOptim
 			if (runes[rune.Slot - 1] == null)
 				runeCount++;
 
-			runes[rune.Slot - 1] = rune;//new Rune(rune);
+			runes[rune.Slot - 1] = rune;
 			if (runeCount % checkOn == 0)
 				CheckSets();
 		}
@@ -411,8 +410,6 @@ namespace RuneOptim
 				return;
 
 			// can only have 3 sets max (eg. energy / energy / blade)
-			//if (sets == null)
-			//    sets = new RuneSet[3];
 			sets[0] = 0;
 			sets[1] = 0;
 			sets[2] = 0;
@@ -427,53 +424,50 @@ namespace RuneOptim
 			// how many runes are in sets
 			int setNums = 0;
 
+			Rune rune;
+			RuneSet set;
+			int getNum;
+			int gotNum;
+
 			// Check slots 1 - 5, minimum set size is 2.
 			// Because it will search forward for sets, can't find more from 6
 			// Eg. starting from 6, working around, find 2 runes?
 			for (; slotInd < 5; slotInd++)
 			{
 				//if there is a uncounted rune in this slot
-				Rune rune = runes[slotInd];
-				if (rune != null && used[slotInd] == false)
+				rune = runes[slotInd];
+				if (rune != null && !used[slotInd])
 				{
 					// look for more in the set
-					RuneSet set = rune.Set;
+					set = rune.Set;
 					// how many runes we need to get
-					int getNum = Rune.SetRequired(set);
+					getNum = Rune.SetRequired(set);
 					// how many we got
-					int gotNum = 1;
+					gotNum = 1;
 					// we have now used this slot
 					used[slotInd] = true;
 
 					// for the runes after this rune
 					for (int ind = slotInd + 1; ind < 6; ind++)
 					{
-						// if there is a rune in this slot
-						if (runes[ind] != null)
-							// that hasn't been counted
-							if (used[ind] == false)
-								// that is the type I want
-								if (runes[ind].Set == set)
-								{
-									used[ind] = true;
-									gotNum++;
-								}
-
-						// if we have more than 1 rune
-						if (gotNum > 1)
+						// if there is a rune in this slot that is the type I want
+						if (runes[ind] != null && !used[ind] && runes[ind].Set == set)
 						{
-							// if we have enough runes for a set
-							if (gotNum == getNum)
-							{
-								// log this set
-								sets[setInd] = set;
-								// increase the number of runes in sets
-								setNums += getNum;
-								// look for the next set
-								setInd++;
-								// stop looking forward
-								break;
-							}
+							used[ind] = true;
+							gotNum++;
+						}
+
+						// if we have more than 1 rune and we have enough runes for a set
+						if (gotNum == getNum)
+						{
+							// log this set
+							sets[setInd] = set;
+							// increase the number of runes in sets
+							setNums += getNum;
+							// look for the next set
+							setInd++;
+							// stop looking forward
+							break;
 						}
 					}
 				}

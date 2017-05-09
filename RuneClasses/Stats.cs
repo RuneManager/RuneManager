@@ -199,8 +199,10 @@ namespace RuneOptim
 			damageFormula = rhs.damageFormula;
 			_damageFormula = rhs._damageFormula;
 
-			rhs._skillsFormula.CopyTo(_skillsFormula, 0);
-			rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
+			//rhs._skillsFormula.CopyTo(_skillsFormula, 0);
+			//rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
+			_skillsFormula = rhs._skillsFormula;
+			DamageSkillups = rhs.DamageSkillups;
 
 			if (copyExtra)
 			{
@@ -650,7 +652,7 @@ namespace RuneOptim
 		/// <returns>If any values in this Stats are greater than rhs</returns>
 		public bool CheckMax(Stats rhs)
 		{
-			return Build.statEnums.Any(s => !rhs[s].EqualTo(0) && this[s] > rhs[s]);
+			return Build.statEnums.Any(s => rhs[s] != 0 && this[s] > rhs[s]);
 		}
 
 		public bool GreaterEqual(Stats rhs, bool extraGet = false)

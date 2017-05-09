@@ -1112,13 +1112,18 @@ namespace RuneOptim
 			foreach (Attr attr in Build.statEnums)
 			{
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0))
+				{
+					Console.Out.WriteLine(attr + ": " + this[attr, fake, pred] + "/" + rPerc[attr] + (this[attr, fake, pred] / rPerc[attr]));
 					val += this[attr, fake, pred] / rPerc[attr];
-
+				}
 			}
 			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
 			{
 				if (!rFlat[attr].EqualTo(0))
+				{
+					Console.Out.WriteLine(attr + ": " + this[attr, fake, pred] + "/" + rFlat[attr] + (this[attr, fake, pred] / rFlat[attr]));
 					val += this[attr, fake, pred] / rFlat[attr];
+				}
 			}
 			manageStats.AddOrUpdate("testScore", val, (k, v) => val);
 			return val;

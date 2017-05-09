@@ -34,7 +34,7 @@ namespace RuneApp
 		{
 			get
 			{
-				var qwete = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+				//var qwete = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
 				//Console.WriteLine(qwete);
 				//Properties.Settings.Default.Upgrade();
 				return Properties.Settings.Default;
@@ -118,6 +118,14 @@ namespace RuneApp
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var l in e.OldItems.Cast<Loadout>())
+					{
+						foreach (Rune r in l.Runes)
+						{
+							r.Locked = false;
+						}
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				default:

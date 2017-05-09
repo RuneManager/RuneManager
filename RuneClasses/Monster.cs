@@ -11,6 +11,9 @@ using System.Linq.Expressions;
 
 namespace RuneOptim
 {
+
+
+
 	// The monster stores its base stats in its base class
 	public class Monster : Stats
 	{
@@ -38,6 +41,7 @@ namespace RuneOptim
 		[JsonProperty("skills")]
 		public IList<Skill> _skilllist = new List<Skill>();
 
+		[JsonConverter(typeof(RuneLoadConverter))]
 		[JsonProperty("runes")]
 		public Rune[] Runes;
 
@@ -225,6 +229,54 @@ namespace RuneOptim
 			{
 				return 2;
 			}
+		}
+	}
+
+
+
+	public class RuneLoadConverter : JsonConverter
+	{
+		public override bool CanConvert(Type objectType)
+		{
+			return typeof(IList<RuneOptim.Rune>).IsAssignableFrom(objectType);
+		}
+
+		public override bool CanRead
+		{
+			get
+			{
+				return base.CanRead;
+			}
+		}
+
+		public override bool CanWrite
+		{
+			get
+			{
+				return base.CanWrite;
+			}
+		}
+
+		public override object ReadJson(JsonReader reader,
+			Type objectType, object existingValue, JsonSerializer serializer)
+		{
+			JToken tok = JToken.Load(reader);
+			if (tok is JArray)
+			{
+				return tok.ToObject<RuneOptim.Rune[]>();
+			}
+			else if (tok is JObject)
+			{
+				var jo = tok as JObject;
+				return jo.Children().Select(o => o.First.ToObject<RuneOptim.Rune>()).ToArray();
+			}
+			throw new InvalidCastException("A monsters runes are in an invalid format.");
+		}
+
+		public override void WriteJson(JsonWriter writer,
+			object value, JsonSerializer serializer)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
@@ -579,4 +631,5 @@ namespace MonsterDefinitions
 			throw new NotImplementedException();
 		}
 	}
+
 }

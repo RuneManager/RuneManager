@@ -81,11 +81,16 @@ namespace OptimizerJsonPlugin
 			{
 				monster_id_mapping[(long)monster["unit_id"]] = monster_id;
 				monster_id++;
-				var monster_runes = monster["runes"];
-				if (monster_runes is JObject)
-				{
-					monster_runes = (JToken)((JObject)monster_runes).Values();
-				}
+
+				JEnumerable<JToken> monster_runes;
+				var rr = monster["runes"];
+
+				JObject jo = rr as JObject;
+				if (jo != null)
+					monster_runes = (JEnumerable<JToken>)jo.Values();
+				else
+					monster_runes = rr.Children();
+
 				foreach (var rune in monster_runes
 					.OrderBy(r => (long)r["slot_no"]))
 				{
@@ -107,12 +112,14 @@ namespace OptimizerJsonPlugin
 
 				optimizer.mons.Add(optimizer_monster);
 
-				var monster_runes = monster["runes"];
+				JEnumerable<JToken> monster_runes;
+				var rr = monster["runes"];
 
-				if (monster_runes is JObject)
-				{
-					monster_runes = (JToken)((JObject)monster_runes).Values();
-				}
+				JObject jo = rr as JObject;
+				if (jo != null)
+					monster_runes = (JEnumerable<JToken>)jo.Values();
+				else
+					monster_runes = rr.Children();
 				
 				foreach (var rune in monster_runes)
 				{
