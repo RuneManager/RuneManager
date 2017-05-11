@@ -180,16 +180,16 @@ namespace RuneApp
 				li.ForeColor = Color.Gray;
 			else
 			{
-				if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-					b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+				if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+					b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 				{
 					li.ForeColor = Color.Green;
 				}
-				else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+				else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
 				{
 					li.ForeColor = Color.Goldenrod;
 				}
-				else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+				else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 				{
 					li.ForeColor = Color.DarkBlue;
 				}
@@ -243,7 +243,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort[stat] != 0)
 					{
-						p = (build.Threshold[stat].EqualTo(0) ? vv : vv - build.Threshold[stat]) / build.Sort[stat];
+						p = (build.Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, build.Threshold[stat])) / build.Sort[stat];
 						str = p.ToString("0.#") + " (" + Cur[stat] + ")";
 						pts += p;
 					}
@@ -256,7 +256,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.ExtraGet(stat) != 0)
 					{
-						p = (build.Threshold.ExtraGet(stat).EqualTo(0) ? vv : vv - build.Threshold.ExtraGet(stat)) / build.Sort.ExtraGet(stat);
+						p = (build.Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, build.Threshold.ExtraGet(stat))) / build.Sort.ExtraGet(stat);
 						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}
@@ -272,7 +272,7 @@ namespace RuneApp
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (build.Sort.DamageSkillups[j] != 0)
 					{
-						p = (build.Threshold.DamageSkillups[j].EqualTo(0) ? vv : vv - build.Threshold.DamageSkillups[j]) / build.Sort.DamageSkillups[j];
+						p = (build.Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, build.Threshold.DamageSkillups[j])) / build.Sort.DamageSkillups[j];
 						str = p.ToString("0.#") + " (" + vv + ")";
 						pts += p;
 					}
@@ -533,11 +533,11 @@ namespace RuneApp
 		private void btn_runtest_Click(object sender, EventArgs e)
 		{
 			this.toolStripStatusLabel1.Text = "Generating...";
-			Program.RunTest(build, (b) =>
+			Program.RunTest(build, (b, res) =>
 			{
 				if (b.loads == null)
 				{
-					toolStripStatusLabel1.Text = "Error: no builds";
+					toolStripStatusLabel1.Text = "Error: " + res;
 					return;
 				}
 

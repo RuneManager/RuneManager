@@ -46,14 +46,14 @@ namespace RuneOptim
 	public enum Attr
 	{
 		[EnumMember(Value = "-")]
-		Neg = -1,
-
-		[EnumMember(Value = "")]
-		// TODO: FIXME:
 		[SkillAttr("DIE_RATE")]
 		[SkillAttr("ATTACK_CUR_HP_RATE")]
 		[SkillAttr("TARGET_CUR_HP_RATE")]
 		[SkillAttr("ATTACK_LV")]
+		Neg = -1,
+
+		[EnumMember(Value = "")]
+		// TODO: FIXME:
 		Null = 0,
 
 		[EnumMember(Value = "HP flat")]

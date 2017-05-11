@@ -66,7 +66,7 @@ namespace RuneOptim.Tests
         public void FixShitTest()
         {
             var rune = TestData.Rune1();
-            rune.FixShit();
+            rune.PrebuildAttributes();
             Assert.AreEqual(78, rune.AttackFlat[0]);
             Assert.AreEqual(99, rune.AttackFlat[12 + 16]);
             Assert.AreEqual(135, rune.AttackFlat[15]);

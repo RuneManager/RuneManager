@@ -20,8 +20,51 @@ namespace RuneOptim
 		}
 	}
 
+	[Flags]
+	public enum LogSeverity
+	{
+		Any =	0x00000000,
+
+
+
+		Info =	0x10000000,
+		Debug = 0x01000000,
+		Error = 0x00100000,
+	}
+
+	public static class RuneLog
+	{
+		public static System.IO.TextWriter logTo = Console.Out;
+		public static LogSeverity CurrentSeverity = LogSeverity.Any;
+
+		public static void Log(LogSeverity sev, string str)
+		{
+			if (sev.HasFlag(CurrentSeverity))
+			{
+				logTo.WriteLine(str);
+			}
+		}
+
+		public static void Info(string str, LogSeverity sev = LogSeverity.Any)
+		{
+			Log(sev | LogSeverity.Info, str);
+		}
+
+		public static void Debug(string str, LogSeverity sev = LogSeverity.Any)
+		{
+			Log(sev | LogSeverity.Debug, str);
+		}
+
+		public static void Error(string str, LogSeverity sev = LogSeverity.Any)
+		{
+			Log(sev | LogSeverity.Error, str);
+		}
+	}
+
 	public static class ExtensionMethods
 	{
+		
+
 		public static bool EqualTo(this double a, double b, double within = 0.00000001)
 		{
 			return (Math.Abs(a - b) < within);

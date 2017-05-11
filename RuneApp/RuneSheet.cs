@@ -714,7 +714,7 @@ namespace RuneApp
 			List<string> colHead = new List<string>();
 
 			// ,MType,Points,FlatPts
-			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
+			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
 			{
 				colHead.Add(th);
 				ws.Cells[row, col].Value = th; col++;
@@ -811,6 +811,9 @@ namespace RuneApp
 						case "Level":
 							ws.Cells[row, col].Value = r.Level;
 							break;
+						case "SellVal":
+							ws.Cells[row, col].Value = r.SellValue;
+							break;
 						case "Select":
 							ws.Cells[row, col].Value = r.manageStats.GetOrAdd("Set", 0);
 							break;
@@ -831,6 +834,9 @@ namespace RuneApp
 							break;
 						case "BuildT":
 							ws.Cells[row, col].Value = r.manageStats.GetOrAdd("buildScoreTotal", 0);
+							break;
+						case "BuildPercent":
+							ws.Cells[row, col].Value = r.manageStats.GetOrAdd("bestBuildPercent", 0);
 							break;
 						case "Eff":
 							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";

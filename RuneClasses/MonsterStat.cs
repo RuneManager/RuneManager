@@ -63,7 +63,7 @@ namespace RuneOptim
 				name = name.Substring(0, bracketInd).Trim();
 			}
 
-			Console.WriteLine("searching for \"" + name + "\"");
+			RuneLog.Info("searching for \"" + name + "\"");
 			if (element == "")
 				return monStats.FirstOrDefault(m => m.name == name);
 			else

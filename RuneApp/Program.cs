@@ -445,7 +445,7 @@ namespace RuneApp
 			loads.Clear();
 		}
 
-		public static void RunTest(Build build, Action<Build> onFinish = null)
+		public static void RunTest(Build build, Action<Build, BuildResult> onFinish = null)
 		{
 			if (build.IsRunning)
 				throw new InvalidOperationException("This build is already running");
@@ -463,11 +463,12 @@ namespace RuneApp
 				build.BuildTimeout = Program.Settings.TestTime;
 				build.shrines = Program.data.shrines;
 				build.BuildDumpBads = false;
+				build.BuildGoodRunes = false;
 
 				build.GenRunes(Program.data);
-				build.GenBuilds();
+				var result = build.GenBuilds();
 
-				onFinish?.Invoke(build);
+				onFinish?.Invoke(build, result);
 			});
 		}
 
@@ -562,6 +563,7 @@ namespace RuneApp
 				b.RunesUseLocked = false;
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
 				b.BuildSaveStats = saveStats;
+				b.BuildGoodRunes = false;
 				b.GenRunes(Program.data);
 				b.shrines = Program.data.shrines;
 
@@ -594,7 +596,7 @@ namespace RuneApp
 						b.Cancel();
 				};
 
-				b.GenBuilds();
+				var result = b.GenBuilds();
 
 				buildTime.Stop();
 				b.Time = buildTime.ElapsedMilliseconds;
@@ -682,41 +684,55 @@ namespace RuneApp
 				if (b.Best != null)
 					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Done"));
 				else
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Zero :("));
+					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, result + " :("));
 
 				log.Info("Cleaning up");
-				currentBuild = null;
 				//b.isRun = false;
 				//currentBuild = null;
-				log.Info("Cleaned");
 			}
 			catch (Exception e)
 			{
 				log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
+			}
+			finally
+			{
+				currentBuild = null;
+				log.Info("Cleaned");
 			}
 		}
 		
 		private static void RunBanned(Build b, int c, params ulong[] doneIds)
 		{
 			log.Info("Running ban");
-			b.BanEmTemp(doneIds);
+			try
+			{
+				b.BanEmTemp(doneIds);
 
-			b.RunesUseLocked = false;
-			b.RunesUseEquipped = Program.Settings.UseEquipped;
-			b.BuildSaveStats = true;
-			b.BuildGoodRunes = goodRunes;
-			b.GenRunes(Program.data);
+				b.RunesUseLocked = false;
+				b.RunesUseEquipped = Program.Settings.UseEquipped;
+				b.BuildSaveStats = true;
+				b.BuildGoodRunes = goodRunes;
+				b.GenRunes(Program.data);
 
-			b.BuildTimeout = 0;
-			b.BuildTake = 0;
-			b.BuildGenerate = 0;
-			b.BuildDumpBads = true;
-			b.GenBuilds($"{c} ");
-			log.Info("Ban finished");
-			
-			b.BanEmTemp(new ulong[] { });
-			b.BuildSaveStats = false;
-			b.GenRunes(Program.data);
+				b.BuildTimeout = 0;
+				b.BuildTake = 0;
+				b.BuildGenerate = 0;
+				b.BuildDumpBads = true;
+				var result = b.GenBuilds($"{c} ");
+				b.BuildGoodRunes = false;
+				log.Info("ran ban with result: " + result);
+			}
+			catch (Exception ex)
+			{
+				log.Error("Running ban failed ", ex);
+			}
+			finally
+			{
+				b.BanEmTemp(new ulong[] { });
+				b.BuildSaveStats = false;
+				b.GenRunes(Program.data);
+				log.Info("Ban finished");
+			}
 		}
 
 		public static void RunBuilds(bool skipLoaded, int runTo = -1)

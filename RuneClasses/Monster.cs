@@ -420,6 +420,8 @@ namespace MonsterDefinitions
 			}
 			else if (key != RuneOptim.Attr.Null)
 			{//Expression.Parameter(typeof(RuneOptim.Stats), "stats")
+				if (key == RuneOptim.Attr.Neg)
+					return Expression.Constant(1.0);
 				return Expression.Property(statType, "Item", Expression.Constant(key));
 			}
 			else

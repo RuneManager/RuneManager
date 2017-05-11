@@ -290,16 +290,16 @@ namespace RuneApp
 							li.ForeColor = Color.Gray;
 						else
 						{
-							if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-								b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+							if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 							{
 								li.ForeColor = Color.Green;
 							}
-							else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
 							{
 								li.ForeColor = Color.Goldenrod;
 							}
-							else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 							{
 								li.ForeColor = Color.DarkBlue;
 							}
@@ -772,16 +772,16 @@ namespace RuneApp
 							li.ForeColor = Color.Gray;
 						else
 						{
-							if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-								b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+							if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 							{
 								li.ForeColor = Color.Green;
 							}
-							else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
 							{
 								li.ForeColor = Color.Goldenrod;
 							}
-							else if (b.Current.Sets.Any(rs => Rune.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 							{
 								li.ForeColor = Color.DarkBlue;
 							}

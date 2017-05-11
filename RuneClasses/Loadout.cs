@@ -608,7 +608,7 @@ namespace RuneOptim
 			// different lengths, or not the same sets
 
 			// count the number of magical sets, and make sure both loadout have the same number of sets
-			foreach (RuneSet s in Rune.MagicalSets)
+			foreach (RuneSet s in RuneProperties.MagicalSets)
 			{
 				if (a.Count(x => x == s) != b.Count(x => x == s))
 					return 0;

@@ -115,7 +115,7 @@ namespace RuneOptim
 							if (s.__int2 != 0)
 								throw new Exception("What is this?\r\nPlease give me your savefile :)");
 						}
-						r.FixShit();
+						r.PrebuildAttributes();
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
