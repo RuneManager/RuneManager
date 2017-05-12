@@ -133,6 +133,9 @@ namespace RuneOptim
 		[JsonProperty("MonName")]
 		public string MonName;
 
+		[JsonProperty("MonId")]
+		public ulong MonId;
+
 		[JsonProperty("priority")]
 		public int priority;
 

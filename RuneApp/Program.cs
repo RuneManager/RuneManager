@@ -145,8 +145,15 @@ namespace RuneApp
 							// for each build, find the build in the buildlist with the same mon name?
 							//var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
 							// if there is a build with this monname, maybe I have 2 mons with that name?!
-							var bnum = builds.Where(bu => bu.MonName == b.MonName).Count();
-							b.mon = Program.data.GetMonster(b.MonName, bnum + 1);
+							if (Program.data.GetMonster(b.MonId) != null)
+							{
+								b.mon = Program.data.GetMonster(b.MonId);
+							}
+							else
+							{
+								var bnum = builds.Count(bu => bu.MonName == b.MonName);
+								b.mon = Program.data.GetMonster(b.MonName, bnum + 1);
+							}
 						}
 						else
 						{
@@ -345,11 +352,17 @@ namespace RuneApp
 				if (bb.mon.Name != "Missingno")
 				{
 					if (!bb.DownloadAwake || Program.data.GetMonster(bb.mon.Name).Name != "Missingno")
+					{
 						bb.MonName = bb.mon.Name;
+						bb.MonId = bb.mon.Id;
+					}
 					else
 					{
 						if (Program.data.GetMonster(bb.mon.Id).Name != "Missingno")
+						{
+							bb.MonId = bb.mon.Id;
 							bb.MonName = Program.data.GetMonster(bb.mon.Id).Name;
+						}
 					}
 				}
 				//Program.builds.Add(bb);
@@ -416,7 +429,8 @@ namespace RuneApp
 					for (int i = 0; i < 6; i++)
 					{
 						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
-						load.Runes[i].Locked = true;
+						if (load.Runes[i] != null)
+							load.Runes[i].Locked = true;
 					}
 					load.Shrines = data.shrines;
 					loads.Add(load);
@@ -439,7 +453,8 @@ namespace RuneApp
 			{
 				foreach (Rune r in l.Runes)
 				{
-					r.Locked = false;
+					if (r != null)
+						r.Locked = false;
 				}
 			}
 			loads.Clear();

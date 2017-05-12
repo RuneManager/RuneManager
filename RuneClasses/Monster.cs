@@ -67,7 +67,7 @@ namespace RuneOptim
 			int cost = 0;
 			for (int i = 0; i < 6; i++)
 			{
-				if (l.Runes[i].AssignedName != Name)
+				if (l.Runes[i] != null && l.Runes[i].AssignedName != Name)
 				{
 					// unequip current rune
 					if (Current.Runes[i] != null)
