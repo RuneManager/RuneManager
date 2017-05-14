@@ -50,7 +50,8 @@ namespace RuneOptim
 		[SkillAttr("ATTACK_CUR_HP_RATE")]
 		[SkillAttr("TARGET_CUR_HP_RATE")]
 		[SkillAttr("ATTACK_LV")]
-		Neg = -1,
+		[SkillAttr("ATTACK_WIZARD_LIFE_RATE")]
+		Neg = -1, 
 
 		[EnumMember(Value = "")]
 		// TODO: FIXME:

@@ -9,9 +9,9 @@ namespace RunePlugin
 {
 	public abstract class SWPlugin
 	{
-		public void OnLoad() { }
+		public virtual void OnLoad() { }
 
-		public void OnUnload() { }
+		public virtual void OnUnload() { }
 
 		public abstract void ProcessRequest(object sender, SWEventArgs args);
 

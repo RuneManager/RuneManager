@@ -148,7 +148,7 @@ namespace RuneOptim
 						var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
 						if (df.props.Count > 0) //ss.Cooltime != null && 
 						{
-							var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level);
+							var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level ?? 0);
 							var ct = levels.Count(s => s == "Cooltime Turn -1");
 							int cooltime = (ss.Cooltime ?? 1) - ct;
 							this.SkillTimes[i] = cooltime;
@@ -215,13 +215,13 @@ namespace RuneOptim
 		}
 	}
 
-	public class Skill : ListProp
+	public class Skill : ListProp<int?>
 	{
 		// TODO: name
 		[ListProperty(0)]
-		public int SkillId = -1;
+		public int? SkillId = null;
 		[ListProperty(1)]
-		public int Level = -1;
+		public int? Level = null;
 
 		protected override int MaxInd
 		{

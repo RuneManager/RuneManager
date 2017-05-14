@@ -553,10 +553,10 @@ namespace RuneOptim
 		Six = 6
 	};
 	
-	public class RuneAttr : ListProp
+	public class RuneAttr : ListProp<int?>
 	{
 		[ListProperty(0)]
-		public Attr Type = Attr.Neg;
+		public Attr Type = default(Attr);
 
 		[ListProperty(1)]
 		public int BaseValue = -1;
@@ -570,7 +570,7 @@ namespace RuneOptim
 		[JsonIgnore]
 		private int _calcVal = -1;
 
-		protected override void OnSet(int i, int val)
+		protected override void OnSet(int i, int? val)
 		{
 			if (Type != Attr.Neg)
 			{
@@ -607,7 +607,7 @@ namespace RuneOptim
 
 		public override bool IsReadOnly { get { return false; } }
 
-		public override int this[int index]
+		public override int? this[int index]
 		{
 			get
 			{
@@ -627,24 +627,24 @@ namespace RuneOptim
 				if (index == 0)
 					Type = (Attr)value;
 				else if (index == 1)
-					BaseValue = value;
+					BaseValue = value ?? -1;
 				else if (index == 2)
-					__int2 = value;
+					__int2 = value ?? -1;
 				else if (index == 3)
-					GrindBonus = value;
+					GrindBonus = value ?? -1;
 			}
 		}
 
-		public override void Add(int item)
+		public override void Add(int? item)
 		{
-			if (Type == Attr.Neg)
+			if (Type == Attr.Null)
 				Type = (Attr)item;
 			else if (BaseValue == -1)
-				BaseValue = item;
+				BaseValue = item ?? -1;
 			else if (__int2 == -1)
-				__int2 = item;
+				__int2 = item ?? -1;
 			else if (GrindBonus == -1)
-				GrindBonus = item;
+				GrindBonus = item ?? -1;
 			else
 				throw new IndexOutOfRangeException();
 		}

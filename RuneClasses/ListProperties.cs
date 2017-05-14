@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 namespace RuneOptim
 {
 
-	public class OnSetEventArgs
+	public class OnSetEventArgs<T>
 	{
 		public int i = -1;
-		public int val = -1;
+		public T val = default(T);
 	}
 
-	public abstract class ListProp
-		: IList<int>
+	public abstract class ListProp<T>
+		: IList<T>
 	{
 		int maxind = -1;
 
@@ -34,15 +34,15 @@ namespace RuneOptim
 			}
 		}
 
-		virtual protected void OnSet(int i, int val) { }
+		virtual protected void OnSet(int i, T val) { }
 
-		private void _onSet(int i, int v)
+		private void _onSet(int i, T v)
 		{
 			OnSet(i, v);
-			onSet?.Invoke(this, new OnSetEventArgs() { i = i, val = v });
+			onSet?.Invoke(this, new OnSetEventArgs<T>() { i = i, val = v });
 		}
 
-		public event EventHandler<OnSetEventArgs> onSet;
+		public event EventHandler<OnSetEventArgs<T>> onSet;
 
 		public int Count
 		{
@@ -50,7 +50,7 @@ namespace RuneOptim
 			{
 				for (int i = 0; i < MaxInd; i++)
 				{
-					if (this[i] == -1)
+					if (this[i].Equals(default(T)))
 						return i;
 				}
 				return MaxInd;
@@ -63,7 +63,7 @@ namespace RuneOptim
 			{
 				foreach (var p in Props)
 				{
-					if (this[p.Key] == -1)
+					if (this[p.Key].Equals(default(T)))
 						return false;
 				}
 				return true;
@@ -86,43 +86,43 @@ namespace RuneOptim
 			}
 		}
 
-		virtual public int this[int index]
+		virtual public T this[int index]
 		{
 			get
 			{
 				if (Props[index] == null)
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
-				return (int)props[index].GetValue(this);
+				return (T)props[index].GetValue(this);
 			}
 			set
 			{
 				if (Props[index] == null)
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
 
-				props[index].SetValue(this, (int)value);
+				props[index].SetValue(this, (T)value);
 				_onSet(index, value);
 			}
 		}
 
-		public int IndexOf(int item) { throw new NotImplementedException(); }
+		public int IndexOf(T item) { throw new NotImplementedException(); }
 
-		public void Insert(int index, int item) { throw new NotImplementedException(); }
+		public void Insert(int index, T item) { throw new NotImplementedException(); }
 
 		public void RemoveAt(int index) { throw new NotImplementedException(); }
 
 		public void Clear() { throw new NotImplementedException(); }
 
-		public bool Contains(int item) { throw new NotImplementedException(); }
+		public bool Contains(T item) { throw new NotImplementedException(); }
 
-		public void CopyTo(int[] array, int arrayIndex) { throw new NotImplementedException(); }
+		public void CopyTo(T[] array, int arrayIndex) { throw new NotImplementedException(); }
 
-		public bool Remove(int item) { throw new NotImplementedException(); }
+		public bool Remove(T item) { throw new NotImplementedException(); }
 
-		public IEnumerator<int> GetEnumerator() { throw new NotImplementedException(); }
+		public IEnumerator<T> GetEnumerator() { throw new NotImplementedException(); }
 
 		IEnumerator IEnumerable.GetEnumerator() { throw new NotImplementedException(); }
 
-		virtual public void Add(int item)
+		virtual public void Add(T item)
 		{
 			this[Count] = item;
 		}
