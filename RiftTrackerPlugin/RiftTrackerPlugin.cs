@@ -13,7 +13,8 @@ namespace RiftTrackerPlugin
 {
 	public class RiftTrackerPlugin : RunePlugin.SWPlugin
 	{
-		string riftdir = Environment.CurrentDirectory + "\\Plugins\\RiftTrackerPlugin\\Rift Teams";
+		string riftdir = Environment.CurrentDirectory + "\\Plugins\\RiftTrackerPlugin";
+		string teamsdir = Environment.CurrentDirectory + "\\Plugins\\RiftTrackerPlugin\\Rift Teams";
 
 		Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>> allMons = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
 
@@ -21,8 +22,10 @@ namespace RiftTrackerPlugin
 		{
 			if (!Directory.Exists(riftdir))
 				Directory.CreateDirectory(riftdir);
+			if (!Directory.Exists(teamsdir))
+				Directory.CreateDirectory(teamsdir);
 
-			var files = Directory.GetFiles(riftdir, "*.json");
+			var files = Directory.GetFiles(teamsdir, "*.json");
 			foreach (var f in files)
 			{
 				ProcessDeck(File.ReadAllText(f));
@@ -35,7 +38,7 @@ namespace RiftTrackerPlugin
 				return;
 
 			var riftstats = JsonConvert.DeserializeObject<RiftDeck>(args.ResponseJson["bestdeck_rift_dungeon"].ToString());
-			File.WriteAllText(riftdir + "\\" + riftstats.rift_dungeon_id + "_" + riftstats.wizard_id + ".json", args.ResponseRaw);
+			File.WriteAllText(teamsdir + "\\" + riftstats.rift_dungeon_id + "_" + riftstats.wizard_id + ".json", args.ResponseRaw);
 			ProcessDeck(args.ResponseRaw);
 			SaveStuff();
 		}
@@ -146,10 +149,16 @@ namespace RiftTrackerPlugin
 									page.Cells[row, col].Value = stats.Accuracy;
 									break;
 								case "Set1":
-									page.Cells[row, col].Value = mon.Current.Sets[0];
+									if (RuneOptim.Rune.SetRequired(mon.Current.Sets[1]) == 4)
+										page.Cells[row, col].Value = mon.Current.Sets[1];
+									else
+										page.Cells[row, col].Value = mon.Current.Sets[0];
 									break;
 								case "Set2":
-									page.Cells[row, col].Value = mon.Current.Sets[1];
+									if (RuneOptim.Rune.SetRequired(mon.Current.Sets[1]) == 4)
+										page.Cells[row, col].Value = mon.Current.Sets[0];
+									else
+										page.Cells[row, col].Value = mon.Current.Sets[1];
 									break;
 								case "Set3":
 									page.Cells[row, col].Value = mon.Current.Sets[2];
@@ -199,6 +208,7 @@ namespace RiftTrackerPlugin
 				excelPack.Workbook.Worksheets.MoveToStart(cc.Key);
 			}
 			excelPack.Save();
+			Console.WriteLine("Saved riftstats");
 		}
 	}
 

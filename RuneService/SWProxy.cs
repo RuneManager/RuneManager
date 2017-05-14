@@ -212,22 +212,23 @@ namespace RuneService
 
 							if (trackedRequests.ContainsKey(e.Id))
 							{
-								SWEventArgs args = null;
-								try
+								System.Threading.Thread thr = new System.Threading.Thread(() =>
 								{
-									args = new SWEventArgs(trackedRequests[e.Id], dec);
-								}
-								catch { }
-								try
-								{
-									SWResponse?.Invoke(this, args);
-								}
-								catch (Exception ex)
-								{
-									Console.WriteLine($"Failed triggering plugins with exception: {ex.GetType().Name}");
-									// TODO: log stacktrace?
-								}
-								trackedRequests.Remove(e.Id);
+									SWEventArgs args = null;
+									try
+									{
+										args = new SWEventArgs(trackedRequests[e.Id], dec);
+
+										SWResponse?.Invoke(this, args);
+									}
+									catch (Exception ex)
+									{
+										Console.WriteLine($"Failed triggering plugins with exception: {ex.GetType().Name}");
+										// TODO: log stacktrace?
+									}
+									trackedRequests.Remove(e.Id);
+								});
+								thr.Start();
 							}
 						}
 					}

@@ -88,6 +88,7 @@ namespace RuneOptim
 
 		[EnumMember(Value = "SPD")]
 		[SkillAttr("ATTACK_SPEED")]
+		[SkillAttr("TARGET_SPEED")]
 		Speed = 8,
 
 		[EnumMember(Value = "CRate")]
