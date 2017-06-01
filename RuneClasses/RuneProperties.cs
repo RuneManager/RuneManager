@@ -11,6 +11,34 @@ namespace RuneOptim
 {
 	public partial class Rune
 	{
+		public static readonly RuneSet[] RuneSets = new RuneSet[] { RuneSet.Energy, // Health
+			RuneSet.Guard, // Def
+			RuneSet.Swift, // Speed
+			RuneSet.Blade, // CRate
+			RuneSet.Rage, // CDmg
+			RuneSet.Focus, // Acc
+			RuneSet.Endure, // Res
+			RuneSet.Fatal, // Attack
+
+			// Here be magic
+			RuneSet.Despair,
+			RuneSet.Vampire,
+
+			RuneSet.Violent,
+			RuneSet.Nemesis,
+			RuneSet.Will,
+			RuneSet.Shield,
+			RuneSet.Revenge,
+			RuneSet.Destroy,
+
+			// Ally sets
+			RuneSet.Fight,
+			RuneSet.Determination,
+			RuneSet.Enhance,
+			RuneSet.Accuracy,
+			RuneSet.Tolerance,
+		};
+
 		[JsonIgnore]
 		public double Efficiency
 		{

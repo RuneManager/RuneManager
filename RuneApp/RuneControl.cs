@@ -76,6 +76,7 @@ namespace RuneApp
             grade = rune.Grade;
             switch (rune.Slot)
             {
+                default:
                 case 1:
                     _imageSlot = Runes.rune1;
                     break;
@@ -93,9 +94,6 @@ namespace RuneApp
                     break;
                 case 6:
                     _imageSlot = Runes.rune6;
-                    break;
-                default:
-                    _imageSlot = Runes.rune1;
                     break;
             }
             switch (rune.Set)
@@ -155,7 +153,7 @@ namespace RuneApp
                     _imageSet = Runes.fight;
                     break;
                 case RuneOptim.RuneSet.Determination:
-                    _imageSet = Runes.fight;
+                    _imageSet = Runes.determination;
                     break;
                 case RuneOptim.RuneSet.Enhance:
                     _imageSet = Runes.enhance;
@@ -208,7 +206,7 @@ namespace RuneApp
                 attr.SetGamma(gamma);
 
                 int squarish = Math.Max(_imageSlot.Width, _imageSlot.Height);
-                squarish = (int)(squarish * 1.25);
+                //squarish = (int)(squarish * 1.25);
 
                 if (renderBack)
                     e.Graphics.DrawImage(_imageBack,

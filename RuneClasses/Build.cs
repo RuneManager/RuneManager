@@ -1175,7 +1175,8 @@ namespace RuneOptim
 						foreach (var r in ra)
 						{
 							var cbp = r.manageStats.GetOrAdd("currentBuildPoints", 0);
-							r.manageStats.AddOrUpdate("bestBuildPercent", cbp / Best.score, (k, v) => Math.Max(v, cbp / Best.score));
+							if (cbp / Best.score < 1)
+								r.manageStats.AddOrUpdate("bestBuildPercent", cbp / Best.score, (k, v) => Math.Max(v, cbp / Best.score));
 						}
 					}
 				}

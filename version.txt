@@ -1,8 +1,4 @@
-0.3.1.0
+0.4.0.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Waaayyyy faster, like, almost 2x as fast.
-Setting minimum EHP and DPS works properly now.
-Requiring 2x SET works properly now.
-Find all the runes in Test that need powerups.
-Outputs a log file.
-0.3 - A big runedial for easy viewing, click the mon face.
+Now uses swarfarm.json.
+Ruins your computer.
