@@ -52,13 +52,9 @@ namespace RiftTrackerPlugin
 			var mons = JsonConvert.DeserializeObject<RuneOptim.Monster[]>(jobj["unit_list"].ToString());
 			foreach (var m in mons)
 			{
-				m.Name = RunePlugin.SWPlugin.MonsterName(m._monsterTypeId);
-
-				if (m.Name == "Missingno")
-				{
-					m.Name = MonsterName(m._monsterTypeId);
-				}
-
+				var tid = long.Parse(m._monsterTypeId.ToString().Substring(0, m._monsterTypeId.ToString().Length - 2) + "1" + m._monsterTypeId.ToString().Last());
+				m.Name = MonsterName(tid);
+				
 				foreach (var r in m.Runes)
 				{
 					r.PrebuildAttributes();
@@ -73,11 +69,23 @@ namespace RiftTrackerPlugin
 				{
 					if (mm.Name == "Missingno")
 					{
-						mm.Name = MonsterName(mm._monsterTypeId);
+						tid = long.Parse(mm._monsterTypeId.ToString().Substring(0, mm._monsterTypeId.ToString().Length-2) + "1" + mm._monsterTypeId.ToString().Last());
+						mm.Name = MonsterName(tid);
 					}
+
+					if (m.Name == mm.Name)
+						continue;
+
 					if (!matchCount[riftstats.rift_dungeon_id][m.Name].ContainsKey(mm.Name))
 						matchCount[riftstats.rift_dungeon_id][m.Name].Add(mm.Name, 0);
+					if (!matchCount[riftstats.rift_dungeon_id].ContainsKey(mm.Name))
+						matchCount[riftstats.rift_dungeon_id].Add(mm.Name, new Dictionary<string, int>());
+					if (!matchCount[riftstats.rift_dungeon_id][mm.Name].ContainsKey(m.Name))
+						matchCount[riftstats.rift_dungeon_id][mm.Name].Add(m.Name, 0);
+
+
 					matchCount[riftstats.rift_dungeon_id][m.Name][mm.Name]++;
+					matchCount[riftstats.rift_dungeon_id][mm.Name][m.Name]++;
 				}
 
 				//if (!allMons.ContainsKey(riftstats.rift_dungeon_id))
@@ -242,11 +250,28 @@ namespace RiftTrackerPlugin
 				
 				int row = 2;
 				int col = 2;
-				foreach (var mx in rd.Value.Select(q => q.Key))
+
+				var monsX = rd.Value.OrderByDescending(q => q.Value.Sum(v => v.Value)).Select(q => q.Key).ToArray();
+
+				//var monsY = rd.Value.OrderByDescending(q => q.Value.Sum(v => v.Value)).SelectMany(q => q.Value.Select(w => w.Key)).Distinct().ToArray();
+				var monsdY = new Dictionary<string, int>();
+				foreach (var mq in rd.Value)
+				{
+					foreach (var mw in mq.Value)
+					{
+						if (!monsdY.ContainsKey(mw.Key))
+							monsdY.Add(mw.Key, 0);
+						monsdY[mw.Key]++;
+					}
+				}
+				var monsY = monsdY.OrderByDescending(v => v.Value).Select(v => v.Key).ToArray();
+
+
+				foreach (var mx in monsX)
 				{
 					page.Cells[1, col].Value = mx; col++;
 				}
-				foreach (var my in rd.Value.SelectMany(q => q.Value.Select(w => w.Key)).Distinct())
+				foreach (var my in monsY)
 				{
 					page.Cells[row, 1].Value = my; row++;
 				}
@@ -254,17 +279,22 @@ namespace RiftTrackerPlugin
 				row = 2;
 				col = 2;
 
-				foreach (var mx in rd.Value.OrderByDescending(q => q.Value.Sum(v => v.Value)).Select(q => q.Key))
+				foreach (var mx in monsX)
 				{
 					row = 2;
-					foreach (var my in rd.Value.OrderByDescending(q => q.Value.Sum(v => v.Value)).SelectMany(q => q.Value.Select(w => w.Key)).Distinct())
+					foreach (var my in monsY)
 					{
-						if (rd.Value.ContainsKey(mx) && rd.Value[mx].ContainsKey(my))
+						if (rd.Value.ContainsKey(monsX[col - 2]) && rd.Value[mx].ContainsKey(monsY[row - 2]))
 						{
 							var c = rd.Value[mx][my];
+							c = rd.Value[monsX[col - 2]][monsY[row - 2]];
 							//var c = rds.Count(r => r.my_unit_list.Any(p => p.unit_master_id == mx._monsterTypeId) && r.my_unit_list.Any(p => p.unit_master_id == my._monsterTypeId)); ;
 							page.Cells[row, col].Value = c;
 						}
+						else
+							page.Cells[row, col].Value = "";
+
+
 						row++;
 					}
 					col++;

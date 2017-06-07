@@ -1806,27 +1806,7 @@ namespace RuneApp
 				}
 			}
 
-			if (build.BuildSets == null && build.RequiredSets == null)
-			{
-				tooltipSets.IsBalloon = true;
-				tooltipSets.Show(string.Empty, setList);
-				tooltipSets.Show("No sets", setList, 0);
-				return true;
-			}
-			if ((build.BuildSets?.Count ?? 0) + (build.RequiredSets?.Count ?? 0) == 0)
-			{
-				tooltipSets.IsBalloon = true;
-				tooltipSets.Show(string.Empty, setList);
-				tooltipSets.Show("No sets", setList, 0);
-				return true;
-			}
-
-			if (CalcPerms() != 0) return false;
-
-			tooltipBadRuneFilter.IsBalloon = true;
-			tooltipBadRuneFilter.Show(string.Empty, runeNums);
-			tooltipBadRuneFilter.Show("No builds\nAdd more sets, lax your rune filters, or unlock runes.", runeNums, 0);
-			return true;
+			return false;
 		}
 
 		void global_CheckChanged(object sender, EventArgs e)
