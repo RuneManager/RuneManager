@@ -12,115 +12,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RuneOptim;
+using RuneApp;
+using System.Collections;
 #if TEST_SLAVE
 using SocketSender;
 #endif
 
-namespace RuneApp
+namespace RuneApp.InternalServer
 {
-	public abstract class PageRenderer
-	{
-		public abstract HttpResponseMessage Render(HttpListenerRequest req, string[] uri);
-
-		protected virtual HttpResponseMessage Recurse(HttpListenerRequest req, string[] uri)
-		{
-			if (uri.Length == 0)
-				return null;
-
-			var types = this.GetType().GetNestedTypes();
-			var atypes = types.Where(t => (t.GetCustomAttribute(typeof(Master.PageAddressRenderAttribute)) is Master.PageAddressRenderAttribute));
-			var type = atypes.FirstOrDefault(t => (t.GetCustomAttribute(typeof(Master.PageAddressRenderAttribute)) as Master.PageAddressRenderAttribute).PositionalString == uri.First());
-			if (type != null)
-			{
-				var tt = type.GetConstructor(new Type[] { }).Invoke(new object[] { });
-				return (HttpResponseMessage)type.GetMethod("Render").Invoke(tt, new object[] { req, uri.Skip(1).ToArray() });
-			}
-			return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("<html><body>404: " + req.RawUrl + " not found. <a href='/'>Return.</a></body></html>") };
-		}
-	}
-
-	public class ServedResult
-	{
-		public string name;
-
-		public bool isList = false;
-		public Dictionary<string, ServedResult> contentDic = new Dictionary<string, ServedResult>();
-		public List<ServedResult> contentList = new List<ServedResult>();
-
-		public ServedResult()
-		{
-		}
-
-		public ServedResult(bool listify) : base()
-		{
-			isList = listify;
-		}
-		
-		public ServedResult(string n) : base()
-		{
-			name = n;
-			if (name == "script")
-				contentList.Add("");
-		}
-
-		public virtual string ToJson()
-		{
-			if (isList)
-				return "[" + string.Join(",", string.Join("", contentList.Select(li => li.ToJson()))) + "]";
-			else
-				return "{" + string.Join(",", contentDic.Select(kv => '"' + kv.Key + "\":" + kv.Value.ToJson())) + "}";
-		}
-
-		public virtual string ToHtml()
-		{
-			return "<" + name 
-					+ (contentDic.Count > 0 ? " " : "") + string.Join(" ", contentDic.Select(kv => kv.Key + "=" + kv.Value)) 
-					+ (contentList.Count == 0 ? "/" : "") + ">" + (contentList.Count > 0 ? "\n" : "") 
-					+ string.Join("\n", contentList.Select(li => li.ToHtml())) + (contentList.Count > 0 ? "\n" : "")
-					+ (contentList.Count > 0 ? ("</" + name + ">") : "");
-		}
-		
-		public static implicit operator ServedResult(string rhs)
-		{
-			return (ServedString)rhs;
-		}
-	}
-
-	public class ServedString : ServedResult
-	{
-		readonly string value = null;
-
-		public ServedString(string v)
-		{
-			value = v;
-		}
-
-		public static implicit operator ServedString(string rhs)
-		{
-			return new ServedString(rhs);
-		}
-
-		public static implicit operator string(ServedString rhs)
-		{
-			return rhs.value;
-		}
-
-		public override string ToHtml()
-		{
-			return value;
-		}
-
-		public override string ToJson()
-		{
-			return "\"" + value + "\"";
-		}
-
-		public override string ToString()
-		{
-			return value;
-		}
-	}
-
 	/// <summary>
 	/// Connects and manages slaves.
 	/// Also acts as the server for the remote management app.
@@ -140,7 +39,7 @@ namespace RuneApp
 
 		bool isRunning = false;
 
-		public static string currentTheme = "css/none.css";
+		public static string currentTheme = "/css/none.css";
 
 		/// <summary>
 		/// Dispatches a thread to listen for the incoming Remote App connection
@@ -294,14 +193,13 @@ namespace RuneApp
 		{
 			if (uri == null || uri.Length == 0 || uri[0] == "/")
 			{
-				return returnPage(false, null, "Check my thingo!<br/>",
+				return returnHtml(null, "Check my thingo!<br/>",
 					new ServedResult("a") { contentDic = { { "href", "api" } }, contentList = { "Api docs" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "runes" } }, contentList = { "Rune list" } }, "<br/>",
-					new ServedResult("a") { contentDic = { { "href", "builds" } }, contentList = { "Monster list" } }, "<br/>",
+					new ServedResult("a") { contentDic = { { "href", "monsters" } }, contentList = { "Monster list" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "builds" } }, contentList = { "Build list" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "loads" } }, contentList = { "Load list" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "css" } }, contentList = { "Choose a theme!" } }, "<br/>",
-					renderMagicList(),
 					"<br/>");
 			}
 			else
@@ -310,39 +208,194 @@ namespace RuneApp
 			}
 		}
 
-		ServedResult renderMagicList()
+		static ServedResult renderMagicList()
 		{
 			// return all completed loads on top, in progress build, unrun builds, mons with no builds
 			ServedResult list = new ServedResult("ul");
 			list.contentList = new List<ServedResult>();
 
 			var ll = Program.loads;
-			var bb = Program.builds.Where(b => !ll.Any(l => l.BuildID == b.ID));
-			var mm = Program.data.Monsters.Where(m => !ll.Any(l => bb.FirstOrDefault(b => b.ID == l.BuildID)?.mon == m) && !bb.Any(b => b.mon == m));
+			var ldic = ll.ToDictionary(l => l.BuildID);
 
-			list.contentList.AddRange(ll.Select(l => new ServedResult("li") { contentList = { "load " + Program.builds.FirstOrDefault(b => b.ID == l.BuildID)?.mon.Name } }));
-			list.contentList.AddRange(bb.Select(b => new ServedResult("li") { contentList = { "build " + b.MonName } }));
-			list.contentList.AddRange(mm.Select(m => new ServedResult("li") { contentList = { "mon " + m.Name } }));
+			var bb = Program.builds.Where(b => !ldic.ContainsKey(b.ID));
+			var bdic = bb.ToDictionary(b => b.MonId);
+			
+			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id));
+
+			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
+			var unlocked = Program.data.Monsters.Except(locked).ToList();
+			var pairs = new Dictionary<Monster, List<Monster>>();
+			foreach (var m in locked)
+			{
+				pairs.Add(m, new List<Monster>());
+				int i = m.SkillupsTotal - m.SkillupsLevel;
+				for (; i > 0; i--)
+				{
+					var um = unlocked.FirstOrDefault(ul => ul._monsterTypeId.ToString().Substring(0,3) == m._monsterTypeId.ToString().Substring(0, 3));
+					if (um == null)
+						break;
+					pairs[m].Add(um);
+					unlocked.Remove(um);
+				}
+			}
+
+			mm = mm.OrderByDescending(m => !unlocked.Contains(m))
+				.ThenByDescending(m => m.Locked)
+				.ThenByDescending(m => m._class)
+				.ThenByDescending(m => m.level)
+				.ThenBy(m => m._attribute)
+				.ThenByDescending(m => m.createdOn)
+				;
+
+			list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
+			list.contentList.AddRange(bb.Select(b => {
+				var m = b.mon;
+				var nl = new ServedResult("ul");
+				var li = new ServedResult("li") { contentList = {
+						new ServedResult("span") { contentList = { "build " + m.Name + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl } };
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+				if (nl.contentList.Count == 0)
+					nl.name = "br";
+				return li;
+				}
+			));
+
+			Console.WriteLine(mm.Count());
+			mm = mm.Except(bb.Select(b => b.mon));
+			Console.WriteLine(mm.Count());
+			mm = mm.Except(Program.builds.Select(b => b.mon));
+			Console.WriteLine(mm.Count());
+			mm = mm.Except(pairs.SelectMany(p => p.Value));
+			Console.WriteLine(mm.Count());
+			
+			list.contentList.AddRange(mm.Select(m => {
+				var nl = new ServedResult("ul");
+				var li = new ServedResult("li") { contentList = { ((unlocked.Contains(m)) ?
+					("TRASH: " + m.Name + " " + m._class + "* " + m.level ) :
+					("mon " + m.Name + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl } };
+				if (!unlocked.Contains(m))
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+				if (nl.contentList.Count == 0)
+					nl.name = "br";
+				return li;
+			}));
 
 			return list;
 		}
 
-		protected static HttpResponseMessage returnPage(bool asJson = false, ServedResult[] head = null, params ServedResult[] body)
+		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs)
 		{
-			var hh = new ServedResult("head") { contentList = {
-					new ServedResult("title") { contentList = { "TopKek" } },
-					new ServedResult("meta") {contentDic = { { "http-equiv", "\"Content-Type\"" }, { "content", "\"text/html; charset=utf-8\""} } },
-					new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"" + Master.currentTheme + "\"" } } },
-					
-				} };
+			var b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
+			var m = b.mon;
+
+			var li = new ServedResult("li");
+
+			// render name
+			var span = new ServedResult("span") {
+				contentList = {
+					new ServedResult("a") { contentDic = { { "href", "\"javascript:showhide(" +m.Id.ToString() + ")\"" } }, contentList = { "+ load" } },
+					" ",
+					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
+			} };
+
+			// render rune swaps
+			var div = new ServedResult("div") { contentDic = { { "id", '"' + m.Id.ToString() + '"' },
+					//{ "class", "\"rune-container\"" }
+			}};
+			foreach (var r in l.Runes)
+			{
+				var rd = RuneRenderer.renderRune(r);
+				var hide = rd.contentList.FirstOrDefault(ele => ele.contentDic.Any(pr => pr.Value.ToString() == '"' + r.Id.ToString() + '"'));
+				hide.contentDic["style"] = (r.AssignedId == m.Id) ? "\"display:none;\"" : "";
+				div.contentList.Add(rd);
+			}
+			if (l.Runes.All(r => r.AssignedId == m.Id))
+				div.contentDic.Add("style", "\"display:none;\"");
+
+			// list skillups
+			var nl = new ServedResult("ul");
+			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+			if (nl.contentList.Count == 0)
+				nl.name = "br";
+
+			li.contentList.Add(span);
+			li.contentList.Add(div);
+			li.contentList.Add(nl);
+
+			return li;
+		}
+
+		protected static ServedResult renderMonName(Monster m)
+		{
+			return new ServedResult("span") { contentList = { m.Name } };
+		}
+
+		protected static HttpResponseMessage return404()
+		{
+			// TODO:
+			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("404 lol") };
+		}
+
+		protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body)
+		{
+			var bb = new StringBuilder();
+			if (body != null)
+				foreach (var b in body)
+					bb.AppendLine(b.ToHtml());
+
+			var hh = new StringBuilder();
 			if (head != null)
-				hh.contentList.AddRange(head);
-			var bb = new ServedResult("body");
-			bb.contentList.AddRange(body);
-			var rr = new ServedResult("html") { contentList = { hh, bb } };
-			if (asJson)
-				return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(rr.ToJson()) };
-			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("<!DOCTYPE html>\r\n" + rr.ToHtml()) };
+				foreach (var h in head)
+					hh.AppendLine(h.ToHtml());
+
+			var html = InternalServer.default_tpl
+			.Replace("{title}", "TopKek")
+			.Replace("{theme}", Master.currentTheme)
+			.Replace("{head}", hh.ToString())
+			.Replace("{body}", bb.ToString())
+			;
+
+			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(html) };
+		}
+
+		[PageAddressRender("monsters")]
+		public class MonstersRenderer : PageRenderer
+		{
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
+			{
+				if (uri.Length == 0)
+				{
+					return returnHtml(new ServedResult[]{
+					new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
+					new ServedResult("script")
+					{
+						contentDic = { { "type", "\"application/javascript\"" } },
+						contentList = { @"function showhide(id) {
+	var ee = document.getElementById(id);
+	if (ee.style.display == 'none')
+		ee.style.display = 'block';
+	else
+		ee.style.display = 'none';
+}" }
+					}
+				}, renderMagicList());
+				}
+
+				ulong mid = 0;
+				if (ulong.TryParse(uri[0], out mid))
+				{
+					// got Monster Id
+					var m = Program.data.GetMonster(mid);
+					return returnHtml(null, (m.Locked ? "L " : "") + m.Name + " " + m.Id);
+				}
+				else
+				{
+					var m = Program.data.GetMonster(uri[0]);
+					if (m != null)
+						return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "/monsters/" + m.Id } } };
+				}
+				return return404();
+			}
 		}
 
 		[PageAddressRender("runes")]
@@ -400,8 +453,14 @@ namespace RuneApp
 					.ThenByDescending(r => r.Efficiency * (12 - Math.Min(12, r.Level)))
 					.Select(r => renderRune(r)).ToArray());
 
-				return returnPage(false, new ServedResult[] {
+				return returnHtml(new ServedResult[] {
 					new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
+					new ServedResult("script") {contentDic = { { "type", "\"text/css\"" } }, contentList = { @"@media only screen and (min-resolution: 192dpi),
+	   only screen and (min-resolution: 2dppx) {
+	body {
+		font-size: 1.5em;
+	}
+}" } },
 					new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" } },
 					contentList = { @"function showhide(id) {
 	var ee = document.getElementById(id);
@@ -438,7 +497,7 @@ namespace RuneApp
 				return ret;
 			}
 
-			private ServedResult renderRune(RuneOptim.Rune r)
+			public static ServedResult renderRune(RuneOptim.Rune r)
 			{
 				var ret = new ServedResult("div") { contentDic = { { "class", "\"rune-box\"" } } };
 				var mainspan = new ServedResult("span") { contentList = {
@@ -450,27 +509,41 @@ namespace RuneApp
 						" " + " " + r.Main.Value + " " + r.Main.Type + " +" + r.Level + " (" + r.manageStats?.GetOrAdd("bestBuildPercent", 0).ToString("0.##") + ")"
 					}
 				};
+				// colour name base on level
+				switch (r.Level / 3)
+				{
+					case 5:
+					case 4:
+						mainspan.contentDic.Add("style", "\"color: darkorange\"");
+						break;
+					case 3:
+						mainspan.contentDic.Add("style", "\"color: purple\"");
+						break;
+					case 2:
+						mainspan.contentDic.Add("style", "\"color: cornflourblue\"");
+						break;
+					case 1:
+						mainspan.contentDic.Add("style", "\"color: limegreen\"");
+						break;
+				}
+				// show the proper background
 				var runebackName = "normal";
 				switch (r.Rarity)
 				{
 					case 4:
-						mainspan.contentDic.Add("style", "\"color: darkorange\"");
 						runebackName = "legend";
 						break;
 					case 3:
-						mainspan.contentDic.Add("style", "\"color: purple\"");
 						runebackName = "hero";
 						break;
 					case 2:
-						mainspan.contentDic.Add("style", "\"color: cornflourblue\"");
 						runebackName = "rare";
 						break;
 					case 1:
-						mainspan.contentDic.Add("style", "\"color: limegreen\"");
 						runebackName = "magic";
 						break;
-
 				}
+
 				ret.contentList.Add(mainspan);
 				var hidediv = new ServedResult("div") { contentDic = { { "id", '"' + r.Id.ToString() + '"' } } };
 				if (r.Level == 15 || (r.Slot % 2 == 1 && r.Level >= 12))
@@ -489,19 +562,22 @@ namespace RuneApp
 					}
 				});
 
+				var propdiv = new ServedResult("div") { contentDic = { { "class", "\"rune-box-right\"" } } };
 				if (r.Innate != null && r.Innate.Type != RuneOptim.Attr.Null)
 				{
-					hidediv.contentList.Add(new ServedResult("div") {contentDic = { { "class", "\"rune-box-right\""} },
-						contentList = {
-							new ServedResult("div") { contentDic = { { "class", "\"rune-prop rune-sub rune-innate\"" } },
-								contentList = {
-									"+" + r.Innate.Type + " " + r.Innate.Value
-								} },
-							new ServedResult("div") { contentDic = { { "class", "\"monster-name rune-prop rune-monster-name\"" } },
-								contentList = { new ServedResult("a") { contentDic = { { "href", "\"monsters/" + r.AssignedName + "\"" } }, contentList = { r.AssignedName } }
-								} }
-						} });
+					propdiv.contentList.Add(new ServedResult("div")
+					{
+						contentDic = { { "class", "\"rune-prop rune-sub rune-innate\"" } },
+						contentList = { "+" + r.Innate.Type + " " + r.Innate.Value }
+					});
 				}
+				propdiv.contentList.Add(new ServedResult("div")
+				{
+					contentDic = { { "class", "\"monster-name rune-prop rune-monster-name\"" } },
+					contentList = { new ServedResult("a") { contentDic = { { "href", "\"monsters/" + r.AssignedName + "\"" } }, contentList = { r.AssignedName } }
+								}
+				});
+				hidediv.contentList.Add(propdiv);
 				hidediv.contentList.Add("<br/>");
 				for (int i = 0; i < 4; i++)
 				{
@@ -522,20 +598,35 @@ namespace RuneApp
 		{
 			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 			{
+				var themeSet = Themes.Themes.ResourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
+
+				if (uri.Length > 0 && uri[0].Contains(".css"))
+				{
+					var theme = themeSet.Cast<DictionaryEntry>().FirstOrDefault(kv => kv.Key.ToString() == uri[0].Replace(".css", ""));
+					if (theme.Key != null)
+						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(theme.Value.ToString()) };
+				}
+				
 				var resp = this.Recurse(req, uri);
 				if (resp != null)
 					return resp;
 
-				return returnPage(false, null,
+				var sr = new List<ServedResult>
+				{
 					"Select a theme<br/>",
 					new ServedResult("a") { contentDic = { { "href", "/" } }, contentList = { "Return Home" } },
 					"<br/>",
-					new ServedResult("button") { contentDic = { { "onclick", "javascript:window.location.href=\"/css/set?theme=/css/none.css\"" } }, contentList = { "Reset to default" } },
-					new ServedResult("iframe") { contentDic = { { "src", "css/light.html" }, { "style", "display:block;" } } },
-					new ServedResult("button") { contentDic = { { "onclick", "javascript:window.location.href=\"/css/set?theme=/css/light.css\"" } }, contentList = { "Use this theme" } },
-					new ServedResult("iframe") { contentDic = { { "src", "css/dark.html" }, { "style", "display:block;" } } },
-					new ServedResult("button") { contentDic = { { "onclick", "javascript:window.location.href=\"/css/set?theme=/css/dark.css\"" } }, contentList = { "Use this theme" } }
-				);
+					new ServedResult("button") { contentDic = { { "onclick", "javascript:window.location.href=\"/css/set?theme=/css/none.css\"" } }, contentList = { "Reset to default" } }
+				};
+
+				foreach (DictionaryEntry t in themeSet)
+				{
+					sr.Add(new ServedResult("iframe") { contentDic = { { "src", "\"css/" + t.Key + ".html\"" }, { "style", "\"display:block;\"" } }, contentList = { " " } });
+					sr.Add(new ServedResult("button") { contentDic = { { "onclick", "\"javascript:window.location.href='/css/set?theme=/css/" + t.Key + ".css'\"" } },
+						contentList = { "Use this theme" } });
+				}
+
+				return returnHtml(null, sr.ToArray());
 			}
 
 			[PageAddressRender("preview.html")]
@@ -543,7 +634,7 @@ namespace RuneApp
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return returnPage(false, null, new ThemePreview());
+					return returnHtml(null, new ThemePreview());
 				}
 			}
 
@@ -556,13 +647,7 @@ namespace RuneApp
 
 				public override string ToHtml()
 				{
-					return @"Theme preview!<br/>
-<button>Click</button><br/>
-<a href=""" + Guid.NewGuid() + @""" class=""link"">Sample Link</a>&nbsp;<a class=""link_visited"" href=""/css"">Visited link</a><br/>
-<br/>
-<ul><li>List item</li>
-<li>Another</li></ul>
-";
+					return InternalServer.theme_preview.Replace("{guid}", new Guid().ToString());
 				}
 			}
 
@@ -581,16 +666,7 @@ namespace RuneApp
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(File.ReadAllText("swagger.css")) };
-				}
-			}
-
-			[PageAddressRender("light.html")]
-			public class LightPreview : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					return returnPage(false, new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "light.css" } } }}, new ThemePreview());
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_css) };
 				}
 			}
 
@@ -599,78 +675,27 @@ namespace RuneApp
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					var cssStr = new StringBuilder(@"
-@media only screen and (min-resolution: 192dpi),
-	   only screen and (min-resolution: 2dppx) {
-	body {
-		font-size: 1.5em;
-	}
-}
-.rune-container {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: flex-start;
-}
-.rune-box {
-	display: inline-flex;
-	flex-direction: column;
-	border: 1px solid black;
-	border-radius: 5pt;
-	margin: 1pt;
-	padding: 1pt;
-}
-.rune-icon {
-	text-align: center;
-	vertical-align: middle;
-	background-position-x: center;
-	background-position-y: center;
-	background-repeat-x: no-repeat;
-	background-repeat-y: no-repeat;
-}
-.rune-icon-back {
-	display: inline-block;
-	background-size: 100%;
-}
-.rune-icon-body {
-	background-size: 100%;
-}
-.rune-icon-set {
-	background-size: 55%;
-	height: 3em;
-	width: 3em;
-}
-.rune-box-right {
-	display: inline-block;
-	vertical-align: middle;
-}
-.rune-innate {
-	font-style: italic;
-}
-.rune-monster-name {
-	text-align: right;
-}
-");
+					var cssStr = new StringBuilder(InternalServer.runes_css);
+
 					foreach (var s in new string[] { "normal", "magic", "rare", "hero", "legend" })
-						cssStr.Append(@"
-.rune-back." + s + @" {
-	background-image: url(/runes/bg_" + s + @".png);
-}");
+						cssStr.Append("\r\n.rune-back." + s + " {\r\n\tbackground-image: url(/runes/bg_" + s + ".png);\r\r}");
+
 					for (int i = 1; i < 7; i++)
-						cssStr.Append(@"
-					
-.rune-body.rune-slot" + i + @" {
-	background-image: url(/runes/rune" + i + @".png);
-}");
+						cssStr.Append("\r\n.rune-body.rune-slot" + i + " {\r\n\tbackground-image: url(/runes/rune" + i + ".png);\r\n}");
+
 					foreach (RuneSet rs in Rune.RuneSets)
-					{
-						cssStr.Append(@"
-.rune-set." + rs + @" {
-	background-image: url(/runes/" + rs + @".png);
-}");
-					}
+						cssStr.Append("\r\n.rune-set." + rs + " {\r\n\tbackground-image: url(/runes/" + rs + ".png);\r\n}");
 
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(cssStr.ToString()) };
+				}
+			}
+
+			[PageAddressRender("light.html")]
+			public class LightPreview : PageRenderer
+			{
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
+				{
+					return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "light.css" } } }}, new ThemePreview());
 				}
 			}
 
@@ -682,36 +707,13 @@ namespace RuneApp
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(@"") };
 				}
 			}
-			[PageAddressRender("light.css")]
-			public class LightTheme : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(@"
-body{background:#ccc;color:#733;}
-") };
-				}
-			}
 
 			[PageAddressRender("dark.html")]
 			public class DarkPreview : PageRenderer
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return returnPage(false, new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "dark.css" } } }}, new ThemePreview());
-				}
-			}
-
-			[PageAddressRender("dark.css")]
-			public class DarkTheme : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(@"
-body{background:#000;color:#ccc;}
-a,.link{color:#aaf;}
-a:visited,.link_visited{color:#88c;}
-") };
+					return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "dark.css" } } }}, new ThemePreview());
 				}
 			}
 		}
@@ -725,8 +727,7 @@ a:visited,.link_visited{color:#88c;}
 				if (resp != null)
 					return resp;
 
-				return returnPage(false, 
-					new ServedResult[] {
+				return returnHtml(new ServedResult[] {
 						new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"/css/swagger.css\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"http://code.jquery.com/jquery-1.8.0.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.3.3/underscore-min.js\"" } } },
@@ -858,7 +859,7 @@ document.getElementById(""out"").innerHTML = ""<div class=\""swagger-ui-wrap\"" 
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(File.ReadAllText("swagger.js")) };
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_js) };
 				}
 			}
 
@@ -867,7 +868,7 @@ document.getElementById(""out"").innerHTML = ""<div class=\""swagger-ui-wrap\"" 
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(File.ReadAllText("swagger-ui.js")) };
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_ui) };
 				}
 			}
 
@@ -876,7 +877,7 @@ document.getElementById(""out"").innerHTML = ""<div class=\""swagger-ui-wrap\"" 
 			{
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(File.ReadAllText("swagger-client.js")) };
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_client) };;
 				}
 			}
 
@@ -975,31 +976,6 @@ document.getElementById(""out"").innerHTML = ""<div class=\""swagger-ui-wrap\"" 
 
 	}
 
-	public static class ServerExtensions
-	{
-		public static string getHeadOrParam(this HttpListenerRequest req, string name)
-		{
-			if (req.QueryString.AllKeys.Contains(name))
-				return req.QueryString[name];
-
-			if (req.Headers.AllKeys.Contains(name))
-				return req.Headers[name];
-
-			return null;
-		}
-	}
-
-	public class FileContent : ByteArrayContent
-	{
-		public readonly string FileName;
-		public readonly string Type;
-
-		public FileContent(string fname, byte[] content, string type = "application/octet-stream") : base(content)
-		{
-			this.FileName = fname;
-			this.Type = type;
-		}
-	}
 
 	public class DeserialCommand : JsonConverter
 	{

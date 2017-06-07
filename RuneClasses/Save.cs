@@ -22,6 +22,9 @@ namespace RuneOptim
 		[JsonProperty("runes")]
 		public readonly ObservableCollection<Rune> Runes = new ObservableCollection<Rune>();
 
+		[JsonProperty("unit_lock_list")]
+		public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
+
 		// builds from rune optimizer don't match mine.
 		// Don't care right now, perhaps a fuzzy-import later?
 		[JsonProperty("savedBuilds")]
@@ -44,6 +47,28 @@ namespace RuneOptim
 			Runes.CollectionChanged += Runes_CollectionChanged;
 			Monsters.CollectionChanged += Monsters_CollectionChanged;
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
+			LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
+		}
+
+		private void LockedUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			switch (e.Action)
+			{
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					foreach (var i in e.NewItems.Cast<ulong>())
+					{
+						var mon = GetMonster(i);
+						if (mon != null)
+							mon.Locked = true;
+					}
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+				default:
+					throw new NotImplementedException();
+			}
 		}
 
 		private void Decorations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -92,6 +117,9 @@ namespace RuneOptim
 							mon.ApplyRune(rune);
 							rune.AssignedName = mon.Name;
 						}
+
+						if (LockedUnits.Contains(mon.Id))
+							mon.Locked = true;
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
@@ -146,7 +174,7 @@ namespace RuneOptim
 				mon = Monsters.FirstOrDefault(m => m.Name == name);
 			if (mon != null)
 				return mon;
-			return new Monster();
+			return null;
 		}
 
 		public Monster GetMonster(ulong id)

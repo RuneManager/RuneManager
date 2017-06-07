@@ -46,11 +46,13 @@ namespace RuneOptim
 	public enum Attr
 	{
 		[EnumMember(Value = "-")]
+		[SkillAttr("DICE")]
 		[SkillAttr("DIE_RATE")]
 		[SkillAttr("ATTACK_CUR_HP_RATE")]
 		[SkillAttr("TARGET_CUR_HP_RATE")]
 		[SkillAttr("ATTACK_LV")]
 		[SkillAttr("ATTACK_WIZARD_LIFE_RATE")]
+		[SkillAttr("LIFE_SHARE_TARGET")]
 		Neg = -1, 
 
 		[EnumMember(Value = "")]
@@ -184,6 +186,12 @@ namespace RuneOptim
 
 		[JsonProperty("skill_cooltime")]
 		public int[] SkillTimes = new int[8];
+
+		[JsonIgnore]
+		public int[] SkillupLevel = new int[8];
+
+		[JsonIgnore]
+		public int[] SkillupMax = new int[8];
 
 		public Stats() { }
 		// copy constructor, amrite?

@@ -213,6 +213,7 @@ namespace RuneOptim
 		{
 			get
 			{
+				if (this.AssignedId == 0) return true;
 				return new string[] { "Unknown name", "Inventory", "Unknown name (???[0])" }.Any(s => s.Equals(this.AssignedName));
 			}
 		}
@@ -249,6 +250,9 @@ namespace RuneOptim
 
 		public static string StringIt(Attr type, int val)
 		{
+			if (type == Attr.Null)
+				return "";
+
 			string ret = StringIt(type);
 
 			ret += " +" + val;

@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.check_autoBuild = new System.Windows.Forms.CheckBox();
@@ -86,10 +86,9 @@
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton3 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
+			this.tBtnSetLess = new System.Windows.Forms.ToolStripButton();
+			this.tBtnBreak = new System.Windows.Forms.ToolStripButton();
+			this.tBtnSetMore = new System.Windows.Forms.ToolStripButton();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabg = new System.Windows.Forms.TabPage();
 			this.tabo = new System.Windows.Forms.TabPage();
@@ -731,25 +730,23 @@
 			this.setList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
 			this.setList.FullRowSelect = true;
-			listViewGroup10.Header = "Required";
-			listViewGroup10.Name = "listViewGroup3";
-			listViewGroup11.Header = "Included";
-			listViewGroup11.Name = "listViewGroup1";
-			listViewGroup12.Header = "Excluded";
-			listViewGroup12.Name = "listViewGroup2";
+			listViewGroup1.Header = "Required";
+			listViewGroup1.Name = "listViewGroup3";
+			listViewGroup2.Header = "Included";
+			listViewGroup2.Name = "listViewGroup1";
+			listViewGroup3.Header = "Excluded";
+			listViewGroup3.Name = "listViewGroup2";
 			this.setList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup10,
-            listViewGroup11,
-            listViewGroup12});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
 			this.setList.Location = new System.Drawing.Point(6, 44);
 			this.setList.Name = "setList";
 			this.setList.Size = new System.Drawing.Size(111, 644);
 			this.setList.TabIndex = 8;
 			this.setList.UseCompatibleStateImageBehavior = false;
 			this.setList.View = System.Windows.Forms.View.Details;
-			this.setList.SelectedIndexChanged += new System.EventHandler(this.listView1_SelectedIndexChanged);
-			this.setList.DoubleClick += new System.EventHandler(this.toolStripButton1_Click);
-			this.setList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.listView1_MouseClick);
+			this.setList.DoubleClick += new System.EventHandler(this.tBtnSetShuffle);
 			// 
 			// columnHeader1
 			// 
@@ -772,55 +769,44 @@
 			// toolStrip1
 			// 
 			this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton3,
-            this.toolStripButton4});
+            this.tBtnBreak,
+            this.tBtnSetMore,
+            this.tBtnSetLess});
 			this.toolStrip1.Location = new System.Drawing.Point(3, 16);
 			this.toolStrip1.Name = "toolStrip1";
 			this.toolStrip1.Size = new System.Drawing.Size(117, 25);
 			this.toolStrip1.TabIndex = 0;
 			this.toolStrip1.Text = "toolStrip1";
 			// 
-			// toolStripButton1
+			// tBtnSetLess
 			// 
-			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton1.Image = global::RuneApp.App.subtract;
-			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton1.Name = "toolStripButton1";
-			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton1.Text = "Exclude";
-			this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+			this.tBtnSetLess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tBtnSetLess.Image = global::RuneApp.App.down;
+			this.tBtnSetLess.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tBtnSetLess.Name = "tBtnSetLess";
+			this.tBtnSetLess.Size = new System.Drawing.Size(23, 22);
+			this.tBtnSetLess.Text = "Include Less";
+			this.tBtnSetLess.Click += new System.EventHandler(this.tBtnSetLess_Click);
 			// 
-			// toolStripButton2
+			// tBtnBreak
 			// 
-			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton2.Image = global::RuneApp.App.broken;
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton2.Text = "Broken Icon = Broken Sets";
-			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+			this.tBtnBreak.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tBtnBreak.Image = global::RuneApp.App.broken;
+			this.tBtnBreak.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tBtnBreak.Name = "tBtnBreak";
+			this.tBtnBreak.Size = new System.Drawing.Size(23, 22);
+			this.tBtnBreak.Text = "Broken Icon = Broken Sets";
+			this.tBtnBreak.Click += new System.EventHandler(this.tBtnBreak_Click);
 			// 
-			// toolStripButton3
+			// tBtnSetMore
 			// 
-			this.toolStripButton3.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton3.Image = global::RuneApp.App.up;
-			this.toolStripButton3.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton3.Name = "toolStripButton3";
-			this.toolStripButton3.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton3.Text = "Make Required";
-			this.toolStripButton3.Click += new System.EventHandler(this.toolStripButton3_Click);
-			// 
-			// toolStripButton4
-			// 
-			this.toolStripButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton4.Image = global::RuneApp.App.go;
-			this.toolStripButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton4.Name = "toolStripButton4";
-			this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton4.Text = "Increase Required";
-			this.toolStripButton4.Click += new System.EventHandler(this.toolStripButton4_Click);
+			this.tBtnSetMore.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tBtnSetMore.Image = global::RuneApp.App.up;
+			this.tBtnSetMore.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tBtnSetMore.Name = "tBtnSetMore";
+			this.tBtnSetMore.Size = new System.Drawing.Size(23, 22);
+			this.tBtnSetMore.Text = "Required More";
+			this.tBtnSetMore.Click += new System.EventHandler(this.tBtnSetMore_Click);
 			// 
 			// tabControl1
 			// 
@@ -889,13 +875,13 @@
 			// 
 			this.priStat2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-			listViewGroup13.Header = "Include";
-			listViewGroup13.Name = "listViewGroup1";
-			listViewGroup14.Header = "Excluded";
-			listViewGroup14.Name = "listViewGroup2";
+			listViewGroup4.Header = "Include";
+			listViewGroup4.Name = "listViewGroup1";
+			listViewGroup5.Header = "Excluded";
+			listViewGroup5.Name = "listViewGroup2";
 			this.priStat2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup13,
-            listViewGroup14});
+            listViewGroup4,
+            listViewGroup5});
 			this.priStat2.Location = new System.Drawing.Point(3, 241);
 			this.priStat2.Name = "priStat2";
 			this.priStat2.Size = new System.Drawing.Size(123, 256);
@@ -925,13 +911,13 @@
 			// 
 			this.priStat4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-			listViewGroup15.Header = "Include";
-			listViewGroup15.Name = "listViewGroup1";
-			listViewGroup16.Header = "Excluded";
-			listViewGroup16.Name = "listViewGroup2";
+			listViewGroup6.Header = "Include";
+			listViewGroup6.Name = "listViewGroup1";
+			listViewGroup7.Header = "Excluded";
+			listViewGroup7.Name = "listViewGroup2";
 			this.priStat4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup15,
-            listViewGroup16});
+            listViewGroup6,
+            listViewGroup7});
 			this.priStat4.Location = new System.Drawing.Point(3, 241);
 			this.priStat4.Name = "priStat4";
 			this.priStat4.Size = new System.Drawing.Size(123, 256);
@@ -961,13 +947,13 @@
 			// 
 			this.priStat6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-			listViewGroup17.Header = "Include";
-			listViewGroup17.Name = "listViewGroup1";
-			listViewGroup18.Header = "Excluded";
-			listViewGroup18.Name = "listViewGroup2";
+			listViewGroup8.Header = "Include";
+			listViewGroup8.Name = "listViewGroup1";
+			listViewGroup9.Header = "Excluded";
+			listViewGroup9.Name = "listViewGroup2";
 			this.priStat6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup17,
-            listViewGroup18});
+            listViewGroup8,
+            listViewGroup9});
 			this.priStat6.Location = new System.Drawing.Point(3, 241);
 			this.priStat6.Name = "priStat6";
 			this.priStat6.Size = new System.Drawing.Size(123, 256);
@@ -1084,8 +1070,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader1;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStrip toolStrip1;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
+        private System.Windows.Forms.ToolStripButton tBtnSetLess;
+        private System.Windows.Forms.ToolStripButton tBtnBreak;
         private RuneControl runeControl6;
         private RuneControl runeControl5;
         private RuneControl runeControl4;
@@ -1115,7 +1101,7 @@
         private System.Windows.Forms.ColumnHeader columnHeader4;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ToolStripButton toolStripButton3;
+        private System.Windows.Forms.ToolStripButton tBtnSetMore;
         private System.Windows.Forms.Label runeNum1;
         private System.Windows.Forms.Label runeNum6;
         private System.Windows.Forms.Label runeNum5;
@@ -1130,7 +1116,6 @@
         private System.Windows.Forms.Button btnHelp;
 		private System.Windows.Forms.CheckBox checkDL6star;
 		private System.Windows.Forms.Button btnDL6star;
-		private System.Windows.Forms.ToolStripButton toolStripButton4;
 		private System.Windows.Forms.Button btnDLawake;
 		private System.Windows.Forms.CheckBox checkDLawake;
         private System.Windows.Forms.ListView priStat2;

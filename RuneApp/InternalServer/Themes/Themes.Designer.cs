@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RuneApp.Properties {
+namespace RuneApp.InternalServer.Themes {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace RuneApp.Properties {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources {
+    internal class Themes {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources() {
+        internal Themes() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace RuneApp.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.InternalServer.Themes.Themes", typeof(Themes).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,37 @@ namespace RuneApp.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to body {
+        ///	background: #000;
+        ///	color: #ccc;
+        ///}
+        ///a, .link {
+        ///	color: #aaf;
+        ///}
+        ///a:visited, .link_visited {
+        ///	color: #88c;
+        ///}.
+        /// </summary>
+        internal static string dark {
+            get {
+                return ResourceManager.GetString("dark", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to body {
+        ///	background: #ccc;
+        ///	color: #733;
+        ///}
+        ///.
+        /// </summary>
+        internal static string light {
+            get {
+                return ResourceManager.GetString("light", resourceCulture);
             }
         }
     }

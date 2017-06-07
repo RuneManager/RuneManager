@@ -337,6 +337,21 @@ namespace RuneApp
 							nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
 							nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
 							nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.Id.ToString());
+
+							l.runesNew = 0;
+							l.runesChanged = 0;
+
+							foreach (var r in l.Runes)
+							{
+								if (r.AssignedId != b.mon.Id)
+								{
+									if (r.IsUnassigned)
+										l.runesNew++;
+									else
+										l.runesChanged++;
+								}
+							}
+
 							nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.runesNew + l.runesChanged).ToString());
 							if (l.runesNew > 0 && b.mon.Current.RuneCount < 6)
 								nli.SubItems[3].ForeColor = Color.Green;
@@ -766,7 +781,9 @@ namespace RuneApp
 			Build bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
 			{
 				New = true,
-				ID = buildList.Items.Count + 1
+				ID = buildList.Items.Count + 1,
+				MonId = mon.Id,
+				MonName = mon.Name
 			};
 			using (var ff = new Create(bb))
 			{
@@ -774,22 +791,21 @@ namespace RuneApp
 				{
 					bb.ID++;
 				}
-
-				ff.build = bb;
+				
 				var res = ff.ShowDialog();
 				if (res != DialogResult.OK) return;
 
 				if (Program.builds.Count > 0)
-					ff.build.priority = Program.builds.Max(b => b.priority) + 1;
+					bb.priority = Program.builds.Max(b => b.priority) + 1;
 				else
-					ff.build.priority = 1;
+					bb.priority = 1;
 				
-				ListViewItem li = new ListViewItem(new string[] { ff.build.priority.ToString(), ff.build.ID.ToString(), ff.build.mon.Name, "", ff.build.mon.Id.ToString(), "" });
-				li.Tag = ff.build;
+				ListViewItem li = new ListViewItem(new string[] { bb.priority.ToString(), bb.ID.ToString(), bb.mon.Name, "", bb.mon.Id.ToString(), "" });
+				li.Tag = bb;
 				buildList.Items.Add(li);
-				Program.builds.Add(ff.build);
+				Program.builds.Add(bb);
 
-				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.Name));
+				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.Name));
 				if (lv1li != null)
 					lv1li.ForeColor = Color.Green;
 			}

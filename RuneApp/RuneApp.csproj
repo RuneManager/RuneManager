@@ -105,6 +105,22 @@
     <Compile Include="Help.Designer.cs">
       <DependentUpon>Help.cs</DependentUpon>
     </Compile>
+    <Compile Include="InternalServer\InternalServer.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InternalServer.resx</DependentUpon>
+    </Compile>
+    <Compile Include="InternalServer\ServerExtensions.cs" />
+    <Compile Include="InternalServer\Swagger\Swagger.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Swagger.resx</DependentUpon>
+    </Compile>
+    <Compile Include="InternalServer\Themes\Themes.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Themes.resx</DependentUpon>
+    </Compile>
     <Compile Include="ListViewSort.cs" />
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
@@ -112,7 +128,7 @@
     <Compile Include="Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
-    <Compile Include="Master.cs" />
+    <Compile Include="InternalServer\Master.cs" />
     <Compile Include="MonSelect.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -174,6 +190,20 @@
     <EmbeddedResource Include="Help.resx">
       <DependentUpon>Help.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="InternalServer\InternalServer.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>InternalServer.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalServer\Swagger\Swagger.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Swagger.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="InternalServer\Themes\Themes.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Themes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -192,6 +222,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="RuneBox.resx">
       <DependentUpon>RuneBox.cs</DependentUpon>
@@ -209,6 +240,7 @@
     <None Include="basestats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="InternalServer\default.tpl" />
     <None Include="monsters.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -225,9 +257,7 @@
     <None Include="skills.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="swagger.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="InternalServer\Swagger\swagger.js" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -377,6 +407,10 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="Resources\accuracy.png" />
+    <Content Include="InternalServer\runes.css" />
+    <Content Include="InternalServer\Themes\dark.css" />
+    <Content Include="InternalServer\Themes\light.css" />
+    <Content Include="InternalServer\theme_preview.inc" />
     <Content Include="Resources\boxToMon.png" />
     <None Include="Resources\enhance.png" />
     <None Include="Resources\fight.png" />
@@ -393,15 +427,9 @@
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />
     <Content Include="Resources\upto.png" />
-    <None Include="swagger-client.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="swagger-ui.js">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="swagger.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="InternalServer\Swagger\swagger-client.js" />
+    <None Include="InternalServer\Swagger\swagger-ui.js" />
+    <None Include="InternalServer\Swagger\swagger.css" />
     <Content Include="User Manual\build.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

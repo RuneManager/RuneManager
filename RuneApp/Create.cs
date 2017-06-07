@@ -142,7 +142,7 @@ namespace RuneApp
 				runes[i].Tag = i + 1;
 			}
 
-			toolStripButton1.Tag = 0;
+			tBtnSetLess.Tag = 0;
 			addAttrsToEvens();
 
 			Control textBox;
@@ -644,6 +644,8 @@ namespace RuneApp
 
 			refreshStats(mon, cur);
 
+			RegenSetList();
+
 			// do we allow broken sets?
 			ChangeBroken(build.AllowBroken);
 
@@ -893,8 +895,8 @@ namespace RuneApp
 		// switch the cool icon on the button (and the bool in the build)
 		private void ChangeBroken(bool state)
 		{
-			toolStripButton2.Tag = state;
-			toolStripButton2.Image = state ? App.broken : App.whole;
+			tBtnBreak.Tag = state;
+			tBtnBreak.Image = state ? App.broken : App.whole;
 			if (build != null)
 				build.AllowBroken = state;
 		}
@@ -932,66 +934,141 @@ namespace RuneApp
 
 			bonus.Text = "+" + (val) + (hasPercent ? "%" : "");
 		}
-
-		void listView1_SelectedIndexChanged(object sender, EventArgs e)
+		
+		void tBtnBreak_Click(object sender, EventArgs e)
+		{
+			ChangeBroken(!(bool)((ToolStripButton)sender).Tag);
+		}
+		
+		void tBtnSetMore_Click(object sender, EventArgs e)
 		{
 			if (build == null)
 				return;
 
-			var list = (ListView)sender;
+			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>())
+			{
+				var ss = (RuneSet)sl.Tag;
+				if (build.RequiredSets.Contains(ss))
+				{
+					int num = build.RequiredSets.Count(s => s == ss);
+					if (Rune.SetRequired(ss) == 2 && num < 3)
+					{
+						build.RequiredSets.Add(ss);
+					}
+				}
+				else if (build.BuildSets.Contains(ss))
+				{
+					build.addRequiredSet(ss);
+				}
+				else
+				{
+					build.addIncludedSet(ss);
+				}
+			}
 
-			var items = list.SelectedItems;
-			if (items.Count == 0)
+			RegenSetList();
+		}
+
+		void tBtnSetLess_Click(object sender, EventArgs e)
+		{
+			if (build == null)
 				return;
 
-			ListViewItem item = items[0];
+			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>())
+			{
+				var ss = (RuneSet)sl.Tag;
+				if (build.RequiredSets.Contains(ss))
+				{
+					build.removeRequiredSet(ss);
+				}
+				else if (build.BuildSets.Contains(ss))
+				{
+					build.toggleIncludedSet(ss);
+				}
+			}
 
-			ChangeMove(build.BuildSets.Contains((RuneSet)item.Tag));
-			ChangeReq(build.RequiredSets.Contains((RuneSet)item.Tag));
+			RegenSetList();
 		}
 
-		// flip the icon for the INCLUDE set button
-		void ChangeMove(bool dir)
+		void tBtnSetShuffle(object sender, EventArgs e)
 		{
-			toolStripButton1.Tag = dir;
-			if (!dir)
+			if (build == null)
+				return;
+
+			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>())
 			{
-				toolStripButton1.Image = App.add;
-				toolStripButton1.Text = "Include selected set";
+				var ss = (RuneSet)sl.Tag;
+				if (build.RequiredSets.Contains(ss))
+				{
+					int num = build.RequiredSets.Count(s => s == ss);
+					if (Rune.SetRequired(ss) == 2 && num < 3)
+					{
+						build.RequiredSets.Add(ss);
+					}
+					else
+					{
+						build.removeRequiredSet(ss);
+					}
+				}
+				else if (build.BuildSets.Contains(ss))
+				{
+					build.addRequiredSet(ss);
+				}
+				else
+				{
+					build.addIncludedSet(ss);
+				}
 			}
-			else
-			{
-				toolStripButton1.Image = App.subtract;
-				toolStripButton1.Text = "Exclude selected set";
-			}
-			updatePerms();
+
+			RegenSetList();
 		}
 
-		// flip the icon for the REQUIRED set button
-		void ChangeReq(bool dir)
+		void RegenSetList()
 		{
-			toolStripButton3.Tag = dir;
-			if (!dir)
-			{
-				toolStripButton3.Image = App.up;
-				toolStripButton3.Text = "Require selected set";
-			}
-			else
-			{
-				toolStripButton3.Image = App.down;
-				toolStripButton3.Text = "Option selected set";
-			}
-			updatePerms();
+			if (build == null)
+				return;
 
-		}
-
-		void toolStripButton2_Click(object sender, EventArgs e)
-		{
-			ChangeBroken(!(bool)((ToolStripButton)sender).Tag);
+			foreach (var sl in setList.Items.Cast<ListViewItem>())
+			{
+				var ss = (RuneSet)sl.Tag;
+				if (build.RequiredSets.Contains(ss))
+				{
+					sl.Group = setList.Groups[0];
+					int num = build.RequiredSets.Count(s => s == ss);
+					sl.Text = ss.ToString() + (num > 1 ? " x" + num : "");
+					sl.ForeColor = Color.Black;
+					if (Rune.SetRequired(ss) == 4 && build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+						sl.ForeColor = Color.Red;
+					// TODO: too many twos
+				}
+				else if (build.BuildSets.Contains(ss))
+				{
+					sl.Group = setList.Groups[1];
+					sl.Text = ss.ToString();
+					sl.ForeColor = Color.Black;
+					if (Rune.SetRequired(ss) == 4 && build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+						sl.ForeColor = Color.Red;
+				}
+				else if ((Rune.SetRequired(ss) == 2 && build.BuildSets.All(s => Rune.SetRequired(s) == 4) && build.RequiredSets.All(s => Rune.SetRequired(s) == 4))
+					|| (Rune.SetRequired(ss) == 4 && build.BuildSets.Count == 0 && build.RequiredSets.Count == 0)
+					)
+				{
+					sl.Group = setList.Groups[1];
+					sl.Text = ss.ToString();
+					sl.ForeColor = Color.Gray;
+				}
+				else
+				{
+					sl.Group = setList.Groups[2];
+					sl.Text = ss.ToString();
+					sl.ForeColor = Color.Black;
+				}
+			}
+			CalcPerms();
 		}
 
 		// shuffle runesets between: included <-> excluded
-		void toolStripButton1_Click(object sender, EventArgs e)
+		void tBtnInclude_Click(object sender, EventArgs e)
 		{
 			if (build == null)
 				return;
@@ -1044,11 +1121,25 @@ namespace RuneApp
 			setList.SelectedIndices.Clear();
 			
 			setList.SelectedIndices.Add(ind);
-			listView1_SelectedIndexChanged(setList, null);
+		}
+
+		void tBtnRequire_Click(object sender, EventArgs e)
+		{
+			if (setList.SelectedItems.Count == 1)
+			{
+				var li = setList.SelectedItems[0];
+				RuneSet set = (RuneSet)li.Tag;
+				// whatever, just add it to required if not
+				int num = build.addRequiredSet(set);
+				/*if (num > 1)
+					li.Text = set.ToString() + " x" + num;
+				if (num > 3 || num <= 1)
+					li.Text = set.ToString();*/
+			}
 		}
 
 		// shuffle rnuesets between: excluded > required <-> included
-		void toolStripButton3_Click(object sender, EventArgs e)
+		void tBtnShuffle_Click(object sender, EventArgs e)
 		{
 			if (build == null)
 				return;
@@ -1108,7 +1199,6 @@ namespace RuneApp
 			setList.SelectedIndices.Clear();
 
 			setList.SelectedIndices.Add(ind);
-			listView1_SelectedIndexChanged(setList, null);
 		}
 
 		// if you click on a little rune
@@ -2005,28 +2095,7 @@ namespace RuneApp
 			build.DownloadAwake = checkDLawake.Checked;
 			checkDL6star.Enabled = !checkDLawake.Checked;
 		}
-
-		void listView1_MouseClick(object sender, MouseEventArgs e)
-		{
-			if (e.Button == MouseButtons.Right)
-				toolStripButton4_Click(sender, e);
-		}
-
-		void toolStripButton4_Click(object sender, EventArgs e)
-		{
-			if (setList.SelectedItems.Count == 1)
-			{
-				var li = setList.SelectedItems[0];
-				RuneSet set = (RuneSet)li.Tag;
-				// whatever, just add it to required if not
-				int num = build.addRequiredSet(set);
-				/*if (num > 1)
-					li.Text = set.ToString() + " x" + num;
-				if (num > 3 || num <= 1)
-					li.Text = set.ToString();*/
-			}
-		}
-
+		
 		void monLabel_Click(object sender, EventArgs e)
 		{
 			using (MonSelect ms = new MonSelect(build.mon))

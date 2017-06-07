@@ -66,7 +66,7 @@ namespace RuneApp
 
 		public static readonly RuneSheet runeSheet = new RuneSheet();
 
-		public static readonly Master master = new Master();
+		public static readonly InternalServer.Master master = new InternalServer.Master();
 		public static bool goodRunes;
 
 		/// <summary>
@@ -430,7 +430,11 @@ namespace RuneApp
 					{
 						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
 						if (load.Runes[i] != null)
+						{
 							load.Runes[i].Locked = true;
+							foreach (var ms in load.manageStats[i])
+								load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+						}
 					}
 					load.Shrines = data.shrines;
 					loads.Add(load);
@@ -631,7 +635,7 @@ namespace RuneApp
 					foreach (Rune r in b.Best.Current.Runes)
 					{
 						r.Locked = true;
-						if (r.AssignedName != b.Best.Name)
+						if (r.AssignedId != b.Best.Id)
 						{
 							if (r.IsUnassigned)
 								b.Best.Current.runesNew++;

@@ -1,0 +1,10 @@
+﻿body {
+	background: #000;
+	color: #ccc;
+}
+a, .link {
+	color: #aaf;
+}
+a:visited, .link_visited {
+	color: #88c;
+}
