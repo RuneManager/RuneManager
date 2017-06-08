@@ -207,6 +207,16 @@ namespace RuneService
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
 								Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
+
+								if (json["command"].Equals("GetNoticeChat"))
+								{
+									var version = Assembly.GetExecutingAssembly().GetName().Version;
+									var jobj = new JObject();
+									// Add the proxy version number to chat notices to remind people.
+									jobj["message"] = "====[PROXY v" + version + "]====";
+									(json["notice_list"] as JArray).Add(jobj);
+									await e.SetResponseBodyString(JsonConvert.SerializeObject(json));
+								}
 							}
 							catch { };
 
