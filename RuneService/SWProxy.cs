@@ -304,6 +304,31 @@ namespace RuneService
 			}
 		}
 
+		public class Adler32Computer
+		{
+			private int a = 1;
+			private int b = 0;
+
+			public int Checksum
+			{
+				get
+				{
+					return ((b * 65536) + a);
+				}
+			}
+
+			private static readonly int Modulus = 65521;
+
+			public void Update(byte[] data, int offset, int length)
+			{
+				for (int counter = 0; counter < length; ++counter)
+				{
+					a = (a + (data[offset + counter])) % Modulus;
+					b = (b + a) % Modulus;
+				}
+			}
+		}
+
 		private static byte[] zlibCompressData(string body)
 		{
 			using (var stream = new MemoryStream())
@@ -314,10 +339,13 @@ namespace RuneService
 					streamWriter.Write(body);
 				}
 				var res = stream.ToArray();
-				var ret = new byte[res.Length + 2];
+				var ret = new byte[res.Length + 6];
 				ret[0] = 120;
 				ret[1] = 156;
 				res.CopyTo(ret, 2);
+				var adl = new Adler32Computer();
+				adl.Update(res, 0, res.Length);
+				BitConverter.GetBytes(adl.Checksum).CopyTo(ret, 2 + res.Length);
 				return ret;
 			}
 		}
