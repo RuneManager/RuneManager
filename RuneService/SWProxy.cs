@@ -202,20 +202,41 @@ namespace RuneService
 
 							try
 							{
-								var json = JsonConvert.DeserializeObject<JObject>(dec);
+								var json = JsonConvert.DeserializeObject<JObject>(dec, new JsonSerializerSettings() { Formatting = Formatting.Indented });
 								if (!Directory.Exists("Json"))
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
 								Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
 
-								if (json["command"].Equals("GetNoticeChat"))
+								if (json["command"].ToString() == "GetNoticeChat")
 								{
 									var version = Assembly.GetExecutingAssembly().GetName().Version;
 									var jobj = new JObject();
 									// Add the proxy version number to chat notices to remind people.
-									jobj["message"] = "====[PROXY v" + version + "]====";
-									(json["notice_list"] as JArray).Add(jobj);
-									await e.SetResponseBodyString(JsonConvert.SerializeObject(json));
+									jobj["message"] = "Special Quiz Event..\u2661 Check the Event icon!";
+									///(json["notice_list"] as JArray).Add(jobj);
+									//var ll = json["tzone"].ToString().Replace("/", @"\/").ToList();
+									json["tzone"] = json["tzone"].ToString().Replace("/", @"\/");
+
+									var ver = e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
+
+									var inMsg = Convert.FromBase64String(body);
+									var outMsg = decryptMessage(inMsg, ver);
+									var decData = zlibDecompressData(outMsg);
+
+									var fix = JsonConvert.SerializeObject(json);
+									fix = fix.Replace(@"\\", "\\");
+									var bytes = zlibCompressData(fix);
+									var str = encryptMessage(bytes, ver);
+									var send = Convert.ToBase64String(str);
+
+									Console.WriteLine("str:" + (fix == decData));
+									Console.WriteLine("b64:" + (inMsg.Equals(str)));
+									Console.WriteLine("cry:" + (outMsg.Equals(bytes)));
+									Console.WriteLine("bytes:" + (body == send));
+									
+									//encryptResponse(fix, ver);
+									await e.SetResponseBodyString(send);
 								}
 							}
 							catch { };
@@ -259,6 +280,13 @@ namespace RuneService
 			return zlibDecompressData(outMsg);
 		}
 
+		private static string encryptResponse(string body, int version = 1)
+		{
+			var bytes = zlibCompressData(body);
+			var str = encryptMessage(bytes, version);
+			return Convert.ToBase64String(str);
+		}
+		
 		// Use inbuilts for zlib Decomp
 		// http://stackoverflow.com/questions/17212964/net-zlib-inflate-with-net-4-5
 		private static string zlibDecompressData(byte[] bytes)
@@ -267,7 +295,30 @@ namespace RuneService
 			using (var inflater = new DeflateStream(stream, CompressionMode.Decompress))
 			using (var streamReader = new StreamReader(inflater))
 			{
+				List<int> kek = new List<int>();
+				while (streamReader.Peek() != -1)
+					kek.Add(streamReader.Read());
+
+				return Encoding.ASCII.GetString(kek.Select(i => (byte)i).ToArray());
 				return streamReader.ReadToEnd();
+			}
+		}
+
+		private static byte[] zlibCompressData(string body)
+		{
+			using (var stream = new MemoryStream())
+			{
+				using (var inflater = new DeflateStream(stream, CompressionMode.Compress))
+				using (var streamWriter = new StreamWriter(inflater))
+				{
+					streamWriter.Write(body);
+				}
+				var res = stream.ToArray();
+				var ret = new byte[res.Length + 2];
+				ret[0] = 120;
+				ret[1] = 156;
+				res.CopyTo(ret, 2);
+				return ret;
 			}
 		}
 
@@ -291,6 +342,26 @@ namespace RuneService
 			return Decrypt(bodyString, key, new byte[16]);
 		}
 		
+		public static byte[] encryptMessage(byte[] bodyString, int version = 1)
+		{
+			byte[] key;
+			switch (version)
+			{
+				case 1:
+					byte[] kek = new byte[] { 13, 122, 63, 6, 125, 13, 39, 120, 60, 124, 47, 36, 45, 113, 122, 18 };
+					key = kek.Select(b => (byte)(b ^ 0x1248)).ToArray();
+					break;
+				case 2:
+					byte[] kek2 = new byte[] { 15, 58, 124, 27, 122, 45, 33, 6, 36, 127, 50, 57, 125, 5, 58, 29 };
+					key = kek2.Select(b => (byte)(b ^ 0x1248)).ToArray();
+					break;
+				default:
+					throw new NotImplementedException($"Decrypting version {version} is unsupported.");
+			}
+
+			return Encrypt(bodyString, key, new byte[16]);
+		}
+
 		public static byte[] Decrypt(byte[] buff, byte[] key, byte[] iv)
 		{
 			using (RijndaelManaged rijndael = new RijndaelManaged())
@@ -304,6 +375,23 @@ namespace RuneService
 				byte[] output = new byte[buff.Length];
 				int readBytes = cryptoStream.Read(output, 0, output.Length);
 				return output.Take(readBytes).ToArray();
+			}
+		}
+
+		public static byte[] Encrypt(byte[] buff, byte[] key, byte[] iv)
+		{
+			using (RijndaelManaged rijndael = new RijndaelManaged())
+			{
+				rijndael.Padding = PaddingMode.PKCS7;
+				rijndael.Mode = CipherMode.CBC;
+				rijndael.KeySize = key.Length * 8;
+				ICryptoTransform decryptor = rijndael.CreateEncryptor(key, iv);
+				MemoryStream memoryStream = new MemoryStream();
+				CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Write);
+				byte[] output = new byte[buff.Length];
+				//int readBytes = cryptoStream.Read(output, 0, output.Length);
+				cryptoStream.Write(buff, 0, buff.Length);
+				return memoryStream.ToArray();
 			}
 		}
 	}
