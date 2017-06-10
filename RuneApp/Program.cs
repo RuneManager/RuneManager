@@ -190,7 +190,7 @@ namespace RuneApp
 			if (files.Any())
 			{
 				var firstFile = files.First();
-				return LoadSave(firstFile, "swarfarm");
+				return LoadSave(firstFile);
 			}
 			else if (File.Exists("save.json"))
 			{
@@ -199,7 +199,7 @@ namespace RuneApp
 			return LoadSaveResult.FileNotFound;
 		}
 
-		public static LoadSaveResult LoadSave(string filename, string format = "optimizer")
+		public static LoadSaveResult LoadSave(string filename)
 		{
 			if (string.IsNullOrWhiteSpace(filename))
 			{

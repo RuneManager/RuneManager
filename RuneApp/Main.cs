@@ -201,13 +201,27 @@ namespace RuneApp
 
 			try {
 				LoadSaveResult loadResult = 0;
-				while ((loadResult = Program.FindSave()) != LoadSaveResult.Success)
+				do
 				{
-					if (loadResult == LoadSaveResult.FileNotFound && MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
+					loadResult = Program.FindSave();
+					switch (loadResult)
 					{
-						loadSaveDialogue(null, new EventArgs());
+						case LoadSaveResult.Success:
+							break;
+						default:
+							if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
+							{
+								loadResult = loadSaveDialogue(null, new EventArgs());
+							}
+							else
+							{
+								Application.Exit();
+								return;
+							}
+							break;
 					}
-				}
+				} while (loadResult != LoadSaveResult.Success) ;
+
 				loadResult = Program.LoadMonStats();
 				if (loadResult != LoadSaveResult.Success)
 				{
@@ -223,7 +237,7 @@ namespace RuneApp
 						case LoadSaveResult.Failure:
 							if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
 							{
-								loadSaveDialogue(null, new EventArgs());
+								loadResult = loadSaveDialogue(null, new EventArgs());
 							}
 							break;
 						case LoadSaveResult.EmptyFile:
@@ -233,9 +247,6 @@ namespace RuneApp
 						default:
 							break;
 					}
-
-					
-
 				} while (loadResult != LoadSaveResult.Success) ;
 			}
 			catch (Exception ex)
@@ -507,9 +518,9 @@ namespace RuneApp
 			}
 		}
 
-		private void loadSaveDialogue(object sender, EventArgs e)
+		private LoadSaveResult loadSaveDialogue(object sender, EventArgs e)
 		{
-			LoadSaveResult size;
+			LoadSaveResult loadres = LoadSaveResult.Failure;
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
 			openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
 			DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
@@ -520,8 +531,8 @@ namespace RuneApp
 				{
 					try
 					{
-						size = Program.LoadSave(file);
-						if (size > 0)
+						loadres = Program.LoadSave(file);
+						if (loadres > 0)
 						{
 							if (File.Exists("save.json"))
 							{
@@ -545,6 +556,7 @@ namespace RuneApp
 					}
 				}
 			}
+			return loadres;
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e)
