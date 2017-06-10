@@ -81,7 +81,7 @@ namespace RuneApp
 			loads.CollectionChanged += Loads_CollectionChanged;
 			BuildsProgressTo += Program_BuildsProgressTo;
 
-			if (Program.Settings.MasterRead)
+			if (Program.Settings.InternalServer)
 				master.Start();
 
 			Application.EnableVisualStyles();

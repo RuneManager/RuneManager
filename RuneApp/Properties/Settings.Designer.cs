@@ -157,13 +157,13 @@ namespace RuneApp.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool MasterRead {
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool InternalServer {
             get {
-                return ((bool)(this["MasterRead"]));
+                return ((bool)(this["InternalServer"]));
             }
             set {
-                this["MasterRead"] = value;
+                this["InternalServer"] = value;
             }
         }
     }

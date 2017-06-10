@@ -46,7 +46,7 @@ namespace RuneApp.InternalServer
 		/// </summary>
 		public void Start()
 		{
-			Task.Factory.StartNew(() =>
+			try
 			{
 				IPAddress ipAddress = IPAddress.Any;
 
@@ -56,16 +56,46 @@ namespace RuneApp.InternalServer
 				listener.Prefixes.Add("http://*:7676/");
 				listener.Start();
 				Log.Info("Server is listening on " + listener.Prefixes.First());
-
 				isRunning = true;
+			}
+			catch (Exception e)
+			{
+				Log.Error("Failed to start server", e);
+				throw;
+			}
 
-				while (isRunning)
+			Task.Factory.StartNew(() =>
+			{
+				try
 				{
-					Log.Info("Waiting for a connection...");
-					var context = listener.GetContext();
-					new Thread(() => RemoteManageLoop(context)).Start();
+					while (isRunning)
+					{
+						Log.Info("Waiting for a connection...");
+						var context = listener.GetContext();
+						new Thread(() => RemoteManageLoop(context)).Start();
+					}
 				}
-			});
+				catch (Exception e)
+				{
+					Log.Error("Failed while running server", e);
+				}
+				isRunning = false;
+			}, TaskCreationOptions.LongRunning);
+		}
+
+		public void Stop()
+		{
+			listener.Stop();
+			listener.Close();
+
+			DateTime start = DateTime.Now;
+			while (DateTime.Now - start < new TimeSpan(0,0,5))
+			{
+				Thread.Sleep(100);
+				if (!isRunning)
+					return;
+			}
+			throw new TaskCanceledException("Failed to stop server!");
 		}
 
 		public async void RemoteManageLoop(HttpListenerContext context)

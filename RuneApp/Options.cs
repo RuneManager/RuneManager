@@ -11,6 +11,7 @@ namespace RuneApp
 		Dictionary<string, CheckBox> checks = new Dictionary<string, CheckBox>();
 		Dictionary<string, TextBox> nums = new Dictionary<string, TextBox>();
 		bool loading;
+		bool isUnchecking = false;
 
 		public void AddCheck(string config, CheckBox box)
 		{
@@ -40,6 +41,8 @@ namespace RuneApp
 			AddCheck("ColorTeams", cColorTeams);
 			AddCheck("StartUpHelp", cHelpStart);
 			cHelpStart.CheckedChanged += CHelpStart_CheckedChanged;
+			AddCheck("InternalServer", cInternalServer);
+			cInternalServer.CheckedChanged += CInternalServer_CheckedChanged;
 
 			AddNum("TestGen", gTestRun);
 			AddNum("TestShow", gTestShow);
@@ -55,6 +58,43 @@ namespace RuneApp
 			}
 
 			loading = false;
+		}
+
+		private void CInternalServer_CheckedChanged(object sender, EventArgs e)
+		{
+			if (loading || isUnchecking)
+				return;
+
+			isUnchecking = true;
+			cInternalServer.Checked = !cInternalServer.Checked;
+			cInternalServer.Enabled = false;
+
+			if (!cInternalServer.Checked)
+			{
+				try
+				{
+					Program.master.Start();
+					cInternalServer.Checked = true;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Failed starting server\r\n" + ex.GetType() + ": " + ex.Message);
+				}
+			}
+			else
+			{
+				try
+				{
+					Program.master.Stop();
+					cInternalServer.Checked = false;
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show("Failed stopping server\r\n" + ex.GetType() + ": " + ex.Message);
+				}
+			}
+			cInternalServer.Enabled = true;
+			isUnchecking = false;
 		}
 
 		private void CHelpStart_CheckedChanged(object sender, EventArgs e)

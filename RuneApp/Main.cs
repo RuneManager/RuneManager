@@ -215,13 +215,28 @@ namespace RuneApp
 					MessageBox.Show("Error loading base monsters stats.\r\nThings could go bad.", "Base Monster Stats");
 				}
 				loadResult = 0;
-				while ((loadResult = Program.LoadBuilds()) != LoadSaveResult.Success)
+				do
 				{
-					if (loadResult == LoadSaveResult.Failure && MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
+					loadResult = Program.LoadBuilds();
+					switch (loadResult)
 					{
-						loadSaveDialogue(null, new EventArgs());
+						case LoadSaveResult.Failure:
+							if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
+							{
+								loadSaveDialogue(null, new EventArgs());
+							}
+							break;
+						case LoadSaveResult.EmptyFile:
+						case LoadSaveResult.FileNotFound:
+							loadResult = LoadSaveResult.Success;
+							break;
+						default:
+							break;
 					}
-				}
+
+					
+
+				} while (loadResult != LoadSaveResult.Success) ;
 			}
 			catch (Exception ex)
 			{
@@ -802,7 +817,7 @@ namespace RuneApp
 				
 				ListViewItem li = new ListViewItem(new string[] { bb.priority.ToString(), bb.ID.ToString(), bb.mon.Name, "", bb.mon.Id.ToString(), "" });
 				li.Tag = bb;
-				buildList.Items.Add(li);
+				//buildList.Items.Add(li);
 				Program.builds.Add(bb);
 
 				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.Name));
@@ -1434,14 +1449,17 @@ namespace RuneApp
 			listView4.Items.Clear();
 			if (Program.data == null)
 				return;
-			int maxPri = Program.builds.Max(b => b.priority) + 1;
-			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => new ListViewItem() {
+			int maxPri = 0;
+			if (Program.builds.Count > 0)
+				maxPri = Program.builds.Max(b => b.priority) + 1;
+			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => new ListViewItem()
+			{
 				ForeColor = mon.inStorage ? Color.Gray : Color.Black,
 				Text = mon.Name,
 				SubItems = {
-					mon.Id.ToString(),
-					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
-				},
+				mon.Id.ToString(),
+				(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
+			},
 				Tag = mon,
 			}).ToArray());
 

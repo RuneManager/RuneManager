@@ -533,23 +533,36 @@ namespace RuneApp
 		private void btn_runtest_Click(object sender, EventArgs e)
 		{
 			this.toolStripStatusLabel1.Text = "Generating...";
-			Program.RunTest(build, (b, res) =>
+			try
 			{
-				if (b.loads == null)
+				if (build.IsRunning)
+					build.Cancel();
+				else
 				{
-					toolStripStatusLabel1.Text = "Error: " + res;
-					return;
-				}
-
-				if (!IsDisposed && IsHandleCreated)
-				{
-					Invoke((MethodInvoker)delegate
+					Program.RunTest(build, (b, res) =>
 					{
-						toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
-						building = false;
+						if (b.loads == null)
+						{
+							toolStripStatusLabel1.Text = "Error: " + res;
+							return;
+						}
+
+						if (!IsDisposed && IsHandleCreated)
+						{
+							Invoke((MethodInvoker)delegate
+							{
+								toolStripStatusLabel1.Text = "Generated " + loadoutList.Items.Count + " builds";
+								building = false;
+							});
+						}
 					});
 				}
-			});
+			}
+			catch (Exception ex)
+			{
+				Program.log.Error("Error running tests: " + ex.GetType() + ": " + ex.Message);
+				MessageBox.Show("Error running tests: " + ex.GetType() + ": " + ex.Message);
+			}
 		}
 	}
 }

@@ -28,6 +28,8 @@ namespace RuneService
 
 		private ICollection<SWPlugin> plugins;
 
+		private static ulong[] whitelistDebugWizards = new ulong[]{ 12168103 };
+
 		private List<string> skipHosts = new List<string>() { "216.58.199.46", // Wifi check
 			"pasta.esfile.duapps.com", "analytics.app-adforce.jp", "push.qpyou.cn", "activeuser.qpyou.cn", "mlog.appguard.co.kr" // SW init
 		};
@@ -162,7 +164,6 @@ namespace RuneService
 				//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
 				if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 				{
-					Console.WriteLine("Request " + e.WebSession.Request.RequestUri.AbsoluteUri);
 
 					var dec = decryptRequest(bodyString, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 					try
@@ -171,7 +172,7 @@ namespace RuneService
 						if (!Directory.Exists("Json"))
 							Directory.CreateDirectory("Json");
 						File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", dec);
-						Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
+						Console.WriteLine($">{json["command"]}");
 					}
 					catch { };
 
@@ -196,26 +197,28 @@ namespace RuneService
 						
 						if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 						{
-							Console.WriteLine("Response " + e.WebSession.Request.RequestUri.AbsoluteUri);
-
 							var dec = decryptResponse(body, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
+							string req = null;
+							if (trackedRequests.ContainsKey(e.Id))
+								req = trackedRequests[e.Id];
 
 							try
 							{
 								var json = JsonConvert.DeserializeObject<JObject>(dec, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+								var reqjson = JsonConvert.DeserializeObject<JObject>(req, new JsonSerializerSettings() { Formatting = Formatting.Indented });
 								if (!Directory.Exists("Json"))
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
-								Console.WriteLine($"Wrote {json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}");
+								Console.WriteLine($"<{json["command"]}");
 
-								if (json["command"].ToString() == "GetNoticeChat")
+								// only mangle my wizards who want it, don't crash others.
+								if (json["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)reqjson["wizard_id"]))
 								{
 									var version = Assembly.GetExecutingAssembly().GetName().Version;
 									var jobj = new JObject();
 									// Add the proxy version number to chat notices to remind people.
-									jobj["message"] = "Special Quiz Event..\u2661 Check the Event icon!";
+									jobj["message"] = "Proxy version: " + version;
 									///(json["notice_list"] as JArray).Add(jobj);
-									//var ll = json["tzone"].ToString().Replace("/", @"\/").ToList();
 									json["tzone"] = json["tzone"].ToString().Replace("/", @"\/");
 
 									var ver = e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
@@ -231,9 +234,9 @@ namespace RuneService
 									var send = Convert.ToBase64String(str);
 
 									Console.WriteLine("str:" + (fix == decData));
-									Console.WriteLine("b64:" + (inMsg.Equals(str)));
-									Console.WriteLine("cry:" + (outMsg.Equals(bytes)));
-									Console.WriteLine("bytes:" + (body == send));
+									Console.WriteLine("b64:" + (inMsg.SequenceEqual(str)));
+									Console.WriteLine("cry:" + (outMsg.SequenceEqual(bytes)));
+									Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
 									
 									//encryptResponse(fix, ver);
 									await e.SetResponseBodyString(send);
@@ -241,14 +244,15 @@ namespace RuneService
 							}
 							catch { };
 
-							if (trackedRequests.ContainsKey(e.Id))
+							
+							if (req != null)
 							{
 								System.Threading.Thread thr = new System.Threading.Thread(() =>
 								{
 									SWEventArgs args = null;
 									try
 									{
-										args = new SWEventArgs(trackedRequests[e.Id], dec);
+										args = new SWEventArgs(req, dec);
 
 										SWResponse?.Invoke(this, args);
 									}
@@ -280,13 +284,6 @@ namespace RuneService
 			return zlibDecompressData(outMsg);
 		}
 
-		private static string encryptResponse(string body, int version = 1)
-		{
-			var bytes = zlibCompressData(body);
-			var str = encryptMessage(bytes, version);
-			return Convert.ToBase64String(str);
-		}
-		
 		// Use inbuilts for zlib Decomp
 		// http://stackoverflow.com/questions/17212964/net-zlib-inflate-with-net-4-5
 		private static string zlibDecompressData(byte[] bytes)
@@ -295,11 +292,6 @@ namespace RuneService
 			using (var inflater = new DeflateStream(stream, CompressionMode.Decompress))
 			using (var streamReader = new StreamReader(inflater))
 			{
-				List<int> kek = new List<int>();
-				while (streamReader.Peek() != -1)
-					kek.Add(streamReader.Read());
-
-				return Encoding.ASCII.GetString(kek.Select(i => (byte)i).ToArray());
 				return streamReader.ReadToEnd();
 			}
 		}
@@ -333,20 +325,20 @@ namespace RuneService
 		{
 			using (var stream = new MemoryStream())
 			{
-				using (var inflater = new DeflateStream(stream, CompressionMode.Compress))
+				using (var inflater = new Ionic.Zlib.ZlibStream(stream, Ionic.Zlib.CompressionMode.Compress))
 				using (var streamWriter = new StreamWriter(inflater))
 				{
 					streamWriter.Write(body);
 				}
 				var res = stream.ToArray();
-				var ret = new byte[res.Length + 6];
+				/*var ret = new byte[res.Length + 6];
 				ret[0] = 120;
 				ret[1] = 156;
 				res.CopyTo(ret, 2);
 				var adl = new Adler32Computer();
 				adl.Update(res, 0, res.Length);
-				BitConverter.GetBytes(adl.Checksum).CopyTo(ret, 2 + res.Length);
-				return ret;
+				BitConverter.GetBytes(adl.Checksum).CopyTo(ret, 2 + res.Length);*/
+				return res;
 			}
 		}
 

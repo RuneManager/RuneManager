@@ -48,6 +48,7 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
+			this.cInternalServer = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -61,6 +62,7 @@
 			this.tabPage1.Controls.Add(this.gTestShow);
 			this.tabPage1.Controls.Add(this.label4);
 			this.tabPage1.Controls.Add(this.gTestRun);
+			this.tabPage1.Controls.Add(this.cInternalServer);
 			this.tabPage1.Controls.Add(this.cHelpStart);
 			this.tabPage1.Controls.Add(this.cOtherUpdate);
 			this.tabPage1.Controls.Add(this.label3);
@@ -270,6 +272,17 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
+			// cInternalServer
+			// 
+			this.cInternalServer.AutoSize = true;
+			this.cInternalServer.Location = new System.Drawing.Point(465, 88);
+			this.cInternalServer.Name = "cInternalServer";
+			this.cInternalServer.Size = new System.Drawing.Size(115, 17);
+			this.cInternalServer.TabIndex = 3;
+			this.cInternalServer.Text = "Run internal server";
+			this.cInternalServer.UseVisualStyleBackColor = true;
+			this.cInternalServer.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -309,5 +322,6 @@
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox gTestTime;
         private System.Windows.Forms.CheckBox cHelpStart;
-    }
+		private System.Windows.Forms.CheckBox cInternalServer;
+	}
 }
