@@ -160,6 +160,7 @@
 			this.tsBtnBuildsRunAll = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnBuildsRunUpTo = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnBuildsResume = new System.Windows.Forms.ToolStripButton();
+			this.tsBtnFindSpeed = new System.Windows.Forms.ToolStripButton();
 			this.buildList = new System.Windows.Forms.ListView();
 			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -183,7 +184,6 @@
 			this.runeInventory = new RuneApp.RuneBox();
 			this.lbCloseInventory = new System.Windows.Forms.Label();
 			this.findGoodRunes = new System.Windows.Forms.CheckBox();
-			this.tsBtnFindSpeed = new System.Windows.Forms.ToolStripButton();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -313,7 +313,7 @@
 			this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
 			this.loadToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.loadToolStripMenuItem.Text = "Load";
-			this.loadToolStripMenuItem.Click += new System.EventHandler((a,e)=>this.loadSaveDialogue(a,e));
+			this.loadToolStripMenuItem.Click += new System.EventHandler(this.loadSaveDialogue);
 			// 
 			// optionsToolStripMenuItem
 			// 
@@ -1607,6 +1607,16 @@
 			this.tsBtnBuildsResume.Text = "Resume";
 			this.tsBtnBuildsResume.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
 			// 
+			// tsBtnFindSpeed
+			// 
+			this.tsBtnFindSpeed.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnFindSpeed.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnFindSpeed.Image")));
+			this.tsBtnFindSpeed.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnFindSpeed.Name = "tsBtnFindSpeed";
+			this.tsBtnFindSpeed.Size = new System.Drawing.Size(23, 22);
+			this.tsBtnFindSpeed.Text = "toolStripButton3";
+			this.tsBtnFindSpeed.Click += new System.EventHandler(this.tsBtnFindSpeed_Click);
+			// 
 			// buildList
 			// 
 			this.buildList.AllowColumnReorder = true;
@@ -1849,16 +1859,6 @@
 			this.findGoodRunes.Text = "Find Good Runes";
 			this.findGoodRunes.UseVisualStyleBackColor = true;
 			this.findGoodRunes.CheckedChanged += new System.EventHandler(this.findGoodRunes_CheckedChanged);
-			// 
-			// tsBtnFindSpeed
-			// 
-			this.tsBtnFindSpeed.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnFindSpeed.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnFindSpeed.Image")));
-			this.tsBtnFindSpeed.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tsBtnFindSpeed.Name = "tsBtnFindSpeed";
-			this.tsBtnFindSpeed.Size = new System.Drawing.Size(23, 22);
-			this.tsBtnFindSpeed.Text = "toolStripButton3";
-			this.tsBtnFindSpeed.Click += new System.EventHandler(this.tsBtnFindSpeed_Click);
 			// 
 			// Main
 			// 

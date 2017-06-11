@@ -829,7 +829,7 @@ namespace RuneApp
 					if (mon != null)
 					{
 						if (Main.runeDial == null || Main.runeDial.IsDisposed)
-							Main.runeDial = new RuneDial();
+							Main.runeDial = new RuneDisplay();
 						if (!Main.runeDial.Visible)
 						{
 							Main.runeDial.Show(this);

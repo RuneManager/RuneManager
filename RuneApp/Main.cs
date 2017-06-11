@@ -33,7 +33,7 @@ namespace RuneApp
 		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
 
 		public static Main currentMain = null;
-		public static RuneDial runeDial = null;
+		public static RuneDisplay runeDial = null;
 		Monster displayMon = null;
 
 		bool teamChecking = false;
@@ -211,7 +211,7 @@ namespace RuneApp
 						default:
 							if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
 							{
-								loadResult = loadSaveDialogue(null, new EventArgs());
+								loadResult = loadSaveDialogue();
 							}
 							else
 							{
@@ -237,7 +237,7 @@ namespace RuneApp
 						case LoadSaveResult.Failure:
 							if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes)
 							{
-								loadResult = loadSaveDialogue(null, new EventArgs());
+								loadResult = loadSaveDialogue();
 							}
 							break;
 						case LoadSaveResult.EmptyFile:
@@ -518,7 +518,12 @@ namespace RuneApp
 			}
 		}
 
-		private LoadSaveResult loadSaveDialogue(object sender, EventArgs e)
+		private void loadSaveDialogue(object sender, EventArgs e)
+		{
+			loadSaveDialogue();
+		}
+
+		private LoadSaveResult loadSaveDialogue()
 		{
 			LoadSaveResult loadres = LoadSaveResult.Failure;
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -1669,7 +1674,7 @@ namespace RuneApp
 		private void pictureBox1_DoubleClick(object sender, EventArgs e)
 		{
 			if (runeDial == null || runeDial.IsDisposed)
-				runeDial = new RuneDial();
+				runeDial = new RuneDisplay();
 			if (!runeDial.Visible)
 			{
 				runeDial.Show(this);

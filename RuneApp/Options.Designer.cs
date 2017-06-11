@@ -36,6 +36,7 @@
 			this.gTestShow = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.gTestRun = new System.Windows.Forms.TextBox();
+			this.cInternalServer = new System.Windows.Forms.CheckBox();
 			this.cHelpStart = new System.Windows.Forms.CheckBox();
 			this.cOtherUpdate = new System.Windows.Forms.CheckBox();
 			this.label3 = new System.Windows.Forms.Label();
@@ -48,7 +49,6 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
-			this.cInternalServer = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -144,6 +144,17 @@
 			this.gTestRun.TabIndex = 4;
 			this.gTestRun.Text = "5000";
 			this.gTestRun.TextChanged += new System.EventHandler(this.num_TextChanged);
+			// 
+			// cInternalServer
+			// 
+			this.cInternalServer.AutoSize = true;
+			this.cInternalServer.Location = new System.Drawing.Point(465, 88);
+			this.cInternalServer.Name = "cInternalServer";
+			this.cInternalServer.Size = new System.Drawing.Size(115, 17);
+			this.cInternalServer.TabIndex = 3;
+			this.cInternalServer.Text = "Run internal server";
+			this.cInternalServer.UseVisualStyleBackColor = true;
+			this.cInternalServer.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
 			// 
 			// cHelpStart
 			// 
@@ -272,17 +283,6 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
-			// cInternalServer
-			// 
-			this.cInternalServer.AutoSize = true;
-			this.cInternalServer.Location = new System.Drawing.Point(465, 88);
-			this.cInternalServer.Name = "cInternalServer";
-			this.cInternalServer.Size = new System.Drawing.Size(115, 17);
-			this.cInternalServer.TabIndex = 3;
-			this.cInternalServer.Text = "Run internal server";
-			this.cInternalServer.UseVisualStyleBackColor = true;
-			this.cInternalServer.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
-			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -292,6 +292,7 @@
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
 			this.Name = "Options";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Options";
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
