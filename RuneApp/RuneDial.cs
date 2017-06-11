@@ -29,7 +29,7 @@ namespace RuneApp
 			set { showSetIcons = value; refreshControls(); }
 		}
 
-		bool alwaysShowBases = true;
+		bool alwaysShowBases = false;
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always), DefaultValue(false)]
 		public bool AlwaysShowBases
 		{
@@ -39,7 +39,7 @@ namespace RuneApp
 
 		Loadout load = null;
 
-		public Loadout ShownBuild
+		public Loadout Loadout
 		{
 			get { return load; }
 			set { load = value; refreshControls(); }
@@ -49,6 +49,9 @@ namespace RuneApp
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
 		public event EventHandler<RuneClickEventArgs> RuneClick;
 
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		public event EventHandler DialDoubleClick;
+
 		public RuneDial()
 		{
 			InitializeComponent();
@@ -56,23 +59,25 @@ namespace RuneApp
 			checkLabels();
 		}
 
-		private void rune_Click(object sender, EventArgs e)
+		public void ResetRuneClicked()
 		{
 			foreach (RuneControl t in runes)
 			{
 				t.Gamma = 1;
 				t.Refresh();
 			}
-			
-			RuneControl tc = ((RuneControl)sender);
-			if (tc.Tag != null)
-			{
-				tc.Gamma = 1.4f;
-				tc.Refresh();
-			}
+		}
 
+		private void rune_Click(object sender, EventArgs e)
+		{
+			ResetRuneClicked();
+
+			RuneControl tc = ((RuneControl)sender);
+			tc.Gamma = 1.4f;
+			tc.Refresh();
+			
 			var ind = runes.ToList().IndexOf(tc) + 1;
-			if (ind > 0 && tc.Tag != null)
+			if (alwaysShowBases || (ind > 0 && tc.Tag != null))
 			{
 				RuneClick?.Invoke(sender, new RuneClickEventArgs(ind, (Rune)tc.Tag));
 			}
@@ -204,6 +209,11 @@ namespace RuneApp
 					Set3Label_h.Text = "Broken";
 				}
 			}
+		}
+
+		private void pictureBox1_DoubleClick(object sender, EventArgs e)
+		{
+			DialDoubleClick?.Invoke(sender, e);
 		}
 	}
 

@@ -828,15 +828,15 @@ namespace RuneApp
 					Monster mon = item.Tag as Monster;
 					if (mon != null)
 					{
-						if (Main.runeDial == null || Main.runeDial.IsDisposed)
-							Main.runeDial = new RuneDisplay();
-						if (!Main.runeDial.Visible)
+						if (Main.runeDisplay == null || Main.runeDisplay.IsDisposed)
+							Main.runeDisplay = new RuneDisplay();
+						if (!Main.runeDisplay.Visible)
 						{
-							Main.runeDial.Show(this);
+							Main.runeDisplay.Show(this);
 						}
-						Main.runeDial.Owner = this;
-						Main.runeDial.Location = new Point(0, 0);
-						Main.runeDial.UpdateRunes(mon.Current.Runes);
+						Main.runeDisplay.Owner = this;
+						Main.runeDisplay.Location = new Point(0, 0);
+						Main.runeDisplay.UpdateRunes(mon.Current.Runes);
 					}
 				}
 			}
@@ -871,10 +871,10 @@ namespace RuneApp
 
 		private void Generate_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			if (Main.runeDial != null && !Main.runeDial.IsDisposed && Main.runeDial.Owner == this)
+			if (Main.runeDisplay != null && !Main.runeDisplay.IsDisposed && Main.runeDisplay.Owner == this)
 			{
-				Main.runeDial.Owner = Main.currentMain;
-				Main.runeDial.Location = new Point(Main.currentMain.Location.X + Main.currentMain.Width, Main.currentMain.Location.Y);
+				Main.runeDisplay.Owner = Main.currentMain;
+				Main.runeDisplay.Location = new Point(Main.currentMain.Location.X + Main.currentMain.Width, Main.currentMain.Location.Y);
 			}
 		}
 	}

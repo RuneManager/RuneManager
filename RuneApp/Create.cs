@@ -21,9 +21,6 @@ namespace RuneApp
 		private ListViewGroup rsExc;
 		private ListViewGroup rsReq;
 
-		// keep track of the rune hex controls
-		private RuneControl[] runes;
-
 		// the current rune to look at
 		private Rune runeTest = null;
 		// is the form loading? wouldn't want to trigger any OnChanges, eh?
@@ -133,13 +130,6 @@ namespace RuneApp
 					li.Group = setList.Groups[2];
 					setList.Items.Add(li);
 				}
-			}
-
-			// track all the clickable rune things
-			runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
-			for (int i = 0; i < runes.Length; i++)
-			{
-				runes[i].Tag = i + 1;
 			}
 
 			tBtnSetLess.Tag = 0;
@@ -1201,23 +1191,8 @@ namespace RuneApp
 			setList.SelectedIndices.Add(ind);
 		}
 
-		// if you click on a little rune
-		void runeControl_Click(object sender, EventArgs e)
+		private void runeDial_RuneClick(object sender, RuneClickEventArgs e)
 		{
-			// reset all the gammas
-			foreach (RuneControl t in runes)
-			{
-				t.Gamma = 1;
-				t.Refresh();
-			}
-
-			RuneControl tc = ((RuneControl)sender);
-			
-			// darken? wut
-			tc.Gamma = 1.4f;
-			// redraw that
-			tc.Refresh();
-
 			build.RunesUseEquipped = Program.Settings.UseEquipped;
 			build.RunesUseLocked = false;
 			// good idea, generate right now whenever the user clicks a... whatever
@@ -1225,15 +1200,14 @@ namespace RuneApp
 
 			using (RuneSelect rs = new RuneSelect())
 			{
-				rs.returnedRune = build.mon.Current.Runes[(int)tc.Tag - 1];
+				rs.returnedRune = build.mon.Current.Runes[e.Slot - 1];
 				rs.build = build;
-				rs.slot = ((int)tc.Tag).ToString();
-				rs.runes = build.runes[(int)tc.Tag-1];
+				rs.slot = e.Slot.ToString();
+				rs.runes = build.runes[e.Slot - 1];
 				rs.ShowDialog();
 			}
-
 		}
-
+		
 		void UpdateGlobal()
 		{
 			// if the window is loading, try not to save the window

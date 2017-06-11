@@ -166,5 +166,17 @@ namespace RuneApp.Properties {
                 this["InternalServer"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShowBuildWizard {
+            get {
+                return ((bool)(this["ShowBuildWizard"]));
+            }
+            set {
+                this["ShowBuildWizard"] = value;
+            }
+        }
     }
 }

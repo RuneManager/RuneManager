@@ -33,7 +33,7 @@ namespace RuneApp
 		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
 
 		public static Main currentMain = null;
-		public static RuneDisplay runeDial = null;
+		public static RuneDisplay runeDisplay = null;
 		Monster displayMon = null;
 
 		bool teamChecking = false;
@@ -60,8 +60,6 @@ namespace RuneApp
 			findGoodRunes.Enabled = Program.Settings.MakeStats;
 			if (!Program.Settings.MakeStats)
 				findGoodRunes.Checked = false;
-
-			runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
 
 			#region Sorter
 			var sorter = new ListViewSort();
@@ -570,45 +568,27 @@ namespace RuneApp
 			Close();
 		}
 
-		private void rune_Click(object sender, EventArgs e)
+		private void runeDial_RuneClick(object sender, RuneClickEventArgs e)
 		{
-			foreach (RuneControl t in runes)
+			if (e.Rune != null)
 			{
-				t.Gamma = 1;
-				t.Refresh();
-			}
-
-			RuneControl tc = ((RuneControl)sender);
-			if (tc.Tag != null)
-			{
-				tc.Gamma = 1.4f;
-				tc.Refresh();
 				runeEquipped.Show();
-				runeEquipped.SetRune((Rune)tc.Tag);
-				lbCloseEquipped.Show();
+				runeEquipped.SetRune(e.Rune);
 			}
 			else
 			{
-				tc.Hide();
 				runeEquipped.Hide();
-				lbCloseEquipped.Hide();
 			}
 		}
 
 		private void lbCloseEquipped_Click(object sender, EventArgs e)
 		{
-			lbCloseEquipped.Hide();
 			runeEquipped.Hide();
-			foreach (RuneControl r in runes)
-			{
-				r.Gamma = 1;
-				r.Refresh();
-			}
+			runeDial.ResetRuneClicked();
 		}
 
 		private void lbCloseInventory_Click(object sender, EventArgs e)
 		{
-			lbCloseInventory.Hide();
 			runeInventory.Hide();
 		}
 
@@ -621,7 +601,6 @@ namespace RuneApp
 				{
 					Rune rune = (Rune)item.Tag;
 
-					lbCloseInventory.Show();
 					runeInventory.Show();
 					runeInventory.SetRune(rune);
 				}
@@ -752,11 +731,11 @@ namespace RuneApp
 					else
 						mon = build.mon;
 					
-					ShowMon(mon, false);
+					ShowMon(mon);
 
 					ShowStats(load.GetStats(mon), mon);
 
-					ShowRunes(load.Runes);
+					ShowLoadout(load);
 
 					var dmon = Program.data.GetMonster(monid);
 					if (dmon != null)
@@ -779,7 +758,6 @@ namespace RuneApp
 						dmon.Current.Leader = dmonld;
 						dmon.Current.Shrines = dmonsh;
 					}
-					ShowSets(load);
 				}
 			}
 			lastFocused = loadoutList.FocusedItem;
@@ -817,6 +795,16 @@ namespace RuneApp
 				MonId = mon.Id,
 				MonName = mon.Name
 			};
+
+			if (Program.Settings.ShowBuildWizard)
+			{
+				using (var bwiz = new BuildWizard(bb))
+				{
+					var res = bwiz.ShowDialog();
+					if (res != DialogResult.OK) return;
+				}
+			}
+
 			using (var ff = new Create(bb))
 			{
 				while (Program.builds.Any(b => b.ID == bb.ID))
@@ -834,7 +822,6 @@ namespace RuneApp
 				
 				ListViewItem li = new ListViewItem(new string[] { bb.priority.ToString(), bb.ID.ToString(), bb.mon.Name, "", bb.mon.Id.ToString(), "" });
 				li.Tag = bb;
-				//buildList.Items.Add(li);
 				Program.builds.Add(bb);
 
 				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.Name));
@@ -1315,7 +1302,7 @@ namespace RuneApp
 			help.Location = new Point(Location.X + Width, Location.Y);
 		}
 
-		private void ShowMon(Monster mon, bool showRunes = true)
+		private void ShowMon(Monster mon)
 		{
 			displayMon = mon;
 			var cur = mon.GetStats();
@@ -1325,37 +1312,17 @@ namespace RuneApp
 			statLevel.Text = mon.level.ToString();
 
 			ShowStats(cur, mon);
-			if (showRunes)
-				ShowRunes(mon.Current.Runes);
-			ShowSets(mon.Current);
-
+			ShowLoadout(mon.Current);
 		}
 
-		private void ShowSets(Loadout load)
+		private void ShowLoadout(Loadout l)
 		{
-			if (load.Sets != null)
-			{
-				if (load.Sets.Length > 0)
-					Set1Label.Text = load.Sets[0] == RuneSet.Null ? "" : load.Sets[0].ToString();
-				if (load.Sets.Length > 1)
-					Set2Label.Text = load.Sets[1] == RuneSet.Null ? "" : load.Sets[1].ToString();
-				if (load.Sets.Length > 2)
-					Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
+			runeDial.Loadout = l;
 
-				if (!load.SetsFull)
-				{
-					if (load.Sets[0] == RuneSet.Null)
-						Set1Label.Text = "Broken";
-					else if (load.Sets[1] == RuneSet.Null)
-						Set2Label.Text = "Broken";
-					else if (load.Sets[2] == RuneSet.Null)
-						Set3Label.Text = "Broken";
-				}
-			}
-			if (runeDial != null && !runeDial.IsDisposed)
-				runeDial.UpdateSets(load.Sets, !load.SetsFull);
+			if (runeDisplay != null && !runeDisplay.IsDisposed)
+				runeDisplay.UpdateLoad(l);
 		}
-		
+
 		private static string[] statCtrlNames = {"", "HP", "", "ATK", "", "DEF", "", "", "SPD", "CR", "CD", "RES", "ACC" };
 		private static Control[] statCtrls = new Control[37];
 
@@ -1421,40 +1388,7 @@ namespace RuneApp
 
 			}
 		}
-
-		private void ShowRunes(Rune[] rune)
-		{
-			runeControl1.SetRune(rune[0]);
-			runeControl2.SetRune(rune[1]);
-			runeControl3.SetRune(rune[2]);
-			runeControl4.SetRune(rune[3]);
-			runeControl5.SetRune(rune[4]);
-			runeControl6.SetRune(rune[5]);
-
-			foreach (RuneControl tc in runes)
-			{
-				if (tc.Tag != null)
-				{
-					tc.Show();
-					// if the RuneControl is clicked, update the preview
-					if (tc.Gamma > 1.1)
-					{
-						tc.Gamma = 1.4f;
-						tc.Refresh();
-						runeEquipped.Show();
-						runeEquipped.SetRune((Rune)tc.Tag);
-						lbCloseEquipped.Show();
-					}
-				}
-				else
-				{
-					tc.Hide();
-				}
-			}
-			if (runeDial != null && !runeDial.IsDisposed)
-				runeDial.UpdateRunes(rune);
-		}
-
+		
 		public void RegenLists()
 		{
 			// TODO: comment it up a little?
@@ -1673,19 +1607,19 @@ namespace RuneApp
 
 		private void pictureBox1_DoubleClick(object sender, EventArgs e)
 		{
-			if (runeDial == null || runeDial.IsDisposed)
-				runeDial = new RuneDisplay();
-			if (!runeDial.Visible)
+			if (runeDisplay == null || runeDisplay.IsDisposed)
+				runeDisplay = new RuneDisplay();
+			if (!runeDisplay.Visible)
 			{
-				runeDial.Show(this);
+				runeDisplay.Show(this);
 				var xx = Location.X + 1105 + 8 - 271;//271, 213
 				var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
 
-				runeDial.Location = new Point(xx, yy);
-				runeDial.Location = new Point(Location.X + Width, Location.Y);
+				runeDisplay.Location = new Point(xx, yy);
+				runeDisplay.Location = new Point(Location.X + Width, Location.Y);
 			}
 			if (displayMon != null)
-				runeDial.UpdateLoad(displayMon.Current);
+				runeDisplay.UpdateLoad(displayMon.Current);
 		}
 
 		private void findGoodRunes_CheckedChanged(object sender, EventArgs e)

@@ -1,0 +1,125 @@
+[
+	{
+		"id": 0,
+		"version": 1,
+		"MonName": "Farmer",
+		"priority": 1,
+		"new": false,
+		"downloadstats": false,
+		"downloadawake": false,
+		"AllowBroken": false,
+		"Sort": {
+			"con": 0.0,
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 5.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0
+			],
+			"skill_cooltime": [
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 1000.0,
+			"fake_dps": 0.0,
+			"fake_avd": 300.0,
+			"fake_mxd": 0.0,
+			"SkillFunc": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+			]
+		},
+		"Minimum": {
+			"con": 0.0,
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 144.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0,
+				0.0
+			],
+			"skill_cooltime": [
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0,
+				0
+			],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 0.0,
+			"fake_dps": 0.0,
+			"fake_avd": 0.0,
+			"fake_mxd": 0.0,
+			"SkillFunc": [
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null,
+				null
+			]
+		},
+		"slotStats": [
+			[ ],
+			[ "SPDflat" ],
+			[ ],
+			[
+				"CRperc",
+				"CDperc"
+			],
+			[ ],
+			[ "ATKperc" ]
+		],
+		"BuildSets": [
+			"Vampire",
+			"Revenge",
+			"Blade",
+			"Swift",
+			"Fatal",
+			"Energy"
+		],
+		"autoRuneSelect": true,
+		"autoAdjust": false
+	}
+]

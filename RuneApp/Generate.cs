@@ -16,8 +16,6 @@ namespace RuneApp
 		// the build to use
 		public Build build;
 
-		private RuneControl lastclicked;
-
 		// if making builds
 		bool building;
 
@@ -31,8 +29,6 @@ namespace RuneApp
 			build = bb;
 			Label label;
 			TextBox textBox;
-
-			runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
 
 			// cool clicky thing
 			var sorter = new ListViewSort();
@@ -401,52 +397,22 @@ namespace RuneApp
 			Main.help.Show();
 		}
 
-		private void rune_Click(object sender, EventArgs e)
+		private void runeDial_RuneClick(object sender, RuneClickEventArgs e)
 		{
-			foreach (RuneControl t in runes)
+			if (e.Rune == null)
 			{
-				t.Gamma = 1;
-				t.Refresh();
-			}
-
-			RuneControl tc = ((RuneControl)sender);
-			lastclicked = tc;
-			if (tc.Tag != null)
-			{
-				tc.Gamma = 1.4f;
-				tc.Refresh();
-				rune_Stats((Rune)tc.Tag);
-				runeBuild.Show();
-				runeShown.SetRune((Rune)tc.Tag);
+				runeBox.Hide();
 			}
 			else
 			{
-				tc.Hide();
-				runeBuild.Hide();
+				runeBox.Show();
+				runeBox.SetRune(e.Rune);
 			}
 		}
-
-		private void rune_Stats(Rune rune)
+		
+		private void runeBox_hidden(object sender, EventArgs e)
 		{
-			SRuneMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
-			SRuneInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
-			SRuneSub1.Text = Rune.StringIt(rune.Subs, 0);
-			SRuneSub2.Text = Rune.StringIt(rune.Subs, 1);
-			SRuneSub3.Text = Rune.StringIt(rune.Subs, 2);
-			SRuneSub4.Text = Rune.StringIt(rune.Subs, 3);
-			SRuneLevel.Text = rune.Level.ToString();
-			SRuneMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
-		}
-
-		private void hideRuneBox(object sender, EventArgs e)
-		{
-			runeBuild.Hide();
-			foreach (RuneControl r in runes)
-			{
-				r.Gamma = 1;
-				r.Refresh();
-			}
-			lastclicked = null;
+			runeDial.ResetRuneClicked();
 		}
 
 		private void loadoutList_SelectedIndexChanged(object sender, EventArgs e)
@@ -457,58 +423,11 @@ namespace RuneApp
 				if (item.Tag != null)
 				{
 					Monster mon = (Monster)item.Tag;
-					
-					ShowRunes(mon.Current.Runes);
-					ShowSets(mon.Current);
-					if (lastclicked != null)
-						rune_Click(lastclicked, null);
+					runeDial.Loadout = mon.Current;
 				}
 			}
 		}
 		
-		private void ShowSets(Loadout load)
-		{
-			if (load.Sets == null)
-				return;
-			if (load.Sets.Length > 0)
-				Set1Label.Text = load.Sets[0] == RuneSet.Null ? "" : load.Sets[0].ToString();
-			if (load.Sets.Length > 1)
-				Set2Label.Text = load.Sets[1] == RuneSet.Null ? "" : load.Sets[1].ToString();
-			if (load.Sets.Length > 2)
-				Set3Label.Text = load.Sets[2] == RuneSet.Null ? "" : load.Sets[2].ToString();
-
-			if (load.SetsFull) return;
-
-			if (load.Sets[0] == RuneSet.Null)
-				Set1Label.Text = "Broken";
-			else if (load.Sets[1] == RuneSet.Null)
-				Set2Label.Text = "Broken";
-			else if (load.Sets[2] == RuneSet.Null)
-				Set3Label.Text = "Broken";
-		}
-		
-		private void ShowRunes(Rune[] rune)
-		{
-			runeControl1.SetRune(rune[0]);
-			runeControl2.SetRune(rune[1]);
-			runeControl3.SetRune(rune[2]);
-			runeControl4.SetRune(rune[3]);
-			runeControl5.SetRune(rune[4]);
-			runeControl6.SetRune(rune[5]);
-
-			foreach (RuneControl tc in runes)
-			{
-				if (tc.Tag != null)
-				{
-					tc.Show();
-				}
-				else
-				{
-					tc.Hide();
-				}
-			}
-		}
-
 		private void btn_powerrunes_Click(object sender, EventArgs e)
 		{
 			if (!building)
@@ -564,5 +483,6 @@ namespace RuneApp
 				MessageBox.Show("Error running tests: " + ex.GetType() + ": " + ex.Message);
 			}
 		}
+
 	}
 }

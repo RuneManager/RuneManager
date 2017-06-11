@@ -62,13 +62,6 @@
 			this.testBuildButton = new System.Windows.Forms.Button();
 			this.label14 = new System.Windows.Forms.Label();
 			this.button2 = new System.Windows.Forms.Button();
-			this.runeControl6 = new RuneApp.RuneControl();
-			this.runeControl5 = new RuneApp.RuneControl();
-			this.runeControl4 = new RuneApp.RuneControl();
-			this.runeControl3 = new RuneApp.RuneControl();
-			this.runeControl2 = new RuneApp.RuneControl();
-			this.runeControl1 = new RuneApp.RuneControl();
-			this.pictureBox1 = new System.Windows.Forms.PictureBox();
 			this.label16 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
@@ -76,19 +69,17 @@
 			this.statLevel = new System.Windows.Forms.Label();
 			this.statID = new System.Windows.Forms.Label();
 			this.statName = new System.Windows.Forms.Label();
-			this.Set3Label = new System.Windows.Forms.Label();
-			this.Set2Label = new System.Windows.Forms.Label();
-			this.Set1Label = new System.Windows.Forms.Label();
 			this.label4 = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.runeDial = new RuneApp.RuneDial();
 			this.setList = new System.Windows.Forms.ListView();
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.groupBox2 = new System.Windows.Forms.GroupBox();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-			this.tBtnSetLess = new System.Windows.Forms.ToolStripButton();
 			this.tBtnBreak = new System.Windows.Forms.ToolStripButton();
 			this.tBtnSetMore = new System.Windows.Forms.ToolStripButton();
+			this.tBtnSetLess = new System.Windows.Forms.ToolStripButton();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabg = new System.Windows.Forms.TabPage();
 			this.tabo = new System.Windows.Forms.TabPage();
@@ -108,7 +99,6 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
 			this.groupBox1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
 			this.groupBox2.SuspendLayout();
 			this.toolStrip1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
@@ -156,13 +146,6 @@
 			this.groupBox1.Controls.Add(this.testBuildButton);
 			this.groupBox1.Controls.Add(this.label14);
 			this.groupBox1.Controls.Add(this.button2);
-			this.groupBox1.Controls.Add(this.runeControl6);
-			this.groupBox1.Controls.Add(this.runeControl5);
-			this.groupBox1.Controls.Add(this.runeControl4);
-			this.groupBox1.Controls.Add(this.runeControl3);
-			this.groupBox1.Controls.Add(this.runeControl2);
-			this.groupBox1.Controls.Add(this.runeControl1);
-			this.groupBox1.Controls.Add(this.pictureBox1);
 			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Controls.Add(this.label18);
 			this.groupBox1.Controls.Add(this.label17);
@@ -170,12 +153,10 @@
 			this.groupBox1.Controls.Add(this.statLevel);
 			this.groupBox1.Controls.Add(this.statID);
 			this.groupBox1.Controls.Add(this.statName);
-			this.groupBox1.Controls.Add(this.Set3Label);
-			this.groupBox1.Controls.Add(this.Set2Label);
-			this.groupBox1.Controls.Add(this.Set1Label);
 			this.groupBox1.Controls.Add(this.label4);
 			this.groupBox1.Controls.Add(this.label3);
 			this.groupBox1.Controls.Add(this.label2);
+			this.groupBox1.Controls.Add(this.runeDial);
 			this.groupBox1.Location = new System.Drawing.Point(568, 0);
 			this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox1.Name = "groupBox1";
@@ -448,144 +429,6 @@
 			this.button2.UseVisualStyleBackColor = true;
 			this.button2.Click += new System.EventHandler(this.button2_Click);
 			// 
-			// runeControl6
-			// 
-			this.runeControl6.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl6.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl6.BackImage = null;
-			this.runeControl6.Coolness = 0;
-			this.runeControl6.Gamma = 1F;
-			this.runeControl6.Grade = 1;
-			this.runeControl6.Location = new System.Drawing.Point(48, 561);
-			this.runeControl6.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl6.Name = "runeControl6";
-			this.runeControl6.SetImage = null;
-			this.runeControl6.ShowBack = false;
-			this.runeControl6.ShowStars = false;
-			this.runeControl6.Size = new System.Drawing.Size(56, 41);
-			this.runeControl6.SlotImage = global::RuneApp.Runes.rune6;
-			this.runeControl6.StarImage = null;
-			this.runeControl6.TabIndex = 66;
-			this.runeControl6.Text = "runeControl6";
-			this.runeControl6.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// runeControl5
-			// 
-			this.runeControl5.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl5.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl5.BackImage = null;
-			this.runeControl5.Coolness = 0;
-			this.runeControl5.Gamma = 1F;
-			this.runeControl5.Grade = 1;
-			this.runeControl5.Location = new System.Drawing.Point(49, 597);
-			this.runeControl5.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl5.Name = "runeControl5";
-			this.runeControl5.SetImage = null;
-			this.runeControl5.ShowBack = false;
-			this.runeControl5.ShowStars = false;
-			this.runeControl5.Size = new System.Drawing.Size(54, 42);
-			this.runeControl5.SlotImage = global::RuneApp.Runes.rune5;
-			this.runeControl5.StarImage = null;
-			this.runeControl5.TabIndex = 65;
-			this.runeControl5.Text = "runeControl5";
-			this.runeControl5.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// runeControl4
-			// 
-			this.runeControl4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl4.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl4.BackImage = null;
-			this.runeControl4.Coolness = 0;
-			this.runeControl4.Gamma = 1F;
-			this.runeControl4.Grade = 1;
-			this.runeControl4.Location = new System.Drawing.Point(91, 614);
-			this.runeControl4.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl4.Name = "runeControl4";
-			this.runeControl4.SetImage = null;
-			this.runeControl4.ShowBack = false;
-			this.runeControl4.ShowStars = false;
-			this.runeControl4.Size = new System.Drawing.Size(44, 55);
-			this.runeControl4.SlotImage = global::RuneApp.Runes.rune4;
-			this.runeControl4.StarImage = null;
-			this.runeControl4.TabIndex = 64;
-			this.runeControl4.Text = "runeControl4";
-			this.runeControl4.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// runeControl3
-			// 
-			this.runeControl3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl3.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl3.BackImage = null;
-			this.runeControl3.Coolness = 0;
-			this.runeControl3.Gamma = 1F;
-			this.runeControl3.Grade = 1;
-			this.runeControl3.Location = new System.Drawing.Point(123, 597);
-			this.runeControl3.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl3.Name = "runeControl3";
-			this.runeControl3.SetImage = null;
-			this.runeControl3.ShowBack = false;
-			this.runeControl3.ShowStars = false;
-			this.runeControl3.Size = new System.Drawing.Size(53, 41);
-			this.runeControl3.SlotImage = global::RuneApp.Runes.rune3;
-			this.runeControl3.StarImage = null;
-			this.runeControl3.TabIndex = 63;
-			this.runeControl3.Text = "runeControl3";
-			this.runeControl3.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// runeControl2
-			// 
-			this.runeControl2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl2.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl2.BackImage = null;
-			this.runeControl2.Coolness = 0;
-			this.runeControl2.Gamma = 1F;
-			this.runeControl2.Grade = 1;
-			this.runeControl2.Location = new System.Drawing.Point(123, 560);
-			this.runeControl2.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl2.Name = "runeControl2";
-			this.runeControl2.SetImage = null;
-			this.runeControl2.ShowBack = false;
-			this.runeControl2.ShowStars = false;
-			this.runeControl2.Size = new System.Drawing.Size(53, 41);
-			this.runeControl2.SlotImage = global::RuneApp.Runes.rune2;
-			this.runeControl2.StarImage = null;
-			this.runeControl2.TabIndex = 62;
-			this.runeControl2.Text = "runeControl2";
-			this.runeControl2.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// runeControl1
-			// 
-			this.runeControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.runeControl1.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl1.BackImage = null;
-			this.runeControl1.Coolness = 0;
-			this.runeControl1.Gamma = 1F;
-			this.runeControl1.Grade = 1;
-			this.runeControl1.Location = new System.Drawing.Point(93, 529);
-			this.runeControl1.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl1.Name = "runeControl1";
-			this.runeControl1.SetImage = null;
-			this.runeControl1.ShowBack = false;
-			this.runeControl1.ShowStars = false;
-			this.runeControl1.Size = new System.Drawing.Size(41, 55);
-			this.runeControl1.SlotImage = global::RuneApp.Runes.rune1;
-			this.runeControl1.StarImage = null;
-			this.runeControl1.TabIndex = 60;
-			this.runeControl1.Text = "runeControl2";
-			this.runeControl1.Click += new System.EventHandler(this.runeControl_Click);
-			// 
-			// pictureBox1
-			// 
-			this.pictureBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.pictureBox1.Image = global::RuneApp.Runes.runes;
-			this.pictureBox1.Location = new System.Drawing.Point(44, 525);
-			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
-			this.pictureBox1.Name = "pictureBox1";
-			this.pictureBox1.Size = new System.Drawing.Size(138, 151);
-			this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-			this.pictureBox1.TabIndex = 61;
-			this.pictureBox1.TabStop = false;
-			// 
 			// label16
 			// 
 			this.label16.AutoSize = true;
@@ -659,39 +502,6 @@
 			this.statName.Text = "label1";
 			this.statName.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
-			// Set3Label
-			// 
-			this.Set3Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.Set3Label.AutoSize = true;
-			this.Set3Label.Location = new System.Drawing.Point(185, 598);
-			this.Set3Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.Set3Label.Name = "Set3Label";
-			this.Set3Label.Size = new System.Drawing.Size(63, 13);
-			this.Set3Label.TabIndex = 41;
-			this.Set3Label.Text = "SampleText";
-			// 
-			// Set2Label
-			// 
-			this.Set2Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.Set2Label.AutoSize = true;
-			this.Set2Label.Location = new System.Drawing.Point(185, 585);
-			this.Set2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.Set2Label.Name = "Set2Label";
-			this.Set2Label.Size = new System.Drawing.Size(40, 13);
-			this.Set2Label.TabIndex = 40;
-			this.Set2Label.Text = "Energy";
-			// 
-			// Set1Label
-			// 
-			this.Set1Label.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-			this.Set1Label.AutoSize = true;
-			this.Set1Label.Location = new System.Drawing.Point(185, 571);
-			this.Set1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
-			this.Set1Label.Name = "Set1Label";
-			this.Set1Label.Size = new System.Drawing.Size(30, 13);
-			this.Set1Label.TabIndex = 39;
-			this.Set1Label.Text = "Swift";
-			// 
 			// label4
 			// 
 			this.label4.AutoSize = true;
@@ -721,6 +531,18 @@
 			this.label2.Size = new System.Drawing.Size(35, 13);
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
+			// 
+			// runeDial
+			// 
+			this.runeDial.AlwaysShowBases = true;
+			this.runeDial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(26, 510);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.ShowSetIcons = false;
+			this.runeDial.Size = new System.Drawing.Size(225, 175);
+			this.runeDial.TabIndex = 92;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
 			// 
 			// setList
 			// 
@@ -778,16 +600,6 @@
 			this.toolStrip1.TabIndex = 0;
 			this.toolStrip1.Text = "toolStrip1";
 			// 
-			// tBtnSetLess
-			// 
-			this.tBtnSetLess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tBtnSetLess.Image = global::RuneApp.App.down;
-			this.tBtnSetLess.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tBtnSetLess.Name = "tBtnSetLess";
-			this.tBtnSetLess.Size = new System.Drawing.Size(23, 22);
-			this.tBtnSetLess.Text = "Include Less";
-			this.tBtnSetLess.Click += new System.EventHandler(this.tBtnSetLess_Click);
-			// 
 			// tBtnBreak
 			// 
 			this.tBtnBreak.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -807,6 +619,16 @@
 			this.tBtnSetMore.Size = new System.Drawing.Size(23, 22);
 			this.tBtnSetMore.Text = "Required More";
 			this.tBtnSetMore.Click += new System.EventHandler(this.tBtnSetMore_Click);
+			// 
+			// tBtnSetLess
+			// 
+			this.tBtnSetLess.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tBtnSetLess.Image = global::RuneApp.App.down;
+			this.tBtnSetLess.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tBtnSetLess.Name = "tBtnSetLess";
+			this.tBtnSetLess.Size = new System.Drawing.Size(23, 22);
+			this.tBtnSetLess.Text = "Include Less";
+			this.tBtnSetLess.Click += new System.EventHandler(this.tBtnSetLess_Click);
 			// 
 			// tabControl1
 			// 
@@ -1035,7 +857,6 @@
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Create_FormClosing);
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.toolStrip1.ResumeLayout(false);
@@ -1056,9 +877,6 @@
         private System.Windows.Forms.Label statLevel;
         private System.Windows.Forms.Label statID;
         private System.Windows.Forms.Label statName;
-        private System.Windows.Forms.Label Set3Label;
-        private System.Windows.Forms.Label Set2Label;
-        private System.Windows.Forms.Label Set1Label;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
@@ -1072,13 +890,6 @@
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton tBtnSetLess;
         private System.Windows.Forms.ToolStripButton tBtnBreak;
-        private RuneControl runeControl6;
-        private RuneControl runeControl5;
-        private RuneControl runeControl4;
-        private RuneControl runeControl3;
-        private RuneControl runeControl2;
-        private RuneControl runeControl1;
-        private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabg;
         private System.Windows.Forms.TabPage tabo;
@@ -1121,5 +932,6 @@
         private System.Windows.Forms.ListView priStat2;
 		private System.Windows.Forms.CheckBox check_autoRunes;
         private System.Windows.Forms.CheckBox check_autoBuild;
-    }
+		private RuneDial runeDial;
+	}
 }
