@@ -43,6 +43,7 @@ namespace RuneApp
 			cHelpStart.CheckedChanged += CHelpStart_CheckedChanged;
 			AddCheck("InternalServer", cInternalServer);
 			cInternalServer.CheckedChanged += CInternalServer_CheckedChanged;
+			AddCheck("ShowBuildWizard", cBuildWizard);
 
 			AddNum("TestGen", gTestRun);
 			AddNum("TestShow", gTestShow);

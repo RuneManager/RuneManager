@@ -49,6 +49,7 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
+			this.cBuildWizard = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -66,6 +67,7 @@
 			this.tabPage1.Controls.Add(this.cHelpStart);
 			this.tabPage1.Controls.Add(this.cOtherUpdate);
 			this.tabPage1.Controls.Add(this.label3);
+			this.tabPage1.Controls.Add(this.cBuildWizard);
 			this.tabPage1.Controls.Add(this.cColorTeams);
 			this.tabPage1.Controls.Add(this.cDisplayGray);
 			this.tabPage1.Controls.Add(this.cDisplaySplit);
@@ -283,6 +285,17 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
+			// cBuildWizard
+			// 
+			this.cBuildWizard.AutoSize = true;
+			this.cBuildWizard.Location = new System.Drawing.Point(246, 88);
+			this.cBuildWizard.Name = "cBuildWizard";
+			this.cBuildWizard.Size = new System.Drawing.Size(115, 17);
+			this.cBuildWizard.TabIndex = 1;
+			this.cBuildWizard.Text = "Show Build Wizard";
+			this.cBuildWizard.UseVisualStyleBackColor = true;
+			this.cBuildWizard.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -324,5 +337,6 @@
 		private System.Windows.Forms.TextBox gTestTime;
         private System.Windows.Forms.CheckBox cHelpStart;
 		private System.Windows.Forms.CheckBox cInternalServer;
+		private System.Windows.Forms.CheckBox cBuildWizard;
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
@@ -63,7 +64,11 @@ namespace RuneOptim
 
 	public static class ExtensionMethods
 	{
-		
+		public static void AddRange<T>(this Collection<T> lhs, IEnumerable<T> rhs)
+		{
+			foreach (var t in rhs)
+				lhs.Add(t);
+		}
 
 		public static bool EqualTo(this double a, double b, double within = 0.00000001)
 		{

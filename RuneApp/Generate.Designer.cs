@@ -153,6 +153,7 @@
 			this.runeBox.TabIndex = 104;
 			this.runeBox.TabStop = false;
 			this.runeBox.Text = "runeBox1";
+			this.runeBox.Visible = false;
 			this.runeBox.OnClickHide += new System.EventHandler(this.runeBox_hidden);
 			// 
 			// runeDial

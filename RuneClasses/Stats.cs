@@ -144,6 +144,18 @@ namespace RuneOptim
 		Support
 	}
 
+	public class StatModEventArgs : EventArgs
+	{
+		public Attr Attr { get; private set; }
+		public double Value { get; private set; }
+
+		public StatModEventArgs(Attr a, double v)
+		{
+			Attr = a;
+			Value = v;
+		}
+	}
+
 	public class Stats
 	{
 		// allows mapping save.json into the program via Monster
@@ -158,7 +170,14 @@ namespace RuneOptim
 		public double Health { get { return _health ??  _con * 15; } set { _con = value / 15.0; _health = value; } }
 
 		[JsonProperty("atk")]
-		public double Attack = 0;
+		private double attack = 0;
+
+		[JsonIgnore]
+		public double Attack
+		{
+			get { return attack; }
+			set { attack = value; OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackFlat, value)); OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackPercent, value)); }
+		}
 
 		[JsonProperty("def")]
 		public double Defense = 0;
@@ -193,12 +212,14 @@ namespace RuneOptim
 		[JsonIgnore]
 		public int[] SkillupMax = new int[8];
 
+		public event EventHandler<StatModEventArgs> OnStatChanged;
+
 		public Stats() { }
 		// copy constructor, amrite?
 		public Stats(Stats rhs, bool copyExtra = false)
 		{
 			Health = rhs.Health;
-			Attack = rhs.Attack;
+			attack = rhs.Attack;
 			Defense = rhs.Defense;
 			Speed = rhs.Speed;
 			CritRate = rhs.CritRate;
@@ -221,7 +242,17 @@ namespace RuneOptim
 				DamagePerSpeed = rhs.DamagePerSpeed;
 				AverageDamage = rhs.AverageDamage;
 				MaxDamage = rhs.MaxDamage;
+
+				//OnStatChanged += rhs.OnStatChanged;
+				/*foreach (var target in rhs.OnStatChanged.GetInvocationList())
+				{
+					var mi = target.Method;
+					var del = Delegate.CreateDelegate(
+								  typeof(EventHandler<StatModEventArgs>), this, mi.Name);
+					OnStatChanged += (EventHandler<StatModEventArgs>)del;
+				}*/
 			}
+
 		}
 
 		// fake "stats", need to be stored for scoring
@@ -261,7 +292,7 @@ namespace RuneOptim
 		{
 			get
 			{
-				if (_damageFormula == null)
+				if (_damageFormula == null && damageFormula != null)
 				{
 					__form = damageFormula.AsExpression(statType);
 					_damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
@@ -382,9 +413,9 @@ namespace RuneOptim
 				case Attr.DamagePerSpeed:
 					return ExtraValue(Attr.AverageDamage) * Speed / 100;
 				case Attr.AverageDamage:
-					return DamageFormula(this) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
 				case Attr.MaxDamage:
-					return DamageFormula(this) * (1 + SkillupDamage + CritDamage / 100);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100);
 				default:
 					throw new NotImplementedException();
 			}
@@ -397,18 +428,23 @@ namespace RuneOptim
 			{
 				case "EHP":
 					EffectiveHP = value;
+					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.EffectiveHP, value));
 					break;
 				case "EHPDB":
 					EffectiveHPDefenseBreak = value;
+					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.EffectiveHPDefenseBreak, value));
 					break;
 				case "DPS":
 					DamagePerSpeed = value;
+					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.DamagePerSpeed, value));
 					break;
 				case "AvD":
 					AverageDamage = value;
+					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AverageDamage, value));
 					break;
 				case "MxD":
 					MaxDamage = value;
+					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.MaxDamage, value));
 					break;
 				default:
 					throw new NotImplementedException();
@@ -444,8 +480,9 @@ namespace RuneOptim
 				default:
 					throw new NotImplementedException();
 			}
+			OnStatChanged?.Invoke(this, new StatModEventArgs(extra, value));
 		}
-		
+
 		public void SetZero()
 		{
 			Accuracy = 0;
@@ -519,27 +556,38 @@ namespace RuneOptim
 				{
 					case "HP":
 						Health = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.HealthFlat, value));
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.HealthPercent, value));
 						break;
 					case "ATK":
 						Attack = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackFlat, value));
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackPercent, value));
 						break;
 					case "DEF":
 						Defense = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.DefenseFlat, value));
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.DefensePercent, value));
 						break;
 					case "SPD":
 						Speed = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Speed, value));
 						break;
 					case "CD":
 						CritDamage = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.CritDamage, value));
 						break;
 					case "CR":
 						CritRate = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.CritRate, value));
 						break;
 					case "ACC":
 						Accuracy = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Accuracy, value));
 						break;
 					case "RES":
 						Resistance = value;
+						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Resistance, value));
 						break;
 					default:
 						break;
@@ -640,6 +688,7 @@ namespace RuneOptim
 					default:
 						throw new NotImplementedException();
 				}
+				OnStatChanged?.Invoke(this, new StatModEventArgs(stat, value));
 			}
 
 		}
@@ -707,6 +756,31 @@ namespace RuneOptim
 				return false;
 
 			return true;
+		}
+
+		public Stats SetTo(Stats rhs)
+		{
+			/* // TODO: put back when Properties are done
+			Health = rhs.Health;
+			Attack = rhs.Attack;
+			Defense = rhs.Defense;
+			Speed = rhs.Speed;
+			CritRate = rhs.CritRate;
+			CritDamage = rhs.CritDamage;
+			Resistance = rhs.Resistance;
+			Accuracy = rhs.Accuracy;
+			EffectiveHP = rhs.EffectiveHP;
+			EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
+			DamagePerSpeed = rhs.DamagePerSpeed;
+			AverageDamage = rhs.AverageDamage;
+			MaxDamage = rhs.MaxDamage;*/
+
+			foreach (var a in Build.statAll)
+			{
+				this[a] = rhs[a];
+			}
+
+			return this;
 		}
 
 		public static Stats operator +(Stats lhs, Stats rhs)

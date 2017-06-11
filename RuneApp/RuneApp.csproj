@@ -186,6 +186,12 @@
     </Compile>
     <Compile Include="RuneSheet.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="StatColumn.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="StatColumn.Designer.cs">
+      <DependentUpon>StatColumn.cs</DependentUpon>
+    </Compile>
     <Compile Include="TransparentControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -257,6 +263,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="RuneSelect.resx">
       <DependentUpon>RuneSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StatColumn.resx">
+      <DependentUpon>StatColumn.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="basestats.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

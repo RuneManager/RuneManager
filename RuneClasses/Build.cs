@@ -312,6 +312,8 @@ namespace RuneOptim
 		[JsonIgnore]
 		public RuneUsage runeUsage;
 
+		public int autoRuneAmount = 15;
+
 		// magically find good runes to use in the build
 		public bool autoRuneSelect = false;
 
@@ -1620,10 +1622,10 @@ namespace RuneOptim
 						Rune[] rr = new Rune[0];
 						foreach (var rs in RequiredSets)
 						{
-							rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(7).ToArray()).ToArray();
+							rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount / 2).ToArray()).ToArray();
 						}
-						if (rr.Length < 15)
-							rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(15 - rr.Length).ToArray()).Distinct().ToArray();
+						if (rr.Length < autoRuneAmount)
+							rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount - rr.Length).ToArray()).Distinct().ToArray();
 
 						runes[i] = rr;
 					}
@@ -1765,7 +1767,70 @@ namespace RuneOptim
 				ret += r.Accuracy[0] / s.Accuracy;
 			if (s.Resistance > 0)
 				ret += r.Resistance[0] / s.Resistance;
-			
+
+			//Health / ((1000 / (1000 + Defense * 3)))
+			if (s.EffectiveHP > 0)
+			{
+				var sh = 6000 * (100 + r.HealthPercent[0] + 20) / 100.0 + r.HealthFlat[0] + 1200;
+				var sd = 300 * (100 + r.DefensePercent[0] + 10) / 100.0 + r.DefenseFlat[0] + 70;
+
+				double delt = 0;
+				delt += sh / ((1000 / (1000 + sd * 3)));
+				delt -= 6000 / ((1000 / (1000 + 300.0 * 3)));
+				ret += delt / s.EffectiveHP;
+			}
+
+			//Health / ((1000 / (1000 + Defense * 3 * 0.3)))
+			if (s.EffectiveHPDefenseBreak > 0)
+			{
+				var sh = 6000 * (100 + r.HealthPercent[0] + 20) / 100.0 + r.HealthFlat[0] + 1200;
+				var sd = 300 * (100 + r.DefensePercent[0] + 10) / 100.0 + r.DefenseFlat[0] + 70;
+
+				double delt = 0;
+				delt += sh / ((1000 / (1000 + sd * 0.9)));
+				delt -= 6000 / ((1000 / (1000 + 300 * 0.9)));
+				ret += delt / s.EffectiveHPDefenseBreak;
+			}
+
+			// (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100)
+			if (s.MaxDamage > 0)
+			{
+				var sa = 300 * (100 + r.AttackPercent[0] + 20) / 100.0 + r.AttackFlat[0] + 100;
+				var cd = 50 + r.CritDamage[0] + 20;
+
+				double delt = 0;
+				delt += sa * (1 + cd / 100);
+				delt -= 460 * (1 + 0.7);
+				ret += delt / s.MaxDamage;
+			}
+
+			// (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100)
+			if (s.AverageDamage > 0)
+			{
+				var sa = 300 * (100 + r.AttackPercent[0] + 20) / 100.0 + r.AttackFlat[0] + 100;
+				var cd = 50 + r.CritDamage[0] + 20;
+				var cr = 15 + r.CritRate[0] + 15;
+
+				double delt = 0;
+				delt += sa * (1 + cd / 100 * Math.Min(cr, 100) / 100);
+				delt -= 460 * (1 + 0.7 * 0.3);
+				ret += delt / s.AverageDamage;
+			}
+
+			// ExtraValue(Attr.AverageDamage) * Speed / 100
+			if (s.DamagePerSpeed > 0)
+			{
+				var sa = 300 * (100 + r.AttackPercent[0] + 20) / 100.0 + r.AttackFlat[0] + 100;
+				var cd = 50 + r.CritDamage[0] + 20;
+				var cr = 15 + r.CritRate[0] + 15;
+				var sp = 100 + r.Speed[0] + 15;
+
+				double delt = 0;
+				delt += sa * (1 + cd / 100 * Math.Min(cr, 100) / 100) * sp / 100;
+				delt -= 460 * (1 + 0.70 * 0.30) * 1.15;
+				ret += delt / s.DamagePerSpeed;
+			}
+
 			return ret;
 		}
 
