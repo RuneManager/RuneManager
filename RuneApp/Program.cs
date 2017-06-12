@@ -349,7 +349,7 @@ namespace RuneApp
 
 			foreach (Build bb in builds)
 			{
-				if (bb.mon.Name != "Missingno")
+				if (bb.mon != null && bb.mon.Name != "Missingno")
 				{
 					if (!bb.DownloadAwake || Program.data.GetMonster(bb.mon.Name).Name != "Missingno")
 					{

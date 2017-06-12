@@ -155,7 +155,8 @@ namespace RuneApp
 
 			var tb = item.Tag as Build;
 			if (tb == null) return;
-
+			
+			build.AllowBroken = tb.AllowBroken;
 			build.Minimum.SetTo(tb.Minimum);
 			build.Maximum.SetTo(tb.Maximum);
 			build.Threshold.SetTo(tb.Threshold);
@@ -204,6 +205,7 @@ namespace RuneApp
 		private void runeDial_RuneClick(object sender, RuneClickEventArgs e)
 		{
 			runeBox.SetRune(e.Rune);
+			runeBox.Show();
 		}
 	}
 }

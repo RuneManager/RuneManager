@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup22 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup23 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup24 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup25 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup26 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup27 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup10 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup11 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup12 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup13 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup14 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup15 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup16 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup17 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup18 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.check_autoBuild = new System.Windows.Forms.CheckBox();
@@ -552,16 +552,16 @@
 			this.setList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
 			this.setList.FullRowSelect = true;
-			listViewGroup19.Header = "Required";
-			listViewGroup19.Name = "listViewGroup3";
-			listViewGroup20.Header = "Included";
-			listViewGroup20.Name = "listViewGroup1";
-			listViewGroup21.Header = "Excluded";
-			listViewGroup21.Name = "listViewGroup2";
+			listViewGroup10.Header = "Required";
+			listViewGroup10.Name = "listViewGroup3";
+			listViewGroup11.Header = "Included";
+			listViewGroup11.Name = "listViewGroup1";
+			listViewGroup12.Header = "Excluded";
+			listViewGroup12.Name = "listViewGroup2";
 			this.setList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21});
+            listViewGroup10,
+            listViewGroup11,
+            listViewGroup12});
 			this.setList.Location = new System.Drawing.Point(6, 44);
 			this.setList.Name = "setList";
 			this.setList.Size = new System.Drawing.Size(111, 644);
@@ -697,13 +697,13 @@
 			// 
 			this.priStat2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-			listViewGroup22.Header = "Include";
-			listViewGroup22.Name = "listViewGroup1";
-			listViewGroup23.Header = "Excluded";
-			listViewGroup23.Name = "listViewGroup2";
+			listViewGroup13.Header = "Include";
+			listViewGroup13.Name = "listViewGroup1";
+			listViewGroup14.Header = "Excluded";
+			listViewGroup14.Name = "listViewGroup2";
 			this.priStat2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup22,
-            listViewGroup23});
+            listViewGroup13,
+            listViewGroup14});
 			this.priStat2.Location = new System.Drawing.Point(3, 241);
 			this.priStat2.Name = "priStat2";
 			this.priStat2.Size = new System.Drawing.Size(123, 256);
@@ -733,13 +733,13 @@
 			// 
 			this.priStat4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-			listViewGroup24.Header = "Include";
-			listViewGroup24.Name = "listViewGroup1";
-			listViewGroup25.Header = "Excluded";
-			listViewGroup25.Name = "listViewGroup2";
+			listViewGroup15.Header = "Include";
+			listViewGroup15.Name = "listViewGroup1";
+			listViewGroup16.Header = "Excluded";
+			listViewGroup16.Name = "listViewGroup2";
 			this.priStat4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup24,
-            listViewGroup25});
+            listViewGroup15,
+            listViewGroup16});
 			this.priStat4.Location = new System.Drawing.Point(3, 241);
 			this.priStat4.Name = "priStat4";
 			this.priStat4.Size = new System.Drawing.Size(123, 256);
@@ -769,13 +769,13 @@
 			// 
 			this.priStat6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-			listViewGroup26.Header = "Include";
-			listViewGroup26.Name = "listViewGroup1";
-			listViewGroup27.Header = "Excluded";
-			listViewGroup27.Name = "listViewGroup2";
+			listViewGroup17.Header = "Include";
+			listViewGroup17.Name = "listViewGroup1";
+			listViewGroup18.Header = "Excluded";
+			listViewGroup18.Name = "listViewGroup2";
 			this.priStat6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup26,
-            listViewGroup27});
+            listViewGroup17,
+            listViewGroup18});
 			this.priStat6.Location = new System.Drawing.Point(3, 241);
 			this.priStat6.Name = "priStat6";
 			this.priStat6.Size = new System.Drawing.Size(123, 256);

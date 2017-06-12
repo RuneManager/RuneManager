@@ -70,7 +70,7 @@ namespace RuneOptim
 				lhs.Add(t);
 		}
 
-		public static bool EqualTo(this double a, double b, double within = 0.00000001)
+		public static bool EqualTo(this double a, double b, double within = double.Epsilon)
 		{
 			return (Math.Abs(a - b) < within);
 		}

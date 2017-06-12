@@ -47,11 +47,11 @@
 			"SkillFunc": [ null, null, null, null, null, null, null, null ]
 		},
 		"slotStats": [
-			[ ],
+			[],
 			[ "SPDflat" ],
-			[ ],
+			[],
 			[ "CRperc", "CDperc" ],
-			[ ],
+			[],
 			[ "ATKperc", "HPperc" ]
 		],
 		"BuildSets": [ "Vampire", "Revenge", "Blade", "Swift", "Fatal", "Energy" ],
@@ -106,14 +106,74 @@
 			"SkillFunc": [ null, null, null, null, null, null, null, null ]
 		},
 		"slotStats": [
-			[ ],
+			[],
 			[ "SPDflat" ],
-			[ ],
+			[],
 			[ "CRperc", "CDperc" ],
-			[ ],
+			[],
 			[ "ATKperc" ]
 		],
 		"BuildSets": [ "Revenge", "Blade", "Fatal", "Rage" ],
+		"autoRuneSelect": true,
+		"autoAdjust": false
+	},
+	{
+		"id": 0,
+		"version": 1,
+		"MonName": "Speedster",
+		"priority": 0,
+		"new": false,
+		"downloadstats": false,
+		"downloadawake": false,
+		"AllowBroken": true,
+		"Sort": {
+			"con": 0.0,
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 1.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+			"skill_cooltime": [ 0, 0, 0, 0, 0, 0, 0, 0 ],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 0.0,
+			"fake_dps": 0.0,
+			"fake_avd": 0.0,
+			"fake_mxd": 0.0,
+			"SkillFunc": [ null, null, null, null, null, null, null, null ]
+		},
+		"Minimum": {
+			"con": 0.0,
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 0.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+			"skill_cooltime": [ 0, 0, 0, 0, 0, 0, 0, 0 ],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 0.0,
+			"fake_dps": 0.0,
+			"fake_avd": 0.0,
+			"fake_mxd": 0.0,
+			"SkillFunc": [ null, null, null, null, null, null, null, null ]
+		},
+		"slotStats": [
+			[],
+			[ "SPDflat" ],
+			[],
+			[],
+			[],
+			[]
+		],
+		"BuildSets": [],
+		"RequiredSets": [ "Swift" ],
 		"autoRuneSelect": true,
 		"autoAdjust": false
 	},
@@ -184,11 +244,11 @@
 			"SkillFunc": [ null, null, null, null, null, null, null, null ]
 		},
 		"slotStats": [
-			[ ],
+			[],
 			[ "ATKperc" ],
-			[ ],
+			[],
 			[ "ATKperc" ],
-			[ ],
+			[],
 			[ "ATKperc" ]
 		],
 		"BuildSets": [ "Swift", "Fatal", "Energy", "Violent", "Focus" ],
@@ -224,12 +284,12 @@
 			"SkillFunc": [ null, null, null, null, null, null, null, null ]
 		},
 		"slotStats": [
-			[ ],
-			[ ],
-			[ ],
-			[ ],
-			[ ],
-			[ ]
+			[],
+			[],
+			[],
+			[],
+			[],
+			[]
 		],
 		"BuildSets": [ "Guard", "Will", "Swift", "Energy", "Despair", "Shield" ],
 		"autoRuneSelect": true,
@@ -283,12 +343,12 @@
 			"SkillFunc": [ null, null, null, null, null, null, null, null ]
 		},
 		"slotStats": [
-			[ ],
-			[ ],
-			[ ],
-			[ ],
-			[ ],
-			[ ]
+			[],
+			[],
+			[],
+			[],
+			[],
+			[]
 		],
 		"BuildSets": [ "Guard", "Focus", "Swift", "Energy", "Despair" ],
 		"autoRuneSelect": true,

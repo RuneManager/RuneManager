@@ -424,10 +424,10 @@ namespace RuneApp
 					foreach (var b in e.NewItems.Cast<Build>())
 					{
 						var teamstr = (b.Teams == null || b.Teams.Count == 0) ? "" : (b.Teams.Count > 2 ? b.Teams.Count.ToString() : b.Teams[0] + (b.Teams.Count == 2 ? ", " + b.Teams[1] : ""));
-						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon.Name, "", b.mon.Id.ToString(), teamstr });
+						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon?.Name ?? b.MonName, "", (b.mon?.Id ?? b.MonId).ToString(), teamstr });
 						li.Tag = b;
 						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
-						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.Id.ToString()));
+						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null)
 						{
 							lv1li.ForeColor = Color.Green;
