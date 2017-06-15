@@ -50,6 +50,19 @@ namespace RuneService
 			proxyServer.Start();
 
 			LoadPlugins("plugins");
+
+			foreach (var eth in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()) {
+				if (eth.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
+				if (eth.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
+				foreach (var ip in eth.GetIPProperties().UnicastAddresses) {
+					if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6) {
+						Console.WriteLine("Proxy listening on [" + ip.Address + "]:" + endpoint.Port);
+					}
+					else {
+						Console.WriteLine("Proxy listening on " + ip.Address + ":" + endpoint.Port);
+					}
+				}
+			}
 		}
 
 		private void LoadPlugins(string path)
