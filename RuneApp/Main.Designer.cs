@@ -1617,16 +1617,17 @@
 			this.menu_buildlist.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.teamToolStripMenuItem});
 			this.menu_buildlist.Name = "menu_buildlist";
-			this.menu_buildlist.Size = new System.Drawing.Size(105, 26);
+			this.menu_buildlist.Size = new System.Drawing.Size(104, 26);
 			// 
 			// teamToolStripMenuItem
 			// 
 			this.teamToolStripMenuItem.Name = "teamToolStripMenuItem";
-			this.teamToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+			this.teamToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
 			this.teamToolStripMenuItem.Text = "Team";
 			// 
 			// runeEquipped
 			// 
+			this.runeEquipped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeEquipped.Location = new System.Drawing.Point(885, 320);
 			this.runeEquipped.Name = "runeEquipped";
 			this.runeEquipped.Size = new System.Drawing.Size(215, 179);
@@ -1637,6 +1638,7 @@
 			// 
 			// runeInventory
 			// 
+			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeInventory.Location = new System.Drawing.Point(885, 135);
 			this.runeInventory.Name = "runeInventory";
 			this.runeInventory.Size = new System.Drawing.Size(215, 179);

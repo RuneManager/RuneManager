@@ -210,6 +210,7 @@
 			this.Controls.Add(this.cShowWizard);
 			this.Controls.Add(this.runeDial);
 			this.Name = "BuildWizard";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "BuildWizard";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.BuildWizard_FormClosing);
 			this.Load += new System.EventHandler(this.BuildWizard_Load);

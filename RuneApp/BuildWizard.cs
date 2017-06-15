@@ -173,6 +173,7 @@ namespace RuneApp
 		{
 			if (loading) return;
 			loading = true;
+			runeDial.Loadout = null;
 			build.RunesUseLocked = cPreviewLocked.Checked;
 			build.autoRuneSelect = true;
 			build.RunesUseEquipped = true;
