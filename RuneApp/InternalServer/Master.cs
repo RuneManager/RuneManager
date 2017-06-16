@@ -48,13 +48,20 @@ namespace RuneApp.InternalServer
 		{
 			try
 			{
-				IPAddress ipAddress = IPAddress.Any;
+				try
+				{
+					listener = new HttpListener();
+					listener.Prefixes.Add("http://*:7676/");
+					listener.Start();
+				}
+				catch
+				{
+					Log.Error("Failed to bind to *, binding to localhost");
+					listener = new HttpListener();
+					listener.Prefixes.Add("http://localhost:7676/");
+					listener.Start();
+				}
 
-				Log.Info($"Starting TCP listener on {ipAddress}");
-
-				listener = new HttpListener();
-				listener.Prefixes.Add("http://*:7676/");
-				listener.Start();
 				Log.Info("Server is listening on " + listener.Prefixes.First());
 				isRunning = true;
 			}
@@ -156,6 +163,23 @@ namespace RuneApp.InternalServer
 						resp.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
 						resp.Headers.Add("Pragma", "no-cache");
 						resp.Headers.Add("Expires", "Wed, 16 Jul 1969 13:32:00 UTC");
+					}
+
+					var enc = req.Headers.GetValues("Accept-Encoding");
+					// 
+					if (enc.Any(a => a.ToLowerInvariant() == "deflate"))
+					{
+						resp.Headers.Add("Content-Encoding", "deflate");
+						using (MemoryStream ms = new MemoryStream())
+						{
+							using (System.IO.Compression.DeflateStream ds = new System.IO.Compression.DeflateStream(ms, System.IO.Compression.CompressionMode.Compress))
+							{
+								ds.Write(outBytes, 0, outBytes.Length);
+								ds.Flush();
+							}
+							ms.Flush();
+							outBytes = ms.ToArray();
+						}
 					}
 
 					resp.ContentLength64 = outBytes.Length;
