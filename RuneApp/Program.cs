@@ -464,6 +464,17 @@ namespace RuneApp
 			loads.Clear();
 		}
 
+		public static void BuildPriority(Build build, int deltaPriority)
+		{
+			build.priority += deltaPriority;
+			var bpri = builds.OrderBy(b => b.priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
+			int i = 1;
+			foreach (var b in bpri)
+			{
+				b.priority = i++;
+			}
+		}
+
 		public static void RunTest(Build build, Action<Build, BuildResult> onFinish = null)
 		{
 			if (build.IsRunning)
@@ -797,9 +808,9 @@ namespace RuneApp
 				}
 
 				List<Build> toRun = new List<Build>();
-				foreach (var build in builds)
+				foreach (var build in builds.OrderBy(b => b.priority))
 				{
-					if ((!skipLoaded || loads.Count(l => l.BuildID == build.ID) == 0) && (runTo == -1 || build.priority < runTo))
+					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.priority < runTo))
 						toRun.Add(build);
 				}
 
@@ -839,7 +850,6 @@ namespace RuneApp
 						}
 					}
 
-#warning consider making it nicer by using the List<Build>
 					foreach (Build bbb in toRun)
 					{
 						runBuild(bbb, Program.Settings.MakeStats);

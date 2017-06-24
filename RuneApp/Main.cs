@@ -791,7 +791,7 @@ namespace RuneApp
 			Build bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
 			{
 				New = true,
-				ID = buildList.Items.Count + 1,
+				ID = Program.builds.Max(q => q.ID) + 1,
 				MonId = mon.Id,
 				MonName = mon.Name
 			};
@@ -987,34 +987,25 @@ namespace RuneApp
 			{
 				foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderBy(l => (l.Tag as Build).priority))
 				{
-					Build build = (Build)sli.Tag;
+					Build build = sli.Tag as Build;
+					if (build != null)
+						Program.BuildPriority(build, -1);
+				}
 
-					var bb = Program.builds.OrderBy(b => b.priority).ToList();
-					var bi = bb.FindIndex(b => b == build);
+				RegenBuildList();
 
-					if (bi != 0)
-					{
-						var b2 = bb[bi - 1];
-						var sid = build.priority;
-						build.priority = b2.priority;
-						b2.priority = sid;
+				buildList.Sort();
+			}
+		}
 
-						sli.SubItems[0].Text = build.priority.ToString();
-
-						var monname = b2.MonName;
-						if (monname == null || monname == "Missingno")
-						{
-							if (b2.DownloadAwake)
-								return;
-							monname = b2.mon.Name;
-						}
-
-						ListViewItem listmon = buildList.Items.Cast<ListViewItem>().Where(li => li.Tag != null && (li.Tag as Build) == b2).FirstOrDefault();
-						if (listmon != null)
-							listmon.SubItems[0].Text = b2.priority.ToString();
-
-						buildList.Sort();
-					}
+		private void RegenBuildList()
+		{
+			foreach (var lvi in buildList.Items.Cast<ListViewItem>())
+			{
+				var b = lvi.Tag as Build;
+				if (b != null)
+				{
+					lvi.SubItems[0].Text = b.priority.ToString();
 				}
 			}
 		}
@@ -1025,27 +1016,14 @@ namespace RuneApp
 			{
 				foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderByDescending(l => (l.Tag as Build).priority))
 				{
-					Build build = (Build)sli.Tag;
-
-					var bb = Program.builds.OrderBy(b => b.priority).ToList();
-					var bi = bb.FindIndex(b => b == build);
-
-					if (bi != Program.builds.Max(b => b.priority) && bi + 1 < bb.Count)
-					{
-						var b2 = bb[bi + 1];
-						var sid = build.priority;
-						build.priority = b2.priority;
-						b2.priority = sid;
-
-						sli.SubItems[0].Text = build.priority.ToString();
-
-						ListViewItem listmon = buildList.Items.Cast<ListViewItem>().Where(li => li.Tag != null && (li.Tag as Build) == b2).FirstOrDefault();
-						if (listmon != null)
-							listmon.SubItems[0].Text = b2.priority.ToString();
-
-						buildList.Sort();
-					}
+					Build build = sli.Tag as Build;
+					if (build != null)
+						Program.BuildPriority(build, 1);
 				}
+
+				RegenBuildList();
+
+				buildList.Sort();
 			}
 		}
 
