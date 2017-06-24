@@ -37,6 +37,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>..\RuneApp.ico</ApplicationIcon>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
@@ -463,6 +466,7 @@
     <None Include="InternalServer\Swagger\swagger-client.js" />
     <None Include="InternalServer\Swagger\swagger-ui.js" />
     <None Include="InternalServer\Swagger\swagger.css" />
+    <Content Include="..\RuneApp.ico" />
     <Content Include="User Manual\build.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

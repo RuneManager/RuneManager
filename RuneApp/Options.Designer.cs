@@ -304,6 +304,7 @@
 			this.Controls.Add(this.btnHelp);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
+			this.Icon = App.Icon;
 			this.Name = "Options";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Options";

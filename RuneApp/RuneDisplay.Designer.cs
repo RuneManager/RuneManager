@@ -112,6 +112,7 @@
 			this.Controls.Add(this.runeBox1);
 			this.Controls.Add(this.runeBox6);
 			this.Controls.Add(this.runeDial);
+			this.Icon = App.Icon;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
 			this.Name = "RuneDisplay";
 			this.ShowInTaskbar = false;

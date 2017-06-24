@@ -850,6 +850,7 @@
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.monLabel);
 			this.Controls.Add(this.label1);
+			this.Icon = App.Icon;
 			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "Create";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;

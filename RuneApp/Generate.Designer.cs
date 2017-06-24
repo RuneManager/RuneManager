@@ -196,6 +196,7 @@
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.loadoutList);
+			this.Icon = App.Icon;
 			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "Generate";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

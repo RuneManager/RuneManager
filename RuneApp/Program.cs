@@ -376,7 +376,7 @@ namespace RuneApp
 					// keep a single recent backup
 					if (File.Exists(filename))
 						File.Copy(filename, filename + ".backup", true);
-					var str = JsonConvert.SerializeObject(Program.builds);
+					var str = JsonConvert.SerializeObject(Program.builds, Formatting.Indented);
 					File.WriteAllText(filename, str);
 					return LoadSaveResult.Success;
 				}

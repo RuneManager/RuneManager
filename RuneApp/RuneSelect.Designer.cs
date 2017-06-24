@@ -173,6 +173,7 @@
 			this.Controls.Add(this.button3);
 			this.Controls.Add(this.toolStrip1);
 			this.Controls.Add(this.listView2);
+			this.Icon = App.Icon;
 			this.Name = "RuneSelect";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "RuneSelect";

@@ -121,6 +121,7 @@
 			this.Controls.Add(this.webBrowser1);
 			this.Controls.Add(this.toolStrip1);
 			this.Controls.Add(this.menuStrip1);
+			this.Icon = App.Icon;
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
 			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Help";

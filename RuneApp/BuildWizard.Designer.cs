@@ -209,6 +209,7 @@
 			this.Controls.Add(this.btnCreate);
 			this.Controls.Add(this.cShowWizard);
 			this.Controls.Add(this.runeDial);
+			this.Icon = App.Icon;
 			this.Name = "BuildWizard";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "BuildWizard";

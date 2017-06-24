@@ -104,6 +104,7 @@
 			this.Controls.Add(this.btn_cancel);
 			this.Controls.Add(this.btn_select);
 			this.Controls.Add(this.dataMonsterList);
+			this.Icon = App.Icon;
 			this.Name = "MonSelect";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "MonSelect";
