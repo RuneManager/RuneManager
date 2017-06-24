@@ -41,6 +41,9 @@ namespace RuneOptim
 		[JsonIgnore]
 		int priority = 1;
 
+		[JsonIgnore]
+		private int monLoaded = 0;
+
 		public Save()
 		{
 			monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText("monsters.json"));
@@ -99,6 +102,7 @@ namespace RuneOptim
 					foreach (Monster mon in e.NewItems.Cast<Monster>())
 					{
 						mon.Name = monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId).Value;
+						mon.loadOrder = monLoaded++;
 						if (mon.Name == null)
 						{
 							mon.Name = mon._attribute + " " + monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;

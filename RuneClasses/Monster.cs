@@ -89,6 +89,9 @@ namespace RuneOptim
 		[JsonIgnore]
 		public bool inStorage = false;
 
+		[JsonIgnore]
+		public int loadOrder = int.MaxValue;
+
 		public int SwapCost(Loadout l)
 		{
 			int cost = 0;
@@ -155,7 +158,15 @@ namespace RuneOptim
 				return skillList;
 			}
 		}
-		
+
+		public int awakened
+		{
+			get
+			{
+				return (this._monsterTypeId / 10) - (this._monsterTypeId / 100) * 10;
+			}
+		}
+
 		// get the stats of the current build.
 		// NOTE: the monster will contain it's base stats
 		public Stats GetStats()

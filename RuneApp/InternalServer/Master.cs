@@ -279,7 +279,7 @@ namespace RuneApp.InternalServer
 			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).ToList();
 			var pairs = new Dictionary<Monster, List<Monster>>();
-			foreach (var m in locked)
+			foreach (var m in locked.OrderByDescending(m => bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority))
 			{
 				pairs.Add(m, new List<Monster>());
 				int i = m.SkillupsTotal - m.SkillupsLevel;
@@ -298,7 +298,8 @@ namespace RuneApp.InternalServer
 				.ThenByDescending(m => m._class)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m._attribute)
-				.ThenByDescending(m => m.createdOn)
+				.ThenByDescending(m => m.awakened)
+				.ThenBy(m => m.loadOrder)
 				;
 
 			list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
@@ -306,8 +307,8 @@ namespace RuneApp.InternalServer
 				var m = b.mon;
 				var nl = new ServedResult("ul");
 				var li = new ServedResult("li") { contentList = {
-						new ServedResult("span") { contentList = { "build " + m.Name + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl } };
-				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+						new ServedResult("span") { contentList = { "build " + m.Name + " " + +m._class + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl } };
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -326,9 +327,9 @@ namespace RuneApp.InternalServer
 				var nl = new ServedResult("ul");
 				var li = new ServedResult("li") { contentList = { ((unlocked.Contains(m)) ?
 					("TRASH: " + m.Name + " " + m._class + "* " + m.level ) :
-					("mon " + m.Name + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl } };
+					("mon " + m.Name + " " +  + m._class + "* " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl } };
 				if (!unlocked.Contains(m))
-					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -349,7 +350,7 @@ namespace RuneApp.InternalServer
 				contentList = {
 					new ServedResult("a") { contentDic = { { "href", "\"javascript:showhide(" +m.Id.ToString() + ")\"" } }, contentList = { "+ load" } },
 					" ",
-					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
+					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + +m._class + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
 			} };
 
 			// render rune swaps
@@ -368,7 +369,7 @@ namespace RuneApp.InternalServer
 
 			// list skillups
 			var nl = new ServedResult("ul");
-			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name } }));
+			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
 			if (nl.contentList.Count == 0)
 				nl.name = "br";
 
