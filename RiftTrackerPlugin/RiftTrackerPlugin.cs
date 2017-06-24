@@ -20,18 +20,55 @@ namespace RiftTrackerPlugin
 
 		Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>> matchCount = new Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>();
 
+		bool loading = true;
+
 		public override void OnLoad()
 		{
 			if (!Directory.Exists(riftdir))
 				Directory.CreateDirectory(riftdir);
 			if (!Directory.Exists(teamsdir))
 				Directory.CreateDirectory(teamsdir);
+			if (!Directory.Exists(teamsdir + "\\Archive"))
+				Directory.CreateDirectory(teamsdir + "\\Archive");
+
+			if (File.Exists(riftdir + "\\allMons.gz"))
+			{
+				using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(riftdir + "\\allMons.gz")))
+				{
+					using (System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Decompress))
+					{
+						using (MemoryStream os = new MemoryStream())
+						{
+							gz.CopyTo(os);
+							var ostr = Encoding.ASCII.GetString(os.ToArray());
+							allMons = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>>(ostr);
+						}
+					}
+				}
+				foreach (var m in allMons.SelectMany(q => q.Value.Select(r => r.Value.Value)))
+				{
+					var tid = long.Parse(m._monsterTypeId.ToString().Substring(0, m._monsterTypeId.ToString().Length - 2) + "1" + m._monsterTypeId.ToString().Last());
+					m.Name = MonsterName(tid);
+
+					foreach (var r in m.Runes)
+					{
+						r.PrebuildAttributes();
+						m.ApplyRune(r);
+						r.AssignedName = m.Name;
+					}
+				}
+			}
+			if (File.Exists(riftdir + "\\matchCount.json"))
+				matchCount = JsonConvert.DeserializeObject<Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>>(File.ReadAllText(riftdir + "\\matchCount.json"));
 
 			var files = Directory.GetFiles(teamsdir, "*.json");
 			foreach (var f in files)
 			{
 				ProcessDeck(File.ReadAllText(f));
+				File.Move(f, teamsdir + "\\Archive\\" + new FileInfo(f).Name);
 			}
+			loading = false;
+			SaveStuff();
 		}
 
 		public override void ProcessRequest(object sender, SWEventArgs args)
@@ -39,8 +76,8 @@ namespace RiftTrackerPlugin
 			if (args.Response.command != "GetRiftDungeonCommentDeck")
 				return;
 
-			var riftstats = JsonConvert.DeserializeObject<RiftDeck>(args.ResponseJson["bestdeck_rift_dungeon"].ToString());
-			File.WriteAllText(teamsdir + "\\" + riftstats.rift_dungeon_id + "_" + riftstats.wizard_id + ".json", args.ResponseRaw);
+			//var riftstats = JsonConvert.DeserializeObject<RiftDeck>(args.ResponseJson["bestdeck_rift_dungeon"].ToString());
+			//File.WriteAllText(teamsdir + "\\" + riftstats.rift_dungeon_id + "_" + riftstats.wizard_id + ".json", args.ResponseRaw);
 			ProcessDeck(args.ResponseRaw);
 			SaveStuff();
 		}
@@ -59,6 +96,7 @@ namespace RiftTrackerPlugin
 				{
 					r.PrebuildAttributes();
 					m.ApplyRune(r);
+					r.AssignedName = m.Name;
 				}
 
 				if (!matchCount.ContainsKey(riftstats.rift_dungeon_id))
@@ -97,10 +135,28 @@ namespace RiftTrackerPlugin
 				var monList = allMons[m.Name];
 				monList[riftstats.wizard_id] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
 			}
+
 		}
 
 		public void SaveStuff()
 		{
+			if (loading) return;
+
+			var allMonStr = JsonConvert.SerializeObject(allMons);
+			using (MemoryStream ms = new MemoryStream())
+			{
+				using (System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress))
+				{
+					var bytes = Encoding.ASCII.GetBytes(allMonStr);
+					gz.Write(bytes, 0, bytes.Length);
+					gz.Flush();
+				}
+				ms.Flush();
+				File.WriteAllBytes(riftdir + "\\allMons.gz", ms.ToArray());
+			}
+
+			File.WriteAllText(riftdir + "\\matchCount.json", JsonConvert.SerializeObject(matchCount));
+
 			FileInfo excelFile = new FileInfo(riftdir + @"\riftstats.xlsx");
 			ExcelPackage excelPack = null;
 			excelPack = new ExcelPackage(excelFile);
@@ -334,22 +390,41 @@ namespace RiftTrackerPlugin
 		Dark = 5001
 	}
 
-	public class RiftPosition : RuneOptim.ListProp<long>
+	public class RiftPosition : RuneOptim.ListProp<long?>
 	{
 		[RuneOptim.ListProperty(0)]
-		public long position = -1;
+		public long? position = null;
 
 		[RuneOptim.ListProperty(1)]
-		public long unit_id = -1;
+		public long? unit_id = null;
 
 		[RuneOptim.ListProperty(2)]
-		public long unit_master_id = -1;
+		public long? unit_master_id = null;
 
 		[RuneOptim.ListProperty(3)]
-		public long grade = -1;
+		public long? grade = null;
 			
 		[RuneOptim.ListProperty(4)]
-		public long level = -1;
+		public long? level = null;
+
+		public override bool IsReadOnly { get { return false; } }
+		protected override int maxInd { get { return 4; } }
+
+		public override void Add(long? item)
+		{
+			if (position == null)
+				position = item;
+			else if (unit_id == null)
+				unit_id = item;
+			else if (unit_master_id == null)
+				unit_master_id = item;
+			else if (grade == null)
+				grade = item;
+			else if (level == null)
+				level = item;
+			else
+				throw new Exception();
+		}
 	}
 
 	public class RiftDeck

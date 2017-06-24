@@ -14,12 +14,12 @@ namespace RuneOptim
 		public T val = default(T);
 	}
 
-	public abstract class ListProp<T>
+	public abstract class ListProp<T> 
 		: IList<T>
 	{
 		int maxind = -1;
 
-		virtual protected int MaxInd
+		virtual protected int maxInd
 		{
 			get
 			{
@@ -33,6 +33,8 @@ namespace RuneOptim
 				return maxind;
 			}
 		}
+
+		public int MaxInd { get { return maxInd; } }
 
 		virtual protected void OnSet(int i, T val) { }
 
@@ -48,12 +50,12 @@ namespace RuneOptim
 		{
 			get
 			{
-				for (int i = 0; i < MaxInd; i++)
+				for (int i = 0; i < maxInd; i++)
 				{
 					if (this[i].Equals(default(T)))
 						return i;
 				}
-				return MaxInd;
+				return maxInd;
 			}
 		}
 
@@ -118,13 +120,43 @@ namespace RuneOptim
 
 		public bool Remove(T item) { throw new NotImplementedException(); }
 
-		public IEnumerator<T> GetEnumerator() { throw new NotImplementedException(); }
+		public IEnumerator<T> GetEnumerator() { return (IEnumerator<T>)new ListPropertyEnumerator<T>(this); }
 
-		IEnumerator IEnumerable.GetEnumerator() { throw new NotImplementedException(); }
+		IEnumerator IEnumerable.GetEnumerator() { return new ListPropertyEnumerator<T>(this); }
 
 		virtual public void Add(T item)
 		{
 			this[Count] = item;
+		}
+	}
+
+	public class ListPropertyEnumerator<T> : IEnumerator
+	{
+		int i = -1;
+		readonly ListProp<T> parent;
+
+		public ListPropertyEnumerator(ListProp<T> p)
+		{
+			parent = p;
+		}
+
+		public object Current
+		{
+			get
+			{
+				return parent[i];
+			}
+		}
+
+		public bool MoveNext()
+		{
+			i++;
+			return (i < parent.MaxInd);
+		}
+
+		public void Reset()
+		{
+			i = -1;
 		}
 	}
 

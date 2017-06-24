@@ -256,7 +256,7 @@ namespace RuneOptim
 		[ListProperty(1)]
 		public int? Level = null;
 
-		protected override int MaxInd
+		protected override int maxInd
 		{
 			get
 			{
@@ -309,6 +309,17 @@ namespace RuneOptim
 		public override void WriteJson(JsonWriter writer,
 			object value, JsonSerializer serializer)
 		{
+			if (value is Array)
+			{
+				// TODO: not having 6 runes is a mess
+				var a = value as Array;
+				//if (a.Length == 6)
+				{
+					var ja = JArray.FromObject(value);
+					ja.WriteTo(writer);
+					return;
+				}
+			}
 			throw new NotImplementedException();
 		}
 	}

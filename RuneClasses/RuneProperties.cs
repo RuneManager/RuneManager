@@ -631,7 +631,7 @@ namespace RuneOptim
 		}
 
 		#region Remove the slow attribute checking
-		protected override int MaxInd { get { return 4; } }
+		protected override int maxInd { get { return 4; } }
 
 		public override bool IsReadOnly { get { return false; } }
 
