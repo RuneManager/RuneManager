@@ -185,7 +185,9 @@ namespace RuneService
 						if (!Directory.Exists("Json"))
 							Directory.CreateDirectory("Json");
 						File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", dec);
+						Console.ForegroundColor = ConsoleColor.DarkGray;
 						Console.WriteLine($">{json["command"]}");
+						Console.ForegroundColor = ConsoleColor.Gray;
 					}
 					catch { };
 
@@ -222,7 +224,9 @@ namespace RuneService
 								if (!Directory.Exists("Json"))
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
+								Console.ForegroundColor = ConsoleColor.DarkGray;
 								Console.WriteLine($"<{json["command"]}");
+								Console.ForegroundColor = ConsoleColor.Gray;
 
 								// only mangle my wizards who want it, don't crash others.
 								if (json["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)reqjson["wizard_id"]))
@@ -252,7 +256,8 @@ namespace RuneService
 									Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
 									
 									//encryptResponse(fix, ver);
-									await e.SetResponseBodyString(send);
+									if (body.SequenceEqual(send))
+										await e.SetResponseBodyString(send);
 								}
 							}
 							catch { };
