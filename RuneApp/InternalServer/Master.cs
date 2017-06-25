@@ -268,6 +268,13 @@ namespace RuneApp.InternalServer
 			ServedResult list = new ServedResult("ul");
 			list.contentList = new List<ServedResult>();
 
+			var pieces = Program.data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces).ToDictionary(p => p.Id);
+			foreach (var p in pieces)
+			{
+				pieces[p.Key].Quantity -= 50; // TODO: figure out the monsters stars
+			}
+			pieces = pieces.Where(p => p.Value.Quantity > 50).ToDictionary(p => p.Key, p => p.Value);
+
 			var ll = Program.loads;
 			var ldic = ll.ToDictionary(l => l.BuildID);
 
@@ -285,11 +292,23 @@ namespace RuneApp.InternalServer
 				int i = m.SkillupsTotal - m.SkillupsLevel;
 				for (; i > 0; i--)
 				{
-					var um = unlocked.FirstOrDefault(ul => ul._monsterTypeId.ToString().Substring(0,3) == m._monsterTypeId.ToString().Substring(0, 3));
+					var um = unlocked.FirstOrDefault(ul => ul._monsterTypeId.ToString().Substring(0, 3) == m._monsterTypeId.ToString().Substring(0, 3));
 					if (um == null)
 						break;
 					pairs[m].Add(um);
 					unlocked.Remove(um);
+				}
+				for (; i > 0; i--)
+				{
+					int monbase = (m._monsterTypeId / 100) * 100;
+					for (int j = 1; j < 4; j++)
+					{
+						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= 50)
+						{
+							pairs[m].Add(new Monster() { Name = pieces[monbase + j].Name + " Pieces" });
+							pieces[monbase + j].Quantity -= 50;
+						}
+					}
 				}
 			}
 

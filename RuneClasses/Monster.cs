@@ -11,9 +11,6 @@ using System.Linq.Expressions;
 
 namespace RuneOptim
 {
-
-
-
 	// The monster stores its base stats in its base class
 	public class Monster : Stats
 	{
@@ -31,6 +28,8 @@ namespace RuneOptim
 
 		[JsonProperty("unit_master_id")]
 		public int _monsterTypeId;
+
+		public int GetFamily { get { return _monsterTypeId / 100; } }
 
 		[JsonProperty("create_time")]
 		public DateTime? createdOn = null;

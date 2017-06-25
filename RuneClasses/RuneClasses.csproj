@@ -48,6 +48,7 @@
     <Compile Include="Craft.cs" />
     <Compile Include="Deco.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="InventoryItem.cs" />
     <Compile Include="ListProperties.cs" />
     <Compile Include="Loadout.cs" />
     <Compile Include="Monster.cs" />

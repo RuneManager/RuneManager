@@ -22,6 +22,9 @@ namespace RuneOptim
 		[JsonProperty("runes")]
 		public readonly ObservableCollection<Rune> Runes = new ObservableCollection<Rune>();
 
+		[JsonProperty("inventory_info")]
+		public readonly ObservableCollection<InventoryItem> InventoryItems = new ObservableCollection<InventoryItem>();
+
 		[JsonProperty("unit_lock_list")]
 		public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
@@ -36,7 +39,17 @@ namespace RuneOptim
 		public bool isModified = false;
 
 		[JsonIgnore]
-		Dictionary<int, string> monIdNames;
+		static Dictionary<int, string> monIdNames = null;
+
+		public static Dictionary<int, string> MonIdNames
+		{
+			get
+			{
+				if (monIdNames == null)
+					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText("monsters.json"));
+				return monIdNames;
+			}
+		}
 
 		[JsonIgnore]
 		int priority = 1;
@@ -46,7 +59,6 @@ namespace RuneOptim
 
 		public Save()
 		{
-			monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText("monsters.json"));
 			Runes.CollectionChanged += Runes_CollectionChanged;
 			Monsters.CollectionChanged += Monsters_CollectionChanged;
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
@@ -101,11 +113,11 @@ namespace RuneOptim
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					foreach (Monster mon in e.NewItems.Cast<Monster>())
 					{
-						mon.Name = monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId).Value;
+						mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId).Value;
 						mon.loadOrder = monLoaded++;
 						if (mon.Name == null)
 						{
-							mon.Name = mon._attribute + " " + monIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;
+							mon.Name = mon._attribute + " " + MonIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;
 						}
 						foreach (var r in mon.Runes)
 						{

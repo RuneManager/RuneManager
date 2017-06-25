@@ -178,5 +178,17 @@ namespace RuneApp.Properties {
                 this["ShowBuildWizard"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveOneForLater {
+            get {
+                return ((bool)(this["SaveOneForLater"]));
+            }
+            set {
+                this["SaveOneForLater"] = value;
+            }
+        }
     }
 }
