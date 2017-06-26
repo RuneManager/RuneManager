@@ -41,6 +41,17 @@ namespace RuneApp
 			}
 		}
 
+		public static bool WatchSave
+		{
+			get { return Settings.WatchSave; }
+			set
+			{
+				// TODO: start/stop Directory watcher
+				Settings.WatchSave = value;
+				Settings.Save();
+			}
+		}
+
 		private static bool DoesSettingExist(string settingName)
 		{
 			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
@@ -185,12 +196,16 @@ namespace RuneApp
 		/// </summary>
 		public static LoadSaveResult FindSave()
 		{
-			var files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
-
-			if (files.Any())
+			string[] files;
+			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
 			{
-				var firstFile = files.First();
-				return LoadSave(firstFile);
+				return LoadSave(Settings.SaveLocation);
+			}
+			else if ((files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json")).Any())
+			{
+				if (files.Count() > 1)
+					return LoadSaveResult.FileNotFound;
+				return LoadSave(files.First());
 			}
 			else if (File.Exists("save.json"))
 			{

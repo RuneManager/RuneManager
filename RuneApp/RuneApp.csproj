@@ -134,6 +134,12 @@
       <DependentUpon>Themes.resx</DependentUpon>
     </Compile>
     <Compile Include="ListViewSort.cs" />
+    <Compile Include="LoadSaveDialogue.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LoadSaveDialogue.Designer.cs">
+      <DependentUpon>LoadSaveDialogue.cs</DependentUpon>
+    </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -230,6 +236,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Themes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="LoadSaveDialogue.resx">
+      <DependentUpon>LoadSaveDialogue.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

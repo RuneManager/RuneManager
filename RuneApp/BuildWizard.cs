@@ -141,6 +141,7 @@ namespace RuneApp
 			if (loading) return;
 
 			Program.Settings.ShowBuildWizard = cShowWizard.Checked;
+			Program.Settings.Save();
 		}
 
 		private void prebuildList_SelectedIndexChanged(object sender, EventArgs e)

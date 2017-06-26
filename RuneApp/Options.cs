@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace RuneApp
@@ -44,6 +45,7 @@ namespace RuneApp
 			AddCheck("InternalServer", cInternalServer);
 			cInternalServer.CheckedChanged += CInternalServer_CheckedChanged;
 			AddCheck("ShowBuildWizard", cBuildWizard);
+			AddCheck("WatchSave", cWatchSave);
 
 			AddNum("TestGen", gTestRun);
 			AddNum("TestShow", gTestShow);
@@ -151,5 +153,6 @@ namespace RuneApp
 			Main.help = new Help();
 			Main.Instance.OpenHelp(Environment.CurrentDirectory + "\\User Manual\\options.html");//, this);
 		}
+		
 	}
 }

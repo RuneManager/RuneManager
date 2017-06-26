@@ -524,34 +524,15 @@ namespace RuneApp
 		private LoadSaveResult loadSaveDialogue()
 		{
 			LoadSaveResult loadres = LoadSaveResult.Failure;
-			OpenFileDialog openFileDialog1 = new OpenFileDialog();
-			openFileDialog1.InitialDirectory = Directory.GetCurrentDirectory();
-			DialogResult result = openFileDialog1.ShowDialog(); // Show the dialog.
-			if (result == DialogResult.OK) // Test result.
+			using (var lsd = new LoadSaveDialogue())
 			{
-				string file = openFileDialog1.FileName;
-				if (file != null)
+				if (lsd.ShowDialog() == DialogResult.OK) // Test result.
 				{
 					try
 					{
-						loadres = Program.LoadSave(file);
-						if (loadres > 0)
-						{
-							if (File.Exists("save.json"))
-							{
-								if (MessageBox.Show("Do you want to override the existing startup save?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
-								{
-									File.Copy(file, "save.json", true);
-								}
-							}
-							else
-							{
-								if (MessageBox.Show("Do you want to load this save on startup?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes)
-								{
-									File.Copy(file, "save.json");
-								}
-							}
-						}
+						loadres = Program.LoadSave(lsd.Filename);
+						Program.Settings.SaveLocation = lsd.Filename;
+						Program.Settings.Save();
 					}
 					catch (IOException ex)
 					{

@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.cWatchSave = new System.Windows.Forms.CheckBox();
 			this.cOtherStats = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
 			this.gTestTime = new System.Windows.Forms.TextBox();
@@ -40,6 +41,7 @@
 			this.cHelpStart = new System.Windows.Forms.CheckBox();
 			this.cOtherUpdate = new System.Windows.Forms.CheckBox();
 			this.label3 = new System.Windows.Forms.Label();
+			this.cBuildWizard = new System.Windows.Forms.CheckBox();
 			this.cColorTeams = new System.Windows.Forms.CheckBox();
 			this.cDisplayGray = new System.Windows.Forms.CheckBox();
 			this.cDisplaySplit = new System.Windows.Forms.CheckBox();
@@ -49,13 +51,13 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
-			this.cBuildWizard = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.cWatchSave);
 			this.tabPage1.Controls.Add(this.cOtherStats);
 			this.tabPage1.Controls.Add(this.label6);
 			this.tabPage1.Controls.Add(this.gTestTime);
@@ -81,6 +83,16 @@
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "General";
 			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// cWatchSave
+			// 
+			this.cWatchSave.AutoSize = true;
+			this.cWatchSave.Location = new System.Drawing.Point(465, 111);
+			this.cWatchSave.Name = "cWatchSave";
+			this.cWatchSave.Size = new System.Drawing.Size(102, 17);
+			this.cWatchSave.TabIndex = 9;
+			this.cWatchSave.Text = "Watch Save file";
+			this.cWatchSave.UseVisualStyleBackColor = true;
 			// 
 			// cOtherStats
 			// 
@@ -189,6 +201,17 @@
 			this.label3.TabIndex = 2;
 			this.label3.Text = "Other";
 			// 
+			// cBuildWizard
+			// 
+			this.cBuildWizard.AutoSize = true;
+			this.cBuildWizard.Location = new System.Drawing.Point(246, 88);
+			this.cBuildWizard.Name = "cBuildWizard";
+			this.cBuildWizard.Size = new System.Drawing.Size(115, 17);
+			this.cBuildWizard.TabIndex = 1;
+			this.cBuildWizard.Text = "Show Build Wizard";
+			this.cBuildWizard.UseVisualStyleBackColor = true;
+			this.cBuildWizard.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// cColorTeams
 			// 
 			this.cColorTeams.AutoSize = true;
@@ -285,17 +308,6 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
-			// cBuildWizard
-			// 
-			this.cBuildWizard.AutoSize = true;
-			this.cBuildWizard.Location = new System.Drawing.Point(246, 88);
-			this.cBuildWizard.Name = "cBuildWizard";
-			this.cBuildWizard.Size = new System.Drawing.Size(115, 17);
-			this.cBuildWizard.TabIndex = 1;
-			this.cBuildWizard.Text = "Show Build Wizard";
-			this.cBuildWizard.UseVisualStyleBackColor = true;
-			this.cBuildWizard.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
-			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -304,10 +316,11 @@
 			this.Controls.Add(this.btnHelp);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
-			this.Icon = App.Icon;
+			this.Icon = global::RuneApp.App.Icon;
 			this.Name = "Options";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Options";
+			this.Load += new System.EventHandler(this.Options_Load);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			this.tabControl1.ResumeLayout(false);
@@ -339,5 +352,6 @@
         private System.Windows.Forms.CheckBox cHelpStart;
 		private System.Windows.Forms.CheckBox cInternalServer;
 		private System.Windows.Forms.CheckBox cBuildWizard;
+		private System.Windows.Forms.CheckBox cWatchSave;
 	}
 }
