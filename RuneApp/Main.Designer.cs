@@ -234,7 +234,7 @@
 			// 
 			// ColMonID
 			// 
-			this.ColMonID.Text = "ID";
+			this.ColMonID.Text = "★";
 			this.ColMonID.Width = 40;
 			// 
 			// ColMonPriority

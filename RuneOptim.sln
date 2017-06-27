@@ -34,10 +34,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SWarFarmUpdater", "SWarFarm
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RiftTrackerPlugin", "RiftTrackerPlugin\RiftTrackerPlugin.csproj", "{23EB26EE-CF11-48CC-9C18-C70AB92D4D22}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimizeFriendsPlugin", "OptimizeFriendsPlugin\OptimizeFriendsPlugin.csproj", "{802CC26E-4E90-47AD-811E-B3B9BD85D491}"
+EndProject
 Global
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -187,6 +186,18 @@ Global
 		{23EB26EE-CF11-48CC-9C18-C70AB92D4D22}.Release|x64.Build.0 = Release|Any CPU
 		{23EB26EE-CF11-48CC-9C18-C70AB92D4D22}.Release|x86.ActiveCfg = Release|Any CPU
 		{23EB26EE-CF11-48CC-9C18-C70AB92D4D22}.Release|x86.Build.0 = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|x64.Build.0 = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Debug|x86.Build.0 = Debug|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|Any CPU.Build.0 = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|x64.ActiveCfg = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|x64.Build.0 = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|x86.ActiveCfg = Release|Any CPU
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -195,5 +206,6 @@ Global
 		{40E09ADD-4833-40A2-A46E-59ADB38925B8} = {EF75F3F3-FE58-457C-80C6-1FE1D3052CDC}
 		{FF7E218A-B0C4-48D9-A62F-F8D0681DF663} = {EF75F3F3-FE58-457C-80C6-1FE1D3052CDC}
 		{23EB26EE-CF11-48CC-9C18-C70AB92D4D22} = {EF75F3F3-FE58-457C-80C6-1FE1D3052CDC}
+		{802CC26E-4E90-47AD-811E-B3B9BD85D491} = {EF75F3F3-FE58-457C-80C6-1FE1D3052CDC}
 	EndGlobalSection
 EndGlobal

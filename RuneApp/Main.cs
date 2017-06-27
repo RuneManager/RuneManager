@@ -1373,9 +1373,9 @@ namespace RuneApp
 				ForeColor = mon.inStorage ? Color.Gray : Color.Black,
 				Text = mon.Name,
 				SubItems = {
-				mon.Id.ToString(),
-				(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
-			},
+					mon._class.ToString(),
+					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
+				},
 				Tag = mon,
 			}).ToArray());
 
