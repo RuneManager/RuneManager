@@ -193,6 +193,7 @@ namespace RuneApp
 		private void Main_Load(object sender, EventArgs e)
 		{
 			#region Watch collections and try loading
+			Program.saveFileTouched += Program_saveFileTouched;
 			Program.builds.CollectionChanged += Builds_CollectionChanged;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
@@ -310,6 +311,11 @@ namespace RuneApp
 
 			if (Program.Settings.StartUpHelp)
 				OpenHelp();
+		}
+
+		private void Program_saveFileTouched(object sender, EventArgs e)
+		{
+			this.fileBox.Visible = true;
 		}
 
 		private void ColorMonsWithBuilds()
@@ -1618,6 +1624,11 @@ namespace RuneApp
 						li.SubItems[0].ForeColor = Color.Orange;
 				}
 			}
+		}
+
+		private void btnRefreshSave_Click(object sender, EventArgs e)
+		{
+			Program.LoadSave(Program.Settings.SaveLocation);
 		}
 	}
 

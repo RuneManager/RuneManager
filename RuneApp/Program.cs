@@ -80,6 +80,10 @@ namespace RuneApp
 		public static readonly InternalServer.Master master = new InternalServer.Master();
 		public static bool goodRunes;
 
+		static FileSystemWatcher saveFileWatcher = null;
+		static System.Timers.Timer saveFileDebouncer = null;
+		public static event EventHandler saveFileTouched;
+
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
@@ -94,6 +98,8 @@ namespace RuneApp
 
 			if (Program.Settings.InternalServer)
 				master.Start();
+			if (Program.Settings.WatchSave)
+				watchSave();
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
@@ -252,6 +258,44 @@ namespace RuneApp
 				throw new Exception("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 			}
 			return LoadSaveResult.Success;//text.Length;
+		}
+
+		private static void watchSave()
+		{
+			if (saveFileWatcher == null)
+			{
+				saveFileWatcher = new FileSystemWatcher();
+				saveFileWatcher.Changed += SaveFileWatcher_Changed;
+			}
+			saveFileWatcher.Path = Path.GetDirectoryName(Program.Settings.SaveLocation);
+			saveFileWatcher.Filter = Path.GetFileName(Program.Settings.SaveLocation);
+			saveFileWatcher.NotifyFilter = NotifyFilters.LastWrite;
+
+		}
+
+		private static void SaveFileWatcher_Changed(object sender, FileSystemEventArgs e)
+		{
+			if (saveFileDebouncer == null)
+			{
+				saveFileDebouncer = new System.Timers.Timer();
+				saveFileDebouncer.Elapsed += SaveFileDebouncer_Elapsed;
+				saveFileDebouncer.AutoReset = false;
+			}
+			saveFileDebouncer.Interval = 500;
+			saveFileDebouncer.Stop();
+			saveFileDebouncer.Start();
+		}
+
+		private static void SaveFileDebouncer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+		{
+			if (saveFileTouched != null && saveFileTouched.GetInvocationList().Length > 0)
+			{
+				saveFileTouched.Invoke(Program.Settings.SaveLocation, new EventArgs());
+			}
+			else
+			{
+				LoadSave(Program.Settings.SaveLocation);
+			}
 		}
 
 		public static LoadSaveResult LoadBuilds(string filename = "builds.json")

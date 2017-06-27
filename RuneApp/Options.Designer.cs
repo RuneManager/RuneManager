@@ -320,7 +320,6 @@
 			this.Name = "Options";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Options";
-			this.Load += new System.EventHandler(this.Options_Load);
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
 			this.tabControl1.ResumeLayout(false);

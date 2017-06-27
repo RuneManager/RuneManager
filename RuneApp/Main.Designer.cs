@@ -173,6 +173,9 @@
 			this.runeEquipped = new RuneApp.RuneBox();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.findGoodRunes = new System.Windows.Forms.CheckBox();
+			this.fileBox = new System.Windows.Forms.GroupBox();
+			this.btnRefreshSave = new System.Windows.Forms.Button();
+			this.label1 = new System.Windows.Forms.Label();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -197,6 +200,7 @@
 			this.splitContainer2.SuspendLayout();
 			this.updateBox.SuspendLayout();
 			this.menu_buildlist.SuspendLayout();
+			this.fileBox.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// dataMonsterList
@@ -1617,12 +1621,12 @@
 			this.menu_buildlist.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.teamToolStripMenuItem});
 			this.menu_buildlist.Name = "menu_buildlist";
-			this.menu_buildlist.Size = new System.Drawing.Size(104, 26);
+			this.menu_buildlist.Size = new System.Drawing.Size(105, 26);
 			// 
 			// teamToolStripMenuItem
 			// 
 			this.teamToolStripMenuItem.Name = "teamToolStripMenuItem";
-			this.teamToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+			this.teamToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
 			this.teamToolStripMenuItem.Text = "Team";
 			// 
 			// runeEquipped
@@ -1660,11 +1664,44 @@
 			this.findGoodRunes.UseVisualStyleBackColor = true;
 			this.findGoodRunes.CheckedChanged += new System.EventHandler(this.findGoodRunes_CheckedChanged);
 			// 
+			// fileBox
+			// 
+			this.fileBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.fileBox.Controls.Add(this.btnRefreshSave);
+			this.fileBox.Controls.Add(this.label1);
+			this.fileBox.Location = new System.Drawing.Point(885, 505);
+			this.fileBox.Name = "fileBox";
+			this.fileBox.Size = new System.Drawing.Size(215, 81);
+			this.fileBox.TabIndex = 21;
+			this.fileBox.TabStop = false;
+			this.fileBox.Text = "File Status";
+			this.fileBox.Visible = false;
+			// 
+			// btnRefreshSave
+			// 
+			this.btnRefreshSave.Location = new System.Drawing.Point(134, 52);
+			this.btnRefreshSave.Name = "btnRefreshSave";
+			this.btnRefreshSave.Size = new System.Drawing.Size(75, 23);
+			this.btnRefreshSave.TabIndex = 1;
+			this.btnRefreshSave.Text = "Refresh";
+			this.btnRefreshSave.UseVisualStyleBackColor = true;
+			this.btnRefreshSave.Click += new System.EventHandler(this.btnRefreshSave_Click);
+			// 
+			// label1
+			// 
+			this.label1.AutoSize = true;
+			this.label1.Location = new System.Drawing.Point(6, 25);
+			this.label1.Name = "label1";
+			this.label1.Size = new System.Drawing.Size(193, 13);
+			this.label1.TabIndex = 0;
+			this.label1.Text = "A change has been made to your save.";
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1350, 730);
+			this.Controls.Add(this.fileBox);
 			this.Controls.Add(this.runeInventory);
 			this.Controls.Add(this.runeEquipped);
 			this.Controls.Add(this.updateBox);
@@ -1675,7 +1712,7 @@
 			this.Controls.Add(this.toolStrip1);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.menuStrip1);
-			this.Icon = App.Icon;
+			this.Icon = global::RuneApp.App.Icon;
 			this.MainMenuStrip = this.menuStrip1;
 			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "Main";
@@ -1721,6 +1758,8 @@
 			this.updateBox.ResumeLayout(false);
 			this.updateBox.PerformLayout();
 			this.menu_buildlist.ResumeLayout(false);
+			this.fileBox.ResumeLayout(false);
+			this.fileBox.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -1871,6 +1910,9 @@
         private System.Windows.Forms.CheckBox findGoodRunes;
 		private System.Windows.Forms.ToolStripButton tsBtnFindSpeed;
 		private RuneDial runeDial;
+		private System.Windows.Forms.GroupBox fileBox;
+		private System.Windows.Forms.Label label1;
+		private System.Windows.Forms.Button btnRefreshSave;
 	}
 }
 
