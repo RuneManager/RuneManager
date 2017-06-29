@@ -322,13 +322,9 @@ namespace RuneApp
 		{
 			foreach (ListViewItem lvim in dataMonsterList.Items)
 			{
-				var mtag = lvim.Tag as Monster;
-				if (mtag != null)
+				if (Program.builds.Any(b => b.mon == lvim.Tag as Monster))
 				{
-					if (Program.builds.Any(b => b.mon == mtag))
-					{
-						lvim.ForeColor = Color.Green;
-					}
+					lvim.ForeColor = Color.Green;
 				}
 			}
 		}
@@ -510,16 +506,9 @@ namespace RuneApp
 
 		private void monstertab_list_select(object sender, EventArgs e)
 		{
-			if (dataMonsterList.FocusedItem != null)
-			{
-				var item = dataMonsterList.FocusedItem;
-				if (item.Tag != null)
-				{
-					Monster mon = (Monster)item.Tag;
-
-					ShowMon(mon);
-				}
-			}
+			Monster mon = dataMonsterList?.FocusedItem?.Tag as Monster;
+			if (mon != null)
+				ShowMon(mon);
 		}
 
 		private void loadSaveDialogue(object sender, EventArgs e)
@@ -604,9 +593,9 @@ namespace RuneApp
 
 		private void toolStripButton1_Click(object sender, EventArgs e)
 		{
-			if (dataMonsterList.FocusedItem != null && dataMonsterList.FocusedItem.Tag != null)
+			Monster mon = dataMonsterList?.FocusedItem?.Tag as Monster;
+			if (mon != null)
 			{
-				Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
 				int maxPri = Program.data.Monsters.Max(x => x.priority);
 				if (mon.priority == 0)
 				{
@@ -632,34 +621,32 @@ namespace RuneApp
 
 		private void toolStripButton2_Click(object sender, EventArgs e)
 		{
-			if (dataMonsterList.FocusedItem != null)
+			Monster mon = dataMonsterList?.FocusedItem?.Tag as Monster;
+			if (mon != null)
 			{
-				if (dataMonsterList.FocusedItem.Tag != null)
+				int maxPri = Program.data.Monsters.Max(x => x.priority);
+				if (mon.priority == 0)
 				{
-					Monster mon = (Monster)dataMonsterList.FocusedItem.Tag;
-					int maxPri = Program.data.Monsters.Max(x => x.priority);
-					if (mon.priority == 0)
-					{
-						mon.priority = maxPri + 1;
-						dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
-					}
-					else if (mon.priority != maxPri)
-					{
-						int pri = mon.priority;
-						Monster mon2 = Program.data.Monsters.Where(x => x.priority == pri + 1).FirstOrDefault();
-						if (mon2 != null)
-						{
-							var items = dataMonsterList.Items;
-							ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
-							mon2.priority -= 1;
-							listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
-						}
-						mon.priority += 1;
-						dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
-					}
-					dataMonsterList.Sort();
+					mon.priority = maxPri + 1;
+					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
 				}
+				else if (mon.priority != maxPri)
+				{
+					int pri = mon.priority;
+					Monster mon2 = Program.data.Monsters.Where(x => x.priority == pri + 1).FirstOrDefault();
+					if (mon2 != null)
+					{
+						var items = dataMonsterList.Items;
+						ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
+						mon2.priority -= 1;
+						listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
+					}
+					mon.priority += 1;
+					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
+				}
+				dataMonsterList.Sort();
 			}
+			
 		}
 
 		private void button2_Click(object sender, EventArgs e)
@@ -1378,7 +1365,8 @@ namespace RuneApp
 				Text = mon.Name,
 				SubItems = {
 					mon._class.ToString(),
-					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#")
+					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#"),
+					mon.Id.ToString()
 				},
 				Tag = mon,
 			}).ToArray());

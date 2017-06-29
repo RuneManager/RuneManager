@@ -420,6 +420,10 @@
       <Project>{8cdb42ed-c6f7-4915-9a10-6161eca4adc6}</Project>
       <Name>RuneClasses</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RunePlugin\RunePlugin.csproj">
+      <Project>{fa95cac9-ad93-4cfa-b3d9-0674be156d5a}</Project>
+      <Name>RunePlugin</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\broken.png" />

@@ -176,6 +176,7 @@
 			this.fileBox = new System.Windows.Forms.GroupBox();
 			this.btnRefreshSave = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
+			this.ColMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -212,7 +213,8 @@
 			this.dataMonsterList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColMonName,
             this.ColMonGrade,
-            this.ColMonPriority});
+            this.ColMonPriority,
+            this.ColMonID});
 			this.dataMonsterList.FullRowSelect = true;
 			this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
 			this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
@@ -1696,6 +1698,11 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "A change has been made to your save.";
 			// 
+			// ColMonID
+			// 
+			this.ColMonID.Text = "ID";
+			this.ColMonID.Width = 0;
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1913,6 +1920,7 @@
 		private System.Windows.Forms.GroupBox fileBox;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button btnRefreshSave;
+		private System.Windows.Forms.ColumnHeader ColMonID;
 	}
 }
 
