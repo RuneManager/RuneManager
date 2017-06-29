@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RunePlugin.Rift;
+using RuneOptim;
 
 namespace RunePlugin.Response
 {
-	class BattleRiftDungeonResultResponse : SWResponse
+	public class BattleRiftDungeonResultResponse : SWResponse
 	{
 		//public string command;
 		//public int ret_code;

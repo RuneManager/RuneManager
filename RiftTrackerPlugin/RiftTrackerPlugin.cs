@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using RunePlugin;
-using RunePlugin.Rift;
+using RuneOptim;
 
 namespace RiftTrackerPlugin
 {

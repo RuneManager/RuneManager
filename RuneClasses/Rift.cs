@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace RunePlugin.Rift
+namespace RuneOptim
 {
 	public enum RiftRating
 	{
@@ -33,25 +33,25 @@ namespace RunePlugin.Rift
 		Dark = 5001
 	}
 
-	public class RiftPosition : RuneOptim.ListProp<long?>
+	public class RiftPosition : ListProp<long?>
 	{
-		[RuneOptim.ListProperty(0)]
+		[ListProperty(0)]
 		[JsonProperty("position")]
 		public long? Position = null;
 
-		[RuneOptim.ListProperty(1)]
+		[ListProperty(1)]
 		[JsonProperty("unit_id")]
 		public long? MonsterId = null;
 
-		[RuneOptim.ListProperty(2)]
+		[ListProperty(2)]
 		[JsonProperty("unit_master_id")]
 		public long? MonsterTypeId = null;
 
-		[RuneOptim.ListProperty(3)]
+		[ListProperty(3)]
 		[JsonProperty("grade")]
 		public long? Grade = null;
 
-		[RuneOptim.ListProperty(4)]
+		[ListProperty(4)]
 		[JsonProperty("level")]
 		public long? Level = null;
 

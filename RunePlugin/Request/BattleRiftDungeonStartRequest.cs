@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RunePlugin.Request
 {
-	class BattleRiftDungeonStartRequest : SWRequest
+	public class BattleRiftDungeonStartRequest : SWRequest
 	{
 	}
 }

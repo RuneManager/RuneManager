@@ -59,6 +59,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Rift.cs" />
     <Compile Include="Rune.cs" />
     <Compile Include="RuneProperties.cs" />
     <Compile Include="RuneFilter.cs" />

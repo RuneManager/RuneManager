@@ -5,15 +5,13 @@ using RunePlugin.Response;
 
 namespace RunePlugin
 {
-	[JsonConverter(typeof(SWResponseConverter))]
 	public class SWResponse : SWMessage
 	{
+		//public string Command;
 		//public int ret_code;
 		//public int tvalue;
 		//public int tvaluelocal;
 		//public string tzone;
-
-		public string Command;
 
 		[JsonProperty("ret_code")]
 		public int ReturnCode;
@@ -46,6 +44,8 @@ namespace RunePlugin
 			{
 				case "BattleRiftDungeonResult":
 					return obj.ToObject<BattleRiftDungeonResultResponse>();
+				case "GetBestClearRiftDungeon":
+					return obj.ToObject<GetBestClearRiftDungeonResponse>();
 				default:
 					return obj.ToObject<SWResponse>();
 			}
