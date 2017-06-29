@@ -3,23 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace RunePlugin
 {
 	public class SWMessage
 	{
-		public string command;
+		[JsonProperty("command")]
+		public string Command;
 
-		protected string session_key;
+		[JsonProperty("session_key")]
+		protected string SessionKey;
 
-		public int proto_ver;
+		[JsonProperty("proto_ver")]
+		public int ProtoVer;
 
-		public string infocsv;
+		[JsonProperty("infocsv")]
+		public string InfoCSV;
 
-		public int channel_uid;
+		[JsonProperty("channel_uid")]
+		public int ChannelUID;
 
-		public int ts_val;
+		[JsonProperty("ts_val")]
+		public int TSVal;
 
-		public int wizard_id;
+		[JsonProperty("wizard_id")]
+		public int WizardId;
 	}
 }

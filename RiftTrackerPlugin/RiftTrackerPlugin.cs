@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using RunePlugin;
+using RunePlugin.Rift;
 
 namespace RiftTrackerPlugin
 {
@@ -73,11 +74,11 @@ namespace RiftTrackerPlugin
 
 		public override void ProcessRequest(object sender, SWEventArgs args)
 		{
-			if (args.Response.command != "GetRiftDungeonCommentDeck")
+			if (args.Response.Command != "GetRiftDungeonCommentDeck")
 				return;
 
 			//var riftstats = JsonConvert.DeserializeObject<RiftDeck>(args.ResponseJson["bestdeck_rift_dungeon"].ToString());
-			//File.WriteAllText(teamsdir + "\\" + riftstats.rift_dungeon_id + "_" + riftstats.wizard_id + ".json", args.ResponseRaw);
+			//File.WriteAllText(teamsdir + "\\" + riftstats.RiftDungeonId + "_" + riftstats.WizardId + ".json", args.ResponseRaw);
 			ProcessDeck(args.ResponseRaw);
 			SaveStuff();
 		}
@@ -99,10 +100,10 @@ namespace RiftTrackerPlugin
 					r.AssignedName = m.Name;
 				}
 
-				if (!matchCount.ContainsKey(riftstats.rift_dungeon_id))
-					matchCount.Add(riftstats.rift_dungeon_id, new Dictionary<string, Dictionary<string, int>>());
-				if (!matchCount[riftstats.rift_dungeon_id].ContainsKey(m.Name))
-					matchCount[riftstats.rift_dungeon_id].Add(m.Name, new Dictionary<string, int>());
+				if (!matchCount.ContainsKey(riftstats.RiftDungeonId))
+					matchCount.Add(riftstats.RiftDungeonId, new Dictionary<string, Dictionary<string, int>>());
+				if (!matchCount[riftstats.RiftDungeonId].ContainsKey(m.Name))
+					matchCount[riftstats.RiftDungeonId].Add(m.Name, new Dictionary<string, int>());
 				foreach (var mm in mons)
 				{
 					if (mm.Name == "Missingno")
@@ -114,26 +115,26 @@ namespace RiftTrackerPlugin
 					if (m.Name == mm.Name)
 						continue;
 
-					if (!matchCount[riftstats.rift_dungeon_id][m.Name].ContainsKey(mm.Name))
-						matchCount[riftstats.rift_dungeon_id][m.Name].Add(mm.Name, 0);
-					if (!matchCount[riftstats.rift_dungeon_id].ContainsKey(mm.Name))
-						matchCount[riftstats.rift_dungeon_id].Add(mm.Name, new Dictionary<string, int>());
-					if (!matchCount[riftstats.rift_dungeon_id][mm.Name].ContainsKey(m.Name))
-						matchCount[riftstats.rift_dungeon_id][mm.Name].Add(m.Name, 0);
+					if (!matchCount[riftstats.RiftDungeonId][m.Name].ContainsKey(mm.Name))
+						matchCount[riftstats.RiftDungeonId][m.Name].Add(mm.Name, 0);
+					if (!matchCount[riftstats.RiftDungeonId].ContainsKey(mm.Name))
+						matchCount[riftstats.RiftDungeonId].Add(mm.Name, new Dictionary<string, int>());
+					if (!matchCount[riftstats.RiftDungeonId][mm.Name].ContainsKey(m.Name))
+						matchCount[riftstats.RiftDungeonId][mm.Name].Add(m.Name, 0);
 
 
-					matchCount[riftstats.rift_dungeon_id][m.Name][mm.Name]++;
-					matchCount[riftstats.rift_dungeon_id][mm.Name][m.Name]++;
+					matchCount[riftstats.RiftDungeonId][m.Name][mm.Name]++;
+					matchCount[riftstats.RiftDungeonId][mm.Name][m.Name]++;
 				}
 
-				//if (!allMons.ContainsKey(riftstats.rift_dungeon_id))
-				//	allMons[riftstats.rift_dungeon_id] = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
-				//var riftMons = allMons[riftstats.rift_dungeon_id];
+				//if (!allMons.ContainsKey(riftstats.RiftDungeonId))
+				//	allMons[riftstats.RiftDungeonId] = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
+				//var riftMons = allMons[riftstats.RiftDungeonId];
 
 				if (!allMons.ContainsKey(m.Name))
 					allMons.Add(m.Name, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
 				var monList = allMons[m.Name];
-				monList[riftstats.wizard_id] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
+				monList[riftstats.WizardId] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
 			}
 
 		}
@@ -180,7 +181,7 @@ namespace RiftTrackerPlugin
 				}
 				row++;
 
-				foreach (var kvm in montype.Value.OrderByDescending(mv => mv.Value.Key.clear_damage))
+				foreach (var kvm in montype.Value.OrderByDescending(mv => mv.Value.Key.ClearDamage))
 				{
 					if (!mcount.ContainsKey(montype.Key))
 						mcount[montype.Key] = 1;
@@ -194,20 +195,20 @@ namespace RiftTrackerPlugin
 						switch (colHead[col - 1])
 						{
 							case "Raid":
-								page.Cells[row, col].Value = kvm.Value.Key.rift_dungeon_id;
+								page.Cells[row, col].Value = kvm.Value.Key.RiftDungeonId;
 								break;
 							case "Grade":
-								page.Cells[row, col].Value = kvm.Value.Key.clear_rating;
+								page.Cells[row, col].Value = kvm.Value.Key.ClearRating;
 								break;
 							case "Points":
-								page.Cells[row, col].Value = kvm.Value.Key.clear_damage;
+								page.Cells[row, col].Value = kvm.Value.Key.ClearDamage;
 								break;
 							case "Pos":
-								page.Cells[row, col].Value = kvm.Value.Key.my_unit_list.FirstOrDefault(l => l.unit_id == (long)mon.Id)?.position;
+								page.Cells[row, col].Value = kvm.Value.Key.Monsters.FirstOrDefault(l => l.MonsterId == (long)mon.Id)?.Position;
 								break;
 							case "Lead":
-								var rifty = kvm.Value.Key.my_unit_list.FirstOrDefault(l => l.unit_id == (long)mon.Id);
-								page.Cells[row, col].Value = (rifty?.position == kvm.Value.Key.leader_index);
+								var rifty = kvm.Value.Key.Monsters.FirstOrDefault(l => l.MonsterId == (long)mon.Id);
+								page.Cells[row, col].Value = (rifty?.Position == kvm.Value.Key.LeaderIndex);
 								break;
 							case "HP":
 								page.Cells[row, col].Value = stats.Health;
@@ -300,7 +301,7 @@ namespace RiftTrackerPlugin
 				if (page == null)
 					page = excelPack.Workbook.Worksheets.Add(rd.Key.ToString());
 
-				var rmons = allMons.SelectMany(q => q.Value.Select(r => r.Value)).Where(d => d.Key.rift_dungeon_id == rd.Key);
+				var rmons = allMons.SelectMany(q => q.Value.Select(r => r.Value)).Where(d => d.Key.RiftDungeonId == rd.Key);
 				var monm = rmons.Select(d => d.Value);
 				//var mp = rmons.Select(d => d.Value._monsterTypeId.ToString().Substring(0,3)).Select(i => monm.FirstOrDefault(m => m._monsterTypeId.ToString().Substring(0,3) == i));
 				
@@ -344,7 +345,7 @@ namespace RiftTrackerPlugin
 						{
 							var c = rd.Value[mx][my];
 							c = rd.Value[monsX[col - 2]][monsY[row - 2]];
-							//var c = rds.Count(r => r.my_unit_list.Any(p => p.unit_master_id == mx._monsterTypeId) && r.my_unit_list.Any(p => p.unit_master_id == my._monsterTypeId)); ;
+							//var c = rds.Count(r => r.Monsters.Any(p => p.unit_master_id == mx._monsterTypeId) && r.Monsters.Any(p => p.unit_master_id == my._monsterTypeId)); ;
 							page.Cells[row, col].Value = c;
 						}
 						else
@@ -361,79 +362,5 @@ namespace RiftTrackerPlugin
 			excelPack.Save();
 			Console.WriteLine("Saved riftstats");
 		}
-	}
-
-
-	public enum RiftRating
-	{
-		F,
-		E,
-		D,
-		C,
-		Bminus,
-		B,
-		Bplus,
-		Aminus,
-		A,
-		Aplus,
-		S,
-		SS,
-		SSS,
-	}
-
-	public enum RiftDungeon
-	{
-		Ice = 1001,
-		Fire = 2001,
-		Wind = 3001,
-		Light = 4001,
-		Dark = 5001
-	}
-
-	public class RiftPosition : RuneOptim.ListProp<long?>
-	{
-		[RuneOptim.ListProperty(0)]
-		public long? position = null;
-
-		[RuneOptim.ListProperty(1)]
-		public long? unit_id = null;
-
-		[RuneOptim.ListProperty(2)]
-		public long? unit_master_id = null;
-
-		[RuneOptim.ListProperty(3)]
-		public long? grade = null;
-			
-		[RuneOptim.ListProperty(4)]
-		public long? level = null;
-
-		public override bool IsReadOnly { get { return false; } }
-		protected override int maxInd { get { return 4; } }
-
-		public override void Add(long? item)
-		{
-			if (position == null)
-				position = item;
-			else if (unit_id == null)
-				unit_id = item;
-			else if (unit_master_id == null)
-				unit_master_id = item;
-			else if (grade == null)
-				grade = item;
-			else if (level == null)
-				level = item;
-			else
-				throw new Exception();
-		}
-	}
-
-	public class RiftDeck
-	{
-		public ulong wizard_id;
-		public RiftDungeon rift_dungeon_id;
-		public RiftRating clear_rating;
-		public int clear_damage;
-		public int leader_index;
-		public RiftPosition[] my_unit_list;
 	}
 }

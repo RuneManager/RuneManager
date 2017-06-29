@@ -34,7 +34,7 @@ namespace OptimizerJsonPlugin
 			List<JObject> crafts = ((JArray)args.ResponseJson["rune_craft_item_list"]).Cast<JObject>().ToList();
 
 			Optimizer optimizer = new Optimizer();
-			optimizer.tvalue = args.Response.tvalue;
+			optimizer.tvalue = args.Response.TValue;
 			optimizer.wizard_id = (long)wizard["wizard_id"];
 			optimizer.deco_list = args.ResponseJson["deco_list"];
 
