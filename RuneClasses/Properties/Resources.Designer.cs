@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace RuneApp.Properties {
+namespace RuneOptim.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace RuneApp.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneOptim.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,20 +61,20 @@ namespace RuneApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to data/basestats.json.
+        ///   Looks up a localized string similar to data/monsters.json.
         /// </summary>
-        internal static string BaseStatsJSON {
+        internal static string MonstersJSON {
             get {
-                return ResourceManager.GetString("BaseStatsJSON", resourceCulture);
+                return ResourceManager.GetString("MonstersJSON", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to data/templates.json.
+        ///   Looks up a localized string similar to data/skills.json.
         /// </summary>
-        internal static string TemplatesJSON {
+        internal static string SkillsJSON {
             get {
-                return ResourceManager.GetString("TemplatesJSON", resourceCulture);
+                return ResourceManager.GetString("SkillsJSON", resourceCulture);
             }
         }
     }

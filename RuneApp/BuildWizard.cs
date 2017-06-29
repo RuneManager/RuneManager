@@ -27,14 +27,14 @@ namespace RuneApp
 			{
 				if (templateList == null)
 				{
-					if (File.Exists("templates.json"))
+					if (File.Exists(global::RuneApp.Properties.Resources.TemplatesJSON))
 					{
-						var bstr = File.ReadAllText("templates.json");
+						var bstr = File.ReadAllText(global::RuneApp.Properties.Resources.TemplatesJSON);
 						templateList = JsonConvert.DeserializeObject<List<Build>>(bstr);
 					}
 					else
 					{
-						Program.log.Error("Templates.json not found?");
+						Program.log.Error(global::RuneApp.Properties.Resources.TemplatesJSON + " not found?");
 						templateList = new List<Build>();
 					}
 				}

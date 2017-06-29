@@ -46,7 +46,7 @@ namespace RuneOptim
 			get
 			{
 				if (monIdNames == null)
-					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText("monsters.json"));
+					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(global::RuneOptim.Properties.Resources.MonstersJSON));
 				return monIdNames;
 			}
 		}

@@ -190,8 +190,8 @@ namespace RuneApp
 		
 		public static LoadSaveResult LoadMonStats()
 		{
-			if (File.Exists("basestats.json"))
-				MonsterStat.monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(File.ReadAllText("basestats.json"));
+			if (File.Exists(global::RuneApp.Properties.Resources.BaseStatsJSON))
+				MonsterStat.monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(File.ReadAllText(global::RuneApp.Properties.Resources.BaseStatsJSON));
 			else
 				return LoadSaveResult.FileNotFound;
 			return LoadSaveResult.Success;

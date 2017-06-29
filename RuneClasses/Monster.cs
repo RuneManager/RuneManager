@@ -152,7 +152,7 @@ namespace RuneOptim
 			get
 			{
 				if (skillList == null)
-					Monster.skillList = JsonConvert.DeserializeObject<MonsterDefinitions.Monster[]>(File.ReadAllText("skills.json"));
+					Monster.skillList = JsonConvert.DeserializeObject<MonsterDefinitions.Monster[]>(File.ReadAllText(global::RuneOptim.Properties.Resources.SkillsJSON));
 
 				return skillList;
 			}

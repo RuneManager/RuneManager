@@ -117,10 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="BaseStatsJSON" xml:space="preserve">
-    <value>data/basestats.json</value>
+  <data name="MonstersJSON" xml:space="preserve">
+    <value>data/monsters.json</value>
   </data>
-  <data name="TemplatesJSON" xml:space="preserve">
-    <value>data/templates.json</value>
+  <data name="SkillsJSON" xml:space="preserve">
+    <value>data/skills.json</value>
   </data>
 </root>
