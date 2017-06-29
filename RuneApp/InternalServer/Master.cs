@@ -542,7 +542,20 @@ namespace RuneApp.InternalServer
 		ee.style.display = 'block';
 	else
 		ee.style.display = 'none';
-}" } } }, rcont
+}
+function hackLots(prop, num, on) {
+	var as = document.getElementsByClassName('rune-details');
+	for (var i = 0; i < as.length; i++) {
+		as[i].style.display = on ? 'none' : 'block';
+	}
+	if (on) {
+		var es = document.getElementsByClassName(prop + '-' + num);
+		for (var i = 0; i < es.length; i++) {
+			es[i].style.display = 'block';
+		}
+	}
+}
+" } } }, "<a href=\"javascript:hackLots('stars', 6, true);\">show 6*</a>", rcont
 					);
 			}
 
@@ -619,7 +632,7 @@ namespace RuneApp.InternalServer
 				}
 
 				ret.contentList.Add(mainspan);
-				var hidediv = new ServedResult("div") { contentDic = { { "id", '"' + r.Id.ToString() + '"' } } };
+				var hidediv = new ServedResult("div") { contentDic = { { "id", '"' + r.Id.ToString() + '"' }, { "class", '"' + $"rune-details stars-{r.Grade} rarity-{r.Rarity} level-{r.Level} slot-{r.Slot}" + '"' } } };
 				if (r.Level == 15 || (r.Slot % 2 == 1 && r.Level >= 12))
 					hidediv.contentDic.Add("style", "\"display:none\"");
 				//hidediv.contentList.Add("<img src=\"/runes/" + r.Set.ToString() + ".png\" style=\"position:relative;left:1em;height:2em;\" />");

@@ -32,7 +32,7 @@
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
 			this.dataMonsterList = new System.Windows.Forms.ListView();
 			this.ColMonName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ColMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ColMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ColMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -211,7 +211,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataMonsterList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColMonName,
-            this.ColMonID,
+            this.ColMonGrade,
             this.ColMonPriority});
 			this.dataMonsterList.FullRowSelect = true;
 			this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
@@ -232,10 +232,10 @@
 			this.ColMonName.Text = "Name";
 			this.ColMonName.Width = 130;
 			// 
-			// ColMonID
+			// ColMonGrade
 			// 
-			this.ColMonID.Text = "★";
-			this.ColMonID.Width = 40;
+			this.ColMonGrade.Text = "★";
+			this.ColMonGrade.Width = 40;
 			// 
 			// ColMonPriority
 			// 
@@ -1769,7 +1769,7 @@
 
         private System.Windows.Forms.ListView dataMonsterList;
         private System.Windows.Forms.ColumnHeader ColMonName;
-        private System.Windows.Forms.ColumnHeader ColMonID;
+        private System.Windows.Forms.ColumnHeader ColMonGrade;
         private System.Windows.Forms.ColumnHeader ColMonPriority;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;

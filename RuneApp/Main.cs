@@ -64,7 +64,7 @@ namespace RuneApp
 			#region Sorter
 			var sorter = new ListViewSort();
 			dataMonsterList.ListViewItemSorter = sorter;
-			sorter.OnColumnClick(ColMonID.Index);
+			sorter.OnColumnClick(ColMonGrade.Index);
 			sorter.OnColumnClick(ColMonPriority.Index);
 			dataRuneList.ListViewItemSorter = new ListViewSort();
 
@@ -1396,7 +1396,10 @@ namespace RuneApp
 			checkLocked();
 			ColorMonsWithBuilds();
 
-			((ListViewSort)dataMonsterList.ListViewItemSorter).ShouldSort = true;
+			var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
+			mlvs.OrderBy(2, true);
+			mlvs.ThenBy(1, false);
+			mlvs.ShouldSort = true;
 			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
 
 			dataMonsterList.Sort();
