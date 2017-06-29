@@ -774,11 +774,15 @@ namespace RuneApp
 			var mon = dataMonsterList.SelectedItems[0].Tag as Monster;
 			if (mon == null)
 				return;
-			
+
+			var nextId = 1;
+			if (Program.builds.Any())
+				nextId = Program.builds.Max(q => q.ID) + 1;
+
 			Build bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
 			{
 				New = true,
-				ID = Program.builds.Max(q => q.ID) + 1,
+				ID = nextId,
 				MonId = mon.Id,
 				MonName = mon.Name
 			};
