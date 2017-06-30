@@ -5,7 +5,6 @@ using RunePlugin.Request;
 
 namespace RunePlugin
 {
-	[JsonConverter(typeof(SWRequestConverter))]
 	public class SWRequest : SWMessage
 	{
 

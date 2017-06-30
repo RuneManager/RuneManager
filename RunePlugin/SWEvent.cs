@@ -21,8 +21,8 @@ namespace RunePlugin
 			ResponseRaw = resp;
 			RequestJson = JsonConvert.DeserializeObject<JObject>(req);
 			ResponseJson = JsonConvert.DeserializeObject<JObject>(resp);
-			Request = JsonConvert.DeserializeObject<SWRequest>(req);
-			Response = JsonConvert.DeserializeObject<SWResponse>(resp);
+			Request = JsonConvert.DeserializeObject<SWRequest>(req, new SWRequestConverter());
+			Response = JsonConvert.DeserializeObject<SWResponse>(resp, new SWResponseConverter());
 		}
 	}
 }
