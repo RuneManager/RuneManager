@@ -84,7 +84,12 @@ namespace RuneApp.InternalServer
 
 			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).ToList();
+
+			var trashOnes = unlocked.Where(m => m._class == 1 && m.Name != "Devilmon" && !m.Name.Contains("Angelmon")).ToList();
+			unlocked = unlocked.Except(trashOnes).ToList();
+
 			var pairs = new Dictionary<Monster, List<Monster>>();
+			var rem = new List<Monster>();
 			foreach (var m in locked.OrderByDescending(m => bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority))
 			{
 				pairs.Add(m, new List<Monster>());
@@ -95,6 +100,7 @@ namespace RuneApp.InternalServer
 					if (um == null)
 						break;
 					pairs[m].Add(um);
+					rem.Add(um);
 					unlocked.Remove(um);
 				}
 				for (; i > 0; i--)
@@ -110,6 +116,14 @@ namespace RuneApp.InternalServer
 					}
 				}
 			}
+
+			mm = mm.Except(bb.Select(b => b.mon));
+			mm = mm.Except(Program.builds.Select(b => b.mon));
+			mm = mm.Except(pairs.SelectMany(p => p.Value));
+			mm = mm.Except(rem);
+
+			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && m.Name != "Devilmon" && !m.Name.Contains("Angelmon"))).ToList();
+			mm = mm.Except(trashOnes);
 
 			mm = mm.OrderByDescending(m => !unlocked.Contains(m))
 				.ThenByDescending(m => m.Locked)
@@ -137,13 +151,8 @@ namespace RuneApp.InternalServer
 			}
 			));
 
-			Console.WriteLine(mm.Count());
-			mm = mm.Except(bb.Select(b => b.mon));
-			Console.WriteLine(mm.Count());
-			mm = mm.Except(Program.builds.Select(b => b.mon));
-			Console.WriteLine(mm.Count());
-			mm = mm.Except(pairs.SelectMany(p => p.Value));
-			Console.WriteLine(mm.Count());
+			
+			
 			list.contentList.AddRange(mm.Select(m =>
 			{
 				var nl = new ServedResult("ul");
@@ -156,14 +165,81 @@ namespace RuneApp.InternalServer
 					("TRASH: " + m.Name + " " + m._class + "* " + m.level ) :
 					("mon " + m.Name + " " + m._class + " " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
 				};
-				if (!unlocked.Contains(m))
+				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
 					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
 			}));
 
+			var food = trashOnes.Select(m => new Food() { mon = m, fakeLevel = m._class }).ToList();
+			food = makeFood(2, food);
+			food = makeFood(3, food);
+			food = makeFood(4, food);
+
+			list.contentList.AddRange(food.Select(f => recurseFood(f)).ToList());
+
 			return list;
+		}
+
+		static ServedResult recurseFood(Food f)
+		{
+			ServedResult sr = new ServedResult("li");
+			sr.contentList.Add(f.mon.Name + " " + f.mon._class + "* > " + f.fakeLevel + "*");
+			if (f.food.Any())
+			{
+				var rr = new ServedResult("ul");
+				foreach (var o in f.food)
+				{
+					rr.contentList.Add(recurseFood(o));
+				}
+				sr.contentList.Add(rr);
+			}
+			return sr;
+		}
+
+		static List<Food> makeFood(int lev, List<Food> food)
+		{
+			var outFood = new List<Food>();
+			Food current = null;
+			while (food.Any(f => f.fakeLevel == lev - 1))
+			{
+				if (current == null)
+				{
+					if (food.Count(f => f.fakeLevel == lev - 1) <= lev - 1)
+						break;
+					current = food.OrderByDescending(f => f.mon.level).FirstOrDefault(f => f.fakeLevel == lev - 1);
+					if (current == null)
+						break;
+					food.Remove(current);
+					outFood.Add(current);
+					current.fakeLevel = lev;
+				}
+				else
+				{
+					var tfood = food.OrderBy(f => f.mon.level).FirstOrDefault(f => f.fakeLevel == lev - 1);
+					if (tfood == null)
+						break;
+					if (current.food.Count(f => f.fakeLevel == lev - 1) >= lev - 1)
+					{
+						current = null;
+					}
+					else
+					{
+						current.food.Add(tfood);
+						food.Remove(tfood);
+					}
+				}
+			}
+
+			return outFood.Concat(food).ToList();
+		}
+
+		class Food
+		{
+			public Monster mon;
+			public List<Food> food = new List<Food>();
+			public int fakeLevel;
 		}
 
 		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs)
