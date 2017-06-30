@@ -61,15 +61,6 @@ namespace RuneApp.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to data/basestats.json.
-        /// </summary>
-        internal static string BaseStatsJSON {
-            get {
-                return ResourceManager.GetString("BaseStatsJSON", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to data/templates.json.
         /// </summary>
         internal static string TemplatesJSON {

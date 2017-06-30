@@ -42,7 +42,27 @@ namespace RuneOptim
 		public StatReference AwakenRef;
 
 		[JsonIgnore]
-		public static List<MonsterStat> monStats;
+		private static List<MonsterStat> monStats = null;
+
+		[JsonIgnore]
+		public static List<MonsterStat> MonStats
+		{
+			get
+			{
+				if (File.Exists(global::RuneOptim.Properties.Resources.BaseStatsJSON))
+					monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(File.ReadAllText(global::RuneOptim.Properties.Resources.BaseStatsJSON));
+				return monStats;
+			}
+		}
+
+		public static int BaseStars(string familyName)
+		{
+			var m = MonStats.FirstOrDefault(ms => ms.name == familyName);
+			if (m != null)
+				return m.grade;
+			// TODO: lookup?
+			return 4; // close enough
+		}
 
 		public static StatReference FindMon(Monster mon)
 		{
@@ -51,7 +71,7 @@ namespace RuneOptim
 
 		public static StatReference FindMon(string name)
 		{
-			if (monStats == null)
+			if (MonStats == null)
 				return null;
 
 			int bracketInd = name.IndexOf('(');
@@ -65,9 +85,9 @@ namespace RuneOptim
 
 			RuneLog.Info("searching for \"" + name + "\"");
 			if (element == "")
-				return monStats.FirstOrDefault(m => m.name == name);
+				return MonStats.FirstOrDefault(m => m.name == name);
 			else
-				return monStats.FirstOrDefault(m => m.name == name && m.element.ToString() == element);
+				return MonStats.FirstOrDefault(m => m.name == name && m.element.ToString() == element);
 		}
 
 		public static MonsterStat Download(StatReference refer)

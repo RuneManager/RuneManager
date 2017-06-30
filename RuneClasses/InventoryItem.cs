@@ -84,6 +84,24 @@ namespace RuneOptim
 		[JsonProperty("item_quantity")]
 		public long Quantity;
 
+		public static int PiecesRequired(int stars)
+		{
+			switch (stars)
+			{
+				case 1:
+					return 10;
+				case 2:
+					return 20;
+				case 3:
+					return 40;
+				case 4:
+					return 50;
+				case 5:
+					return 100;
+			}
+			return 50;
+		}
+
 		public string Name
 		{
 			get
@@ -98,7 +116,7 @@ namespace RuneOptim
 						if (Id > 10000)
 						{
 							if (Save.MonIdNames.ContainsKey(Id / 100))
-								return Save.MonIdNames[Id / 100] + " " + (Element)(Id % 10);
+								return (Element)(Id % 10) + " " + Save.MonIdNames[Id / 100] + " ";
 							return "Missingno " + Id;
 						}
 						break;

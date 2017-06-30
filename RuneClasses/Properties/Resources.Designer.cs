@@ -61,6 +61,15 @@ namespace RuneOptim.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to data/basestats.json.
+        /// </summary>
+        internal static string BaseStatsJSON {
+            get {
+                return ResourceManager.GetString("BaseStatsJSON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to data/monsters.json.
         /// </summary>
         internal static string MonstersJSON {

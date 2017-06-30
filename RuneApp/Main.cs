@@ -47,7 +47,7 @@ namespace RuneApp
 		//public static Configuration config {  get { return Program.config; } }
 		public static log4net.ILog Log { get { return Program.log; } }
 
-		public Main()
+		public Main()	
 		{
 			InitializeComponent();
 			Log.Info("Initialized Main");
@@ -221,12 +221,6 @@ namespace RuneApp
 					}
 				} while (loadResult != LoadSaveResult.Success) ;
 
-				loadResult = Program.LoadMonStats();
-				if (loadResult != LoadSaveResult.Success)
-				{
-					// TODO: pulling from SWarFarm API might be sad
-					MessageBox.Show("Error loading base monsters stats.\r\nThings could go bad.", "Base Monster Stats");
-				}
 				loadResult = 0;
 				do
 				{
