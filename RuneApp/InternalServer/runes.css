@@ -41,3 +41,7 @@
 .rune-monster-name {
 	text-align: right;
 }
+.star {
+	position: relative;
+	height: 0.7em;
+}

@@ -126,6 +126,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InternalServer.resx</DependentUpon>
     </Compile>
+    <Compile Include="InternalServer\PageRenderers\ApiRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\CssRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\MonstersRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\RiftRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\RuneRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\ScriptRenderer.cs" />
     <Compile Include="InternalServer\ServerExtensions.cs" />
     <Compile Include="InternalServer\Swagger\Swagger.Designer.cs">
       <AutoGen>True</AutoGen>
