@@ -34,6 +34,7 @@
 			this.ColMonName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ColMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.ColMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.ColMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -153,12 +154,12 @@
 			this.tsBtnBuildsResume = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnFindSpeed = new System.Windows.Forms.ToolStripButton();
 			this.buildList = new System.Windows.Forms.ListView();
-			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHProgress = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHMID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.buildCHTeams = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.splitContainer2 = new System.Windows.Forms.SplitContainer();
 			this.useRunesCheck = new System.Windows.Forms.CheckBox();
@@ -176,7 +177,6 @@
 			this.fileBox = new System.Windows.Forms.GroupBox();
 			this.btnRefreshSave = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
-			this.ColMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -244,6 +244,11 @@
 			this.ColMonPriority.DisplayIndex = 0;
 			this.ColMonPriority.Text = "Priority";
 			this.ColMonPriority.Width = 40;
+			// 
+			// ColMonID
+			// 
+			this.ColMonID.Text = "ID";
+			this.ColMonID.Width = 0;
 			// 
 			// statusStrip1
 			// 
@@ -1450,12 +1455,12 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.buildList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader3,
-            this.columnHeader2,
-            this.columnHeader1,
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6});
+            this.buildCHPriority,
+            this.buildCHID,
+            this.buildCHName,
+            this.buildCHProgress,
+            this.buildCHMID,
+            this.buildCHTeams});
 			this.buildList.FullRowSelect = true;
 			this.buildList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
 			this.buildList.Location = new System.Drawing.Point(4, 37);
@@ -1465,41 +1470,42 @@
 			this.buildList.TabIndex = 12;
 			this.buildList.UseCompatibleStateImageBehavior = false;
 			this.buildList.View = System.Windows.Forms.View.Details;
+			this.buildList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.buildList_ColumnWidthChanging);
 			this.buildList.DoubleClick += new System.EventHandler(this.listView5_DoubleClick);
 			this.buildList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.buildList_MouseClick);
 			// 
-			// columnHeader3
+			// buildCHPriority
 			// 
-			this.columnHeader3.Text = "Priority";
-			this.columnHeader3.Width = 40;
+			this.buildCHPriority.Text = "Priority";
+			this.buildCHPriority.Width = 40;
 			// 
-			// columnHeader2
+			// buildCHID
 			// 
-			this.columnHeader2.Text = "ID";
-			this.columnHeader2.Width = 0;
+			this.buildCHID.Text = "ID";
+			this.buildCHID.Width = 0;
 			// 
-			// columnHeader1
+			// buildCHName
 			// 
-			this.columnHeader1.DisplayIndex = 3;
-			this.columnHeader1.Text = "Name";
-			this.columnHeader1.Width = 80;
+			this.buildCHName.DisplayIndex = 3;
+			this.buildCHName.Text = "Name";
+			this.buildCHName.Width = 80;
 			// 
-			// columnHeader4
+			// buildCHProgress
 			// 
-			this.columnHeader4.DisplayIndex = 4;
-			this.columnHeader4.Text = "Progress";
-			this.columnHeader4.Width = 80;
+			this.buildCHProgress.DisplayIndex = 4;
+			this.buildCHProgress.Text = "Progress";
+			this.buildCHProgress.Width = 80;
 			// 
-			// columnHeader5
+			// buildCHMID
 			// 
-			this.columnHeader5.DisplayIndex = 2;
-			this.columnHeader5.Text = "MID";
-			this.columnHeader5.Width = 0;
+			this.buildCHMID.DisplayIndex = 2;
+			this.buildCHMID.Text = "MID";
+			this.buildCHMID.Width = 0;
 			// 
-			// columnHeader6
+			// buildCHTeams
 			// 
-			this.columnHeader6.Text = "Teams";
-			this.columnHeader6.Width = 80;
+			this.buildCHTeams.Text = "Teams";
+			this.buildCHTeams.Width = 80;
 			// 
 			// splitContainer1
 			// 
@@ -1698,11 +1704,6 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "A change has been made to your save.";
 			// 
-			// ColMonID
-			// 
-			this.ColMonID.Text = "ID";
-			this.ColMonID.Width = 0;
-			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1852,10 +1853,10 @@
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsMoveUp;
         private System.Windows.Forms.ListView buildList;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader buildCHName;
+        private System.Windows.Forms.ColumnHeader buildCHID;
+        private System.Windows.Forms.ColumnHeader buildCHPriority;
+        private System.Windows.Forms.ColumnHeader buildCHProgress;
 		private System.Windows.Forms.SplitContainer splitContainer1;
 		private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.ToolStripMenuItem loadToolStripMenuItem;
@@ -1896,7 +1897,7 @@
         private System.Windows.Forms.ToolStripButton tsBtnLoadsLock;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsResume;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsRunUpTo;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.ColumnHeader buildCHMID;
         private System.Windows.Forms.ToolStripMenuItem attackToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem healthToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem defenseToolStripMenuItem;
@@ -1909,7 +1910,7 @@
         private System.Windows.Forms.ToolStripButton tsBtnRuneStats;
         private System.Windows.Forms.ContextMenuStrip menu_buildlist;
         private System.Windows.Forms.ToolStripMenuItem teamToolStripMenuItem;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
+        private System.Windows.Forms.ColumnHeader buildCHTeams;
         private System.Windows.Forms.ToolStripButton tsBtnLoadsSave;
         private System.Windows.Forms.ToolStripButton tsBtnLoadsLoad;
         private RuneBox runeEquipped;

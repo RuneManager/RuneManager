@@ -272,6 +272,10 @@ namespace RuneApp
 
 			buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
+			#region DoubleBuffered
+			this.SetDoubleBuffered();
+			buildList.SetDoubleBuffered();
+			#endregion
 
 			foreach (ToolStripItem ii in menu_buildlist.Items)
 			{
@@ -361,7 +365,7 @@ namespace RuneApp
 							l.runesNew = 0;
 							l.runesChanged = 0;
 
-							foreach (var r in l.Runes)
+							foreach (var r in l.Runes.Where(r => r != null))
 							{
 								if (r.AssignedId != b.mon.Id)
 								{
@@ -419,8 +423,7 @@ namespace RuneApp
 
 					foreach (var b in e.NewItems.Cast<Build>())
 					{
-						var teamstr = (b.Teams == null || b.Teams.Count == 0) ? "" : (b.Teams.Count > 2 ? b.Teams.Count.ToString() : b.Teams[0] + (b.Teams.Count == 2 ? ", " + b.Teams[1] : ""));
-						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon?.Name ?? b.MonName, "", (b.mon?.Id ?? b.MonId).ToString(), teamstr });
+						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon?.Name ?? b.MonName, "", (b.mon?.Id ?? b.MonId).ToString(), getTeamStr(b) });
 						li.Tag = b;
 						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
 						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
@@ -437,6 +440,28 @@ namespace RuneApp
 				default:
 					throw new NotImplementedException();
 			}
+		}
+
+		private string getTeamStr(Build b)
+		{
+			if (b.Teams == null || b.Teams.Count == 0)
+				return "";
+
+			var sz = buildCHTeams.Width;
+			var str = "";
+			for (int i = 0; i < b.Teams.Count; i++)
+			{
+				str = string.Join(", ", b.Teams.Take(i));
+				if (!string.IsNullOrWhiteSpace(str))
+					str += ", ";
+				str += (b.Teams.Count - i).ToString();
+				var tstr = string.Join(", ", b.Teams.Take(i+1));
+				if (this.CreateGraphics().MeasureString(tstr + "...", buildList.Font).Width > sz - 10)
+					break;
+				str = tstr;
+			}
+
+			return str;
 		}
 
 		private void tsTeamAdd(ToolStripMenuItem parent, string item)
@@ -488,12 +513,11 @@ namespace RuneApp
 					teamBuild.Teams.Remove(tsmi.Text);
 				}
 			}
-			var teamstr = (teamBuild.Teams == null || teamBuild.Teams.Count == 0) ? "" : (teamBuild.Teams.Count > 2 ? teamBuild.Teams.Count.ToString() : teamBuild.Teams[0] + (teamBuild.Teams.Count == 2 ? ", " + teamBuild.Teams[1] : ""));
-			var bli = buildList.Items.Cast<ListViewItem>().Where(it => it.Tag == teamBuild).FirstOrDefault();
+			var bli = buildList.Items.Cast<ListViewItem>().FirstOrDefault(it => it.Tag == teamBuild);
 			if (bli != null)
 			{
 				while (bli.SubItems.Count < 6) bli.SubItems.Add("");
-				bli.SubItems[5].Text = teamstr;
+				bli.SubItems[5].Text = getTeamStr(teamBuild);
 			}
 			menu_buildlist.Close();
 		}
@@ -1618,6 +1642,18 @@ namespace RuneApp
 		private void btnRefreshSave_Click(object sender, EventArgs e)
 		{
 			Program.LoadSave(Program.Settings.SaveLocation);
+		}
+
+		private void buildList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e)
+		{
+			if (e.ColumnIndex == buildCHTeams.Index)
+			{
+				foreach (var lvi in buildList.Items.Cast<ListViewItem>())
+				{
+					if (lvi.SubItems.Count > buildCHTeams.Index)
+						lvi.SubItems[buildCHTeams.Index].Text = getTeamStr(lvi.Tag as Build);
+				}
+			}
 		}
 	}
 

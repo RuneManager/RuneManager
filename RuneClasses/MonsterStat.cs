@@ -49,7 +49,7 @@ namespace RuneOptim
 		{
 			get
 			{
-				if (File.Exists(global::RuneOptim.Properties.Resources.BaseStatsJSON))
+				if (monStats == null && File.Exists(global::RuneOptim.Properties.Resources.BaseStatsJSON))
 					monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(File.ReadAllText(global::RuneOptim.Properties.Resources.BaseStatsJSON));
 				return monStats;
 			}

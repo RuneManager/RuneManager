@@ -137,7 +137,7 @@ namespace RuneApp
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 					foreach (var l in e.OldItems.Cast<Loadout>())
 					{
-						foreach (Rune r in l.Runes)
+						foreach (Rune r in l.Runes.Where(r => r != null))
 						{
 							r.Locked = false;
 						}

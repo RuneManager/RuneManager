@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -65,6 +66,8 @@ namespace RuneApp.InternalServer
 			// return all completed loads on top, in progress build, unrun builds, mons with no builds
 			ServedResult list = new ServedResult("ul");
 			list.contentList = new List<ServedResult>();
+			if (Program.data == null)
+				return "no";
 
 			var pieces = Program.data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces)
 				.Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => p.Id);
@@ -77,7 +80,14 @@ namespace RuneApp.InternalServer
 			var ll = Program.loads;
 			var ldic = ll.ToDictionary(l => l.BuildID);
 
-			var bb = Program.builds.Where(b => !ldic.ContainsKey(b.ID));
+			var bq = Program.builds.Where(b => !ldic.ContainsKey(b.ID));
+			var bb = new List<Build>();
+			foreach (var b in bq)
+			{
+				if (!bb.Any(u => u.MonId == b.MonId))
+					bb.Add(b);
+			}
+
 			var bdic = bb.ToDictionary(b => b.MonId);
 
 			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id));
@@ -121,7 +131,7 @@ namespace RuneApp.InternalServer
 			mm = mm.Except(Program.builds.Select(b => b.mon));
 			mm = mm.Except(pairs.SelectMany(p => p.Value));
 			mm = mm.Except(rem);
-
+			
 			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && m.Name != "Devilmon" && !m.Name.Contains("Angelmon"))).ToList();
 			mm = mm.Except(trashOnes);
 
@@ -135,6 +145,7 @@ namespace RuneApp.InternalServer
 				;
 
 			list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
+
 			list.contentList.AddRange(bb.Select(b =>
 			{
 				var m = b.mon;
@@ -151,8 +162,6 @@ namespace RuneApp.InternalServer
 			}
 			));
 
-			
-			
 			list.contentList.AddRange(mm.Select(m =>
 			{
 				var nl = new ServedResult("ul");
@@ -163,7 +172,7 @@ namespace RuneApp.InternalServer
 				{
 					contentList = { ((unlocked.Contains(m)) ?
 					("TRASH: " + m.Name + " " + m._class + "* " + m.level ) :
-					("mon " + m.Name + " " + m._class + " " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
+					("mon " + m.Name + " " + m._class + "* " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
 				};
 				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
 					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
@@ -185,7 +194,8 @@ namespace RuneApp.InternalServer
 		static ServedResult recurseFood(Food f)
 		{
 			ServedResult sr = new ServedResult("li");
-			sr.contentList.Add(f.mon.Name + " " + f.mon._class + "* > " + f.fakeLevel + "*");
+			
+			sr.contentList.Add(f.mon.Name + " " + f.mon._class + "*" + (f.mon._class != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
 			if (f.food.Any())
 			{
 				var rr = new ServedResult("ul");
