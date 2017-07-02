@@ -28,7 +28,7 @@ namespace RuneApp.InternalServer
 	public partial class Master : PageRenderer
 	{
 #if !TEST_SLAVE
-		public log4net.ILog Log { get { return Program.log; } }
+		public static log4net.ILog Log { get { return Program.log; } }
 #else
 		public Logger Log { get { return Program.log; } }
 #endif
@@ -108,11 +108,13 @@ namespace RuneApp.InternalServer
 
 		public async void RemoteManageLoop(HttpListenerContext context)
 		{
+			Log.Debug("serving: " + context.Request.RawUrl);
 			var req = context.Request;
 			var resp = context.Response;
 
 			var msg = getResponse(req);
 			resp.StatusCode = (int)msg.StatusCode;
+			Log.Debug("returning: " + resp.StatusCode);
 			foreach (var h in msg.Headers)
 			{
 				foreach (var v in h.Value)
@@ -216,7 +218,7 @@ namespace RuneApp.InternalServer
 			locList.RemoveAll(a => a == "");
 
 			msg.StatusCode = HttpStatusCode.OK;
-
+			Log.Debug("rendering response...");
 			return this.Render(req, locList.ToArray());
 
 			//<html><head><script src='/script.js'></script></head><body><button id='button1' style='width:50px' onclick='javascript:startProgress();'>Start</button></body></html>

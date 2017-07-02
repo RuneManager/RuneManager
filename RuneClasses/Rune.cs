@@ -225,7 +225,7 @@ namespace RuneOptim
 
 		// Number of sets
 		public static readonly int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
-
+		
 		// Number of runes required for set to be complete
 		public static int SetRequired(RuneSet set)
 		{

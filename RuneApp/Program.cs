@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -22,7 +23,23 @@ namespace RuneApp
 		EmptyFile = 0,
 		Success = 1,
 	}
-	
+
+	class progLogger : TextWriter
+	{
+		public override Encoding Encoding
+		{
+			get
+			{
+				return Encoding.Default;
+			}
+		}
+
+		public override void WriteLine(string value)
+		{
+			Program.log.Debug(value);
+		}
+	}
+
 	public static class Program
 	{
 		public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -100,6 +117,8 @@ namespace RuneApp
 				master.Start();
 			if (Program.Settings.WatchSave)
 				watchSave();
+
+			RuneLog.logTo = new progLogger();
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);

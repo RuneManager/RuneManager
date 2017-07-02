@@ -43,7 +43,7 @@ namespace RuneOptim
 		
 		[JsonIgnore]
 		public bool SetsFull { get { return setsFull; } }
-
+		
 		public double Time;
 		
 		[JsonIgnore]
@@ -377,7 +377,7 @@ namespace RuneOptim
 
 			if (runes[rune.Slot - 1] == null)
 				runeCount++;
-
+			
 			runes[rune.Slot - 1] = rune;
 			if (runeCount % checkOn == 0)
 				CheckSets();
@@ -537,12 +537,12 @@ namespace RuneOptim
 			}*/
 			
 			Stats value = new Stats(baseStats);
-			
+
 			// Apply percent before flat
-			value.Health += (int)Math.Ceiling(baseStats.Health * HealthPercent / 100.0) + HealthFlat;
-			value.Attack += (int)Math.Ceiling(baseStats.Attack * AttackPercent / 100.0) + AttackFlat;
-			value.Defense += (int)Math.Ceiling(baseStats.Defense * DefensePercent / 100.0) + DefenseFlat;
-			value.Speed += (int)Math.Ceiling(baseStats.Speed * SpeedPercent / 100.0) + Speed;
+			value.Health += (int)Math.Ceiling(baseStats.Health * HealthPercent * 0.01) + HealthFlat;
+			value.Attack += (int)Math.Ceiling(baseStats.Attack * AttackPercent * 0.01) + AttackFlat;
+			value.Defense += (int)Math.Ceiling(baseStats.Defense * DefensePercent * 0.01) + DefenseFlat;
+			value.Speed += (int)Math.Ceiling(baseStats.Speed * SpeedPercent * 0.01) + Speed;
 
 			value.CritDamage += CritDamage;
 			value.CritRate += CritRate;

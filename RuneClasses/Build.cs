@@ -1636,12 +1636,11 @@ namespace RuneOptim
 			if (!autoRuneSelect)
 			{
 				// TODO: Remove
-				var tmp = Console.Out;
-				using (var fs = new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create))
-				using (var sw = new System.IO.StreamWriter(fs))
+				//var tmp = RuneLog.logTo;
+				//using (var fs = new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create))
+				//using (var sw = new System.IO.StreamWriter(fs))
 				{
-					//Console.SetOut(sw);
-					RuneLog.logTo = sw;
+					//RuneLog.logTo = sw;
 					// Filter each runeslot
 					for (int i = 0; i < 6; i++)
 					{
@@ -1661,8 +1660,7 @@ namespace RuneOptim
 							}
 						}
 					}
-					RuneLog.logTo = tmp;
-					//Console.SetOut(tmp);
+					//RuneLog.logTo = tmp;
 				}
 			}
 		}

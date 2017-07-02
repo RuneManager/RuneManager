@@ -64,7 +64,7 @@ namespace RuneOptim
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
 			LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
 		}
-
+		
 		private void LockedUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -195,6 +195,7 @@ namespace RuneOptim
 
 		public Monster GetMonster(ulong id)
 		{
+			RuneLog.Debug("GetMonster " + id);
 			return Monsters.FirstOrDefault(m => m.Id == id);
 		}
 	}

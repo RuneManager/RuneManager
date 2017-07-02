@@ -23,10 +23,15 @@ namespace RuneApp.InternalServer
 				if (resp != null)
 					return resp;
 
+				Master.Log.Debug("getting best clear");
 				var best = Directory.GetFiles(Environment.CurrentDirectory, "GetBestClearRiftDungeon*.resp.json").OrderByDescending(s => s);
 				if (best.Any())
 				{
 					var bestRift = JsonConvert.DeserializeObject<RunePlugin.Response.GetBestClearRiftDungeonResponse>(File.ReadAllText(best.First()), new SWResponseConverter());
+					Master.Log.Debug("deserialised " + bestRift.BestDeckRiftDungeons.Count() + " best teams");
+
+					Master.Log.Debug("can do name " + RuneOptim.Save.MonIdNames.FirstOrDefault());
+					Master.Log.Debug("can do mon " + Program.data.Monsters.FirstOrDefault());
 					var sr = new List<ServedResult>();
 					foreach (var br in bestRift.BestDeckRiftDungeons)
 					{
@@ -42,12 +47,20 @@ namespace RuneApp.InternalServer
 							else
 								table += "<td>";
 							var mp = br.Monsters.FirstOrDefault(p => p.Position == i);
+							Master.Log.Debug("retrieving " + i + " mon " + mp?.MonsterId);
 							if (mp != null)
 							{
 								var mon = Program.data.GetMonster((ulong)mp.MonsterId);
+								Master.Log.Debug("mon " + mon?.Name);
 								if (mon == null)
 								{
-									table += RunePlugin.SWPlugin.MonsterName((long)mp.MonsterId) + "";
+									var name = mp.MonsterTypeId.ToString();
+									if (RuneOptim.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
+										name = RuneOptim.Save.MonIdNames[(int)mp.MonsterTypeId];
+									else
+										name = RuneOptim.Save.MonIdNames[(int)(mp.MonsterTypeId/100)];
+
+									table += name;
 								}
 								else
 								{
@@ -66,12 +79,20 @@ namespace RuneApp.InternalServer
 							else
 								table += "<td>";
 							var mp = br.Monsters.FirstOrDefault(p => p.Position == i);
+							Master.Log.Debug("retrieving " + i + " mon " + mp?.MonsterId);
 							if (mp != null)
 							{
 								var mon = Program.data.GetMonster((ulong)mp.MonsterId);
+								Master.Log.Debug("mon " + mon?.Name);
 								if (mon == null)
 								{
-									table += RunePlugin.SWPlugin.MonsterName((long)mp.MonsterId) + "";
+									var name = mp.MonsterTypeId.ToString();
+									if (RuneOptim.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
+										name = RuneOptim.Save.MonIdNames[(int)mp.MonsterTypeId];
+									else
+										name = RuneOptim.Save.MonIdNames[(int)(mp.MonsterTypeId / 100)];
+
+									table += name;
 								}
 								else
 								{

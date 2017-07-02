@@ -15,6 +15,7 @@ namespace RuneApp.InternalServer
 
 		protected virtual HttpResponseMessage Recurse(HttpListenerRequest req, string[] uri)
 		{
+			Master.Log.Debug("recursing " + uri.Length + " " + uri.FirstOrDefault());
 			if (uri.Length == 0)
 				return null;
 

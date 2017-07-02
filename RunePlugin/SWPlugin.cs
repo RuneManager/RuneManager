@@ -83,7 +83,6 @@ namespace RunePlugin
 				name = attr.Value;
 			}
 
-			//var name = Enum.GetName(typeof(RuneOptim.Element), id); ;
 			if (name.Length > 3)
 				return name;
 			return $"???[{id}]";
@@ -174,34 +173,44 @@ namespace RunePlugin
 
 		public static string MonsterName(long uid, string default_unknown = "???", bool full = true)
 		{
-			string suid = uid.ToString().PadRight(5, '0');
-			if (default_unknown == "???")
-				default_unknown += $"[{suid.Substring(0, suid.Length - 2)}]";
-
-			if (SWReference.MonsterNameMap.ContainsKey(suid) && SWReference.MonsterNameMap[suid].Length > 0)
+			try
 			{
-				return SWReference.MonsterNameMap[suid];
+				string suid = uid.ToString().PadRight(5, '0');
+				if (default_unknown == "???")
+					default_unknown += $"[{suid.Substring(0, suid.Length - 2)}]";
+
+				if (SWReference.MonsterNameMap == null)
+					return "MonsterNameMap is null";
+
+				if (SWReference.MonsterNameMap.ContainsKey(suid) && SWReference.MonsterNameMap[suid].Length > 0)
+				{
+					return SWReference.MonsterNameMap[suid];
+				}
+
+				var awakened = int.Parse(suid.Substring(3, 1)) > 0;
+				string name = default_unknown;
+
+				if (SWReference.MonsterNameMap.ContainsKey(suid.Substring(0, 3)) && SWReference.MonsterNameMap[suid.Substring(0, 3)].Length > 0)
+				{
+					name = SWReference.MonsterNameMap[suid.Substring(0, 3)];
+				}
+
+				if (full)
+				{
+					var attribute = int.Parse(suid.Substring(4));
+					return $"{(awakened ? "AWAKENED" : "")}{name} ({MonsterAttribute(attribute)})";
+				}
+				else if (!awakened)
+				{
+					return name;
+				}
+
+				return default_unknown;
 			}
-
-			var awakened = int.Parse(suid.Substring(3,1)) > 0;
-			string name = default_unknown;
-
-			if (SWReference.MonsterNameMap.ContainsKey(suid.Substring(0, 3)) && SWReference.MonsterNameMap[suid.Substring(0,3)].Length > 0)
+			catch (Exception e)
 			{
-				name = SWReference.MonsterNameMap[suid.Substring(0, 3)];
+				return uid + " failed with " + e.GetType();
 			}
-
-			if (full)
-			{
-				var attribute = int.Parse(suid.Substring(4));
-				return $"{(awakened?"AWAKENED":"")}{name} ({MonsterAttribute(attribute)})";
-			}
-			else if (!awakened)
-			{
-				return name;
-			}
-
-			return default_unknown;
 		}
 	}
 }
