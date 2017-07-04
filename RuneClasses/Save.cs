@@ -185,6 +185,8 @@ namespace RuneOptim
 
 		private Monster getMonster(string name, int num)
 		{
+			if (!System.Diagnostics.Debugger.IsAttached)
+				RuneLog.Debug("GetMonster " + num + "th " + name + " from " + Monsters.Count);
 			Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.Name == name);
 			if (mon == null)
 				mon = Monsters.FirstOrDefault(m => m.Name == name);
@@ -195,7 +197,8 @@ namespace RuneOptim
 
 		public Monster GetMonster(ulong id)
 		{
-			RuneLog.Debug("GetMonster " + id);
+			if (!System.Diagnostics.Debugger.IsAttached)
+				RuneLog.Debug("GetMonster " + id + " from " + Monsters.Count);
 			return Monsters.FirstOrDefault(m => m.Id == id);
 		}
 	}

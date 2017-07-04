@@ -181,6 +181,8 @@ namespace RuneApp
 							// for each build, find the build in the buildlist with the same mon name?
 							//var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
 							// if there is a build with this monname, maybe I have 2 mons with that name?!
+							if (!System.Diagnostics.Debugger.IsAttached)
+								Program.log.Debug("finding " + b.MonId);
 							if (Program.data.GetMonster(b.MonId) != null)
 							{
 								b.mon = Program.data.GetMonster(b.MonId);

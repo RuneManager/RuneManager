@@ -73,25 +73,39 @@ namespace RuneApp
 
 			localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
 
+			bool isLocal = false;
+
 			if (localFiles.Any())
 			{
 				radSwarfarm.Enabled = true;
 				cboxSwarfarm.Items.AddRange(localFiles.Select(s => s.Replace(Environment.CurrentDirectory + "\\", "")).ToArray());
 				cboxSwarfarm.SelectedIndex = 0;
 				cboxSwarfarm.Enabled = true;
+				if (cboxSwarfarm.Items.Contains(Program.Settings.SaveLocation))
+				{
+					isLocal = true;
+					cboxSwarfarm.SelectedIndex = cboxSwarfarm.Items.IndexOf(Program.Settings.SaveLocation);
+				}
 			}
 
-			LookupFile = Program.Settings.SaveLocation;
+			if (!isLocal)
+				LookupFile = Program.Settings.SaveLocation;
 		}
 
 		private void btnOpen_Click(object sender, EventArgs e)
 		{
 			if (!string.IsNullOrWhiteSpace(file))
 			{
-				Program.WatchSave = (MessageBox.Show("Watch file for live updates?", "Load Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ;
+				//Program.WatchSave = (MessageBox.Show("Watch file for live updates?", "Load Save", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes) ;
 
 				if (radLookup.Checked && !string.IsNullOrWhiteSpace(lookupFile))
-					Program.Settings.SaveLocation = lookupFile;
+					Filename = lookupFile;
+				else if (radSwarfarm.Checked && !string.IsNullOrWhiteSpace(swarfarmFile))
+					Filename = swarfarmFile;
+				else if (radSave.Checked)
+					Filename = "save.json";
+
+				Program.Settings.SaveLocation = Filename;
 				Program.Settings.Save();
 
 				DialogResult = DialogResult.OK;
@@ -122,7 +136,14 @@ namespace RuneApp
 		private void cboxSwarfarm_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			// do things
-			swarfarmFile = cboxSwarfarm.SelectedItem.ToString();
+			if (cboxSwarfarm.SelectedIndex == -1)
+			{
+				swarfarmFile = null;
+				radSwarfarm.Checked = false;
+				return;
+			}
+
+			swarfarmFile = cboxSwarfarm.Items[cboxSwarfarm.SelectedIndex].ToString();
 
 			radSwarfarm.Checked = true;
 		}

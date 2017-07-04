@@ -1401,9 +1401,11 @@ namespace RuneOptim
 				else if (and == 2)
 				{
 					slotTest = r => {
-						RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
+						if (!System.Diagnostics.Debugger.IsAttached)
+							RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
 						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
-						RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
+						if (!System.Diagnostics.Debugger.IsAttached)
+							RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
 						return vv >= testVal;
 					};
 				}

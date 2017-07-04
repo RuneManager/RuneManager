@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
@@ -38,27 +39,39 @@ namespace RuneOptim
 		public static System.IO.TextWriter logTo = Console.Out;
 		public static LogSeverity CurrentSeverity = LogSeverity.Any;
 
-		public static void Log(LogSeverity sev, string str)
+		public static void Log(LogSeverity sev, string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null)
 		{
 			if (sev.HasFlag(CurrentSeverity))
 			{
-				logTo.WriteLine(str);
+				logTo.WriteLine(System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str);
 			}
 		}
 
-		public static void Info(string str, LogSeverity sev = LogSeverity.Any)
+		public static void Info(string str, LogSeverity sev = LogSeverity.Any,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null)
 		{
-			Log(sev | LogSeverity.Info, str);
+			Log(sev | LogSeverity.Info, str, lineNumber, caller, filepath);
 		}
 
-		public static void Debug(string str, LogSeverity sev = LogSeverity.Any)
+		public static void Debug(string str, LogSeverity sev = LogSeverity.Any,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null)
 		{
-			Log(sev | LogSeverity.Debug, str);
+			Log(sev | LogSeverity.Debug, str, lineNumber, caller, filepath);
 		}
 
-		public static void Error(string str, LogSeverity sev = LogSeverity.Any)
+		public static void Error(string str, LogSeverity sev = LogSeverity.Any,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null)
 		{
-			Log(sev | LogSeverity.Error, str);
+			Log(sev | LogSeverity.Error, str, lineNumber, caller, filepath);
 		}
 	}
 

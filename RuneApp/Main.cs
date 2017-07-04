@@ -544,8 +544,6 @@ namespace RuneApp
 					try
 					{
 						loadres = Program.LoadSave(lsd.Filename);
-						Program.Settings.SaveLocation = lsd.Filename;
-						Program.Settings.Save();
 					}
 					catch (IOException ex)
 					{
@@ -970,9 +968,9 @@ namespace RuneApp
 
 		private void toolStripButton14_Click(object sender, EventArgs e)
 		{
-			if (File.Exists("save.json"))
+			if (File.Exists(Program.Settings.SaveLocation))
 			{
-				Program.LoadSave("save.json");
+				Program.LoadSave(Program.Settings.SaveLocation);
 				RegenLists();
 			}
 		}

@@ -104,9 +104,15 @@ namespace RuneApp
 			this.SetDoubleBuffered();
 			// when show, check we have stuff
 
-			build = bb;
+			if (bb == null)
+			{
+				MessageBox.Show("Build is null", "Create Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+				DialogResult = DialogResult.Cancel;
+				Close();
+				return;
+			}
 
-			Shown += Create_Shown;
+			build = bb;
 
 			// declare the truthyness of the groups and track them
 			setList.Groups[1].Tag = true;
@@ -146,12 +152,14 @@ namespace RuneApp
 			int colWidth = 50;
 			int rowHeight = 24;
 
-			string[] comb = Build.statNames.Concat(Build.extraNames).ToArray();
+			var comb = Build.statNames.Concat(Build.extraNames).ToArray();
 
 			int genX = 0;
 
 			int dlCheckX = 0;
 			int dlBtnX = 0;
+
+			Program.log.Debug("comb " + comb.Length  + " " + string.Join(",", comb));
 
 			#region Statbox
 			foreach (var stat in comb)
