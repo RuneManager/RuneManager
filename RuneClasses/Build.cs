@@ -724,7 +724,7 @@ namespace RuneOptim
 
 				loads.Clear();
 				mon.GetStats();
-				mon.DamageFormula(mon);
+				mon.DamageFormula?.Invoke(mon);
 
 				// set to running
 				IsRunning = true;

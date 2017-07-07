@@ -15,7 +15,22 @@ namespace RuneOptim
 	public class Monster : Stats
 	{
 		[JsonIgnore]
-		public string Name = "Missingno";
+		private string name = "Missingno";
+
+		[JsonIgnore]
+		public string Name
+		{
+			get
+			{
+				if (IsHomunculus)
+					return HomunculusName;
+				return name;
+			}
+			set
+			{
+				name = value;
+			}
+		}
 
 		[JsonProperty("unit_id")]
 		public ulong Id = 0;
@@ -87,6 +102,12 @@ namespace RuneOptim
 
 		[JsonIgnore]
 		public bool inStorage = false;
+
+		[JsonProperty("homunculus")]
+		public bool IsHomunculus = false;
+
+		[JsonProperty("homunculus_name")]
+		public string HomunculusName;
 
 		[JsonIgnore]
 		public int loadOrder = int.MaxValue;

@@ -31,10 +31,10 @@
 			this.components = new System.ComponentModel.Container();
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
 			this.dataMonsterList = new System.Windows.Forms.ListView();
-			this.ColMonName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ColMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ColMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.ColMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -211,10 +211,10 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataMonsterList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.ColMonName,
-            this.ColMonGrade,
-            this.ColMonPriority,
-            this.ColMonID});
+            this.colMonName,
+            this.colMonGrade,
+            this.colMonPriority,
+            this.colMonID});
 			this.dataMonsterList.FullRowSelect = true;
 			this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
 			this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
@@ -228,27 +228,27 @@
 			this.dataMonsterList.SelectedIndexChanged += new System.EventHandler(this.monstertab_list_select);
 			this.dataMonsterList.DoubleClick += new System.EventHandler(this.toolStripButton7_Click);
 			// 
-			// ColMonName
+			// colMonName
 			// 
-			this.ColMonName.DisplayIndex = 2;
-			this.ColMonName.Text = "Name";
-			this.ColMonName.Width = 130;
+			this.colMonName.DisplayIndex = 2;
+			this.colMonName.Text = "Name";
+			this.colMonName.Width = 130;
 			// 
-			// ColMonGrade
+			// colMonGrade
 			// 
-			this.ColMonGrade.Text = "★";
-			this.ColMonGrade.Width = 40;
+			this.colMonGrade.Text = "★";
+			this.colMonGrade.Width = 40;
 			// 
-			// ColMonPriority
+			// colMonPriority
 			// 
-			this.ColMonPriority.DisplayIndex = 0;
-			this.ColMonPriority.Text = "Priority";
-			this.ColMonPriority.Width = 40;
+			this.colMonPriority.DisplayIndex = 0;
+			this.colMonPriority.Text = "Priority";
+			this.colMonPriority.Width = 40;
 			// 
-			// ColMonID
+			// colMonID
 			// 
-			this.ColMonID.Text = "ID";
-			this.ColMonID.Width = 0;
+			this.colMonID.Text = "ID";
+			this.colMonID.Width = 0;
 			// 
 			// statusStrip1
 			// 
@@ -1776,9 +1776,9 @@
         #endregion
 
         private System.Windows.Forms.ListView dataMonsterList;
-        private System.Windows.Forms.ColumnHeader ColMonName;
-        private System.Windows.Forms.ColumnHeader ColMonGrade;
-        private System.Windows.Forms.ColumnHeader ColMonPriority;
+        private System.Windows.Forms.ColumnHeader colMonName;
+        private System.Windows.Forms.ColumnHeader colMonGrade;
+        private System.Windows.Forms.ColumnHeader colMonPriority;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.MenuStrip menuStrip1;
@@ -1921,7 +1921,7 @@
 		private System.Windows.Forms.GroupBox fileBox;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button btnRefreshSave;
-		private System.Windows.Forms.ColumnHeader ColMonID;
+		private System.Windows.Forms.ColumnHeader colMonID;
 	}
 }
 

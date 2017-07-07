@@ -1,5 +1,5 @@
-0.4.1.0
+0.4.2.0
 https://github.com/Skibisky/RuneManager/releases/latest
-Now uses swarfarm.json - backup your builds.
-More stable, lets you use it.
-Can run a server telling showing your runes.
+Build Wizard will suggest some numbers, preview some runes!
+Interal Webserver fun. Try localhost:7676 today!
+Track a save location, sometimes.

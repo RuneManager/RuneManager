@@ -64,8 +64,8 @@ namespace RuneApp
 			#region Sorter
 			var sorter = new ListViewSort();
 			dataMonsterList.ListViewItemSorter = sorter;
-			sorter.OnColumnClick(ColMonGrade.Index);
-			sorter.OnColumnClick(ColMonPriority.Index);
+			sorter.OnColumnClick(colMonGrade.Index);
+			sorter.OnColumnClick(colMonPriority.Index);
 			dataRuneList.ListViewItemSorter = new ListViewSort();
 
 			sorter = new ListViewSort();
@@ -616,7 +616,7 @@ namespace RuneApp
 				if (mon.priority == 0)
 				{
 					mon.priority = maxPri + 1;
-					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
+					dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
 				}
 				else if (mon.priority != 1)
 				{
@@ -626,10 +626,10 @@ namespace RuneApp
 					{
 						ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
 						mon2.priority += 1;
-						listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
+						listMon.SubItems[colMonPriority.Index].Text = mon2.priority.ToString();
 					}
 					mon.priority -= 1;
-					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
+					dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.priority).ToString();
 				}
 				dataMonsterList.Sort();
 			}
@@ -644,7 +644,7 @@ namespace RuneApp
 				if (mon.priority == 0)
 				{
 					mon.priority = maxPri + 1;
-					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (maxPri + 1).ToString();
+					dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
 				}
 				else if (mon.priority != maxPri)
 				{
@@ -655,10 +655,10 @@ namespace RuneApp
 						var items = dataMonsterList.Items;
 						ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.Name);
 						mon2.priority -= 1;
-						listMon.SubItems[ColMonPriority.Index].Text = mon2.priority.ToString();
+						listMon.SubItems[colMonPriority.Index].Text = mon2.priority.ToString();
 					}
 					mon.priority += 1;
-					dataMonsterList.FocusedItem.SubItems[ColMonPriority.Index].Text = (mon.priority).ToString();
+					dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.priority).ToString();
 				}
 				dataMonsterList.Sort();
 			}
@@ -1405,9 +1405,9 @@ namespace RuneApp
 			ColorMonsWithBuilds();
 
 			var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
-			mlvs.OrderBy(2, true);
-			mlvs.ThenBy(1, false);
 			mlvs.ShouldSort = true;
+			mlvs.OrderBy(colMonGrade.Index, false);
+			mlvs.ThenBy(colMonPriority.Index, true);
 			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
 
 			dataMonsterList.Sort();
