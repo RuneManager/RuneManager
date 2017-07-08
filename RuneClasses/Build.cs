@@ -1541,7 +1541,7 @@ namespace RuneOptim
 				// Only using 'inventory' or runes on mon
 				// also, include runes which have been unequipped (should only look above)
 				if (!RunesUseEquipped)
-					rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedName == mon.Name) || r.Swapped);
+					rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped);
 				// only if the rune isn't currently locked for another purpose
 				if (!RunesUseLocked)
 					rsGlobal = rsGlobal.Where(r => !r.Locked);

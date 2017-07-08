@@ -425,6 +425,8 @@ namespace RuneApp
 					{
 						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon?.Name ?? b.MonName, "", (b.mon?.Id ?? b.MonId).ToString(), getTeamStr(b) });
 						li.Tag = b;
+						if (b.runePrediction.Any(p => p.Value.Value))
+							li.ForeColor = Color.Purple;
 						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
 						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null)
@@ -841,8 +843,10 @@ namespace RuneApp
 						{
 							item.SubItems[2].Text = bb.mon.Name;
 							item.SubItems[4].Text = bb.mon.Id.ToString();
+							item.ForeColor = bb.runePrediction.Any(p => p.Value.Value) ? Color.Purple : Color.Black;
 							if (bb.mon != before)
 							{
+								// TODO: check tag?
 								var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.Name));
 								if (lv1li != null)
 									lv1li.ForeColor = before.inStorage ? Color.Gray : Color.Black;
