@@ -237,7 +237,7 @@
 			// colMonGrade
 			// 
 			this.colMonGrade.Text = "★";
-			this.colMonGrade.Width = 40;
+			this.colMonGrade.Width = 25;
 			// 
 			// colMonPriority
 			// 
@@ -1083,7 +1083,7 @@
 			// 
 			this.runesSet.DisplayIndex = 2;
 			this.runesSet.Text = "Set";
-			this.runesSet.Width = 100;
+			this.runesSet.Width = 55;
 			// 
 			// runesID
 			// 
@@ -1093,8 +1093,8 @@
 			// runesGrade
 			// 
 			this.runesGrade.DisplayIndex = 0;
-			this.runesGrade.Text = "Grade";
-			this.runesGrade.Width = 40;
+			this.runesGrade.Text = "★";
+			this.runesGrade.Width = 25;
 			// 
 			// runesMType
 			// 

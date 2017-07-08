@@ -276,7 +276,7 @@ namespace RuneService
 									}
 									catch (Exception ex)
 									{
-										Console.WriteLine($"Failed triggering plugins with exception: {ex.GetType().Name}");
+										Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
 										// TODO: log stacktrace?
 									}
 									trackedRequests.Remove(e.Id);
