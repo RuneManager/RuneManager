@@ -736,6 +736,10 @@ namespace RuneApp
 						var dmonsh = dmon.Current.Shrines;
 						dmon.Current.Leader = load.Leader;
 						dmon.Current.Shrines = load.Shrines;
+						var dmonfl = dmon.Current.FakeLevel;
+						var dmonps = dmon.Current.PredictSubs;
+						dmon.Current.FakeLevel = load.FakeLevel;
+						dmon.Current.PredictSubs = load.PredictSubs;
 
 						if (build != null)
 						{
@@ -749,6 +753,9 @@ namespace RuneApp
 
 						dmon.Current.Leader = dmonld;
 						dmon.Current.Shrines = dmonsh;
+						dmon.Current.FakeLevel = dmonfl;
+						dmon.Current.PredictSubs = dmonps;
+
 					}
 				}
 			}

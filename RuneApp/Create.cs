@@ -2065,6 +2065,8 @@ namespace RuneApp
 				if (ms.ShowDialog() == DialogResult.OK)
 				{
 					build.mon = ms.retMon;
+					build.MonId = build.mon.Id;
+					build.MonName = build.mon.Name;
 					monLabel.Text = "Build for " + build.mon.Name + " (" + build.mon.Id + ")";
 					refreshStats(build.mon, build.mon.GetStats());
 				}

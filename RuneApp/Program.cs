@@ -345,7 +345,7 @@ namespace RuneApp
 				File.WriteAllText("error_build.txt", e.ToString());
 				throw new Exception("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
 			}
-		
+			
 			if (Program.builds.Count > 0 && (Program.data?.Monsters == null))
 			{
 				// backup, just in case
