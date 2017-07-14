@@ -339,57 +339,13 @@ namespace RuneApp
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					foreach (var l in e.NewItems.Cast<Loadout>())
 					{
+						checkLocked();
 						Invoke((MethodInvoker)delegate
 						{
-							checkLocked();
-							Build b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
-
-							ListViewItem nli;
-
-							var lvs = loadoutList.Items.Find(b.ID.ToString(), false);
-
-							if (lvs.Length == 0)
-								nli = new ListViewItem();
-							else
-								nli = lvs.First();
-
-							nli.Tag = l;
-							nli.Text = b.ID.ToString();
-							nli.Name = b.ID.ToString();
-							while (nli.SubItems.Count < 6)
-								nli.SubItems.Add("");
-							nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
-							nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
-							nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.Id.ToString());
-
-							l.runesNew = 0;
-							l.runesChanged = 0;
-
-							foreach (var r in l.Runes.Where(r => r != null))
-							{
-								if (r.AssignedId != b.mon.Id)
-								{
-									if (r.IsUnassigned)
-										l.runesNew++;
-									else
-										l.runesChanged++;
-								}
-							}
-
-							nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.runesNew + l.runesChanged).ToString());
-							if (l.runesNew > 0 && b.mon.Current.RuneCount < 6)
-								nli.SubItems[3].ForeColor = Color.Green;
-							if (Program.Settings.SplitAssign)
-								nli.SubItems[3].Text = l.runesNew.ToString() + "/" + l.runesChanged.ToString();
-							nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
-							nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
-							nli.UseItemStyleForSubItems = false;
-							if (l.Time / (double)1000 > 60)
-								nli.SubItems[5].BackColor = Color.Red;
-							else if (l.Time / (double)1000 > 30)
-								nli.SubItems[5].BackColor = Color.Orange;
-
-							if (lvs.Length == 0)
+							ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+							
+							ListViewItemLoad(nli, l);
+							if (!loadoutList.Items.Contains(nli))
 								loadoutList.Items.Add(nli);
 						});
 					}
@@ -413,6 +369,34 @@ namespace RuneApp
 			}
 		}
 
+		private void ListViewItemLoad(ListViewItem nli, Loadout l)
+		{
+			Build b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
+			nli.Tag = l;
+			nli.Text = b.ID.ToString();
+			nli.Name = b.ID.ToString();
+			nli.UseItemStyleForSubItems = false;
+			while (nli.SubItems.Count < 6)
+				nli.SubItems.Add("");
+			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
+			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
+			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.Id.ToString());
+
+			l.RecountDiff(b.mon.Id);
+
+			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.runesNew + l.runesChanged).ToString());
+			if (l.runesNew > 0 && b.mon.Current.RuneCount < 6)
+				nli.SubItems[3].ForeColor = Color.Green;
+			if (Program.Settings.SplitAssign)
+				nli.SubItems[3].Text = l.runesNew.ToString() + "/" + l.runesChanged.ToString();
+			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
+			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
+			if (l.Time / (double)1000 > 60)
+				nli.SubItems[5].BackColor = Color.Red;
+			else if (l.Time / (double)1000 > 30)
+				nli.SubItems[5].BackColor = Color.Orange;
+		}
+
 		private void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -423,10 +407,8 @@ namespace RuneApp
 
 					foreach (var b in e.NewItems.Cast<Build>())
 					{
-						ListViewItem li = new ListViewItem(new string[] { b.priority.ToString(), b.ID.ToString(), b.mon?.Name ?? b.MonName, "", (b.mon?.Id ?? b.MonId).ToString(), getTeamStr(b) });
-						li.Tag = b;
-						if (b.runePrediction.Any(p => p.Value.Value))
-							li.ForeColor = Color.Purple;
+						ListViewItem li = new ListViewItem();
+						ListViewItemBuild(li, b);
 						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
 						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null)
@@ -442,6 +424,22 @@ namespace RuneApp
 				default:
 					throw new NotImplementedException();
 			}
+		}
+
+		private void ListViewItemBuild(ListViewItem lvi, Build b)
+		{
+			lvi.Text = b.ID.ToString();
+			lvi.SubItems[0] = new ListViewItem.ListViewSubItem(lvi, b.priority.ToString());
+			lvi.SubItems[1] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
+			lvi.SubItems[2] = new ListViewItem.ListViewSubItem(lvi, b.mon?.Name ?? b.MonName);
+			lvi.SubItems[3] = new ListViewItem.ListViewSubItem(lvi, "");
+			lvi.SubItems[4] = new ListViewItem.ListViewSubItem(lvi, (b.mon?.Id ?? b.MonId).ToString());
+			lvi.SubItems[5] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
+
+			lvi.Tag = b;
+
+			if (b.runePrediction.Any(p => p.Value.Value))
+				lvi.ForeColor = Color.Purple;
 		}
 
 		private string getTeamStr(Build b)
@@ -951,8 +949,17 @@ namespace RuneApp
 			Program.RunBuilds(false, -1);
 		}
 
+		private void CheckSaveChanges()
+		{
+			if (Program.data.isModified && MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
+			{
+				Program.SaveData();
+			}
+		}
+
 		private void Main_FormClosing(object sender, FormClosingEventArgs e)
 		{
+			CheckSaveChanges();
 			Program.BuildsProgressTo -= Program_BuildsProgressTo;
 			Program.SaveBuilds();
 		}
@@ -1184,27 +1191,7 @@ namespace RuneApp
 
 		private void runetab_savebutton_click(object sender, EventArgs e)
 		{
-			// only prompt and backup if the save is str8 outta proxy
-			if (!Program.data.isModified && MessageBox.Show("Changes saved will be lost if you import a new save from the proxy.\n\n", "Save save?", MessageBoxButtons.OKCancel) == DialogResult.OK)
-			{
-				Program.data.isModified = true;
-
-				if (File.Exists("save.json"))
-				{
-					// backup, just in case
-					string destFile = Path.Combine("", string.Format("{0}.backup{1}", "save", ".json"));
-					int num = 2;
-					while (File.Exists(destFile))
-					{
-						destFile = Path.Combine("", string.Format("{0}.backup{1}{2}", "save", num, ".json"));
-						num++;
-					}
-
-					File.Copy("save.json", destFile);
-				}
-			}
-			var str = JsonConvert.SerializeObject(Program.data);
-			File.WriteAllText("save.json", str);
+			Program.SaveData();
 		}
 
 		private void unequipMonsterButton_Click(object sender, EventArgs e)

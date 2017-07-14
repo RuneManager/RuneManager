@@ -394,6 +394,10 @@ namespace RuneOptim
 
 			var r = runes[slot - 1];
 
+			r.Assigned = null;
+			r.AssignedId = 0;
+			r.AssignedName = "";
+
 			runes[slot - 1] = null;
 			runeCount--;
 			CheckSets();
@@ -617,5 +621,31 @@ namespace RuneOptim
 			return 1;
 		}
 
+		public void RecountDiff(ulong monId)
+		{
+			powerup = 0;
+			upgrades = 0;
+			runesNew = 0;
+			runesChanged = 0;
+
+			foreach (Rune r in Runes)
+			{
+				r.Locked = true;
+				if (r.AssignedId != monId)
+				{
+					if (r.IsUnassigned)
+						runesNew++;
+					else
+						runesChanged++;
+				}
+				powerup += Math.Max(0, (FakeLevel[r.Slot - 1]) - r.Level);
+				if (FakeLevel[r.Slot - 1] != 0)
+				{
+					int tup = (int)Math.Floor(Math.Min(12, (FakeLevel[r.Slot - 1])) / (double)3);
+					int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
+					upgrades += Math.Max(0, tup - cup);
+				}
+			}
+		}
 	}
 }

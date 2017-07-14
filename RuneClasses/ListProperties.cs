@@ -34,17 +34,19 @@ namespace RuneOptim
 			}
 		}
 
+		public bool PreventOnChange = false;
+
 		public int MaxInd { get { return maxInd; } }
 
-		virtual protected void OnSet(int i, T val) { }
+		virtual protected void OnChange(int i, T val) { }
 
-		private void _onSet(int i, T v)
+		private void onChanged(int i, T v)
 		{
-			OnSet(i, v);
-			onSet?.Invoke(this, new OnSetEventArgs<T>() { i = i, val = v });
+			OnChange(i, v);
+			OnChanged?.Invoke(this, new OnSetEventArgs<T>() { i = i, val = v });
 		}
 
-		public event EventHandler<OnSetEventArgs<T>> onSet;
+		public event EventHandler<OnSetEventArgs<T>> OnChanged;
 
 		public int Count
 		{
@@ -102,7 +104,8 @@ namespace RuneOptim
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
 
 				props[index].SetValue(this, (T)value);
-				_onSet(index, value);
+				if (!PreventOnChange)
+					onChanged(index, value);
 			}
 		}
 

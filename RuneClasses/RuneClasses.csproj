@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Build.cs" />
+    <Compile Include="Building.cs" />
     <Compile Include="Craft.cs" />
     <Compile Include="Deco.cs" />
     <Compile Include="ExtensionMethods.cs" />

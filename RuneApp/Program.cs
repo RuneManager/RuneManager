@@ -217,7 +217,7 @@ namespace RuneApp
 			string[] files;
 			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
 			{
-				return LoadSave(Settings.SaveLocation);
+				return LoadSave(Program.Settings.SaveLocation);
 			}
 			else if ((files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json")).Any())
 			{
@@ -414,10 +414,6 @@ namespace RuneApp
 		{
 			log.Info($"Saving builds to {filename}");
 			// TODO: fix this mess
-			//Program.builds.Clear();
-
-			//var lbs = buildList.Items;
-
 			foreach (Build bb in builds)
 			{
 				if (bb.mon != null && bb.mon.Name != "Missingno")
@@ -436,7 +432,6 @@ namespace RuneApp
 						}
 					}
 				}
-				//Program.builds.Add(bb);
 			}
 
 			// only write if there are builds, may save some files
@@ -709,29 +704,7 @@ namespace RuneApp
 					b.Best.Current.BuildID = b.ID;
 
 					#region Get the rune diff
-					b.Best.Current.powerup =
-					b.Best.Current.upgrades =
-					b.Best.Current.runesNew =
-					b.Best.Current.runesChanged = 0;
-
-					foreach (Rune r in b.Best.Current.Runes)
-					{
-						r.Locked = true;
-						if (r.AssignedId != b.Best.Id)
-						{
-							if (r.IsUnassigned)
-								b.Best.Current.runesNew++;
-							else
-								b.Best.Current.runesChanged++;
-						}
-						b.Best.Current.powerup += Math.Max(0, (b.Best.Current.FakeLevel[r.Slot - 1]) - r.Level);
-						if (b.Best.Current.FakeLevel[r.Slot - 1] != 0)
-						{
-							int tup = (int)Math.Floor(Math.Min(12, (b.Best.Current.FakeLevel[r.Slot - 1])) / (double)3);
-							int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
-							b.Best.Current.upgrades += Math.Max(0, tup - cup);
-						}
-					}
+					b.Best.Current.RecountDiff(b.mon.Id);
 					#endregion
 
 					//currentBuild = null;
@@ -950,6 +923,19 @@ namespace RuneApp
 			}
 		}
 
+		public static void SaveData()
+		{
+			// tag the save as a modified save
+			Program.data.isModified = true;
+
+			if (File.Exists(Program.Settings.SaveLocation))
+			{
+				// backup, just in case
+				File.Copy(Program.Settings.SaveLocation, Path.ChangeExtension(Program.Settings.SaveLocation, ".backup.json"));
+			}
+
+			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data));
+		}
 
 		#region Extension Methods
 		public static bool IsConnected(this Socket socket)

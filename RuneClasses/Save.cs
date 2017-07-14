@@ -28,6 +28,9 @@ namespace RuneOptim
 		[JsonProperty("unit_lock_list")]
 		public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
+		[JsonProperty("building_list")]
+		public readonly ObservableCollection<Building> Buildings = new ObservableCollection<Building>();
+
 		[JsonProperty("wizard_info")]
 		public WizardInfo WizardInfo;
 		
@@ -39,6 +42,7 @@ namespace RuneOptim
 		[JsonIgnore]
 		public readonly Stats shrines = new Stats();
 
+		[JsonProperty("modified")]
 		public bool isModified = false;
 
 		[JsonIgnore]
@@ -122,19 +126,17 @@ namespace RuneOptim
 						{
 							mon.Name = mon._attribute + " " + MonIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;
 						}
+						// Add the runes contained in the Monsters JSON definition to the Rune pool
 						foreach (var r in mon.Runes)
 						{
-							r.Assigned = mon;
 							Runes.Add(r);
 						}
-						var equipedRunes = Runes.Where(r => r.AssignedId == mon.Id);
-						
 						mon.Current.Shrines = shrines;
 
-						foreach (Rune rune in equipedRunes)
+						// Add all the Runes in the pool assigned to the monster to it's current loadout
+						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id))
 						{
 							mon.ApplyRune(rune);
-							rune.AssignedName = mon.Name;
 						}
 
 						if (LockedUnits.Contains(mon.Id))
@@ -203,6 +205,13 @@ namespace RuneOptim
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetMonster " + id + " from " + Monsters.Count);
 			return Monsters.FirstOrDefault(m => m.Id == id);
+		}
+
+		public Rune GetRune(ulong id)
+		{
+			if (!System.Diagnostics.Debugger.IsAttached)
+				RuneLog.Debug("GetRune " + id + " from " + Runes.Count);
+			return Runes.FirstOrDefault(r => r.Id == id);
 		}
 	}
 }

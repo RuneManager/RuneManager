@@ -91,9 +91,9 @@ namespace RuneOptim
 		
 		[JsonIgnore]
 		public int[] Resistance = new int[32];
-		
+
 		#endregion
-		
+
 		[JsonIgnore]
 		public Monster Assigned;
 		
@@ -134,11 +134,66 @@ namespace RuneOptim
 		{
 			Main = new RuneAttr();
 			Innate = new RuneAttr();
-			Main.onSet += (a, b) => { PrebuildAttributes(); };
-			Innate.onSet += (a, b) => { PrebuildAttributes(); };
+			Main.OnChanged += (a, b) => { PrebuildAttributes(); };
+			Innate.OnChanged += (a, b) => { PrebuildAttributes(); };
 			Subs = new List<RuneAttr>();
 		}
 		
+		public void CopyTo(Rune rhs, bool keepLocked, Monster newAssigned = null)
+		{
+			// TODO
+			rhs.Freeze();
+
+			rhs.Set = Set;
+			rhs.Grade = Grade;
+			rhs.Slot = Slot;
+			rhs.Level = Level;
+			rhs._rank = _rank;
+			if (!keepLocked)
+				rhs.Locked = Locked;
+			rhs._occupiedType = _occupiedType;
+			rhs.SellValue = SellValue;
+			if (rhs.AssignedName != AssignedName && Assigned != null)
+			{
+				if (rhs.Assigned.Current.Runes[rhs.Slot - 1] == rhs)
+					rhs.Assigned.Current.RemoveRune(rhs.Slot - 1);
+				newAssigned.Current.AddRune(rhs);
+				Assigned = newAssigned;
+			}
+			rhs.AssignedName = AssignedName;
+
+
+			Main.CopyTo(rhs.Main);
+			Innate.CopyTo(rhs.Innate);
+			for (int i = 0; i < Math.Min(Subs.Count, rhs.Subs.Count); i++)
+			{
+				Subs[i].CopyTo(rhs.Subs[i]);
+			}
+
+			rhs.Unfreeze();
+			rhs.PrebuildAttributes();
+		}
+
+		protected void Freeze()
+		{
+			Main.PreventOnChange = true;
+			Innate.PreventOnChange = true;
+			foreach (var s in Subs)
+			{
+				s.PreventOnChange = true;
+			}
+		}
+
+		protected void Unfreeze()
+		{
+			Main.PreventOnChange = false;
+			Innate.PreventOnChange = false;
+			foreach (var s in Subs)
+			{
+				s.PreventOnChange = false;
+			}
+		}
+
 		// fast iterate over rune stat types
 		public int this[string stat, int fake, bool pred]
 		{

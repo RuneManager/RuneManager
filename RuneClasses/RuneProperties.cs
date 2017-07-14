@@ -598,7 +598,7 @@ namespace RuneOptim
 		[JsonIgnore]
 		private int _calcVal = -1;
 
-		protected override void OnSet(int i, int? val)
+		protected override void OnChange(int i, int? val)
 		{
 			if (Type != Attr.Neg)
 			{
@@ -614,14 +614,14 @@ namespace RuneOptim
 			get
 			{
 				if (_calcVal == -1)
-					OnSet(0, 0);
+					OnChange(0, 0);
 				return _calcVal;
 			}
 			set
 			{
 				GrindBonus = 0;
 				BaseValue = value;
-				OnSet(1, value);
+				OnChange(1, value);
 			}
 		}
 
@@ -675,6 +675,14 @@ namespace RuneOptim
 				GrindBonus = item ?? -1;
 			else
 				throw new IndexOutOfRangeException();
+		}
+
+		internal void CopyTo(RuneAttr rhs)
+		{
+			rhs.Type = Type;
+			rhs.BaseValue = BaseValue;
+			rhs.__int2 = __int2;
+			rhs.GrindBonus = GrindBonus;
 		}
 		#endregion
 	}
