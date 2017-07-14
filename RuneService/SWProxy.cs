@@ -163,13 +163,9 @@ namespace RuneService
 
 		private async Task OnRequest(object sender, SessionEventArgs e)
 		{
-			var requestHeaders = e.WebSession.Request.RequestHeaders;
-			
 			var method = e.WebSession.Request.Method.ToUpper();
 			if ((method == "POST" || method == "PUT" || method == "PATCH"))
 			{
-				string bodyString = await e.GetRequestBodyAsString();
-
 				if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
 					return;
 
@@ -177,6 +173,7 @@ namespace RuneService
 				//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
 				if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 				{
+					string bodyString = await e.GetRequestBodyAsString();
 
 					var dec = decryptRequest(bodyString, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 					try
@@ -200,95 +197,91 @@ namespace RuneService
 		{
 			if (e.WebSession.Request.Method == "GET" || e.WebSession.Request.Method == "POST")
 			{
-				if (e.WebSession.Response.ResponseStatusCode == "200")
+				if (e.WebSession.Response.ResponseStatusCode == "200" && e.WebSession.Response.ContentType != null)
 				{
-					if (e.WebSession.Response.ContentType != null)
+					if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
+						return;
+
+					if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
 					{
 
 						string body = await e.GetResponseBodyAsString();
+						var dec = decryptResponse(body, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
+						string req = null;
+						if (trackedRequests.ContainsKey(e.Id))
+							req = trackedRequests[e.Id];
 
-						if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
-							return;
-						
-						if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
+						try
 						{
-							var dec = decryptResponse(body, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
-							string req = null;
-							if (trackedRequests.ContainsKey(e.Id))
-								req = trackedRequests[e.Id];
+							var json = JsonConvert.DeserializeObject<JObject>(dec, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+							var reqjson = JsonConvert.DeserializeObject<JObject>(req, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+							if (!Directory.Exists("Json"))
+								Directory.CreateDirectory("Json");
+							File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
+							Console.ForegroundColor = ConsoleColor.DarkGray;
+							Console.WriteLine($"<{json["command"]}");
+							Console.ForegroundColor = ConsoleColor.Gray;
 
-							try
+							// only mangle my wizards who want it, don't crash others.
+							if (json["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)reqjson["wizard_id"]))
 							{
-								var json = JsonConvert.DeserializeObject<JObject>(dec, new JsonSerializerSettings() { Formatting = Formatting.Indented });
-								var reqjson = JsonConvert.DeserializeObject<JObject>(req, new JsonSerializerSettings() { Formatting = Formatting.Indented });
-								if (!Directory.Exists("Json"))
-									Directory.CreateDirectory("Json");
-								File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
-								Console.ForegroundColor = ConsoleColor.DarkGray;
-								Console.WriteLine($"<{json["command"]}");
-								Console.ForegroundColor = ConsoleColor.Gray;
+								var version = Assembly.GetExecutingAssembly().GetName().Version;
+								var jobj = new JObject();
+								// Add the proxy version number to chat notices to remind people.
+								jobj["message"] = "Proxy version: " + version;
+								///(json["notice_list"] as JArray).Add(jobj);
+								json["tzone"] = json["tzone"].ToString().Replace("/", @"\/");
 
-								// only mangle my wizards who want it, don't crash others.
-								if (json["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)reqjson["wizard_id"]))
-								{
-									var version = Assembly.GetExecutingAssembly().GetName().Version;
-									var jobj = new JObject();
-									// Add the proxy version number to chat notices to remind people.
-									jobj["message"] = "Proxy version: " + version;
-									///(json["notice_list"] as JArray).Add(jobj);
-									json["tzone"] = json["tzone"].ToString().Replace("/", @"\/");
+								var ver = e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
 
-									var ver = e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
+								var inMsg = Convert.FromBase64String(body);
+								var outMsg = decryptMessage(inMsg, ver);
+								var decData = zlibDecompressData(outMsg);
 
-									var inMsg = Convert.FromBase64String(body);
-									var outMsg = decryptMessage(inMsg, ver);
-									var decData = zlibDecompressData(outMsg);
+								var fix = JsonConvert.SerializeObject(json);
+								fix = fix.Replace(@"\\", "\\");
+								var bytes = zlibCompressData(fix);
+								var str = encryptMessage(bytes, ver);
+								var send = Convert.ToBase64String(str);
 
-									var fix = JsonConvert.SerializeObject(json);
-									fix = fix.Replace(@"\\", "\\");
-									var bytes = zlibCompressData(fix);
-									var str = encryptMessage(bytes, ver);
-									var send = Convert.ToBase64String(str);
+								Console.WriteLine("str:" + (fix == decData));
+								Console.WriteLine("b64:" + (inMsg.SequenceEqual(str)));
+								Console.WriteLine("cry:" + (outMsg.SequenceEqual(bytes)));
+								Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
 
-									Console.WriteLine("str:" + (fix == decData));
-									Console.WriteLine("b64:" + (inMsg.SequenceEqual(str)));
-									Console.WriteLine("cry:" + (outMsg.SequenceEqual(bytes)));
-									Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
-									
-									//encryptResponse(fix, ver);
-									if (body.SequenceEqual(send))
-										await e.SetResponseBodyString(send);
-								}
+								//encryptResponse(fix, ver);
+								if (body.SequenceEqual(send))
+									await e.SetResponseBodyString(send);
 							}
-							catch { };
+						}
+						catch { };
 
-							
-							if (req != null)
+
+						if (req != null)
+						{
+							System.Threading.Thread thr = new System.Threading.Thread(() =>
 							{
-								System.Threading.Thread thr = new System.Threading.Thread(() =>
+								SWEventArgs args = null;
+								try
 								{
-									SWEventArgs args = null;
-									try
-									{
-										args = new SWEventArgs(req, dec);
+									args = new SWEventArgs(req, dec);
 
-										SWResponse?.Invoke(this, args);
-									}
-									catch (Exception ex)
-									{
-										Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
+									SWResponse?.Invoke(this, args);
+								}
+								catch (Exception ex)
+								{
+									Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
 										// TODO: log stacktrace?
 									}
-									trackedRequests.Remove(e.Id);
-								});
-								thr.Start();
-							}
+								trackedRequests.Remove(e.Id);
+							});
+							thr.Start();
 						}
 					}
 				}
 			}
 		}
-
+		
 		private static string decryptRequest(string bodyString, int version = 1)
 		{
 			var inMsg = Convert.FromBase64String(bodyString);
