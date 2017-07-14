@@ -74,7 +74,7 @@ namespace RiftTrackerPlugin
 
 		public override void ProcessRequest(object sender, SWEventArgs args)
 		{
-			if (args.Response.Command != "GetRiftDungeonCommentDeck")
+			if (args.Response.CommandStr != "GetRiftDungeonCommentDeck")
 				return;
 
 			//var riftstats = JsonConvert.DeserializeObject<RiftDeck>(args.ResponseJson["bestdeck_rift_dungeon"].ToString());
@@ -358,8 +358,8 @@ namespace RiftTrackerPlugin
 				}
 				excelPack.Workbook.Worksheets.MoveToStart(rd.Key.ToString());
 			}
-
-			excelPack.Save();
+			if (excelPack.Workbook.Worksheets.Count > 0)
+				excelPack.Save();
 			Console.WriteLine("Saved riftstats");
 		}
 	}

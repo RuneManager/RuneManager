@@ -24,5 +24,10 @@ namespace RunePlugin
 			Request = JsonConvert.DeserializeObject<SWRequest>(req, new SWRequestConverter());
 			Response = JsonConvert.DeserializeObject<SWResponse>(resp, new SWResponseConverter());
 		}
+
+		public T ResponseAs<T>() where T : SWResponse
+		{
+			return (T)Response;
+		}
 	}
 }

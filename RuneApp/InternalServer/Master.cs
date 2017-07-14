@@ -170,7 +170,7 @@ namespace RuneApp.InternalServer
 
 					var enc = req.Headers.GetValues("Accept-Encoding");
 					// 
-					if (enc.Any(a => a.ToLowerInvariant() == "deflate"))
+					if (enc?.Any(a => a.ToLowerInvariant() == "deflate") ?? false)
 					{
 						resp.Headers.Add("Content-Encoding", "deflate");
 						using (MemoryStream ms = new MemoryStream())
@@ -294,22 +294,35 @@ namespace RuneApp.InternalServer
 			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(html) };
 		}
 		
-		[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+		[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 		public class PageAddressRenderAttribute : Attribute
 		{
-			// See the attribute guidelines at 
-			//  http://go.microsoft.com/fwlink/?LinkId=85236
-			readonly string positionalString;
+			readonly string pageAddress;
 
-			// This is a positional argument
-			public PageAddressRenderAttribute(string positionalString)
+			public PageAddressRenderAttribute(string pageAddress)
 			{
-				this.positionalString = positionalString;
+				this.pageAddress = pageAddress;
 			}
 
-			public string PositionalString
+			public string PageAddress
 			{
-				get { return positionalString; }
+				get { return pageAddress; }
+			}
+		}
+
+		[System.AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+		sealed class HttpMethodAttribute : Attribute
+		{
+			readonly string method;
+
+			public HttpMethodAttribute(string method)
+			{
+				this.method = method;
+			}
+
+			public string Method
+			{
+				get { return method; }
 			}
 		}
 
@@ -317,7 +330,7 @@ namespace RuneApp.InternalServer
 
 
 		#region commands
-
+		// TODO: change to POST, put buttons in webpage
 		[RRM(RRMAction.RunBuilds)]
 		public RRMResponse RunBuilds(RRMRequest req)
 		{

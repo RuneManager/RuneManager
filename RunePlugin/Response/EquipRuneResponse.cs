@@ -14,7 +14,5 @@ namespace RunePlugin.Response
 
 		[JsonProperty("unit_info")]
 		public RuneOptim.Monster Monster;
-
-
 	}
 }

@@ -6,6 +6,10 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
+using System.Net.Http;
+using System.Web;
+using System.Web;
 
 namespace RuneApp.InternalServer
 {
@@ -19,6 +23,13 @@ namespace RuneApp.InternalServer
 				var resp = this.Recurse(req, uri);
 				if (resp != null)
 					return resp;
+
+				if (req.AcceptTypes?.Contains("application/json") ?? false)
+				{
+					return new HttpResponseMessage() { Content = new StringContent(
+						"{\"endpoints\":[\"runes\",\"monsters\"], \"version\":\"0.4.2.0\",\"baseurl\":\"" + req.UserHostName + "\"}"
+						) };
+				}
 
 				return returnHtml(new ServedResult[] {
 						new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"/css/swagger.css\"" } } },
@@ -107,12 +118,66 @@ document.getElementById(""out"").innerHTML = ""<div class=\""swagger-ui-wrap\"" 
 			}
 
 
-			[PageAddressRender("rune")]
-			public class RuneRenderer : PageRenderer
+			[PageAddressRender("monsters")]
+			public class MonstersRenderer : PageRenderer
 			{
+				[HttpMethod("POST")]
+				public HttpResponseMessage PostMethod(HttpListenerRequest req)
+				{
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+				}
+
+				[HttpMethod("PUT")]
+				public HttpResponseMessage PutMethod(HttpListenerRequest req)
+				{
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+				}
+
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{}") };
+					switch (req.HttpMethod)
+					{
+						case "PUT":
+							return PutMethod(req);
+
+						case "POST":
+							return PostMethod(req);
+
+						case "GET":
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{GET}") };
+					}
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{FAIL}") };
+				}
+			}
+
+			[PageAddressRender("runes")]
+			public class RunesRenderer : PageRenderer
+			{
+				[HttpMethod("POST")]
+				public HttpResponseMessage PostMethod(HttpListenerRequest req)
+				{
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+				}
+
+				[HttpMethod("PUT")]
+				public HttpResponseMessage PutMethod(HttpListenerRequest req)
+				{
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+				}
+
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
+				{
+					switch (req.HttpMethod)
+					{
+						case "PUT":
+							return PutMethod(req);
+
+						case "POST":
+							return PostMethod(req);
+						case "GET":
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{GET}") };
+					}
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{FAIL}") };
 				}
 			}
 		}

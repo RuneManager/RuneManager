@@ -21,7 +21,7 @@ namespace RuneApp.InternalServer
 
 			var types = this.GetType().GetNestedTypes();
 			var atypes = types.Where(t => (t.GetCustomAttribute(typeof(Master.PageAddressRenderAttribute)) is Master.PageAddressRenderAttribute));
-			var type = atypes.FirstOrDefault(t => (t.GetCustomAttribute(typeof(Master.PageAddressRenderAttribute)) as Master.PageAddressRenderAttribute).PositionalString == uri.First());
+			var type = atypes.FirstOrDefault(t => (t.GetCustomAttribute(typeof(Master.PageAddressRenderAttribute)) as Master.PageAddressRenderAttribute).PageAddress == uri.First());
 			if (type != null)
 			{
 				var tt = type.GetConstructor(new Type[] { }).Invoke(new object[] { });

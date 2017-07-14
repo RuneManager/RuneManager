@@ -12,6 +12,8 @@ namespace RunePlugin
 		public virtual void OnLoad() { }
 
 		public virtual void OnUnload() { }
+		
+		public virtual ConsoleColor FavouriteColour { get { return ConsoleColor.Gray; } }
 
 		public abstract void ProcessRequest(object sender, SWEventArgs args);
 
@@ -197,7 +199,7 @@ namespace RunePlugin
 
 				if (full)
 				{
-					var attribute = int.Parse(suid.Substring(4));
+					var attribute = int.Parse("" + suid.Last());
 					return $"{(awakened ? "AWAKENED" : "")}{name} ({MonsterAttribute(attribute)})";
 				}
 				else if (!awakened)

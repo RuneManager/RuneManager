@@ -937,6 +937,59 @@ namespace RuneApp
 			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data));
 		}
 
+		public static void AddMonster(Monster mon)
+		{
+			if (mon.WizardId == data.WizardInfo.Id)
+			{
+				data.Monsters.Add(mon);
+			}
+
+			data.isModified = true;
+		}
+
+		public static void AddRune(Rune rune)
+		{
+			if (rune.WizardId == data.WizardInfo.Id)
+			{
+				data.Runes.Add(rune);
+			}
+
+			data.isModified = true;
+		}
+
+		public static void DeleteMonster(Monster mon)
+		{
+			var m = data.GetMonster(mon.Id);
+			data.Monsters.Remove(m);
+
+			data.isModified = true;
+		}
+
+		public static void DeleteRune(Rune rune)
+		{
+			var r = data.GetRune(rune.Id);
+			data.Runes.Remove(r);
+
+			data.isModified = true;
+		}
+
+		public static void UpdateMonster(Monster mon)
+		{
+			var m = data.GetMonster(mon.Id);
+			// TODO: modify stats and trigger callbacks
+
+			data.isModified = true;
+		}
+
+		public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null)
+		{
+			var r = data.GetRune(rune.Id);
+			// TODO: modify stats and trigger callbacks
+			rune.CopyTo(r, keepLocked, newAssigned);
+
+			data.isModified = true;
+		}
+
 		#region Extension Methods
 		public static bool IsConnected(this Socket socket)
 		{

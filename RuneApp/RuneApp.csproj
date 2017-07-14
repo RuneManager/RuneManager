@@ -75,6 +75,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -128,6 +129,7 @@
     </Compile>
     <Compile Include="InternalServer\PageRenderers\ApiRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\CssRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\LoadsRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\MonstersRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\RiftRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\RuneRenderer.cs" />
