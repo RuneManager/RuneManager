@@ -49,6 +49,9 @@ namespace RuneOptim
 		[JsonProperty("sec_eff")]
 		public List<RuneAttr> Subs;
 
+		[JsonProperty("wizard_id")]
+		public ulong WizardId = 0;
+
 		#endregion
 
 		#region Nicer getters for stats by type

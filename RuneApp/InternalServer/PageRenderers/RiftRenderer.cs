@@ -64,7 +64,7 @@ namespace RuneApp.InternalServer
 								}
 								else
 								{
-									table += mon.Name + " " + mon._class + "*";
+									table += mon.Name + " " + mon.Grade + "*";
 								}
 							}
 							table += "</td>";
@@ -96,7 +96,7 @@ namespace RuneApp.InternalServer
 								}
 								else
 								{
-									table += mon.Name + " " + mon._class + "*";
+									table += mon.Name + " " + mon.Grade + "*";
 								}
 							}
 							table += "</td>";

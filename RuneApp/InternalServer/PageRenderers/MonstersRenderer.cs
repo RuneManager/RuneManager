@@ -95,7 +95,7 @@ namespace RuneApp.InternalServer
 			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).ToList();
 
-			var trashOnes = unlocked.Where(m => m._class == 1 && m.Name != "Devilmon" && !m.Name.Contains("Angelmon")).ToList();
+			var trashOnes = unlocked.Where(m => m.Grade == 1 && m.Name != "Devilmon" && !m.Name.Contains("Angelmon")).ToList();
 			unlocked = unlocked.Except(trashOnes).ToList();
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
@@ -137,7 +137,7 @@ namespace RuneApp.InternalServer
 
 			mm = mm.OrderByDescending(m => !unlocked.Contains(m))
 				.ThenByDescending(m => m.Locked)
-				.ThenByDescending(m => m._class)
+				.ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m._attribute)
 				.ThenByDescending(m => m.awakened)
@@ -153,9 +153,9 @@ namespace RuneApp.InternalServer
 				var li = new ServedResult("li")
 				{
 					contentList = {
-						new ServedResult("span") { contentList = { "build " + m.Name + " " + +m._class + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl }
+						new ServedResult("span") { contentList = { "build " + m.Name + " " + +m.Grade + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl }
 				};
-				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -166,22 +166,22 @@ namespace RuneApp.InternalServer
 			{
 				var nl = new ServedResult("ul");
 				var stars = new StringBuilder();
-				for (int s = 0; s < m._class; s++)
+				for (int s = 0; s < m.Grade; s++)
 					stars.Append("<img class='star' src='/runes/star_unawakened.png' >"); //style='left: -" + (0.3*s) + "em' 
 				var li = new ServedResult("li")
 				{
 					contentList = { ((unlocked.Contains(m)) ?
-					("TRASH: " + m.Name + " " + m._class + "* " + m.level ) :
-					("mon " + m.Name + " " + m._class + "* " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
+					("TRASH: " + m.Name + " " + m.Grade + "* " + m.level ) :
+					("mon " + m.Name + " " + m.Grade + "* " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
 				};
 				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
-					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
 			}));
 
-			var food = trashOnes.Select(m => new Food() { mon = m, fakeLevel = m._class }).ToList();
+			var food = trashOnes.Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
 			food = makeFood(2, food);
 			food = makeFood(3, food);
 			food = makeFood(4, food);
@@ -195,7 +195,7 @@ namespace RuneApp.InternalServer
 		{
 			ServedResult sr = new ServedResult("li");
 			
-			sr.contentList.Add(f.mon.Name + " " + f.mon._class + "*" + (f.mon._class != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
+			sr.contentList.Add(f.mon.Name + " " + f.mon.Grade + "*" + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
 			if (f.food.Any())
 			{
 				var rr = new ServedResult("ul");
@@ -265,7 +265,7 @@ namespace RuneApp.InternalServer
 				contentList = {
 					new ServedResult("a") { contentDic = { { "href", "\"javascript:showhide(" +m.Id.ToString() + ")\"" } }, contentList = { "+ load" } },
 					" ",
-					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + +m._class + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
+					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + +m.Grade + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
 			}
 			};
 
@@ -288,7 +288,7 @@ namespace RuneApp.InternalServer
 
 			// list skillups
 			var nl = new ServedResult("ul");
-			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo._class + "* " + mo.level } }));
+			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
 			if (nl.contentList.Count == 0)
 				nl.name = "br";
 

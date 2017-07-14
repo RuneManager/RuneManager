@@ -28,6 +28,9 @@ namespace RuneOptim
 		[JsonProperty("unit_lock_list")]
 		public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
+		[JsonProperty("wizard_info")]
+		public WizardInfo WizardInfo;
+		
 		// builds from rune optimizer don't match mine.
 		// Don't care right now, perhaps a fuzzy-import later?
 		[JsonProperty("savedBuilds")]

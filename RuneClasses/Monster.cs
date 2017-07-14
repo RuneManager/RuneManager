@@ -35,8 +35,11 @@ namespace RuneOptim
 		[JsonProperty("unit_id")]
 		public ulong Id = 0;
 
+		[JsonProperty("wizard_id")]
+		public ulong WizardId = 0;
+
 		[JsonProperty("class")]
-		public int _class;
+		public int Grade;
 
 		[JsonProperty("unit_level")]
 		public int level = 1;
@@ -46,6 +49,9 @@ namespace RuneOptim
 
 		public int GetFamily { get { return _monsterTypeId / 100; } }
 
+		[JsonProperty("building_id")]
+		public ulong BuildingId;
+		
 		[JsonProperty("create_time")]
 		public DateTime? createdOn = null;
 
@@ -146,7 +152,7 @@ namespace RuneOptim
 			Id = rhs.Id;
 			level = rhs.level;
 			_monsterTypeId = rhs._monsterTypeId;
-			_class = rhs._class;
+			Grade = rhs.Grade;
 			_attribute = rhs._attribute;
 			_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
 			priority = rhs.priority;
@@ -162,6 +168,8 @@ namespace RuneOptim
 		// put this rune on the current build
 		public void ApplyRune(Rune rune, int checkOn = 2)
 		{
+			rune.AssignedName = Name;
+			rune.Assigned = this;
 			Current.AddRune(rune, checkOn);
 			chaStats = true;
 		}

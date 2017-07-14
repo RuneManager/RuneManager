@@ -14,7 +14,6 @@ using System.Collections.ObjectModel;
 
 namespace RuneOptim
 {
-
 	public class RuneUsage
 	{
 		// the runes legit used 
