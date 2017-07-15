@@ -429,6 +429,10 @@ namespace RuneApp
 		private void ListViewItemBuild(ListViewItem lvi, Build b)
 		{
 			lvi.Text = b.ID.ToString();
+
+			while (lvi.SubItems.Count < 6)
+				lvi.SubItems.Add("");
+
 			lvi.SubItems[0] = new ListViewItem.ListViewSubItem(lvi, b.priority.ToString());
 			lvi.SubItems[1] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
 			lvi.SubItems[2] = new ListViewItem.ListViewSubItem(lvi, b.mon?.Name ?? b.MonName);
