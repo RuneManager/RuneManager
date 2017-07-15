@@ -49,7 +49,7 @@ namespace RuneOptim
 		public int EnergyMax;
 
 		[JsonProperty("energy_per_min")]
-		public int EnergyPerMinute;
+		public double EnergyPerMinute;
 
 		[JsonProperty("social_point_current")]
 		public int SocialPointCurrent;

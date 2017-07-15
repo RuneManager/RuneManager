@@ -106,7 +106,7 @@ namespace RuneApp.InternalServer
 				int i = m.SkillupsTotal - m.SkillupsLevel;
 				for (; i > 0; i--)
 				{
-					var um = unlocked.FirstOrDefault(ul => ul._monsterTypeId.ToString().Substring(0, 3) == m._monsterTypeId.ToString().Substring(0, 3));
+					var um = unlocked.FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
 					if (um == null)
 						break;
 					pairs[m].Add(um);
@@ -115,7 +115,7 @@ namespace RuneApp.InternalServer
 				}
 				for (; i > 0; i--)
 				{
-					int monbase = (m._monsterTypeId / 100) * 100;
+					int monbase = (m.monsterTypeId / 100) * 100;
 					for (int j = 1; j < 4; j++)
 					{
 						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j]))

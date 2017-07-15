@@ -45,9 +45,9 @@ namespace RuneOptim
 		public int level = 1;
 
 		[JsonProperty("unit_master_id")]
-		public int _monsterTypeId;
+		public int monsterTypeId;
 
-		public int GetFamily { get { return _monsterTypeId / 100; } }
+		public int GetFamily { get { return monsterTypeId / 100; } }
 
 		[JsonProperty("building_id")]
 		public ulong BuildingId;
@@ -151,7 +151,7 @@ namespace RuneOptim
 			Name = rhs.Name;
 			Id = rhs.Id;
 			level = rhs.level;
-			_monsterTypeId = rhs._monsterTypeId;
+			monsterTypeId = rhs.monsterTypeId;
 			Grade = rhs.Grade;
 			_attribute = rhs._attribute;
 			_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
@@ -191,7 +191,7 @@ namespace RuneOptim
 		{
 			get
 			{
-				return (this._monsterTypeId / 10) - (this._monsterTypeId / 100) * 10;
+				return (this.monsterTypeId / 10) - (this.monsterTypeId / 100) * 10;
 			}
 		}
 
@@ -212,14 +212,14 @@ namespace RuneOptim
 
 		private void checkSkillups()
 		{
-			if (this.damageFormula == null && MonDefs.ContainsKey(_monsterTypeId))
+			if (this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId))
 			{
 				MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
 				int skdmg = 0;
 				int i = 0;
 
-				foreach (var ss in MonDefs[_monsterTypeId].Skills)
+				foreach (var ss in MonDefs[monsterTypeId].Skills)
 				{
 					var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
 					if (df.props.Count > 0) //ss.Cooltime != null && 

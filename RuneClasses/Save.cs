@@ -120,11 +120,11 @@ namespace RuneOptim
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					foreach (Monster mon in e.NewItems.Cast<Monster>())
 					{
-						mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId).Value;
+						mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
 						mon.loadOrder = monLoaded++;
 						if (mon.Name == null)
 						{
-							mon.Name = mon._attribute + " " + MonIdNames.FirstOrDefault(m => m.Key == mon._monsterTypeId / 100).Value;
+							mon.Name = mon._attribute + " " + MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
 						}
 						// Add the runes contained in the Monsters JSON definition to the Rune pool
 						foreach (var r in mon.Runes)
