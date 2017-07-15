@@ -247,8 +247,10 @@ namespace RuneApp
 			log.Info("Loading " + filename + " as save.");
 			string text = File.ReadAllText(filename);
 
+#if !DEBUG
 			try
 			{
+#endif
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
 				
 				// TODO: trash
@@ -263,12 +265,14 @@ namespace RuneApp
 						int level = (int)Math.Floor(val / Deco.ShrineLevel[i]);
 					}
 				}
+#if !DEBUG
 			}
 			catch (Exception e)
 			{
 				File.WriteAllText("error_save.txt", e.ToString());
 				throw new Exception("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 			}
+#endif
 			return LoadSaveResult.Success;//text.Length;
 		}
 
@@ -319,12 +323,13 @@ namespace RuneApp
 			}
 			log.Info($"Loading {filename} as builds.");
 
+#if !DEBUG
 			try
 			{
+#endif
 				var bstr = File.ReadAllText(filename);
 
 				// upgrade:
-
 				bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
 				bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
 				bstr = bstr.Replace("\"b_def\"", "\"def\"");
@@ -339,13 +344,15 @@ namespace RuneApp
 				{
 					builds.Add(b);
 				}
+#if !DEBUG
 			}
 			catch (Exception e)
 			{
 				File.WriteAllText("error_build.txt", e.ToString());
 				throw new Exception("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
 			}
-			
+#endif
+
 			if (Program.builds.Count > 0 && (Program.data?.Monsters == null))
 			{
 				// backup, just in case

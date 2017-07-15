@@ -198,7 +198,9 @@ namespace RuneApp
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
 
+#if !DEBUG
 			try {
+#endif
 				LoadSaveResult loadResult = 0;
 				do
 				{
@@ -241,12 +243,14 @@ namespace RuneApp
 							break;
 					}
 				} while (loadResult != LoadSaveResult.Success) ;
+#if !DEBUG
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
 				Log.Fatal($"Fatal during load {ex.GetType()}", ex);
 			}
+#endif
 			#endregion
 
 			RegenLists();
