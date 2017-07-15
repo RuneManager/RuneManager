@@ -168,8 +168,6 @@ namespace RuneOptim
 		// put this rune on the current build
 		public void ApplyRune(Rune rune, int checkOn = 2)
 		{
-			rune.AssignedName = Name;
-			rune.Assigned = this;
 			Current.AddRune(rune, checkOn);
 			chaStats = true;
 		}

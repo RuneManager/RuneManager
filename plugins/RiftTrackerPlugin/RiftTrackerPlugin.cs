@@ -56,6 +56,7 @@ namespace RiftTrackerPlugin
 						r.PrebuildAttributes();
 						m.ApplyRune(r);
 						r.AssignedName = m.Name;
+						r.Assigned = m;
 					}
 				}
 			}
@@ -98,6 +99,7 @@ namespace RiftTrackerPlugin
 					r.PrebuildAttributes();
 					m.ApplyRune(r);
 					r.AssignedName = m.Name;
+					r.Assigned = m;
 				}
 
 				if (!matchCount.ContainsKey(riftstats.RiftDungeonId))

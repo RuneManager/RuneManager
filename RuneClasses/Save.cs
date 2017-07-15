@@ -137,6 +137,8 @@ namespace RuneOptim
 						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id))
 						{
 							mon.ApplyRune(rune);
+							rune.AssignedName = mon.Name;
+							rune.Assigned = mon;
 						}
 
 						if (LockedUnits.Contains(mon.Id))
