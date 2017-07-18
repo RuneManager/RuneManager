@@ -214,5 +214,29 @@ namespace RuneApp.Properties {
                 this["WatchSave"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UpgradeGrinds {
+            get {
+                return ((bool)(this["UpgradeGrinds"]));
+            }
+            set {
+                this["UpgradeGrinds"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OnlyGrind6Legs {
+            get {
+                return ((bool)(this["OnlyGrind6Legs"]));
+            }
+            set {
+                this["OnlyGrind6Legs"] = value;
+            }
+        }
     }
 }

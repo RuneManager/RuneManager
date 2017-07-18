@@ -382,8 +382,8 @@ namespace RuneOptim
 		{
 			if (Main == null) return -1;
 			// the stat can only be present once per rune, early exit
-			if (Main.Type == stat && Grade >= 3 && FakeLevel <= 15 && FakeLevel > Level)
-				return RuneProperties.MainValues[Main.Type][Grade - 3][FakeLevel];
+			if (Main.Type == stat && FakeLevel <= 15 && FakeLevel > Level)
+				return RuneProperties.MainValues[Main.Type][Grade - 1][FakeLevel];
 			else if (Main.Type == stat)
 				return Main.Value;
 
@@ -406,19 +406,17 @@ namespace RuneOptim
 				int subNew = 4 - Rarity;
 				// how many subs will go into existing stats (0 legend will be 4 - 0 - 0 = 4, 6 rare will be 4 - 1 - 2 = 1, 6 magic will be 4 - 2 - 2 = 0)
 				int subEx = maxUpgrades - upgradesGone;// - subNew;
-				int subVal = (this.Grade < 4) ? 1 : (subNew * RuneProperties.MainValues[stat][this.Grade - 4][0] / 8);
-				if (subVal < 1)
-					subVal = 1;
-
+				int subVal = subNew * RuneProperties.MainValues[stat][this.Grade - 1][0] / 8;
+				
 				// TODO: sub prediction
 				if (Subs.Count == 0) return subVal;
-				if (Subs[0].Type == stat) return Subs[0].Value + subEx;
+				if (Subs[0].Type == stat) return Subs[0].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
 				if (Subs.Count == 1) return subVal;
-				if (Subs[1].Type == stat) return Subs[1].Value + subEx;
+				if (Subs[1].Type == stat) return Subs[1].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
 				if (Subs.Count == 2) return subVal;
-				if (Subs[2].Type == stat) return Subs[2].Value + subEx;
+				if (Subs[2].Type == stat) return Subs[2].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
 				if (Subs.Count == 3) return subVal;
-				if (Subs[3].Type == stat) return Subs[3].Value + subEx;
+				if (Subs[3].Type == stat) return Subs[3].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
 				return subVal;
 			}
 		
