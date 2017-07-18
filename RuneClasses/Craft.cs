@@ -180,5 +180,8 @@ namespace RuneOptim
 				return (Max - Min) / (double)2 + Min;
 			}
 		}
+		[JsonIgnore]
+		public bool Locked;
+
 	}
 }

@@ -45,6 +45,8 @@ namespace RuneOptim
 		public bool SetsFull { get { return setsFull; } }
 		
 		public double Time;
+
+		public long ActualTests = 0;
 		
 		[JsonIgnore]
 		public ConcurrentDictionary<string, double>[] manageStats;

@@ -685,6 +685,7 @@ namespace RuneOptim
 				Best = null;
 				Stats bstats = null;
 				long count = 0;
+				long actual = 0;
 				long total = runes[0].Length;
 				total *= runes[1].Length;
 				total *= runes[2].Length;
@@ -743,6 +744,8 @@ namespace RuneOptim
 					int kill = 0;
 					// number of builds added since last sync
 					int plus = 0;
+					// number of builds skipped
+					int skip = 0;
 
 					bool isBad;
 					double bestScore = 0, curScore;
@@ -782,7 +785,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 									outstrs.Add($"bad4@2 {set4} {set2} | {r0.Set} {r1.Set}");
 #endif
-									kill += runes[2].Length * runes[3].Length * runes[4].Length * runes[5].Length;
+									skip += runes[2].Length * runes[3].Length * runes[4].Length * runes[5].Length;
 									continue;
 								}
 							}
@@ -821,7 +824,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"bad4@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
 #endif
-										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										skip += runes[3].Length * runes[4].Length * runes[5].Length;
 										continue;
 									}
 								}
@@ -839,7 +842,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"bad2@3 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set}");
 #endif
-										kill += runes[3].Length * runes[4].Length * runes[5].Length;
+										skip += runes[3].Length * runes[4].Length * runes[5].Length;
 										continue;
 									}
 								}
@@ -868,7 +871,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 											outstrs.Add($"bad4@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
 #endif
-											kill += runes[4].Length * runes[5].Length;
+											skip += runes[4].Length * runes[5].Length;
 											continue;
 										}
 									}
@@ -886,7 +889,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 											outstrs.Add($"bad2@4 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set}");
 #endif
-											kill += runes[4].Length * runes[5].Length;
+											skip += runes[4].Length * runes[5].Length;
 											continue;
 										}
 									}
@@ -917,7 +920,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 												outstrs.Add($"bad4@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
 #endif
-												kill += runes[5].Length;
+												skip += runes[5].Length;
 												continue;
 											}
 										}
@@ -936,7 +939,7 @@ namespace RuneOptim
 #if BUILD_PRECHECK_BUILDS_DEBUG
 												outstrs.Add($"bad2@5 {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set}");
 #endif
-												kill += runes[5].Length;
+												skip += runes[5].Length;
 												continue;
 											}
 										}
@@ -1060,9 +1063,13 @@ namespace RuneOptim
 									}
 									// sum up what work we've done
 									Interlocked.Add(ref total, -kill);
+									Interlocked.Add(ref total, -skip);
+									Interlocked.Add(ref actual, kill);
 									Interlocked.Add(ref buildUsage.failed, kill);
 									kill = 0;
+									skip = 0;
 									Interlocked.Add(ref count, plus);
+									Interlocked.Add(ref actual, plus);
 									Interlocked.Add(ref buildUsage.passed, plus);
 									plus = 0;
 
@@ -1146,6 +1153,7 @@ namespace RuneOptim
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "best " + (Best?.score ?? -1)));
 					//Best.Current.runeUsage = usage.runeUsage;
 					//Best.Current.buildUsage = usage.buildUsage;
+					Best.Current.ActualTests = actual;
 					foreach (var bb in loads)
 					{
 						foreach (Rune r in bb.Current.Runes)
