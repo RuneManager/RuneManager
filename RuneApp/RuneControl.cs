@@ -5,357 +5,301 @@ using System.Drawing.Imaging;
 
 namespace RuneApp
 {
-    // A really overloaded control to display runes cool-like with a million options
-    // Mostly stolen from TransparentControl
-    public sealed class RuneControl : Control
-    {
-        private readonly Timer refresher;
+	// A really overloaded control to display runes cool-like with a million options
+	// Mostly stolen from TransparentControl
+	public sealed class RuneControl : Control
+	{
+		private readonly Timer refresher;
 
-        // yeah, pictures
-        private Image _imageSlot;
-        private Image _imageSet;
-        private Image _imageBack;
-        private Image _imageStars;
+		// yeah, pictures
+		private Image _imageSlot;
+		private Image _imageSet;
+		private Image _imageBack;
+		private Image _imageStars;
 
-        // allows runes to look "selected"
-        private float gamma;
+		// allows runes to look "selected"
+		private float gamma;
 
-        // if to render fx
-        private bool renderStars;
-        private bool renderBack;
+		// if to render fx
+		private bool renderStars;
+		private bool renderBack;
 
-        // Number of stars
-        private int grade;
+		// Number of stars
+		private int grade;
 
-        // Normal, Magic, Rare, Hero, Legend
-        private int coolness;
+		// Normal, Magic, Rare, Hero, Legend
+		private int coolness;
 
-        protected override Size DefaultSize
-        {
-            get
-            {
-                return new Size(171, 179);
-            }
-        }
+		protected override Size DefaultSize
+		{
+			get
+			{
+				return new Size(171, 179);
+			}
+		}
 
-        public RuneControl()
-        {
-            SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            BackColor = Color.Transparent;
-            gamma = 1;
-            refresher = new Timer();
-            refresher.Tick += TimerOnTick;
-            refresher.Interval = 50;
-            refresher.Enabled = true;
-            refresher.Start();
-            grade = 1;
-        }
+		public Image SlotImage
+		{
+			get
+			{
+				return _imageSlot;
+			}
+			set
+			{
+				_imageSlot = value;
+				RecreateHandle();
+			}
+		}
 
-        protected override CreateParams CreateParams
-        {
-            get
-            {
-                CreateParams cp = base.CreateParams;
-                cp.ExStyle |= 0x20;
-                return cp;
-            }
-        }
+		public Image SetImage
+		{
+			get
+			{
+				return _imageSet;
+			}
+			set
+			{
+				_imageSet = value;
+				RecreateHandle();
+			}
+		}
 
-        protected override void OnMove(EventArgs e)
-        {
-            RecreateHandle();
-        }
+		public Image StarImage
+		{
+			get
+			{
+				return _imageStars;
+			}
+			set
+			{
+				_imageStars = value;
+				RecreateHandle();
+			}
+		}
 
-        public void SetRune(object obj)
-        {
-            Tag = obj;
-            if (obj == null)
-                return;
+		public Image BackImage
+		{
+			get
+			{
+				return _imageBack;
+			}
+			set
+			{
+				_imageBack = value;
+				RecreateHandle();
+			}
+		}
 
-            RuneOptim.Rune rune = (RuneOptim.Rune)obj;
-            grade = rune.Grade;
-            switch (rune.Slot)
-            {
-                default:
-                case 1:
-                    _imageSlot = Runes.rune1;
-                    break;
-                case 2:
-                    _imageSlot = Runes.rune2;
-                    break;
-                case 3:
-                    _imageSlot = Runes.rune3;
-                    break;
-                case 4:
-                    _imageSlot = Runes.rune4;
-                    break;
-                case 5:
-                    _imageSlot = Runes.rune5;
-                    break;
-                case 6:
-                    _imageSlot = Runes.rune6;
-                    break;
-            }
-            switch (rune.Set)
-            {
-                case RuneOptim.RuneSet.Null:
-                    _imageSet = null;
-                    break;
-                case RuneOptim.RuneSet.Blade:
-                    _imageSet = Runes.blade;
-                    break;
-                case RuneOptim.RuneSet.Despair:
-                    _imageSet = Runes.despair;
-                    break;
-                case RuneOptim.RuneSet.Destroy:
-                    _imageSet = Runes.destroy;
-                    break;
-                case RuneOptim.RuneSet.Endure:
-                    _imageSet = Runes.endure;
-                    break;
-                case RuneOptim.RuneSet.Energy:
-                    _imageSet = Runes.energy;
-                    break;
-                case RuneOptim.RuneSet.Fatal:
-                    _imageSet = Runes.fatal;
-                    break;
-                case RuneOptim.RuneSet.Focus:
-                    _imageSet = Runes.focus;
-                    break;
-                case RuneOptim.RuneSet.Guard:
-                    _imageSet = Runes.guard;
-                    break;
-                case RuneOptim.RuneSet.Nemesis:
-                    _imageSet = Runes.nemesis;
-                    break;
-                case RuneOptim.RuneSet.Rage:
-                    _imageSet = Runes.rage;
-                    break;
-                case RuneOptim.RuneSet.Revenge:
-                    _imageSet = Runes.revenge;
-                    break;
-                case RuneOptim.RuneSet.Shield:
-                    _imageSet = Runes.shield;
-                    break;
-                case RuneOptim.RuneSet.Swift:
-                    _imageSet = Runes.swift;
-                    break;
-                case RuneOptim.RuneSet.Vampire:
-                    _imageSet = Runes.vampire;
-                    break;
-                case RuneOptim.RuneSet.Violent:
-                    _imageSet = Runes.violent;
-                    break;
-                case RuneOptim.RuneSet.Will:
-                    _imageSet = Runes.will;
-                    break;
-                case RuneOptim.RuneSet.Fight:
-                    _imageSet = Runes.fight;
-                    break;
-                case RuneOptim.RuneSet.Determination:
-                    _imageSet = Runes.determination;
-                    break;
-                case RuneOptim.RuneSet.Enhance:
-                    _imageSet = Runes.enhance;
-                    break;
-                case RuneOptim.RuneSet.Accuracy:
-                    _imageSet = Runes.accuracy;
-                    break;
-                case RuneOptim.RuneSet.Tolerance:
-                    _imageSet = Runes.tolerance;
-                    break;
-            }
+		public float Gamma
+		{
+			get
+			{
+				return gamma;
+			}
+			set
+			{
+				gamma = value;
+			}
+		}
 
+		public int Grade { get { return grade; } set { grade = value; } }
+		public bool ShowBack { get { return renderBack; } set { renderBack = value; } }
+		public bool ShowStars { get { return renderStars; } set { renderStars = value; } }
+		public int Coolness { get { return coolness; } set { coolness = value; } }
 
-            _imageBack = Runes.bg_normal;
-            coolness = 0;
-            if (rune.Subs.Count == 4)
-            {
-                _imageBack = Runes.bg_legend;
-                coolness = 4;
-            }
-            else if (rune.Subs.Count == 3)
-            {
-                _imageBack = Runes.bg_hero;
-                coolness = 3;
-            }
-            else if (rune.Subs.Count == 2)
-            {
-                _imageBack = Runes.bg_rare;
-                coolness = 2;
-            }
-            else if (rune.Subs.Count == 1)
-            {
-                _imageBack = Runes.bg_magic;
-                coolness = 1;
-            }
+		public RuneControl()
+		{
+			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+			BackColor = Color.Transparent;
+			gamma = 1;
+			refresher = new Timer();
+			refresher.Tick += TimerOnTick;
+			refresher.Interval = 50;
+			refresher.Enabled = true;
+			refresher.Start();
+			grade = 1;
+		}
 
-            _imageStars = Runes.star_unawakened;
-            if (rune.Level == 15)
-                _imageStars = Runes.star_awakened;
+		protected override CreateParams CreateParams
+		{
+			get
+			{
+				CreateParams cp = base.CreateParams;
+				cp.ExStyle |= 0x20;
+				return cp;
+			}
+		}
 
-            Refresh();
-        }
+		protected override void OnMove(EventArgs e)
+		{
+			RecreateHandle();
+		}
 
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            if (_imageSlot != null)
-            {
-                var attr = new ImageAttributes();
+		public void SetCraft(RuneOptim.Craft craft)
+		{
+			_imageSet = runeSetImages[craft.Set];
+			_imageBack = runeRarityImages[craft.Rarity];
+			coolness = craft.Rarity;
+		}
 
-                attr.SetGamma(gamma);
+		public void SetRune(RuneOptim.Rune rune)
+		{
+			Tag = rune;
+			if (rune == null)
+				return;
 
-                int squarish = Math.Max(_imageSlot.Width, _imageSlot.Height);
-                //squarish = (int)(squarish * 1.25);
+			grade = rune.Grade;
 
-                if (renderBack)
-                    e.Graphics.DrawImage(_imageBack,
-                        new Rectangle((Width / 2) - (squarish / 2), (Height / 2) - (squarish / 2), squarish, squarish),
-                        new Rectangle(0, 0, _imageBack.Width, _imageBack.Height), GraphicsUnit.Pixel);
-                    //e.Graphics.DrawImage(_imageBack, (Width / 2) - (_imageBack.Width / 2), (Height / 2) - (_imageBack.Height / 2));
+			_imageSlot = runeSlotImages[rune.Slot];
+			_imageSet = runeSetImages[rune.Set];
 
-                //e.Graphics.DrawImage(_image, (Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2));
+			_imageBack = runeRarityImages[rune.Rarity];
+			coolness = rune.Rarity;
 
-                //Point[] dest = new Point[]{ new Point(top, left), new Point(top, right), new Point(bottom, right)};
-                e.Graphics.DrawImage(_imageSlot, 
-                    new Rectangle((Width / 2) - (_imageSlot.Width / 2), (Height / 2) - (_imageSlot.Height / 2), _imageSlot.Width, _imageSlot.Height), 
-                    0, 0, _imageSlot.Width, _imageSlot.Height, 
-                    GraphicsUnit.Pixel, attr);
+			_imageStars = Runes.star_unawakened;
+			if (rune.Level == 15)
+				_imageStars = Runes.star_awakened;
 
-                int smallish = (int)(squarish * 0.5);
+			Refresh();
+		}
 
-                if (coolness != 0)
-                {
-                    float[] colour = new float[] { 0, 0.6f, 0, 0, 1 };
+		protected override void OnPaint(PaintEventArgs e)
+		{
+			if (_imageSlot != null)
+			{
+				var attr = new ImageAttributes();
 
-                    if (coolness == 2)
-                        colour = new float[] { 0.1f, 0.2f, 0.8f, 0, 1 };
-                    else if (coolness == 3)
-                        colour = new float[] { 0.8f, 0, 0.8f, 0, 1 };
-                    else if (coolness == 4)
-                        colour = new float[] { 0.5f, 0.1f, 0, 0, 1 };
+				attr.SetGamma(gamma);
 
+				int squarish = Math.Max(_imageSlot.Width, _imageSlot.Height);
+				//squarish = (int)(squarish * 1.25);
 
-                    float[][] ptsArray = 
-                    { 
-                    new float[] {0.7f, 0, 0, 0, 0},
-                    new float[] {0, 0.7f, 0, 0, 0},
-                    new float[] {0, 0, 0.7f, 0, 0},
-                    new float[] {0, 0, 0, 1, 0}, colour
-                    };
-                    ColorMatrix clrMatrix = new ColorMatrix(ptsArray);
-                    attr.SetColorMatrix(clrMatrix,
-                    ColorMatrixFlag.Default,
-                    ColorAdjustType.Default);
-                }
+				if (renderBack)
+					e.Graphics.DrawImage(_imageBack,
+						new Rectangle((Width / 2) - (squarish / 2), (Height / 2) - (squarish / 2), squarish, squarish),
+						new Rectangle(0, 0, _imageBack.Width, _imageBack.Height), GraphicsUnit.Pixel);
+					//e.Graphics.DrawImage(_imageBack, (Width / 2) - (_imageBack.Width / 2), (Height / 2) - (_imageBack.Height / 2));
 
-                if (_imageSet != null)
-                {
-                    e.Graphics.DrawImage(_imageSet,
-                        new Rectangle((Width / 2) - (smallish / 2), (Height / 2) - (smallish / 2), smallish, smallish),
-                        0, 0, _imageSet.Width, _imageSet.Height,
-                        GraphicsUnit.Pixel, attr);
-                }
+				//e.Graphics.DrawImage(_image, (Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2));
 
-                // for int grade draw star
-                if (renderStars)
-                {
-                    for (int i = 0; i < grade; i++)
-                    {
-                        e.Graphics.DrawImage(_imageStars,
-                            new Rectangle((Width / 2) - (squarish / 2) + 2 + (8 + 6 / grade) * i, (Height / 2) - (squarish / 2) + 3, 13, 13),
-                            new Rectangle(0, 0, _imageStars.Width, _imageStars.Height),
-                            GraphicsUnit.Pixel);
-                    }
-                }
+				//Point[] dest = new Point[]{ new Point(top, left), new Point(top, right), new Point(bottom, right)};
+				e.Graphics.DrawImage(_imageSlot, 
+					new Rectangle((Width / 2) - (_imageSlot.Width / 2), (Height / 2) - (_imageSlot.Height / 2), _imageSlot.Width, _imageSlot.Height), 
+					0, 0, _imageSlot.Width, _imageSlot.Height, 
+					GraphicsUnit.Pixel, attr);
 
-            }
-        }
+				int smallish = (int)(squarish * 0.5);
 
-        protected override void OnPaintBackground(PaintEventArgs e)
-        {
-            //Do not paint background
-        }
+				if (coolness != 0)
+				{
+					// https://www.w3schools.com/colors/colors_converter.asp
+					// var qq = document.getElementById("rgb01").innerHTML; qq = qq.substring(4, qq.length-1).split(","); for (var i in qq) { console.log(qq[i].trim()/255-0.8);}
 
-        //Hack
-        public void Redraw()
-        {
-            RecreateHandle();
-        }
+					float[] colour = new float[] { -0.77f, 0.03f, -0.43f, 0, 1 };
 
-        private void TimerOnTick(object source, EventArgs e)
-        {
-            RecreateHandle();
-            refresher.Stop();
-        }
+					if (coolness == 2)
+						colour = new float[] { -0.48f, 0.2f, 0.12f, 0, 1 };
+					else if (coolness == 3)
+						colour = new float[] { 0.13f, -0.25f, 0.19f, 0, 1 };
+					else if (coolness == 4)
+						colour = new float[] { 0.18f, -0.12f, -0.48f, 0, 1 };
 
-        public Image SlotImage
-        {
-            get
-            {
-                return _imageSlot;
-            }
-            set
-            {
-                _imageSlot = value;
-                RecreateHandle();
-            }
-        }
+					float[][] ptsArray = 
+					{ 
+						new float[] {0.8f, 0, 0, 0, 0},
+						new float[] {0, 0.8f, 0, 0, 0},
+						new float[] {0, 0, 0.8f, 0, 0},
+						new float[] {0, 0, 0, 1, 0}, colour
+					};
+					ColorMatrix clrMatrix = new ColorMatrix(ptsArray);
+					attr.SetColorMatrix(clrMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
+				}
 
-        public Image SetImage
-        {
-            get
-            {
-                return _imageSet;
-            }
-            set
-            {
-                _imageSet = value;
-                RecreateHandle();
-            }
-        }
+				if (_imageSet != null)
+				{
+					e.Graphics.DrawImage(_imageSet,
+						new Rectangle((Width / 2) - (smallish / 2), (Height / 2) - (smallish / 2), smallish, smallish),
+						0, 0, _imageSet.Width, _imageSet.Height,
+						GraphicsUnit.Pixel, attr);
+				}
 
-        public Image StarImage
-        {
-            get
-            {
-                return _imageStars;
-            }
-            set
-            {
-                _imageStars = value;
-                RecreateHandle();
-            }
-        }
+				// for int grade draw star
+				if (renderStars)
+				{
+					for (int i = 0; i < grade; i++)
+					{
+						e.Graphics.DrawImage(_imageStars,
+							new Rectangle((Width / 2) - (squarish / 2) + 2 + (8 + 6 / grade) * i, (Height / 2) - (squarish / 2) + 3, 13, 13),
+							new Rectangle(0, 0, _imageStars.Width, _imageStars.Height),
+							GraphicsUnit.Pixel);
+					}
+				}
 
-        public Image BackImage
-        {
-            get
-            {
-                return _imageBack;
-            }
-            set
-            {
-                _imageBack = value;
-                RecreateHandle();
-            }
-        }
+			}
+		}
 
-        public float Gamma
-        {
-            get
-            {
-                return gamma;
-            }
-            set
-            {
-                gamma = value;
-            }
-        }
+		protected override void OnPaintBackground(PaintEventArgs e)
+		{
+			//Do not paint background
+		}
 
-        public int Grade { get { return grade; } set { grade = value; } }
-        public bool ShowBack { get { return renderBack; } set { renderBack = value; } }
-        public bool ShowStars { get { return renderStars; } set { renderStars = value; } }
-        public int Coolness { get { return coolness; } set { coolness = value; } }
-    }
+		//Hack
+		public void Redraw()
+		{
+			RecreateHandle();
+		}
+
+		private void TimerOnTick(object source, EventArgs e)
+		{
+			RecreateHandle();
+			refresher.Stop();
+		}
+
+		readonly Bitmap[] runeSlotImages =
+		{
+			null,
+			Runes.rune1,
+			Runes.rune2,
+			Runes.rune3,
+			Runes.rune4,
+			Runes.rune5,
+			Runes.rune6,
+		};
+
+		readonly Bitmap[] runeRarityImages =
+		{
+			Runes.bg_normal,
+			Runes.bg_magic,
+			Runes.bg_rare,
+			Runes.bg_hero,
+			Runes.bg_legend,
+		};
+
+		readonly System.Collections.Generic.Dictionary<RuneOptim.RuneSet, Bitmap> runeSetImages = new System.Collections.Generic.Dictionary<RuneOptim.RuneSet, Bitmap>()
+		{
+			{ RuneOptim.RuneSet.Null, null },
+			{ RuneOptim.RuneSet.Blade, Runes.blade },
+			{ RuneOptim.RuneSet.Despair, Runes.despair },
+			{ RuneOptim.RuneSet.Destroy, Runes.destroy },
+			{ RuneOptim.RuneSet.Endure, Runes.endure },
+			{ RuneOptim.RuneSet.Energy, Runes.energy },
+			{ RuneOptim.RuneSet.Fatal, Runes.fatal },
+			{ RuneOptim.RuneSet.Focus, Runes.focus },
+			{ RuneOptim.RuneSet.Guard, Runes.guard },
+			{ RuneOptim.RuneSet.Nemesis, Runes.nemesis },
+			{ RuneOptim.RuneSet.Rage, Runes.rage },
+			{ RuneOptim.RuneSet.Revenge, Runes.revenge },
+			{ RuneOptim.RuneSet.Shield, Runes.shield },
+			{ RuneOptim.RuneSet.Swift, Runes.swift },
+			{ RuneOptim.RuneSet.Vampire, Runes.vampire },
+			{ RuneOptim.RuneSet.Violent, Runes.violent },
+			{ RuneOptim.RuneSet.Will, Runes.will },
+			{ RuneOptim.RuneSet.Fight, Runes.fight },
+			{ RuneOptim.RuneSet.Determination, Runes.determination },
+			{ RuneOptim.RuneSet.Enhance, Runes.enhance },
+			{ RuneOptim.RuneSet.Accuracy, Runes.accuracy },
+			{ RuneOptim.RuneSet.Tolerance, Runes.tolerance }
+		};
+
+	}
 }

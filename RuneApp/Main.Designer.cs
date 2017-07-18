@@ -124,6 +124,14 @@
 			this.buildID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.toolStrip5 = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
+			this.tabCrafts = new System.Windows.Forms.TabPage();
+			this.dataCraftList = new System.Windows.Forms.ListView();
+			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.toolStrip7 = new System.Windows.Forms.ToolStrip();
 			this.loadoutList = new System.Windows.Forms.ListView();
 			this.buildIDCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.buildNameCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -187,6 +195,7 @@
 			this.toolStrip3.SuspendLayout();
 			this.tabBuilds.SuspendLayout();
 			this.toolStrip5.SuspendLayout();
+			this.tabCrafts.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.toolStrip4.SuspendLayout();
 			this.groupBox3.SuspendLayout();
@@ -903,6 +912,7 @@
 			this.tabControl1.Controls.Add(this.tabMonsters);
 			this.tabControl1.Controls.Add(this.tabRunes);
 			this.tabControl1.Controls.Add(this.tabBuilds);
+			this.tabControl1.Controls.Add(this.tabCrafts);
 			this.tabControl1.Location = new System.Drawing.Point(2, 2);
 			this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
 			this.tabControl1.Name = "tabControl1";
@@ -1154,6 +1164,71 @@
 			this.toolStripButton5.Name = "toolStripButton5";
 			this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton5.Text = "Use Build";
+			// 
+			// tabCrafts
+			// 
+			this.tabCrafts.Controls.Add(this.dataCraftList);
+			this.tabCrafts.Controls.Add(this.toolStrip7);
+			this.tabCrafts.Location = new System.Drawing.Point(4, 22);
+			this.tabCrafts.Name = "tabCrafts";
+			this.tabCrafts.Size = new System.Drawing.Size(244, 622);
+			this.tabCrafts.TabIndex = 3;
+			this.tabCrafts.Text = "Crafts";
+			this.tabCrafts.UseVisualStyleBackColor = true;
+			// 
+			// dataCraftList
+			// 
+			this.dataCraftList.AllowColumnReorder = true;
+			this.dataCraftList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.dataCraftList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader5,
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4});
+			this.dataCraftList.FullRowSelect = true;
+			this.dataCraftList.Location = new System.Drawing.Point(2, 27);
+			this.dataCraftList.Margin = new System.Windows.Forms.Padding(2);
+			this.dataCraftList.MultiSelect = false;
+			this.dataCraftList.Name = "dataCraftList";
+			this.dataCraftList.Size = new System.Drawing.Size(240, 593);
+			this.dataCraftList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			this.dataCraftList.TabIndex = 2;
+			this.dataCraftList.UseCompatibleStateImageBehavior = false;
+			this.dataCraftList.View = System.Windows.Forms.View.Details;
+			this.dataCraftList.SelectedIndexChanged += new System.EventHandler(this.crafttab_list_select);
+			// 
+			// columnHeader5
+			// 
+			this.columnHeader5.Text = "Id";
+			this.columnHeader5.Width = 0;
+			// 
+			// columnHeader1
+			// 
+			this.columnHeader1.Text = "Set";
+			this.columnHeader1.Width = 55;
+			// 
+			// columnHeader2
+			// 
+			this.columnHeader2.Text = "Attribute";
+			// 
+			// columnHeader3
+			// 
+			this.columnHeader3.Text = "Grade";
+			// 
+			// columnHeader4
+			// 
+			this.columnHeader4.Text = "Type";
+			// 
+			// toolStrip7
+			// 
+			this.toolStrip7.Location = new System.Drawing.Point(0, 0);
+			this.toolStrip7.Name = "toolStrip7";
+			this.toolStrip7.Size = new System.Drawing.Size(244, 25);
+			this.toolStrip7.TabIndex = 0;
+			this.toolStrip7.Text = "toolStrip7";
 			// 
 			// loadoutList
 			// 
@@ -1747,6 +1822,8 @@
 			this.tabBuilds.PerformLayout();
 			this.toolStrip5.ResumeLayout(false);
 			this.toolStrip5.PerformLayout();
+			this.tabCrafts.ResumeLayout(false);
+			this.tabCrafts.PerformLayout();
 			this.groupBox2.ResumeLayout(false);
 			this.groupBox2.PerformLayout();
 			this.toolStrip4.ResumeLayout(false);
@@ -1922,6 +1999,14 @@
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Button btnRefreshSave;
 		private System.Windows.Forms.ColumnHeader colMonID;
+		private System.Windows.Forms.TabPage tabCrafts;
+		private System.Windows.Forms.ListView dataCraftList;
+		private System.Windows.Forms.ColumnHeader columnHeader1;
+		private System.Windows.Forms.ToolStrip toolStrip7;
+		private System.Windows.Forms.ColumnHeader columnHeader2;
+		private System.Windows.Forms.ColumnHeader columnHeader3;
+		private System.Windows.Forms.ColumnHeader columnHeader4;
+		private System.Windows.Forms.ColumnHeader columnHeader5;
 	}
 }
 

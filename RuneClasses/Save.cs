@@ -16,7 +16,7 @@ namespace RuneOptim
 		[JsonProperty("deco_list")]
 		public readonly ObservableCollection<Deco> Decorations = new ObservableCollection<Deco>();
 		
-		[JsonProperty("crafts")]
+		[JsonProperty("rune_craft_item_list")]
 		public readonly ObservableCollection<Craft> Crafts = new ObservableCollection<Craft>();
 
 		[JsonProperty("runes")]

@@ -66,7 +66,10 @@ namespace RuneApp
 			dataMonsterList.ListViewItemSorter = sorter;
 			sorter.OnColumnClick(colMonGrade.Index);
 			sorter.OnColumnClick(colMonPriority.Index);
+
 			dataRuneList.ListViewItemSorter = new ListViewSort();
+
+			dataCraftList.ListViewItemSorter = new ListViewSort();
 
 			sorter = new ListViewSort();
 			sorter.OnColumnClick(0);
@@ -594,18 +597,22 @@ namespace RuneApp
 
 		private void runetab_list_select(object sender, EventArgs e)
 		{
-			if (dataRuneList.FocusedItem != null)
+			var rune = dataRuneList.SelectedItems.Cast<ListViewItem>().FirstOrDefault()?.Tag as Rune;
+			if (rune != null)
 			{
-				var item = dataRuneList.FocusedItem;
-				if (item.Tag != null)
-				{
-					Rune rune = (Rune)item.Tag;
-
-					runeInventory.Show();
-					runeInventory.SetRune(rune);
-				}
+				runeInventory.Show();
+				runeInventory.SetRune(rune);
 			}
+		}
 
+		private void crafttab_list_select(object sender, EventArgs e)
+		{
+			var craft = dataCraftList.SelectedItems.Cast<ListViewItem>().FirstOrDefault()?.Tag as Craft;
+			if (craft != null)
+			{
+				runeInventory.Show();
+				runeInventory.SetCraft(craft);
+			}
 		}
 
 		private void listView2_ColumnClick(object sender, ColumnClickEventArgs e)
@@ -1391,6 +1398,18 @@ namespace RuneApp
 					mon.Id.ToString()
 				},
 				Tag = mon,
+			}).ToArray());
+
+			dataCraftList.Items.AddRange(Program.data.Crafts.Select(craft => new ListViewItem()
+			{
+				Text = craft.ItemId.ToString(),
+				SubItems =
+				{
+					craft.Set.ToString(),
+					craft.Stat.ToString(),
+					craft.Rarity.ToString(),
+					craft.Type.ToString(),
+				}
 			}).ToArray());
 
 			foreach (Rune rune in Program.data.Runes)
