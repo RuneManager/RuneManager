@@ -160,7 +160,14 @@ namespace RuneApp
 			build.AllowBroken = tb.AllowBroken;
 			build.Minimum.SetTo(tb.Minimum);
 			build.Maximum.SetTo(tb.Maximum);
-			build.Threshold.SetTo(tb.Threshold);
+			if (tb.Threshold.NonZero())
+				build.Threshold.SetTo(tb.Threshold);
+			else
+				build.Threshold.SetTo(new Stats() {
+					Accuracy = 85,
+					Resistance = 100,
+					CritRate = 100,
+				});
 			build.Sort.SetTo(tb.Sort);
 			build.BuildSets.Clear();
 			build.BuildSets.AddRange(tb.BuildSets);

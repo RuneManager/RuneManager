@@ -29,11 +29,16 @@ namespace RuneApp
 			set { locked = value; refreshControls(); }
 		}
 
-		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		string text;
+		[EditorBrowsable(EditorBrowsableState.Always)]
+		[Browsable(true)]
+		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+		[Bindable(true)]
+		[DefaultValue("Title")]
 		public override string Text
 		{
-			get { return this.lbTitle.Text; }
-			set { this.lbTitle.Text = value; }
+			get { return text; }
+			set { text = value; this.lbTitle.Text = value; }
 		}
 
 		bool labels = false;
@@ -94,7 +99,7 @@ namespace RuneApp
 		{
 			InitializeComponent();
 			refreshControls();
-			this.lbTitle.Text = this.Text;
+			this.lbTitle.Text = text;
 		}
 
 		private void StatColumn_Load(object sender, EventArgs e)

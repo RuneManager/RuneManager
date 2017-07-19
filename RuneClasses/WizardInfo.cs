@@ -64,7 +64,7 @@ namespace RuneOptim
 		public int GuildPoint;
 
 		[JsonProperty("rep_unit_id")]
-		public ulong ReputatiopnMonsterId;
+		public ulong ReputationMonsterId;
 
 		[JsonProperty("rep_assigned")]
 		public bool RepAssigned;
