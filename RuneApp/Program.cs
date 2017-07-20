@@ -114,7 +114,18 @@ namespace RuneApp
 			BuildsProgressTo += Program_BuildsProgressTo;
 
 			if (Program.Settings.InternalServer)
+			{
+				try
+				{
 				master.Start();
+				}
+				catch
+				{
+					Program.Settings.InternalServer = false;
+					Program.Settings.Save();
+				}
+			}
+
 			if (Program.Settings.WatchSave)
 				watchSave();
 
@@ -252,7 +263,6 @@ namespace RuneApp
 			{
 #endif
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
-				
 				// TODO: trash
 				for (int i = 0; i < Deco.ShrineStats.Length; i++)
 				{

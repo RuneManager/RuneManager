@@ -16,7 +16,7 @@ namespace RuneOptim
 		[JsonProperty("deco_list")]
 		public readonly ObservableCollection<Deco> Decorations = new ObservableCollection<Deco>();
 		
-		[JsonProperty("crafts")]
+		[JsonProperty("rune_craft_item_list")]
 		public readonly ObservableCollection<Craft> Crafts = new ObservableCollection<Craft>();
 
 		[JsonProperty("runes")]
@@ -70,8 +70,34 @@ namespace RuneOptim
 			Monsters.CollectionChanged += Monsters_CollectionChanged;
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
 			LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
+			Buildings.CollectionChanged += Buildings_CollectionChanged;
 		}
-		
+
+		private void Buildings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			switch (e.Action)
+			{
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					foreach (var b in e.NewItems.Cast<Building>())
+					{
+						if (b.BuildingType == BuildingType.MonsterStorage)
+						{
+							foreach (var m in Monsters.Where(mo => mo.BuildingId == b.Id))
+							{
+								m.inStorage = true;
+							}
+						}
+					}
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+				default:
+					throw new NotImplementedException();
+			}
+		}
+
 		private void LockedUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -132,6 +158,9 @@ namespace RuneOptim
 							Runes.Add(r);
 						}
 						mon.Current.Shrines = shrines;
+
+						if (mon.BuildingId == Buildings.FirstOrDefault(b => b.BuildingType == BuildingType.MonsterStorage)?.Id)
+							mon.inStorage = true;
 
 						// Add all the Runes in the pool assigned to the monster to it's current loadout
 						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id))

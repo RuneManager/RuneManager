@@ -30,7 +30,7 @@
         {
 			this.lbMain = new System.Windows.Forms.Label();
 			this.lbInnate = new System.Windows.Forms.Label();
-			this.runeControl1 = new RuneApp.RuneControl();
+			this.runeControl = new RuneApp.RuneControl();
 			this.lbLevel = new System.Windows.Forms.Label();
 			this.lb1 = new System.Windows.Forms.Label();
 			this.lb2 = new System.Windows.Forms.Label();
@@ -61,22 +61,22 @@
 			// 
 			// runeControl1
 			// 
-			this.runeControl1.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl1.BackImage = global::RuneApp.Runes.bg_normal;
-			this.runeControl1.Coolness = 0;
-			this.runeControl1.Gamma = 1F;
-			this.runeControl1.Grade = 2;
-			this.runeControl1.Location = new System.Drawing.Point(4, 17);
-			this.runeControl1.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl1.Name = "runeControl1";
-			this.runeControl1.SetImage = global::RuneApp.Runes.despair;
-			this.runeControl1.ShowBack = true;
-			this.runeControl1.ShowStars = true;
-			this.runeControl1.Size = new System.Drawing.Size(58, 58);
-			this.runeControl1.SlotImage = global::RuneApp.Runes.rune2;
-			this.runeControl1.StarImage = global::RuneApp.Runes.star_unawakened;
-			this.runeControl1.TabIndex = 11;
-			this.runeControl1.Text = "Rune";
+			this.runeControl.BackColor = System.Drawing.Color.Transparent;
+			this.runeControl.BackImage = global::RuneApp.Runes.bg_normal;
+			this.runeControl.Coolness = 0;
+			this.runeControl.Gamma = 1F;
+			this.runeControl.Grade = 2;
+			this.runeControl.Location = new System.Drawing.Point(4, 17);
+			this.runeControl.Margin = new System.Windows.Forms.Padding(2);
+			this.runeControl.Name = "runeControl1";
+			this.runeControl.SetImage = global::RuneApp.Runes.despair;
+			this.runeControl.ShowBack = true;
+			this.runeControl.ShowStars = true;
+			this.runeControl.Size = new System.Drawing.Size(58, 58);
+			this.runeControl.SlotImage = global::RuneApp.Runes.rune2;
+			this.runeControl.StarImage = global::RuneApp.Runes.star_unawakened;
+			this.runeControl.TabIndex = 11;
+			this.runeControl.Text = "Rune";
 			// 
 			// lbLevel
 			// 
@@ -147,7 +147,7 @@
 			// RuneBox
 			// 
 			this.Controls.Add(this.lbClose);
-			this.Controls.Add(this.runeControl1);
+			this.Controls.Add(this.runeControl);
 			this.Controls.Add(this.lbMain);
 			this.Controls.Add(this.lbInnate);
 			this.Controls.Add(this.lbLevel);
@@ -165,7 +165,7 @@
 
         #endregion
 
-        private RuneControl runeControl1;
+        private RuneControl runeControl;
         private System.Windows.Forms.Label lbMain;
         private System.Windows.Forms.Label lbInnate;
         private System.Windows.Forms.Label lbLevel;

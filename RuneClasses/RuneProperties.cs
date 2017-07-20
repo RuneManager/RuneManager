@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
@@ -11,7 +12,7 @@ namespace RuneOptim
 {
 	public partial class Rune
 	{
-		public static readonly RuneSet[] RuneSets = new RuneSet[] { RuneSet.Energy, // Health
+		public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { RuneSet.Energy, // Health
 			RuneSet.Guard, // Def
 			RuneSet.Swift, // Speed
 			RuneSet.Blade, // CRate
@@ -37,7 +38,7 @@ namespace RuneOptim
 			RuneSet.Enhance,
 			RuneSet.Accuracy,
 			RuneSet.Tolerance,
-		};
+		}.ToImmutableArray();
 
 		[JsonIgnore]
 		public double Efficiency
@@ -85,7 +86,7 @@ namespace RuneOptim
 
 			return count;
 		}
-		
+
 		public static AttributeCategory getSetType(this Rune rune)
 		{
 			var neutral = new RuneSet[] { RuneSet.Violent, RuneSet.Swift, RuneSet.Focus, RuneSet.Nemesis };
@@ -395,9 +396,19 @@ namespace RuneOptim
 			if (a == Attr.Null)
 				return 0;
 			if (a == Attr.HealthFlat || a == Attr.AttackFlat || a == Attr.DefenseFlat)
-				return val / (double)2 / (5 * subUpgrades[a][rune.Grade - 1]);
+				return val / (double)2 / (5 * subUpgrades[a][rune.Grade - 1].Max);
 
-			return val / (double)(5 * subUpgrades[a][rune.Grade - 1]);
+			return val / (double)(5 * subUpgrades[a][rune.Grade - 1].Max);
+		}
+
+		public static double EffectiveBaseRank(this Rune r)
+		{
+			double ret = 0;
+			foreach (RuneAttr s in r.Subs)
+			{
+				ret += (s.BaseValue - subUpgrades[s.Type][r.Grade - 1].Average) / (double)subUpgrades[s.Type][r.Grade - 1].Average;
+			}
+			return ret;
 		}
 
 		#region stats
@@ -421,74 +432,92 @@ namespace RuneOptim
 			{Attr.Accuracy, 40 },
 		};
 
+		private static readonly ValueRange[] flatSubUpgrades = { new ValueRange(1, 4), new ValueRange(2, 5), new ValueRange(3, 8), new ValueRange(4, 10), new ValueRange(8, 15), new ValueRange(10, 20) };
+		private static readonly ValueRange[] percentSubUpgrades = { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 5), new ValueRange(3, 6), new ValueRange(4, 7), new ValueRange(5, 8) };
+		private static readonly ValueRange[] accResSubUpgrades = { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 4), new ValueRange(2, 5), new ValueRange(3, 7), new ValueRange(4, 8) };
 
-		private static Dictionary<Attr, int[]> subUpgrades = new Dictionary<Attr, int[]>()
+		private static Dictionary<Attr, ValueRange[]> subUpgrades = new Dictionary<Attr, ValueRange[]>()
 		{
-			{Attr.HealthFlat, new int[] { 20, 90, 160, 222, 279, 365 } },
-			{Attr.AttackFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
-			{Attr.DefenseFlat, new int[] { 3, 4, 6, 9, 15, 23 } },
-			{Attr.Speed, new int[] { 1, 2, 3, 4, 5, 6} },
+			{Attr.HealthFlat, new ValueRange[] { new ValueRange(15, 60), new ValueRange(30, 105), new ValueRange(45, 165), new ValueRange(60, 225), new ValueRange(90, 300), new ValueRange(135, 375) } },
+			{Attr.AttackFlat, flatSubUpgrades },
+			{Attr.DefenseFlat, flatSubUpgrades },
+			{Attr.Speed, new ValueRange[] { new ValueRange(1, 1), new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 4), new ValueRange(3, 5), new ValueRange(4, 6) } },
 
-			{Attr.HealthPercent, new int[] { 3, 4, 5, 6, 7, 8} },
-			{Attr.AttackPercent, new int[] { 3, 4, 5, 6, 7, 8} },
-			{Attr.DefensePercent, new int[] { 3, 4, 5, 6, 7, 8 } },
+			{Attr.HealthPercent, percentSubUpgrades },
+			{Attr.AttackPercent, percentSubUpgrades },
+			{Attr.DefensePercent, percentSubUpgrades },
 
-			{ Attr.CritRate, new int[] { 1, 2, 3, 4, 5, 6 } },
-			{ Attr.CritDamage, new int[] { 2, 3, 4, 5, 6, 7 } },
+			{ Attr.CritRate, new ValueRange[] { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(1, 3), new ValueRange(2, 4), new ValueRange(3, 5), new ValueRange(4, 6) } },
+			{ Attr.CritDamage, new ValueRange[] { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 4), new ValueRange(2, 5), new ValueRange(3, 5), new ValueRange(4, 7) } },
 
-			{Attr.Resistance, new int[] { 3, 4, 5, 6, 7, 8 } },
-			{Attr.Accuracy, new int[] { 3, 4, 5, 6, 7, 8 } },
+			{Attr.Resistance, accResSubUpgrades },
+			{Attr.Accuracy, accResSubUpgrades },
 		};
 
-		public static readonly int[][] MainValues_Speed = new int[][] {
-			new int[]{3,4,5,6,8,9,10,12,13,14,16,17,18,19,21,25},
-			new int[]{4,5,7,8,10,11,13,14,16,17,19,20,22,23,25,30},
-			new int[]{5,7,9,11,13,15,17,19,21,23,25,27,29,31,33,39},
-			new int[]{7,9,11,13,15,17,19,21,23,25,27,29,31,33,35,42}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_Speed = new RuneMainStatValue[] {
+			new RuneMainStatValue(1,1),
+			new RuneMainStatValue(2,1),
+			new RuneMainStatValue(3,4/(double)3),
+			new RuneMainStatValue(4,1.5),
+			new RuneMainStatValue(5,2),
+			new RuneMainStatValue(7,3),
+		}.ToImmutableArray();
 
-		public static readonly int[][] MainValues_Flat = new int[][] {
-			new int[]{7,12,17,22,27,32,37,42,47,52,57,62,67,72,77,92},
-			new int[]{10,16,22,28,34,40,46,52,58,64,70,76,82,88,94,112},
-			new int[]{15,22,29,36,43,50,57,64,71,78,85,92,99,106,113,135},
-			new int[]{22,30,38,46,54,62,70,78,86,94,102,110,118,126,134,160}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_Flat = new RuneMainStatValue[] {
+			new RuneMainStatValue(3,3),
+			new RuneMainStatValue(5,4),
+			new RuneMainStatValue(7,5),
+			new RuneMainStatValue(10,6),
+			new RuneMainStatValue(15,7),
+			new RuneMainStatValue(22,8),
+		}.ToImmutableArray();
 
-		public static readonly int[][] MainValues_HPflat = new int[][] {
-			new int[]{100,175,250,325,400,475,550,625,700,775,850,925,1000,1075,1150,1380},
-			new int[]{160,250,340,430,520,610,700,790,880,970,1060,1150,1240,1330,1420,1704},
-			new int[]{270,375,480,585,690,795,900,1005,1110,1215,1320,1425,1530,1635,1740,2088},
-			new int[]{360,480,600,720,840,960,1080,1200,1320,1440,1560,1680,1800,1920,2040,2448}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_HPflat = new RuneMainStatValue[] {
+			new RuneMainStatValue(40,45),
+			new RuneMainStatValue(70,60),
+			new RuneMainStatValue(100,75),
+			new RuneMainStatValue(160,90),
+			new RuneMainStatValue(270,105),
+			new RuneMainStatValue(360,120),
+		}.ToImmutableArray();
 
-		public static readonly int[][] MainValues_Percent = new int[][] {
-			new int[]{4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
-			new int[]{5,7,9,11,13,16,18,20,22,23,27,29,31,33,36,43},
-			new int[]{8,10,12,15,17,20,22,24,27,29,32,34,37,40,43,51},
-			new int[]{11,14,17,20,23,26,29,32,35,38,41,44,47,50,53,63}
-		};
-		public static readonly int[][] MainValues_CRate = new int[][] {
-			new int[]{3,5,7,9,11,13,15,17,19,21,23,25,27,29,31,37},
-			new int[]{4,6,8,11,13,15,17,19,22,24,26,28,30,33,35,41},
-			new int[]{5,7,10,12,15,17,19,22,24,27,29,31,34,36,39,47},
-			new int[]{7,10,13,16,19,22,25,28,31,34,37,40,43,46,49,58}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_Percent = new RuneMainStatValue[] {
+			new RuneMainStatValue(1,1),
+			new RuneMainStatValue(2,1),
+			new RuneMainStatValue(4,2),
+			new RuneMainStatValue(5,2.15),
+			new RuneMainStatValue(8,2.45),
+			new RuneMainStatValue(11,3),
+		}.ToImmutableArray();
 
-		public static readonly int[][] MainValues_CDmg = new int[][] {
-			new int[]{4,6,9,11,13,16,18,20,22,25,27,29,32,34,36,43},
-			new int[]{6,9,12,15,18,21,24,27,30,33,36,39,42,45,48,57},
-			new int[]{8,11,15,18,21,25,28,31,34,38,41,44,48,51,54,65},
-			new int[]{11,15,19,23,27,31,35,39,43,47,51,55,59,63,67,80}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_CRate = new RuneMainStatValue[] {
+			new RuneMainStatValue(1,1),
+			new RuneMainStatValue(2,1),
+			new RuneMainStatValue(3,2),
+			new RuneMainStatValue(4,2.15),
+			new RuneMainStatValue(5,2.45),
+			new RuneMainStatValue(7,3),
+		}.ToImmutableArray();
 
-		public static readonly int[][] MainValues_ResAcc = new int[][] {
-			new int[] {4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,38},
-			new int[] {6,8,10,13,15,17,19,21,24,26,28,30,32,35,37,44},
-			new int[] {9,11,14,16,19,21,23,26,28,31,33,35,38,40,43,51},
-			new int[] {12,15,18,21,24,27,30,33,36,39,42,45,48,51,54,64}
-		};
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_CDmg = new RuneMainStatValue[] {
+			new RuneMainStatValue(2,1),
+			new RuneMainStatValue(3,2),
+			new RuneMainStatValue(4,2.25),
+			new RuneMainStatValue(6,3),
+			new RuneMainStatValue(8,10/(double)3),
+			new RuneMainStatValue(11,4),
+		}.ToImmutableArray();
 
-		public static readonly Dictionary<Attr, int[][]> MainValues = new Dictionary<Attr, int[][]>
+		public static readonly ImmutableArray<RuneMainStatValue> MainValues_ResAcc = new RuneMainStatValue[] {
+			new RuneMainStatValue(1,1),
+			new RuneMainStatValue(2,1),
+			new RuneMainStatValue(4,2),
+			new RuneMainStatValue(6,2.15),
+			new RuneMainStatValue(9,2.45),
+			new RuneMainStatValue(12,3),
+		}.ToImmutableArray();
+
+		public static readonly ImmutableDictionary<Attr, ImmutableArray<RuneMainStatValue>> MainValues = new Dictionary<Attr, ImmutableArray<RuneMainStatValue>>
 		{
 			{Attr.HealthFlat, MainValues_HPflat },
 			{Attr.AttackFlat, MainValues_Flat },
@@ -504,9 +533,34 @@ namespace RuneOptim
 
 			{Attr.Accuracy, MainValues_ResAcc },
 			{Attr.Resistance, MainValues_ResAcc },
-		};
+		}.ToImmutableDictionary();
 
 		#endregion
+	}
+
+	public class RuneMainStatValue
+	{
+		int start;
+		double growth;
+
+		public RuneMainStatValue(int s, double g)
+		{
+			start = s;
+			growth = g;
+		}
+
+		public int this[int grade]
+		{
+			get
+			{
+				if (grade == 15)
+					return (int)Math.Round((start + (14 * growth)) * 1.2);
+				else if (grade >= 0 && grade < 15)
+					return (int)Math.Round(start + (grade * growth));
+				else
+					throw new IndexOutOfRangeException("Cannot check grade " + grade + " rune");
+			}
+		}
 	}
 
 	// Enums up Runesets

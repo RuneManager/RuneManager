@@ -52,6 +52,7 @@
     <Compile Include="Response\EquipRuneResponse.cs" />
     <Compile Include="Response\GetBestClearRiftDungeonResponse.cs" />
     <Compile Include="Response\UnequipRuneResponse.cs" />
+    <Compile Include="Response\UpgradeDecoResponse.cs" />
     <Compile Include="SWEvent.cs" />
     <Compile Include="SWMessage.cs" />
     <Compile Include="SWPlugin.cs" />

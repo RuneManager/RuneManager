@@ -219,7 +219,8 @@ namespace RuneApp
 				combinations *= build.runes[4].Length;
 				combinations *= build.runes[5].Length;
 
-				runeSheet.Cells[build.priority + 1, linkCol + 2].Value = combinations;
+				runeSheet.Cells[build.priority + 1, linkCol + 2].Value = load.ActualTests;
+				runeSheet.Cells[build.priority + 1, linkCol + 3].Value = combinations;
 
 			}
 			else
