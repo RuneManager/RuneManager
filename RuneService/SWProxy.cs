@@ -12,58 +12,67 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RunePlugin;
-using Titanium.Web.Proxy;
-using Titanium.Web.Proxy.EventArguments;
-using Titanium.Web.Proxy.Models;
+using TrotiNet;
 
 namespace RuneService
 {
 	class SWProxy
 	{
-		ProxyServer proxyServer;
-
-		private Dictionary<Guid, string> trackedRequests = new Dictionary<Guid, string>();
-
 		public EventHandler<SWEventArgs> SWResponse;
 
 		private ICollection<SWPlugin> plugins;
 
-		private static ulong[] whitelistDebugWizards = new ulong[]{ 12168103 };
+		private static ulong[] whitelistDebugWizards = new ulong[] { 12168103 };
 
-		private List<string> skipHosts = new List<string>() { "216.58.199.46", // Wifi check
+		private static List<string> skipHosts = new List<string>() { "216.58.199.46", // Wifi check
 			"pasta.esfile.duapps.com", "analytics.app-adforce.jp", "push.qpyou.cn", "activeuser.qpyou.cn", "mlog.appguard.co.kr" // SW init
 		};
 
-		public SWProxy()
-		{
-			proxyServer = new ProxyServer();
+		private int listenPort = 8080;
+
+		//public SWProxy(HttpSocket clientSocket) : base(clientSocket) { }
+
+		public SWProxy() {
+
 		}
 
-		public void StartProxy()
-		{
-			proxyServer.BeforeRequest += OnRequest;
-			proxyServer.BeforeResponse += OnResponse;
-
-			// TODO: allow rebinding / more endpoints
-			var endpoint = new TransparentProxyEndPoint(IPAddress.Any, 8080, false);
-			proxyServer.AddEndPoint(endpoint);
-			proxyServer.Start();
-
+		public void StartProxy() {
 			LoadPlugins("plugins");
+
+			var server = new TcpServer(listenPort, false) { BindAddress = IPAddress.Any /* Overrides ipv6=false */ };
+			ProxyHandler.Plugins = SWResponse;	// :(
+			server.Start(ProxyHandler.OnConnection);
 
 			foreach (var eth in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()) {
 				if (eth.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
 				if (eth.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
 				foreach (var ip in eth.GetIPProperties().UnicastAddresses) {
 					if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6) {
-						Console.WriteLine("Proxy listening on [" + ip.Address + "]:" + endpoint.Port);
+						Console.WriteLine("Proxy listening on [" + ip.Address + "]:" + listenPort);
 					}
 					else {
-						Console.WriteLine("Proxy listening on " + ip.Address + ":" + endpoint.Port);
+						Console.WriteLine("Proxy listening on " + ip.Address + ":" + listenPort);
 					}
 				}
 			}
+
+			server.InitListenFinished.WaitOne();
+			if (server.InitListenException != null) throw server.InitListenException;
+
+			while (true)
+				System.Threading.Thread.Sleep(1000);
+
+			//server.Stop();
 		}
+
+		//private async Task OnTunnelConnectRequest(object sender, TunnelConnectSessionEventArgs e) {
+		//	Console.WriteLine("Tunnel to: " + e.WebSession.Request.Host);
+		//}
+		//
+		//private async Task OnTunnelConnectResponse(object sender, TunnelConnectSessionEventArgs e) {
+		//	//throw new NotImplementedException();
+		//	//return Task.FromResult(0);
+		//}
 
 		private void LoadPlugins(string path)
 		{
@@ -155,133 +164,161 @@ namespace RuneService
 		{
 			UnloadPlugins();
 
-			proxyServer.BeforeRequest -= OnRequest;
-			proxyServer.BeforeResponse -= OnResponse;
+			//proxyServer.BeforeRequest -= OnRequest;
+			//proxyServer.BeforeResponse -= OnResponse;
 
-			proxyServer.Stop();
+			//proxyServer.Stop();
 		}
 
-		private async Task OnRequest(object sender, SessionEventArgs e)
-		{
-			var method = e.WebSession.Request.Method.ToUpper();
-			if ((method == "POST" || method == "PUT" || method == "PATCH"))
-			{
-				if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
-					return;
+		class ProxyHandler : BaseProxy {
+			public static EventHandler<SWEventArgs> Plugins { get; internal set; }
+			private string decRequest;
+			private Uri requestUri;
+			private JObject req;
 
-				// Typical requests endpoint:
-				//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
-				if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
-				{
-					string bodyString = await e.GetRequestBodyAsString();
+			public ProxyHandler(HttpSocket clientSocket) : base(clientSocket) { }
 
-					var dec = decryptRequest(bodyString, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
-					try
-					{
-						var json = JsonConvert.DeserializeObject<JObject>(dec);
-						if (!Directory.Exists("Json"))
-							Directory.CreateDirectory("Json");
-						File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", dec);
-						Console.ForegroundColor = ConsoleColor.DarkGray;
-						Console.WriteLine($">{json["command"]}");
-						Console.ForegroundColor = ConsoleColor.Gray;
-					}
-					catch { };
-
-					trackedRequests.Add(e.Id, dec);
-				}
+			public static ProxyHandler OnConnection(HttpSocket clientSocket) {
+				return new ProxyHandler(clientSocket);
 			}
-		}
 
-		private async Task OnResponse(object sender, SessionEventArgs e)
-		{
-			if (e.WebSession.Request.Method == "GET" || e.WebSession.Request.Method == "POST")
-			{
-				if (e.WebSession.Response.ResponseStatusCode == "200" && e.WebSession.Response.ContentType != null)
-				{
-					if (skipHosts.Contains(e.WebSession.Request.RequestUri.Host))
+			protected override void OnReceiveRequest(HttpRequestLine e) {
+#if DEBUG
+				Console.ForegroundColor = ConsoleColor.DarkBlue;
+				Console.WriteLine("-> " + RequestLine + (RequestHeaders.Referer != null ? ", Referer: " + RequestHeaders.Referer : ""));
+				Console.ForegroundColor = ConsoleColor.Gray;
+#endif
+				requestUri = RequestLine.Uri;
+				var method = e.Method.ToUpper();
+				if ((method == "POST" || method == "PUT" || method == "PATCH")) {
+					if (skipHosts.Contains(e.Uri.Host))
 						return;
 
-					if (e.WebSession.Request.RequestUri.AbsoluteUri.Contains("summonerswar") && e.WebSession.Request.RequestUri.AbsoluteUri.Contains("/api/gateway"))
-					{
+					// Typical requests endpoint:
+					//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
+					if (e.Uri.AbsoluteUri.Contains("summonerswar") && e.Uri.AbsoluteUri.Contains("/api/gateway")) {
+						string bodyString = Encoding.ASCII.GetString(SocketBP.Buffer, 0, Array.IndexOf(SocketBP.Buffer, (byte)0));
+						bodyString = bodyString.Substring(bodyString.IndexOf("\r\n\r\n"));		// TODO: FIXME: this needs to match \r?\n\r?\n
 
-						string body = await e.GetResponseBodyAsString();
-						var dec = decryptResponse(body, e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
-						string req = null;
-						if (trackedRequests.ContainsKey(e.Id))
-							req = trackedRequests[e.Id];
-
-						try
-						{
-							var json = JsonConvert.DeserializeObject<JObject>(dec, new JsonSerializerSettings() { Formatting = Formatting.Indented });
-							var reqjson = JsonConvert.DeserializeObject<JObject>(req, new JsonSerializerSettings() { Formatting = Formatting.Indented });
+						decRequest = decryptRequest(bodyString, e.Uri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
+						try {
+							req = JsonConvert.DeserializeObject<JObject>(decRequest);
 							if (!Directory.Exists("Json"))
 								Directory.CreateDirectory("Json");
-							File.WriteAllText($"Json\\{json["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", dec);
+							File.WriteAllText($"Json\\{req["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", JsonConvert.SerializeObject(req, Formatting.Indented));
 							Console.ForegroundColor = ConsoleColor.DarkGray;
-							Console.WriteLine($"<{json["command"]}");
+							Console.WriteLine($">{req["command"]}");
 							Console.ForegroundColor = ConsoleColor.Gray;
-
-							// only mangle my wizards who want it, don't crash others.
-							if (json["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)reqjson["wizard_id"]))
-							{
-								var version = Assembly.GetExecutingAssembly().GetName().Version;
-								var jobj = new JObject();
-								// Add the proxy version number to chat notices to remind people.
-								jobj["message"] = "Proxy version: " + version;
-								///(json["notice_list"] as JArray).Add(jobj);
-								json["tzone"] = json["tzone"].ToString().Replace("/", @"\/");
-
-								var ver = e.WebSession.Request.RequestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
-
-								var inMsg = Convert.FromBase64String(body);
-								var outMsg = decryptMessage(inMsg, ver);
-								var decData = zlibDecompressData(outMsg);
-
-								var fix = JsonConvert.SerializeObject(json);
-								fix = fix.Replace(@"\\", "\\");
-								var bytes = zlibCompressData(fix);
-								var str = encryptMessage(bytes, ver);
-								var send = Convert.ToBase64String(str);
-
-								Console.WriteLine("str:" + (fix == decData));
-								Console.WriteLine("b64:" + (inMsg.SequenceEqual(str)));
-								Console.WriteLine("cry:" + (outMsg.SequenceEqual(bytes)));
-								Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
-
-								//encryptResponse(fix, ver);
-								if (body.SequenceEqual(send))
-									await e.SetResponseBodyString(send);
-							}
 						}
 						catch { };
+					}
+				}
+			}
 
+			//protected override void ReadRequest() {
+			//	base.ReadRequest();
+				//Console.WriteLine(SocketBP.ReadAsciiLine());
+				//Console.WriteLine(Encoding.UTF8.GetString(SocketBP.Buffer, 0, Array.IndexOf(SocketBP.Buffer, (byte)0)));
+			//}
 
-						if (req != null)
-						{
-							System.Threading.Thread thr = new System.Threading.Thread(() =>
-							{
-								SWEventArgs args = null;
-								try
-								{
-									args = new SWEventArgs(req, dec);
+			protected override void OnReceiveResponse() {
+#if DEBUG
+				Console.ForegroundColor = ConsoleColor.DarkBlue;
+				Console.WriteLine("<- " + ResponseStatusLine + ", " + requestUri.AbsoluteUri + " Content-Length: " + (ResponseHeaders.ContentLength ?? 0));
+				Console.ForegroundColor = ConsoleColor.Gray;
+#endif
+				if (RequestLine.Method == "GET" || RequestLine.Method == "POST") {
+					if (ResponseStatusLine.StatusCode == HttpStatus.OK && ResponseHeaders.Headers.ContainsKey("content-type")) {
+						if (skipHosts.Contains(requestUri.Host))
+							return;
 
-									SWResponse?.Invoke(this, args);
+						if (requestUri.AbsoluteUri.Contains("summonerswar") && requestUri.AbsoluteUri.Contains("/api/gateway")) {
+							byte[] response = GetContent();
+
+							// From now on, the default State.NextStep ( == SendResponse()
+							// at this point) must not be called, since we already read
+							// the response.
+							State.NextStep = null;
+
+							// Decompress the message stream, if necessary
+							Stream stream = GetResponseMessageStream(response);
+							string body;
+							using (var sr = new StreamReader(stream)) {
+								body = sr.ReadToEnd();
+							}
+							SendResponseStatusAndHeaders();
+							SocketBP.TunnelDataTo(TunnelBP, response);
+
+							var decResponse = decryptResponse(body, requestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
+
+							try {
+								var resp = JsonConvert.DeserializeObject<JObject>(decResponse);
+								if (!Directory.Exists("Json"))
+									Directory.CreateDirectory("Json");
+								File.WriteAllText($"Json\\{resp["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", JsonConvert.SerializeObject(resp, Formatting.Indented));
+								Console.ForegroundColor = ConsoleColor.DarkGray;
+								Console.WriteLine($"<{resp["command"]}");
+								Console.ForegroundColor = ConsoleColor.Gray;
+
+								// only mangle my wizards who want it, don't crash others.
+								if (resp["command"].ToString() == "GetNoticeChat" && whitelistDebugWizards.Contains((ulong)req["wizard_id"])) {
+									var version = Assembly.GetExecutingAssembly().GetName().Version;
+									var jobj = new JObject();
+									// Add the proxy version number to chat notices to remind people.
+									jobj["message"] = "Proxy version: " + version;
+									///(json["notice_list"] as JArray).Add(jobj);
+									resp["tzone"] = resp["tzone"].ToString().Replace("/", @"\/");
+
+									var ver = requestUri.AbsolutePath.Contains("_c2.php") ? 2 : 1;
+
+									var inMsg = Convert.FromBase64String(body);
+									var outMsg = decryptMessage(inMsg, ver);
+									var decData = zlibDecompressData(outMsg);
+
+									var fix = JsonConvert.SerializeObject(resp);
+									fix = fix.Replace(@"\\", "\\");
+									var bytes = zlibCompressData(fix);
+									var str = encryptMessage(bytes, ver);
+									var send = Convert.ToBase64String(str);
+
+									Console.WriteLine("str:" + (fix == decData));
+									Console.WriteLine("b64:" + (inMsg.SequenceEqual(str)));
+									Console.WriteLine("cry:" + (outMsg.SequenceEqual(bytes)));
+									Console.WriteLine("bytes:" + (body.SequenceEqual(send)));
+
+									//encryptResponse(fix, ver);
+									//if (body.SequenceEqual(send))
+									//	await e.SetResponseBodyString(send);
 								}
-								catch (Exception ex)
+							}
+							catch { };
+
+
+							if (decRequest != null) {
+								System.Threading.Thread thr = new System.Threading.Thread(() =>
 								{
-									Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
-										// TODO: log stacktrace?
+									SWEventArgs args = null;
+									try
+									{
+										args = new SWEventArgs(decRequest, decResponse);
+										Plugins?.Invoke(this, args);
 									}
-								trackedRequests.Remove(e.Id);
-							});
-							thr.Start();
+									catch (Exception ex)
+									{
+										Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
+	#if DEBUG
+										Console.WriteLine(ex.StackTrace);
+	#endif
+									}
+								});
+								thr.Start();
+							}
 						}
 					}
 				}
 			}
 		}
-		
+
 		private static string decryptRequest(string bodyString, int version = 1)
 		{
 			var inMsg = Convert.FromBase64String(bodyString);

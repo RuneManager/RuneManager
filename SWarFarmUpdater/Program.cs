@@ -46,7 +46,7 @@ namespace MonsterDefinitions
 				var mm = AskFor<Monster>(it.URL);
 				monsters.Add(mm);
 			}
-			File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters));
+			File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters, Formatting.Indented));
 		}
 
 		static DateTime lastRequest = DateTime.Now;

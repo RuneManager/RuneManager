@@ -131,7 +131,7 @@ namespace OptimizerJsonPlugin
 				}
 			}
 
-			File.WriteAllText($"{(int)wizard["wizard_id"]}-optimizer.json", JsonConvert.SerializeObject(optimizer));
+			File.WriteAllText($"{(int)wizard["wizard_id"]}-optimizer.json", JsonConvert.SerializeObject(optimizer, Formatting.Indented));
 			Console.WriteLine("Generated optimizer.json");
 		}
 	}

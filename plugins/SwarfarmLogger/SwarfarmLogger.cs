@@ -74,6 +74,8 @@ namespace SwarfarmLogger
 					var post = HttpWebRequest.CreateHttp(log_url);
 					post.Method = "POST";
 					post.ContentType = "application/x-www-form-urlencoded";
+					post.KeepAlive = false;
+					//post.Connection = "close";
 
 					using (var write = new StreamWriter(post.GetRequestStream()))
 					{
@@ -85,7 +87,7 @@ namespace SwarfarmLogger
 				catch (Exception e)
 				{
 					File.WriteAllText(Environment.CurrentDirectory + "\\plugins\\swarfarmlogger.error.log", e.GetType() + ": " + e.Message + Environment.NewLine + e.StackTrace);
-					Console.WriteLine("Sending " + com + " to SWarFarm failed :(");
+					Console.WriteLine("Sending " + com + " to SWarFarm failed :", e.Message);
 				}
 
 			}

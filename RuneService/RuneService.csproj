@@ -77,10 +77,6 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Xml" />
-    <Reference Include="Titanium.Web.Proxy, Version=3.0.8.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Titanium.Web.Proxy.3.0.8\lib\net45\Titanium.Web.Proxy.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="StatServer.cs" />
@@ -106,6 +102,10 @@
     <ProjectReference Include="..\RunePlugin\RunePlugin.csproj">
       <Project>{fa95cac9-ad93-4cfa-b3d9-0674be156d5a}</Project>
       <Name>RunePlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="TrotiNet\Lib\TrotiNet.Lib.csproj">
+      <Project>{7feda61e-ed0a-4357-932e-746c697e464e}</Project>
+      <Name>TrotiNet.Lib</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
