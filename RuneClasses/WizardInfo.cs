@@ -120,4 +120,19 @@ namespace RuneOptim
 		[JsonProperty("crystal")]
 		public int Crystal;
 	}
+
+	public class DefensePlacement
+	{
+		[JsonProperty("pos_id")]
+		public int Position;
+
+		[JsonProperty("unit_id")]
+		public ulong UnitId;
+
+		[JsonProperty("wizard_id")]
+		public ulong WizardId;
+
+		[JsonProperty("battle_round")]
+		public int Round;
+	}
 }

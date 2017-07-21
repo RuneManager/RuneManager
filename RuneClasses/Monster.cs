@@ -12,7 +12,7 @@ using System.Linq.Expressions;
 namespace RuneOptim
 {
 	// The monster stores its base stats in its base class
-	public class Monster : Stats
+	public class Monster : Stats, IComparable<Monster>
 	{
 		[JsonIgnore]
 		private string name = "Missingno";
@@ -117,6 +117,13 @@ namespace RuneOptim
 
 		[JsonIgnore]
 		public int loadOrder = int.MaxValue;
+
+
+		[JsonIgnore]
+		public bool IsRep = false;
+
+		[JsonIgnore]
+		public bool OnDefense = false;
 
 		public int SwapCost(Loadout l)
 		{
@@ -282,6 +289,20 @@ namespace RuneOptim
 		public override string ToString()
 		{
 			return Id + " " + Name + " lvl. " + level;
+		}
+
+		int IComparable<Monster>.CompareTo(Monster rhs)
+		{
+			var comp = rhs.Grade - Grade;
+			if (comp != 0) return comp;
+			comp = rhs.level - level;
+			if (comp != 0) return comp;
+			comp = (int)_attribute - (int)rhs._attribute;
+			if (comp != 0) return comp;
+			comp = rhs.awakened - awakened;
+			if (comp != 0) return comp;
+			comp = loadOrder - rhs.loadOrder;
+			return comp;
 		}
 	}
 
