@@ -24,13 +24,18 @@ namespace SwarfarmLogger
 			{
 				if (commands == null)
 				{
-					var req = HttpWebRequest.CreateHttp(commands_url);
+					var req = (HttpWebRequest)WebRequest.Create(commands_url);
+					//req.KeepAlive = false;
+					req.AllowAutoRedirect = false;
+					//req.ServicePoint.ConnectionLimit = 1;
+					req.ServicePoint.Expect100Continue = false;
 					var resp = req.GetResponse();
 					using (var stream = new StreamReader(resp.GetResponseStream()))
 					{
 						var raw = stream.ReadToEnd();
 						commands = JsonConvert.DeserializeObject<Dictionary<string, SWFCommand>>(raw);
 					}
+					resp.Close();
 				}
 				return commands;
 			}
@@ -39,6 +44,7 @@ namespace SwarfarmLogger
 		public override void OnLoad()
 		{
 			Console.WriteLine("Loaded " + Commands.Count + " commands from SWFarm");
+			//System.Net.ServicePointManager.Expect100Continue = false;
 		}
 
 		public override void ProcessRequest(object sender, SWEventArgs args)
@@ -71,23 +77,28 @@ namespace SwarfarmLogger
 				var send = "data=" + Uri.EscapeDataString(data.ToString(Formatting.None)).Replace(' ', '+');
 				try
 				{
-					var post = HttpWebRequest.CreateHttp(log_url);
+					var post = (HttpWebRequest)WebRequest.Create(log_url);
 					post.Method = "POST";
 					post.ContentType = "application/x-www-form-urlencoded";
-					post.KeepAlive = false;
-					//post.Connection = "close";
-
+					//post.KeepAlive = false;
+					//post.Timeout = 10000;
+					//post.ReadWriteTimeout = 10000;
+					post.AllowAutoRedirect = false;
+					//post.ServicePoint.ConnectionLimit = 1;
+					post.ServicePoint.Expect100Continue = false;
+					
 					using (var write = new StreamWriter(post.GetRequestStream()))
 					{
 						write.Write(send);
 					}
-					post.GetResponse();
+					HttpWebResponse resp = (HttpWebResponse)post.GetResponse();
 					Console.WriteLine("Sent " + com + " to SWarFarm");
+					resp.Close();
 				}
 				catch (Exception e)
 				{
 					File.WriteAllText(Environment.CurrentDirectory + "\\plugins\\swarfarmlogger.error.log", e.GetType() + ": " + e.Message + Environment.NewLine + e.StackTrace);
-					Console.WriteLine("Sending " + com + " to SWarFarm failed :", e.Message);
+					Console.WriteLine("Sending " + com + " to SWarFarm failed: " + e.Message);
 				}
 
 			}

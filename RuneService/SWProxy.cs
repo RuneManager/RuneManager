@@ -28,51 +28,51 @@ namespace RuneService
 			"pasta.esfile.duapps.com", "analytics.app-adforce.jp", "push.qpyou.cn", "activeuser.qpyou.cn", "mlog.appguard.co.kr" // SW init
 		};
 
+		private static List<string> blacklistUris = new List<string> {
+			"hmma.baidu.com", "conf.international.baidu.com", "rts.mobula.sdk.duapps.com", "www.estrongs.com",
+		};
+
 		private int listenPort = 8080;
+		private TcpServer server;
+		
+		public SWProxy() { }
 
-		//public SWProxy(HttpSocket clientSocket) : base(clientSocket) { }
-
-		public SWProxy() {
-
-		}
-
-		public void StartProxy() {
+		public void Start() {
 			LoadPlugins("plugins");
 
-			var server = new TcpServer(listenPort, false) { BindAddress = IPAddress.Any /* Overrides ipv6=false */ };
+			server = new TcpServer(listenPort, false) { BindAddress = IPAddress.Any /* Overrides ipv6=false */ };
 			ProxyHandler.Plugins = SWResponse;	// :(
 			server.Start(ProxyHandler.OnConnection);
 
+			List<string> ips = new List<string>();
 			foreach (var eth in System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces()) {
 				if (eth.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up) continue;
 				if (eth.NetworkInterfaceType == System.Net.NetworkInformation.NetworkInterfaceType.Loopback) continue;
 				foreach (var ip in eth.GetIPProperties().UnicastAddresses) {
 					if (ip.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6) {
-						Console.WriteLine("Proxy listening on [" + ip.Address + "]:" + listenPort);
+						ips.Add("[" + ip.Address + "]");
 					}
 					else {
-						Console.WriteLine("Proxy listening on " + ip.Address + ":" + listenPort);
+						ips.Add(ip.Address.ToString());
 					}
 				}
 			}
+			ips.Sort();
+			foreach (var ip in ips)
+				Console.WriteLine("Proxy listening on " + ip + ":" + listenPort);
 
 			server.InitListenFinished.WaitOne();
 			if (server.InitListenException != null) throw server.InitListenException;
 
-			while (true)
-				System.Threading.Thread.Sleep(1000);
-
+			//while (true)
+			//	System.Threading.Thread.Sleep(1000);
 			//server.Stop();
 		}
 
-		//private async Task OnTunnelConnectRequest(object sender, TunnelConnectSessionEventArgs e) {
-		//	Console.WriteLine("Tunnel to: " + e.WebSession.Request.Host);
-		//}
-		//
-		//private async Task OnTunnelConnectResponse(object sender, TunnelConnectSessionEventArgs e) {
-		//	//throw new NotImplementedException();
-		//	//return Task.FromResult(0);
-		//}
+		public void Stop() {
+			UnloadPlugins();
+			server.Stop();
+		}
 
 		private void LoadPlugins(string path)
 		{
@@ -136,8 +136,10 @@ namespace RuneService
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine($"Failed loading plugin: {type.Name} with exception: {e.GetType().Name}");
-					// TODO: log stacktrace?
+					Console.WriteLine($"Failed loading plugin: {type.Name} with exception: {e.GetType().Name}: {e.Message}");
+#if DEBUG
+					Console.WriteLine(e.StackTrace);
+#endif
 				}
 			}
 		}
@@ -158,16 +160,6 @@ namespace RuneService
 				}
 			}
 			plugins.Clear();
-		}
-
-		public void Stop()
-		{
-			UnloadPlugins();
-
-			//proxyServer.BeforeRequest -= OnRequest;
-			//proxyServer.BeforeResponse -= OnResponse;
-
-			//proxyServer.Stop();
 		}
 
 		class ProxyHandler : BaseProxy {
@@ -198,7 +190,7 @@ namespace RuneService
 					//http://summonerswar-gb.qpyou.cn/api/gateway_c2.php
 					if (e.Uri.AbsoluteUri.Contains("summonerswar") && e.Uri.AbsoluteUri.Contains("/api/gateway")) {
 						string bodyString = Encoding.ASCII.GetString(SocketBP.Buffer, 0, Array.IndexOf(SocketBP.Buffer, (byte)0));
-						bodyString = bodyString.Substring(bodyString.IndexOf("\r\n\r\n"));		// TODO: FIXME: this needs to match \r?\n\r?\n
+						bodyString = bodyString.Substring(bodyString.IndexOf("\r\n\r\n"));		// TODO: FIXME: this needs to match first \r?\n\r?\n
 
 						decRequest = decryptRequest(bodyString, e.Uri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 						try {

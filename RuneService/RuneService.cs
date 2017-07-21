@@ -14,7 +14,7 @@ namespace RuneService
 		protected override void OnStart(string[] args)
 		{
 			proxy = new SWProxy();
-			proxy.StartProxy();
+			proxy.Start();
 		}
 
 		protected override void OnStop()
