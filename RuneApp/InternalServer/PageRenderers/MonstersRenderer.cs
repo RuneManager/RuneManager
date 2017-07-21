@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -20,30 +21,57 @@ namespace RuneApp.InternalServer
 				if (uri.Length == 0)
 				{
 					return returnHtml(new ServedResult[]{
-					new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
-					new ServedResult("script")
-					{
-						contentDic = { { "type", "\"application/javascript\"" } },
-						contentList = { @"function showhide(id) {
+						new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
+						new ServedResult("script")
+						{
+							contentDic = { { "type", "\"application/javascript\"" } },
+							contentList = { @"function showhide(id) {
 	var ee = document.getElementById(id);
 	if (ee.style.display == 'none')
 		ee.style.display = 'block';
 	else
 		ee.style.display = 'none';
 }" }
+						}
+					}, renderMagicList());
+				}
+
+				if (uri.Length > 0 && uri[0].Contains(".png"))
+				{
+					var res = uri[0].Replace(".png", "").ToLower();
+					try
+					{
+						using (var stream = new MemoryStream())
+						{
+							var img = Program.GetMonPortrait(int.Parse(res));
+							img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+							//return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
+
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png") };
+						}
 					}
-				}, renderMagicList());
+					catch (Exception e)
+					{
+						Program.log.Error(e.GetType() + " " + e.Message);
+					}
 				}
 
 				ulong mid = 0;
 				if (ulong.TryParse(uri[0], out mid))
 				{
+					if (Program.data == null)
+						return returnHtml(null, "missingdata");
 					// got Monster Id
 					var m = Program.data.GetMonster(mid);
-					return returnHtml(null, (m.Locked ? "L " : "") + m.Name + " " + m.Id);
+					if (m == null)
+						return returnHtml(null, "missingno");
+					return returnHtml(null, (m.Locked ? "L " : "") + m.Name + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
 				}
 				else
 				{
+					if (Program.data == null)
+						return returnHtml(null, "missingdata");
+
 					var m = Program.data.GetMonster(uri[0]);
 					if (m != null)
 						return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "/monsters/" + m.Id } } };
@@ -153,7 +181,7 @@ namespace RuneApp.InternalServer
 				var li = new ServedResult("li")
 				{
 					contentList = {
-						new ServedResult("span") { contentList = { "build " + m.Name + " " + +m.Grade + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }, nl }
+						new ServedResult("span") { contentList = { renderMonLink(m, "build") } }, nl }
 				};
 				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
@@ -172,7 +200,7 @@ namespace RuneApp.InternalServer
 				{
 					contentList = { ((unlocked.Contains(m)) ?
 					("TRASH: " + m.Name + " " + m.Grade + "* " + m.level ) :
-					("mon " + m.Name + " " + m.Grade + "* " + m.level + " " + (m.Locked ? "<span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal)), nl }
+					renderMonLink(m, "mon")), nl }
 				};
 				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
 					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
@@ -195,7 +223,7 @@ namespace RuneApp.InternalServer
 		{
 			ServedResult sr = new ServedResult("li");
 			
-			sr.contentList.Add(f.mon.Name + " " + f.mon.Grade + "*" + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
+			sr.contentList.Add(f.mon.Name + " " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
 			if (f.food.Any())
 			{
 				var rr = new ServedResult("ul");
@@ -227,7 +255,8 @@ namespace RuneApp.InternalServer
 				}
 				else
 				{
-					var tfood = food.OrderBy(f => f.mon.level).FirstOrDefault(f => f.fakeLevel == lev - 1);
+					// only eat things which are 1 or upgraded
+					var tfood = food.Where(f => f.mon.level == 1 || f.fakeLevel != f.mon.Grade).FirstOrDefault(f => f.fakeLevel == lev - 1);
 					if (tfood == null)
 						break;
 					if (current.food.Count(f => f.fakeLevel == lev - 1) >= lev - 1)
@@ -252,6 +281,21 @@ namespace RuneApp.InternalServer
 			public int fakeLevel;
 		}
 
+		public static ServedResult renderMonLink(Monster m, string prefix = null, bool renderPortrait = true)
+		{
+			var res = new ServedResult("span");
+			if (prefix != null)
+				res.contentList.Add(prefix);
+			if (renderPortrait)
+				res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
+			res.contentList.Add(
+				new ServedResult("a") {
+				contentDic = { { "href", "\"monsters/" + m.Id + "\"" } },
+				contentList = { m.Name + " " + +m.Grade + "* " + m.level} });
+			res.contentList.Add((m.Locked ? " <span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal);
+			return res;
+		}
+
 		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs)
 		{
 			var b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
@@ -265,7 +309,7 @@ namespace RuneApp.InternalServer
 				contentList = {
 					new ServedResult("a") { contentDic = { { "href", "\"javascript:showhide(" +m.Id.ToString() + ")\"" } }, contentList = { "+ load" } },
 					" ",
-					new ServedResult("a") { contentDic = { { "href", "\"monsters/" + m.Id + "\"" } }, contentList = { m.Name + " " + +m.Grade + "* " + m.level + " " + m.SkillupsLevel + "/" + m.SkillupsTotal } }
+					renderMonLink(m)
 			}
 			};
 
@@ -279,7 +323,7 @@ namespace RuneApp.InternalServer
 			foreach (var r in l.Runes)
 			{
 				var rd = RuneRenderer.renderRune(r);
-				var hide = rd.contentList.FirstOrDefault(ele => ele.contentDic.Any(pr => pr.Value.ToString() == '"' + r.Id.ToString() + '"'));
+				var hide = rd.contentList.FirstOrDefault(ele => ele.contentDic.Any(pr => pr.Value.ToString().Contains(r.Id.ToString() + "_")));
 				hide.contentDic["style"] = (r.AssignedId == m.Id) ? "\"display:none;\"" : "";
 				div.contentList.Add(rd);
 			}
@@ -297,11 +341,6 @@ namespace RuneApp.InternalServer
 			li.contentList.Add(nl);
 
 			return li;
-		}
-
-		protected static ServedResult renderMonName(Monster m)
-		{
-			return new ServedResult("span") { contentList = { m.Name } };
 		}
 
 	}

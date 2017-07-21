@@ -44,7 +44,7 @@ namespace RuneApp
 	{
 		public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		public static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
-		
+
 		public static Save data;
 
 		public static Properties.Settings Settings
@@ -73,7 +73,7 @@ namespace RuneApp
 		{
 			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
-		
+
 		public static event EventHandler<PrintToEventArgs> BuildsProgressTo;
 
 		/// <summary>
@@ -117,7 +117,7 @@ namespace RuneApp
 			{
 				try
 				{
-				master.Start();
+					master.Start();
 				}
 				catch
 				{
@@ -219,7 +219,7 @@ namespace RuneApp
 					throw new NotImplementedException();
 			}
 		}
-		
+
 		/// <summary>
 		/// Checks the Working directory for a supported save file
 		/// </summary>
@@ -267,7 +267,7 @@ namespace RuneApp
 				for (int i = 0; i < Deco.ShrineStats.Length; i++)
 				{
 					var stat = Deco.ShrineStats[i];
-					
+
 					if (DoesSettingExist("shrine" + stat))
 					{
 						int val = (int)Settings["shrine" + stat];
@@ -382,7 +382,7 @@ namespace RuneApp
 
 			return LoadSaveResult.Success;
 		}
-		
+
 		public static void SanitizeBuilds()
 		{
 			int current_pri = 1;
@@ -567,7 +567,7 @@ namespace RuneApp
 			{
 				// Allow the window to draw before destroying the CPU
 				Thread.Sleep(100);
-				
+
 				// Disregard locked, but honor equippedness checking
 				build.RunesUseEquipped = Program.Settings.UseEquipped;
 				build.RunesUseLocked = Program.Settings.LockTest;
@@ -743,10 +743,10 @@ namespace RuneApp
 						// after messing all that shit up
 						b.Best = theBest;
 					}
-					
+
 
 					#region Save Build stats
-					
+
 					/* TODO: put Excel on Program */
 					if (saveStats)
 					{
@@ -791,7 +791,7 @@ namespace RuneApp
 				log.Info("Cleaned");
 			}
 		}
-		
+
 		private static void RunBanned(Build b, int c, params ulong[] doneIds)
 		{
 			log.Info("Running ban");
@@ -849,7 +849,7 @@ namespace RuneApp
 				{
 					runSource.Cancel();
 					//if (currentBuild != null)
-					 //   currentBuild.isRun = false;
+					//   currentBuild.isRun = false;
 					//plsDie = true;
 					isRunning = false;
 					return;
@@ -1005,6 +1005,64 @@ namespace RuneApp
 			rune.CopyTo(r, keepLocked, newAssigned);
 
 			data.isModified = true;
+		}
+
+		static Dictionary<string, int[]> monPortraitMap = null;
+
+		static byte[] zipData = null;
+		static object fslock = new object();
+
+		public static Image GetMonPortrait(int monsterTypeId)
+		{
+			if (monPortraitMap == null)
+				monPortraitMap = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(File.ReadAllText("data\\unitmap.json"));
+
+			var baseId = monsterTypeId / 100;
+
+			int a, b, c;
+
+			if (monPortraitMap.ContainsKey(monsterTypeId.ToString()))
+			{
+				var idl = monPortraitMap[monsterTypeId.ToString()];
+				a = idl[0];
+				c = idl[1];
+				b = idl[2];
+			}
+			else if (!monPortraitMap.ContainsKey(baseId.ToString()))
+			{
+				return RuneApp.InternalServer.InternalServer.mon_spot;
+			}
+			else
+			{
+				var woke = (monsterTypeId / 10) % 10;
+				var idl = monPortraitMap[baseId.ToString()];
+				a = idl[woke * 2];
+				b = idl[woke * 2 + 1];
+				c = monsterTypeId % 10 - 1;
+			}
+			
+			lock (fslock)
+			{
+				if (zipData == null)
+				{
+					var fs = new FileStream("data\\unit.zip", FileMode.Open);
+					using (var ms = new MemoryStream())
+					{
+						fs.CopyTo(ms);
+						zipData = ms.ToArray();
+					}
+				}
+
+				using (var zip = new System.IO.Compression.ZipArchive(new MemoryStream(zipData)))
+				{
+					var e = $"unit_icon_{a:D4}_{c}_{b}";
+					var ze = zip.Entries.FirstOrDefault(n => Path.GetFileNameWithoutExtension(n.Name) == e);
+					if (ze == null)
+						return RuneApp.InternalServer.InternalServer.mon_spot;
+
+					return Image.FromStream(ze.Open());
+				}
+			}
 		}
 
 		#region Extension Methods

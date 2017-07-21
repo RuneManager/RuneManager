@@ -49,7 +49,9 @@ namespace RunePlugin
 	{
 		Unhandled,
 		EquipRune,
-		
-		UnequipRune
+		UnequipRune,
+		HubUserLogin,
+		GetGuildWarBattleLogByGuildId,
+		GetGuildWarBattleLogByWizardId,
 	}
 }

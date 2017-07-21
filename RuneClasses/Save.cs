@@ -31,6 +31,12 @@ namespace RuneOptim
 		[JsonProperty("building_list")]
 		public readonly ObservableCollection<Building> Buildings = new ObservableCollection<Building>();
 
+		[JsonProperty("defense_unit_list")]
+		public readonly ObservableCollection<DefensePlacement> DefenseUnits = new ObservableCollection<DefensePlacement>();
+
+		[JsonProperty("guildwar_defense_unit_list")]
+		public readonly ObservableCollection<DefensePlacement[]> GuildDefenseUnits = new ObservableCollection<DefensePlacement[]>();
+
 		[JsonProperty("wizard_info")]
 		public WizardInfo WizardInfo;
 		
@@ -71,6 +77,53 @@ namespace RuneOptim
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
 			LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
 			Buildings.CollectionChanged += Buildings_CollectionChanged;
+			DefenseUnits.CollectionChanged += DefenseUnits_CollectionChanged;
+			GuildDefenseUnits.CollectionChanged += GuildDefenseUnits_CollectionChanged;
+		}
+
+		private void GuildDefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			switch (e.Action)
+			{
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					foreach (var d in e.NewItems.Cast<DefensePlacement[]>())
+					{
+						foreach (var dd in d)
+						{
+							var m = GetMonster(dd.UnitId);
+							if (m != null)
+								m.OnDefense = true;
+						}
+					}
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+				default:
+					throw new NotImplementedException();
+			}
+		}
+
+		private void DefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+		{
+			switch (e.Action)
+			{
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+					foreach (var d in e.NewItems.Cast<DefensePlacement>())
+					{
+						var m = GetMonster(d.UnitId);
+						if (m != null)
+							m.OnDefense = true;
+					}
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+				default:
+					throw new NotImplementedException();
+			}
 		}
 
 		private void Buildings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
@@ -172,6 +225,12 @@ namespace RuneOptim
 
 						if (LockedUnits.Contains(mon.Id))
 							mon.Locked = true;
+
+						if (WizardInfo != null && WizardInfo.ReputationMonsterId == mon.Id)
+							mon.IsRep = true;
+
+						if (DefenseUnits.Any(d => d.UnitId == mon.Id) || GuildDefenseUnits.Any(d => d.Any(dd => dd.UnitId == mon.Id)))
+							mon.OnDefense = true;
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:

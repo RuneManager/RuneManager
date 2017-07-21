@@ -9,6 +9,8 @@ using RunePlugin;
 
 namespace SwarfarmExportPlugin
 {
+	// Conversion of:
+	// https://github.com/kakaroto/SWProxy/blob/master/plugins/SwarfarmExportPlugin.py
 	public class SwarfarmExportPlugin : SWPlugin
 	{
 		public override void ProcessRequest(object sender, SWEventArgs args)
@@ -26,6 +28,8 @@ namespace SwarfarmExportPlugin
 				data["unit_lock_list"] = args.ResponseJson["unit_lock_list"];
 				data["helper_list"] = args.ResponseJson["helper_list"];
 				data["rune_craft_item_list"] = args.ResponseJson["rune_craft_item_list"];
+				data["defense_unit_list"] = args.ResponseJson["defense_unit_list"];
+				data["guildwar_defense_unit_list"] = args.ResponseJson["guildwar_defense_unit_list"];
 
 				File.WriteAllText($"{(int)args.ResponseJson["wizard_info"]["wizard_id"]}-swarfarm.json", JsonConvert.SerializeObject(data));
 				Console.WriteLine("Generated swarfarm.json");

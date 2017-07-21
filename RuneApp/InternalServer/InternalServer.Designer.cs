@@ -61,6 +61,26 @@ namespace RuneApp.InternalServer {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap building_store {
+            get {
+                object obj = ResourceManager.GetObject("building_store", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap building_store_small {
+            get {
+                object obj = ResourceManager.GetObject("building_store_small", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
         ///
         ///&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
@@ -83,13 +103,27 @@ namespace RuneApp.InternalServer {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to @media only screen and (min-resolution: 192dpi),
-        ///	   only screen and (min-resolution: 2dppx) {
-        ///	body {
-        ///		font-size: 1.5em;
-        ///	}
-        ///}
-        ///.rune-container {
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap mon_spot {
+            get {
+                object obj = ResourceManager.GetObject("mon_spot", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap move_right {
+            get {
+                object obj = ResourceManager.GetObject("move_right", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .rune-container {
         ///	display: flex;
         ///	flex-wrap: wrap;
         ///	justify-content: space-between;
@@ -107,7 +141,14 @@ namespace RuneApp.InternalServer {
         ///	text-align: center;
         ///	vertical-align: middle;
         ///	background-position-x: center;
-        ///	background-positi [rest of string was truncated]&quot;;.
+        ///	background-position-y: center;
+        ///	background-repeat: no-repeat;
+        ///}
+        ///.rune-icon-back {
+        ///	display: inline-block;
+        ///	background-size: 100%;
+        ///}
+        ///.rune-icon-b [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string runes_css {
             get {
