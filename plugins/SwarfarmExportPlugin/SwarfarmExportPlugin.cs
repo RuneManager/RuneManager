@@ -9,6 +9,8 @@ using RunePlugin;
 
 namespace SwarfarmExportPlugin
 {
+	// Conversion of:
+	// https://github.com/kakaroto/SWProxy/blob/master/plugins/SwarfarmExportPlugin.py
 	public class SwarfarmExportPlugin : SWPlugin
 	{
 		public override void ProcessRequest(object sender, SWEventArgs args)
