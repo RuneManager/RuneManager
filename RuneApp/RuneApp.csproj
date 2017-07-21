@@ -490,11 +490,17 @@
     <None Include="Resources\enhance.png" />
     <None Include="Resources\fight.png" />
     <None Include="Resources\determination.png" />
+    <None Include="Resources\building_icon_0000_2_1.png" />
+    <None Include="Resources\building_store.png" />
+    <None Include="Resources\building_store_small.png" />
     <Content Include="Resources\fromMon.png" />
     <Content Include="Resources\locked.png" />
     <Content Include="Resources\lockedNo.png" />
     <Content Include="Resources\mon.png" />
     <Content Include="Resources\monToBox.png" />
+    <None Include="Resources\move_left.png" />
+    <None Include="Resources\move_right.png" />
+    <None Include="Resources\mon_spot.png" />
     <Content Include="Resources\resume.png" />
     <Content Include="Resources\runedial.png" />
     <None Include="Resources\tolerance.png" />
