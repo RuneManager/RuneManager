@@ -31,6 +31,18 @@ namespace RuneApp.InternalServer
 		}
 	}
 
+	public class ServedImage : ServedResult
+	{
+		public ServedImage(string location, int? width = null, int? height = null) : base("img")
+		{
+			contentDic.Add("src", "\"" + location + "\"");
+			if (width != null)
+				contentDic.Add("width", "\"" + width + "\"");
+			if (height != null)
+				contentDic.Add("height", "\"" + height + "\"");
+		}
+	}
+
 	public class ServedResult
 	{
 		public string name;

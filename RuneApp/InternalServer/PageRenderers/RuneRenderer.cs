@@ -124,14 +124,21 @@ function hackLots(prop, num, on) {
 				return ret;
 			}
 
-			public static ServedResult renderRune(RuneOptim.Rune r)
+			public static Random rand = new Random();
+
+			public static ServedResult renderRune(RuneOptim.Rune r, bool forceExpand = false)
 			{
+				if (r == null)
+					return "";
 				var ret = new ServedResult("div") { contentDic = { { "class", "\"rune-box\"" } } };
+
+				string trashId = r.Id.ToString() + "_" + rand.Next();
+
 				var mainspan = new ServedResult("span")
 				{
 					contentList = {
 						new ServedResult("a") {  contentDic = {
-								{ "href", "\"javascript:showhide(" +r.Id.ToString() + ")\"" }
+								{ "href", "\"javascript:showhide('" +trashId + "')\"" }
 							},
 							contentList = { "+" }
 						},
@@ -174,8 +181,8 @@ function hackLots(prop, num, on) {
 				}
 
 				ret.contentList.Add(mainspan);
-				var hidediv = new ServedResult("div") { contentDic = { { "id", '"' + r.Id.ToString() + '"' }, { "class", '"' + $"rune-details stars-{r.Grade} rarity-{r.Rarity} level-{r.Level} slot-{r.Slot}" + '"' } } };
-				if (r.Level == 15 || (r.Slot % 2 == 1 && r.Level >= 12))
+				var hidediv = new ServedResult("div") { contentDic = { { "id", '"' + trashId + '"' }, { "class", '"' + $"rune-details stars-{r.Grade} rarity-{r.Rarity} level-{r.Level} slot-{r.Slot}" + '"' } } };
+				if (!forceExpand && (r.Level == 15 || (r.Slot % 2 == 1 && r.Level >= 12)))
 					hidediv.contentDic.Add("style", "\"display:none\"");
 				//hidediv.contentList.Add("<img src=\"/runes/" + r.Set.ToString() + ".png\" style=\"position:relative;left:1em;height:2em;\" />");
 				//hidediv.contentList.Add("<img src=\"/runes/rune" + r.Slot.ToString() + ".png\" style=\"z-index:-1;position:relative;left:-2em;\" />");
