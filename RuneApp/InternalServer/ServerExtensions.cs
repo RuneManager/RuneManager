@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -26,6 +26,30 @@ namespace RuneApp.InternalServer
 			{
 				var tt = type.GetConstructor(new Type[] { }).Invoke(new object[] { });
 				return (HttpResponseMessage)type.GetMethod("Render").Invoke(tt, new object[] { req, uri.Skip(1).ToArray() });
+			}
+			if (req.RawUrl == "/favicon.ico") {
+				System.Drawing.Icon obj = (System.Drawing.Icon)App.ResourceManager.GetObject("Icon"/*, App.Culture*/);
+				byte[] res;
+				using (System.IO.MemoryStream stream = new System.IO.MemoryStream()) {
+					obj.Save(stream);
+					res = stream.ToArray();
+					stream.Close();
+				}
+				return new HttpResponseMessage(HttpStatusCode.OK) {
+					Content = new ByteArrayContent(res)
+				};
+			}
+			if (!uri.FirstOrDefault().Contains("/") && !uri.FirstOrDefault().Contains("..")) {
+				if (System.IO.File.Exists("InternalServer/Swagger/" + uri.FirstOrDefault())) {
+					return new HttpResponseMessage(HttpStatusCode.OK) {
+						Content = new StringContent(System.IO.File.ReadAllText("InternalServer/Swagger/" + uri.FirstOrDefault()))
+					};
+				}
+				if (System.IO.File.Exists("InternalServer/Themes/" + uri.FirstOrDefault())) {
+					return new HttpResponseMessage(HttpStatusCode.OK) {
+						Content = new StringContent(System.IO.File.ReadAllText("InternalServer/Themes/" + uri.FirstOrDefault())/*, Encoding.UTF8, "text/css"*/)
+					};
+				}
 			}
 			return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("<html><body>404: " + req.RawUrl + " not found. <a href='/'>Return.</a></body></html>") };
 		}
@@ -79,8 +103,8 @@ namespace RuneApp.InternalServer
 		{
 			return "<" + name
 					+ (contentDic.Count > 0 ? " " : "") + string.Join(" ", contentDic.Select(kv => kv.Key + "=" + kv.Value))
-					+ (contentList.Count == 0 ? "/" : "") + ">" + (contentList.Count > 0 ? "\n" : "")
-					+ string.Join("\n", contentList.Select(li => li.ToHtml())) + (contentList.Count > 0 ? "\n" : "")
+					+ (contentList.Count == 0 ? "/" : "") + ">" //+ (contentList.Count > 0 ? "\n" : "")
+					+ string.Join("\n", contentList.Select(li => li.ToHtml())) //+ (contentList.Count > 0 ? "\n" : "")
 					+ (contentList.Count > 0 ? ("</" + name + ">") : "");
 		}
 

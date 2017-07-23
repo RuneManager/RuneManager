@@ -322,7 +322,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="InternalServer\Swagger\swagger.js" />
     <Content Include="data\templates.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -483,6 +482,21 @@
   <ItemGroup>
     <None Include="Resources\accuracy.png" />
     <Content Include="InternalServer\runes.css" />
+    <Content Include="InternalServer\Swagger\jquery.ba-bbq.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InternalServer\Swagger\jquery.slideto.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InternalServer\Swagger\jquery.wiggle.min.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InternalServer\Swagger\object-assign-pollyfill.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="InternalServer\Swagger\reset.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="InternalServer\Themes\dark.css" />
     <Content Include="InternalServer\Themes\light.css" />
     <Content Include="InternalServer\theme_preview.inc" />
@@ -508,9 +522,6 @@
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />
     <Content Include="Resources\upto.png" />
-    <None Include="InternalServer\Swagger\swagger-client.js" />
-    <None Include="InternalServer\Swagger\swagger-ui.js" />
-    <None Include="InternalServer\Swagger\swagger.css" />
     <Content Include="..\RuneApp.ico" />
     <Content Include="User Manual\build.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,6 +35,14 @@ namespace RuneApp.InternalServer
 
 		private static readonly RRMResponse genericResponseBad = new GeneralResponse() { ResponseCode = 400, Message = "Request Failed", Exception = new ArgumentException("Method failed to read request.") };
 		private static readonly RRMResponse genericResponseGood = new GeneralResponse() { ResponseCode = 200, Message = "Request Succeeded" };
+
+		private static readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>() {
+			{ ".css", "text/css" },
+			{ ".js", "application/javascript" },
+			{ ".json", "application/json" },
+			{ ".ico", "image/x-icon" },
+			//{ "*", "text/html" },
+		};
 
 		private HttpListener listener;
 
@@ -133,19 +141,26 @@ namespace RuneApp.InternalServer
 					{
 						var qw = msg.Content as StringContent;
 						string qq = await qw.ReadAsStringAsync();
+						resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
+						if (resp.ContentType == null)
+							resp.ContentType = "text/html";					// Default to HTML
 						outBytes = Encoding.UTF8.GetBytes(qq);
 					}
 					else if (msg.Content is FileContent)
 					{
 						var qw = msg.Content as FileContent;
 						resp.ContentType = qw.Type;
-						resp.Headers.Add("Content-Disposition", $"attachment; filename=\"{qw.FileName}\"");
+						if (resp.ContentType == null)
+							resp.ContentType = "application/octet-stream";	// Should always be set, but bin just incase
+						//resp.Headers.Add("Content-Disposition", $"attachment; filename=\"{qw.FileName}\"");
 						outBytes = await qw.ReadAsByteArrayAsync();
 					}
 					else if (msg.Content is ByteArrayContent)
 					{
 						var qw = msg.Content as ByteArrayContent;
-						resp.ContentType = "application/octet-stream";
+						resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
+						if (resp.ContentType == null)
+							resp.ContentType = "application/octet-stream";	// Default to binary
 						outBytes = await qw.ReadAsByteArrayAsync();
 					}
 					else if (msg.Content is StreamContent)
@@ -155,11 +170,13 @@ namespace RuneApp.InternalServer
 						{
 							var stream = await qw.ReadAsStreamAsync();
 							stream.CopyTo(ms);
+							//resp.ContentType = "application/octet-stream"
 							outBytes = ms.ToArray();
 						}
-
 					}
-					resp.Headers.Add("Content-language", "en-au");
+					//resp.Headers.Add("Content-language", "en-au");
+					resp.Headers.Add("Access-Control-Allow-Origin: *");
+					resp.Headers.Add("Access-Control-Allow-Methods: *");
 
 					if (expires)
 					{
@@ -168,20 +185,30 @@ namespace RuneApp.InternalServer
 						resp.Headers.Add("Expires", "Wed, 16 Jul 1969 13:32:00 UTC");
 					}
 
-					var enc = req.Headers.GetValues("Accept-Encoding");
-					// 
-					if (enc?.Any(a => a.ToLowerInvariant() == "deflate") ?? false)
-					{
-						resp.Headers.Add("Content-Encoding", "deflate");
-						using (MemoryStream ms = new MemoryStream())
-						{
-							using (System.IO.Compression.DeflateStream ds = new System.IO.Compression.DeflateStream(ms, System.IO.Compression.CompressionMode.Compress))
-							{
-								ds.Write(outBytes, 0, outBytes.Length);
-								ds.Flush();
+					if ((outBytes.Length > 0) && (resp.ContentType != "image/png")) {	// Don't compress empty responses or compressed file types
+						var enc = req.Headers.GetValues("Accept-Encoding");
+
+						if (enc?.Contains("gzip") ?? false) {
+							using (MemoryStream ms = new MemoryStream())
+							using (System.IO.Compression.GZipStream gs = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress)) {
+								gs.Write(outBytes, 0, outBytes.Length);
+								gs.Flush();
+								gs.Close();     // https://stackoverflow.com/questions/3722192/how-do-i-use-gzipstream-with-system-io-memorystream#comment3929538_3722263
+								ms.Flush();
+								outBytes = ms.ToArray();
 							}
-							ms.Flush();
-							outBytes = ms.ToArray();
+							resp.Headers.Add("Content-Encoding", "gzip");
+						}
+						else if (enc?.Any(a => a.ToLowerInvariant() == "deflate") ?? false) {
+							using (MemoryStream ms = new MemoryStream()) {
+								using (System.IO.Compression.DeflateStream ds = new System.IO.Compression.DeflateStream(ms, System.IO.Compression.CompressionMode.Compress)) {
+									ds.Write(outBytes, 0, outBytes.Length);
+									ds.Flush();
+								}
+								ms.Flush();
+								outBytes = ms.ToArray();
+							}
+							resp.Headers.Add("Content-Encoding", "deflate");
 						}
 					}
 
@@ -285,7 +312,7 @@ namespace RuneApp.InternalServer
 					hh.AppendLine(h.ToHtml());
 
 			var html = InternalServer.default_tpl
-			.Replace("{title}", "TopKek")
+			.Replace("{title}", "Rune Manager")
 			.Replace("{theme}", Master.currentTheme)
 			.Replace("{head}", hh.ToString())
 			.Replace("{body}", bb.ToString())
