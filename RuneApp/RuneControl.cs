@@ -195,21 +195,22 @@ namespace RuneApp
 					// https://www.w3schools.com/colors/colors_converter.asp
 					// var qq = document.getElementById("rgb01").innerHTML; qq = qq.substring(4, qq.length-1).split(","); for (var i in qq) { console.log(qq[i].trim()/255-0.8);}
 
-					float[] colour = new float[] { -0.77f, 0.03f, -0.43f, 0, 1 };
+					float[] colour = new float[] { 0.13f, 0.76f, 0.32f, 0, 1 };
 
 					if (coolness == 2)
-						colour = new float[] { -0.48f, 0.2f, 0.12f, 0, 1 };
+						colour = new float[] { 0.32f, 1.0f, 0.92f, 0, 1 };
 					else if (coolness == 3)
-						colour = new float[] { 0.13f, -0.25f, 0.19f, 0, 1 };
+						colour = new float[] { 0.93f, 0.55f, 0.99f, 0, 1 };
 					else if (coolness == 4)
-						colour = new float[] { 0.18f, -0.12f, -0.48f, 0, 1 };
+						colour = new float[] { 0.98f, 0.68f, 0.48f, 0, 1 };
 
 					float[][] ptsArray = 
-					{ 
-						new float[] {0.8f, 0, 0, 0, 0},
-						new float[] {0, 0.8f, 0, 0, 0},
-						new float[] {0, 0, 0.8f, 0, 0},
-						new float[] {0, 0, 0, 1, 0}, colour
+					{
+						new float[] { colour[0], 0, 0, 0, 0},
+						new float[] {0, colour[1], 0, 0, 0},
+						new float[] {0, 0, colour[2], 0, 0},
+						new float[] {0, 0, 0, 1, 0},
+						new float[] {0, 0, 0, 0, 0}
 					};
 					ColorMatrix clrMatrix = new ColorMatrix(ptsArray);
 					attr.SetColorMatrix(clrMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
