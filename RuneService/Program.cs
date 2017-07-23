@@ -21,7 +21,7 @@ namespace RuneService
 				aMeth.Invoke(service, new object[] { args });
 				
 				Console.WriteLine("Press any key to stop the service.");
-				Console.ReadLine();
+				Console.ReadKey();
 
 				// Not sure the best way to stop it.
 

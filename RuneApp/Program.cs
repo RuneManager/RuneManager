@@ -484,7 +484,7 @@ namespace RuneApp
 					// keep a single recent backup
 					if (File.Exists(filename))
 						File.Copy(filename, filename + ".backup", true);
-					var str = JsonConvert.SerializeObject(loads);
+					var str = JsonConvert.SerializeObject(loads, Formatting.Indented);
 					File.WriteAllText(filename, str);
 					return LoadSaveResult.Success;
 				}
@@ -951,7 +951,7 @@ namespace RuneApp
 				File.Copy(Program.Settings.SaveLocation, Path.ChangeExtension(Program.Settings.SaveLocation, ".backup.json"));
 			}
 
-			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data));
+			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data, Formatting.Indented));
 		}
 
 		public static void AddMonster(Monster mon)
