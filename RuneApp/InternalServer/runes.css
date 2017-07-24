@@ -11,6 +11,8 @@
 	border-radius: 5pt;
 	margin: 1pt;
 	padding: 1pt;
+	min-width: 11em;
+	min-height: 8.7em;
 }
 .rune-icon {
 	text-align: center;

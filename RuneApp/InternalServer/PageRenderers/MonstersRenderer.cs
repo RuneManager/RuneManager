@@ -128,7 +128,11 @@ namespace RuneApp.InternalServer
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
 			var rem = new List<Monster>();
-			foreach (var m in locked.OrderByDescending(m => bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority))
+			foreach (var m in locked.OrderByDescending(m => 1/(bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+				.ThenByDescending(m => m.level)
+				.ThenBy(m => m._attribute)
+				.ThenByDescending(m => m.awakened)
+				.ThenBy(m => m.loadOrder))
 			{
 				pairs.Add(m, new List<Monster>());
 				int i = m.SkillupsTotal - m.SkillupsLevel;
