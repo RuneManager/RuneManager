@@ -311,6 +311,9 @@
     <Content Include="data\unitmap.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="custom_templates.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="InternalServer\default.tpl" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

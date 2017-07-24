@@ -28,9 +28,9 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewGroup listViewGroup19 = new System.Windows.Forms.ListViewGroup("Default", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup20 = new System.Windows.Forms.ListViewGroup("Custom", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup21 = new System.Windows.Forms.ListViewGroup("Online", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Default", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Custom", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Online", System.Windows.Forms.HorizontalAlignment.Left);
 			this.cShowWizard = new System.Windows.Forms.CheckBox();
 			this.btnCreate = new System.Windows.Forms.Button();
 			this.prebuildList = new System.Windows.Forms.ListView();
@@ -45,6 +45,7 @@
 			this.statBase = new RuneApp.StatColumn();
 			this.statColLabel = new RuneApp.StatColumn();
 			this.runeDial = new RuneApp.RuneDial();
+			this.statGoal = new RuneApp.StatColumn();
 			this.SuspendLayout();
 			// 
 			// cShowWizard
@@ -75,16 +76,16 @@
 			this.prebuildList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.lhTemplate});
 			this.prebuildList.FullRowSelect = true;
-			listViewGroup19.Header = "Default";
-			listViewGroup19.Name = "lvgDefault";
-			listViewGroup20.Header = "Custom";
-			listViewGroup20.Name = "lvgCustom";
-			listViewGroup21.Header = "Online";
-			listViewGroup21.Name = "lvgOnline";
+			listViewGroup1.Header = "Default";
+			listViewGroup1.Name = "lvgDefault";
+			listViewGroup2.Header = "Custom";
+			listViewGroup2.Name = "lvgCustom";
+			listViewGroup3.Header = "Online";
+			listViewGroup3.Name = "lvgOnline";
 			this.prebuildList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup19,
-            listViewGroup20,
-            listViewGroup21});
+            listViewGroup1,
+            listViewGroup2,
+            listViewGroup3});
 			this.prebuildList.Location = new System.Drawing.Point(12, 25);
 			this.prebuildList.MultiSelect = false;
 			this.prebuildList.Name = "prebuildList";
@@ -134,7 +135,7 @@
 			// statScore
 			// 
 			this.statScore.Editable = true;
-			this.statScore.Location = new System.Drawing.Point(584, 12);
+			this.statScore.Location = new System.Drawing.Point(600, 12);
 			this.statScore.Name = "statScore";
 			this.statScore.Size = new System.Drawing.Size(69, 489);
 			this.statScore.Stats = null;
@@ -143,7 +144,7 @@
 			// 
 			// statTotal
 			// 
-			this.statTotal.Location = new System.Drawing.Point(659, 12);
+			this.statTotal.Location = new System.Drawing.Point(675, 12);
 			this.statTotal.Name = "statTotal";
 			this.statTotal.Size = new System.Drawing.Size(69, 489);
 			this.statTotal.Stats = null;
@@ -152,7 +153,7 @@
 			// 
 			// statPreview
 			// 
-			this.statPreview.Location = new System.Drawing.Point(509, 12);
+			this.statPreview.Location = new System.Drawing.Point(525, 12);
 			this.statPreview.Name = "statPreview";
 			this.statPreview.Size = new System.Drawing.Size(69, 489);
 			this.statPreview.Stats = null;
@@ -161,7 +162,7 @@
 			// 
 			// statCurrent
 			// 
-			this.statCurrent.Location = new System.Drawing.Point(434, 12);
+			this.statCurrent.Location = new System.Drawing.Point(375, 12);
 			this.statCurrent.Name = "statCurrent";
 			this.statCurrent.Size = new System.Drawing.Size(69, 489);
 			this.statCurrent.Stats = null;
@@ -170,7 +171,7 @@
 			// 
 			// statBase
 			// 
-			this.statBase.Location = new System.Drawing.Point(359, 12);
+			this.statBase.Location = new System.Drawing.Point(300, 12);
 			this.statBase.Name = "statBase";
 			this.statBase.Size = new System.Drawing.Size(69, 489);
 			this.statBase.Stats = null;
@@ -180,7 +181,7 @@
 			// statColLabel
 			// 
 			this.statColLabel.IsLabel = true;
-			this.statColLabel.Location = new System.Drawing.Point(284, 12);
+			this.statColLabel.Location = new System.Drawing.Point(225, 12);
 			this.statColLabel.Name = "statColLabel";
 			this.statColLabel.Size = new System.Drawing.Size(69, 489);
 			this.statColLabel.Stats = null;
@@ -197,6 +198,16 @@
 			this.runeDial.TabIndex = 0;
 			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
 			// 
+			// statGoal
+			// 
+			this.statGoal.Editable = true;
+			this.statGoal.Location = new System.Drawing.Point(450, 12);
+			this.statGoal.Name = "statGoal";
+			this.statGoal.Size = new System.Drawing.Size(69, 489);
+			this.statGoal.Stats = null;
+			this.statGoal.TabIndex = 6;
+			this.statGoal.Text = "Goal";
+			// 
 			// BuildWizard
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -207,6 +218,7 @@
 			this.Controls.Add(this.statScore);
 			this.Controls.Add(this.statTotal);
 			this.Controls.Add(this.statPreview);
+			this.Controls.Add(this.statGoal);
 			this.Controls.Add(this.statCurrent);
 			this.Controls.Add(this.statBase);
 			this.Controls.Add(this.statColLabel);
@@ -242,5 +254,6 @@
 		private StatColumn statPreview;
 		private System.Windows.Forms.CheckBox cPreviewLocked;
 		private RuneBox runeBox;
+		private StatColumn statGoal;
 	}
 }

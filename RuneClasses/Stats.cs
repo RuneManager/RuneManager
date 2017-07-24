@@ -485,6 +485,7 @@ namespace RuneOptim
 
 		public void SetZero()
 		{
+			/* // TODO: put this back when SetTo is good
 			Accuracy = 0;
 			Attack = 0;
 			CritDamage = 0;
@@ -498,7 +499,13 @@ namespace RuneOptim
 			EffectiveHPDefenseBreak = 0;
 			DamagePerSpeed = 0;
 			AverageDamage = 0;
-			MaxDamage = 0;
+			MaxDamage = 0;*/
+
+			foreach (var a in Build.statAll)
+			{
+				this[a] = 0;
+			}
+
 			DamageSkillups = new double[8];
 		}
 

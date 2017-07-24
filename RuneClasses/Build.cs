@@ -271,9 +271,13 @@ namespace RuneOptim
 		[JsonProperty("Maximum")]
 		public Stats Maximum = new Stats();
 
-		// builds with individual stats exceeding these values are penalised as wasteful
+		// individual stats exceeding these values are capped
 		[JsonProperty("Threshold")]
 		public Stats Threshold = new Stats();
+
+		// builds with individual stats below these values are penalised as not good enough
+		[JsonProperty("Goal")]
+		public Stats Goal = new Stats();
 
 		public bool ShouldSerializeMinimum()
 		{
@@ -311,7 +315,7 @@ namespace RuneOptim
 		[JsonIgnore]
 		public RuneUsage runeUsage;
 
-		public int autoRuneAmount = 15;
+		public int autoRuneAmount = 30;
 
 		// magically find good runes to use in the build
 		public bool autoRuneSelect = false;
@@ -468,8 +472,8 @@ namespace RuneOptim
 						outvals.DamageSkillups[j] = ((Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j])) - Goal.DamageSkillups[j]) / Sort.DamageSkillups[j];
 						str = outvals.DamageSkillups[j].ToString("0.#") + " (" + vv + ")";
 						pts += outvals.DamageSkillups[j];
-			}
-			
+					}
+
 					writeTo?.Invoke(str, i);
 					i++;
 				}
@@ -1632,6 +1636,8 @@ namespace RuneOptim
 
 			if (autoRuneSelect)
 			{
+				// TODO: triple pass: start at needed for min, but each pass reduce the requirements by the average of the chosen runes for that pass, increase it by build scoring
+
 				var needed = NeededForMin(slotFakes, slotPred);
 				if (needed == null)
 					autoRuneSelect = false;
@@ -1640,6 +1646,7 @@ namespace RuneOptim
 				{
 					var needRune = new Stats(needed) / 6;
 
+					// Auto-Rune select picking N per RuneSet should be fine to pick more because early-out should keep times low.
 					// reduce number of runes to 10-15
 
 					// odds first, then evens
