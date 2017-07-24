@@ -417,46 +417,63 @@ namespace RuneOptim
 		}
 
 		// build the scoring function
-		public double sort(Stats m)
+		public double CalcScore(Stats current, Stats outvals = null, Action<string, int> writeTo = null)
 		{
-			double pts = 0;
-			if (m == null)
-				return pts;
+			if (current == null)
+				return 0;
+			if (outvals == null)
+				outvals = new Stats();
+			outvals.SetZero();
 
-			double vv;
-			foreach (Attr stat in statAll)
+			double pts = 0;
+			// dodgy hack for indexing in Generate ListView
+			int i = 2;
+			foreach (Attr stat in Build.statAll)
 			{
-				// if this stat is used for sorting
 				if (!stat.HasFlag(Attr.ExtraStat))
 				{
-					if (!Sort[stat].EqualTo(0))
+					double vv = current[stat];
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (Sort[stat] != 0)
 					{
-						vv = m[stat];
-						pts += (Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat])) / Sort[stat];
+						outvals[stat] = ((Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat])) - Goal[stat]) / Sort[stat];
+						str = outvals[stat].ToString("0.#") + " (" + current[stat] + ")";
+						pts += outvals[stat];
 					}
+					writeTo?.Invoke(str, i);
+					i++;
 				}
 				else
 				{
-					if (!Sort.ExtraGet(stat).EqualTo(0))
+					double vv = current.ExtraValue(stat);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (Sort.ExtraGet(stat) != 0)
 					{
-						vv = m.ExtraValue(stat);
-						pts += (Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat))) / Sort.ExtraGet(stat);
+						outvals.ExtraSet(stat, ((Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat))) - Goal.ExtraGet(stat)) / Sort.ExtraGet(stat));
+						str = outvals[stat].ToString("0.#") + " (" + vv + ")";
+						pts += outvals[stat];
 					}
+					writeTo?.Invoke(str, i);
+					i++;
 				}
 			}
-
-			Func<Stats, double> ff;
-			for (int i = 0; i < 4; i++)
+			for (int j = 0; j < 4; j++)
 			{
-				if (mon?.SkillFunc?[i] != null)
+				if (current.SkillFunc[j] != null)
 				{
-					ff = mon.SkillFunc[i];
-					vv = ff(m);
-					if (!Sort.DamageSkillups[i].EqualTo(0))
-						pts += (Threshold.DamageSkillups[i].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[i])) / Sort.DamageSkillups[i];
-				}
+					double vv = current.SkillFunc[j](current);
+					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (Sort.DamageSkillups[j] != 0)
+					{
+						outvals.DamageSkillups[j] = ((Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j])) - Goal.DamageSkillups[j]) / Sort.DamageSkillups[j];
+						str = outvals.DamageSkillups[j].ToString("0.#") + " (" + vv + ")";
+						pts += outvals.DamageSkillups[j];
 			}
 			
+					writeTo?.Invoke(str, i);
+					i++;
+				}
+			}
 			return pts;
 		}
 
@@ -979,7 +996,7 @@ namespace RuneOptim
 										{
 											// we found an okay build!
 											plus++;
-											curScore = sort(cstats);
+											curScore = CalcScore(cstats);
 
 											if (BuildSaveStats)
 											{
@@ -1005,7 +1022,7 @@ namespace RuneOptim
 												if (tests.Count < MaxBuilds32)
 													tests.Add(new Monster(test, true));
 
-												bestScore = sort(bstats);
+												bestScore = CalcScore(bstats);
 												lock (BestLock)
 												{
 													if (Best == null || bestScore < curScore)
@@ -1021,14 +1038,14 @@ namespace RuneOptim
 												// if there are currently no good builds, keep it
 												// or if this build is better than the best, keep it
 
-												curScore = sort(cstats);
+												curScore = CalcScore(cstats);
 
 												lock (BestLock)
 												{
 													if (Best == null || bestScore < curScore)
 													{
 														Best = new Monster(test, true);
-														bestScore = sort(bstats);
+														bestScore = CalcScore(bstats);
 														bstats = Best.GetStats();
 														tests.Add(Best);
 													}
@@ -1096,7 +1113,7 @@ namespace RuneOptim
 						{
 							if (!BuildGoodRunes)
 							{
-								r.manageStats.AddOrUpdate("buildScoreTotal", sort(Best), (k, v) => v + sort(Best));
+								r.manageStats.AddOrUpdate("buildScoreTotal", CalcScore(Best), (k, v) => v + CalcScore(Best));
 								runeUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
 								r.manageStats.AddOrUpdate("LoadGen", total, (s, d) => { return d + total; });
 								
@@ -1123,7 +1140,7 @@ namespace RuneOptim
 					takeAmount = BuildTake;
 
 
-				foreach (var ll in tests.Where(t => t != null).OrderByDescending(r => sort(r.GetStats())).Take(takeAmount))
+				foreach (var ll in tests.Where(t => t != null).OrderByDescending(r => CalcScore(r.GetStats())).Take(takeAmount))
 					loads.Add(ll);
 
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Found a load " + loads.Count()));
@@ -1149,7 +1166,7 @@ namespace RuneOptim
 				{
 					// remember the good one
 					Best = loads.First();
-					Best.score = sort(Best.GetStats());
+					Best.score = CalcScore(Best.GetStats());
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "best " + (Best?.score ?? -1)));
 					//Best.Current.runeUsage = usage.runeUsage;
 					//Best.Current.buildUsage = usage.buildUsage;

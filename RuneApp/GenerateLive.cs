@@ -198,7 +198,7 @@ namespace RuneApp
 					if (freshMons.TryTake(out fresh))
 					{
 						if (fresh.score == 0)
-							fresh.score = build.sort(fresh);
+							fresh.score = build.CalcScore(fresh);
 						//Console.WriteLine("Checking build " + string.Join(",", fresh.Current.Runes.Select(r => r.ID.ToString())));
 						if (currentList.Count < Program.Settings.TestShow || fresh.score > currentList.Min(qq => qq.score))
 						{

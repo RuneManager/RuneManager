@@ -97,37 +97,7 @@ namespace RuneApp
 
 		private void CalcStats_OnStatChanged(object sender, StatModEventArgs e)
 		{
-			double vv;
-			foreach (var a in Build.statEnums)
-			{
-				if (!statScore.Stats[a].EqualTo(0))
-				{
-					vv = statPreview.Stats[a];
-					statTotal.Stats[a] = (build.Threshold[a].EqualTo(0) ? vv : Math.Min(vv, build.Threshold[a])) / statScore.Stats[a];
-				}
-				else
-					statTotal.Stats[a] = 0;
-			}
-			foreach (var a in Build.extraEnums)
-			{
-				if (!statScore.Stats[a].EqualTo(0))
-				{
-					vv = statPreview.Stats.ExtraValue(a);
-					statTotal.Stats[a] = (build.Threshold[a].EqualTo(0) ? vv : Math.Min(vv, build.Threshold[a])) / statScore.Stats[a];
-				}
-				else
-					statTotal.Stats[a] = 0;
-			}
-		}
-
-		ListViewItem addTemplate(Build b, ListViewGroup group)
-		{
-			var lvi = new ListViewItem();
-			lvi.Text = b.MonName;
-			lvi.Tag = b;
-			lvi.Group = group;
-			this.prebuildList.Items.Add(lvi);
-			return lvi;
+			build.CalcScore(statPreview.Stats, statTotal.Stats);
 		}
 
 		private void btnCreate_Click(object sender, EventArgs e)

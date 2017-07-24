@@ -149,14 +149,14 @@ namespace RuneApp
 			}
 		}
 
-		private ListViewItem renderLoadoutTest(Monster b)
+		private ListViewItem renderLoadoutTest(Monster m)
 		{
 			ListViewItem li = new ListViewItem();
-			var Cur = b.GetStats();
+			var Cur = m.GetStats();
 
 			int underSpec = 0;
 			int under12 = 0;
-			foreach (var r in b.Current.Runes)
+			foreach (var r in m.Current.Runes)
 			{
 				if (r.Level < 12)
 					under12 += 12 - r.Level;
@@ -165,27 +165,27 @@ namespace RuneApp
 			}
 
 			li.SubItems.Add(underSpec + "/" + under12);
-			double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-			b.score = pts;
+			double pts = build.CalcScore(Cur, null, (str, i) => { li.SubItems.Add(str); });
+			m.score = pts;
 
 			// put the sum points into the first item
 			li.SubItems[0].Text = pts.ToString("0.##");
 
-			li.Tag = b;
-			if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.Locked))
+			li.Tag = m;
+			if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.Locked))
 				li.ForeColor = Color.Gray;
 			else
 			{
-				if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-					b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+				if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
+					m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 				{
 					li.ForeColor = Color.Green;
 				}
-				else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
+				else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
 				{
 					li.ForeColor = Color.Goldenrod;
 				}
-				else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
+				else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
 				{
 					li.ForeColor = Color.DarkBlue;
 				}
@@ -226,60 +226,6 @@ namespace RuneApp
 			lv.Sort();
 		}
 
-		private double GetPoints(Stats Cur, Action<string, int> w = null)
-		{
-			double pts = 0;
-			double p;
-			int i = 2;
-			foreach (Attr stat in Build.statAll)
-			{
-				if (!stat.HasFlag(Attr.ExtraStat))
-				{
-					double vv = Cur[stat];
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (build.Sort[stat] != 0)
-					{
-						p = (build.Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, build.Threshold[stat])) / build.Sort[stat];
-						str = p.ToString("0.#") + " (" + Cur[stat] + ")";
-						pts += p;
-					}
-					w?.Invoke(str, i);
-					i++;
-				}
-				else
-				{
-					double vv = Cur.ExtraValue(stat);
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (build.Sort.ExtraGet(stat) != 0)
-					{
-						p = (build.Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, build.Threshold.ExtraGet(stat))) / build.Sort.ExtraGet(stat);
-						str = p.ToString("0.#") + " (" + vv + ")";
-						pts += p;
-					}
-					w?.Invoke(str, i);
-					i++;
-				}
-			}
-			for (int j = 0; j < 4; j++)
-			{
-				if (Cur.SkillFunc[j] != null)
-				{
-					double vv = Cur.SkillFunc[j](Cur);
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (build.Sort.DamageSkillups[j] != 0)
-					{
-						p = (build.Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, build.Threshold.DamageSkillups[j])) / build.Sort.DamageSkillups[j];
-						str = p.ToString("0.#") + " (" + vv + ")";
-						pts += p;
-					}
-
-					w?.Invoke(str, i);
-					i++;
-				}
-			}
-			return pts;
-		}
-
 		// recalculate all the points for this monster
 		// TODO: consider hiding point values in the subitem tags and only recalcing the changed column
 		// TODO: pull the scoring algorithm into a neater function
@@ -288,7 +234,7 @@ namespace RuneApp
 			Monster load = (Monster)li.Tag;
 			var Cur = load.GetStats();
 
-			double pts = GetPoints(Cur, (str, num) => { li.SubItems[num].Text = str; });
+			double pts = build.CalcScore(Cur, null, (str, num) => { li.SubItems[num].Text = str; });
 			
 			li.SubItems[0].Text = pts.ToString("0.##");
 

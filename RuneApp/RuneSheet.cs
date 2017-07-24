@@ -234,14 +234,14 @@ namespace RuneApp
 			ws.Cells[row, 3].Value = build.buildUsage.passed;
 
 			if (build.buildUsage != null && build.buildUsage.loads != null)
-				build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => build.sort(m.GetStats())).ToList();
+				build.buildUsage.loads = build.buildUsage.loads.OrderByDescending(m => build.CalcScore(m.GetStats())).ToList();
 
 			double scoreav = 0;
 			int c = 0;
 			Stats minav = new Stats();
 			foreach (var b in build.buildUsage.loads)
 			{
-				double sc = build.sort(b.GetStats());
+				double sc = build.CalcScore(b.GetStats());
 				b.score = sc;
 				scoreav += sc;
 				minav += b.GetStats();

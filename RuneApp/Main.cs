@@ -756,8 +756,8 @@ namespace RuneApp
 
 						if (build != null)
 						{
-							var beforeScore = build.sort(dmon.GetStats());
-							var afterScore = build.sort(load.GetStats(mon));
+							var beforeScore = build.CalcScore(dmon.GetStats());
+							var afterScore = build.CalcScore(load.GetStats(mon));
 							groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
 							groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
 							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = (afterScore - beforeScore).ToString("0.##");
