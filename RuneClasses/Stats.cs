@@ -162,7 +162,7 @@ namespace RuneOptim
 		[JsonProperty("con")]
 		public double _con = 0;
 
-		[JsonProperty("hp")]
+		[JsonProperty("hp", NullValueHandling = NullValueHandling.Ignore)]
 		public double? _health = null;
 
 		// TODO: should I set con?
@@ -203,8 +203,18 @@ namespace RuneOptim
 		[JsonProperty("skillup_damage")]
 		public double[] DamageSkillups = new double[8];
 
+		public bool ShouldSerializeDamageSkillups()
+		{
+			return DamageSkillups.Any(d => d > 0);
+		}
+
 		[JsonProperty("skill_cooltime")]
 		public int[] SkillTimes = new int[8];
+
+		public bool ShouldSerializeSkillTimes()
+		{
+			return SkillTimes.Any(i => i > 0);
+		}
 
 		[JsonIgnore]
 		public int[] SkillupLevel = new int[8];
@@ -259,21 +269,45 @@ namespace RuneOptim
 		[JsonProperty("fake_ehp")]
 		public double EffectiveHP = 0;
 
+		public bool ShouldSerializeEffectiveHP()
+		{
+			return EffectiveHP != 0;
+		}
+
 		[JsonProperty("fake_ehpdb")]
 		public double EffectiveHPDefenseBreak = 0;
+
+		public bool ShouldSerializeEffectiveHPDefenseBreak()
+		{
+			return EffectiveHPDefenseBreak != 0;
+		}
 
 		[JsonProperty("fake_dps")]
 		public double DamagePerSpeed = 0;
 
+		public bool ShouldSerializeDamagePerSpeed()
+		{
+			return DamagePerSpeed != 0;
+		}
+
 		[JsonProperty("fake_avd")]
 		public double AverageDamage = 0;
+
+		public bool ShouldSerializeAverageDamage()
+		{
+			return AverageDamage != 0;
+		}
 
 		[JsonProperty("fake_mxd")]
 		public double MaxDamage = 0;
 
+		public bool ShouldSerializeMaxDamage()
+		{
+			return MaxDamage != 0;
+		}
 
 		[JsonIgnore]
-		public MonsterDefinitions.MultiplierBase damageFormula = null;// new MonsterDefinitions.MultiplierValue(Attr.AttackFlat);
+		public MonsterDefinitions.MultiplierBase damageFormula = null;
 
 		[JsonIgnore]
 		protected static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
@@ -301,6 +335,7 @@ namespace RuneOptim
 			}
 		}
 
+		[JsonIgnore]
 		public Func<Stats, double>[] SkillFunc
 		{
 			get

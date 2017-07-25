@@ -172,11 +172,26 @@ namespace RuneOptim
 		[JsonProperty("new")]
 		public bool New;
 
+		public bool ShouldSerializeNew()
+		{
+			return New;
+		}
+
 		[JsonProperty("downloadstats")]
 		public bool DownloadStats;
 
+		public bool ShouldSerializeDownloadStats()
+		{
+			return DownloadStats;
+		}
+
 		[JsonProperty("downloadawake")]
 		public bool DownloadAwake;
+
+		public bool ShouldSerializeDownloadAwake()
+		{
+			return DownloadAwake;
+		}
 
 		// Magical (and probably bad) tree structure for rune slot stat filters
 		// tab, stat, FILTER
@@ -203,7 +218,7 @@ namespace RuneOptim
 			}
 			runeFilters = nfilters;
 
-			return true;
+			return runeFilters.Count > 0;
 		}
 
 		// For when you want to map 2 pieces of info to a key, just be *really* lazy
@@ -223,7 +238,7 @@ namespace RuneOptim
 			}
 			runeScoring = nscore;
 
-			return true;
+			return runeScoring.Count > 0;
 		}
 
 		// if to raise the runes level, and use the appropriate main stat value.
@@ -243,7 +258,7 @@ namespace RuneOptim
 			}
 			runePrediction = npred;
 
-			return true;
+			return runePrediction.Count > 0;
 		}
 
 		[JsonProperty("AllowBroken")]
@@ -262,6 +277,11 @@ namespace RuneOptim
 		// resulting build must have every set in this collection
 		[JsonProperty("RequiredSets")]
 		public ObservableCollection<RuneSet> RequiredSets = new ObservableCollection<RuneSet>();
+
+		public bool ShouldSerializeRequiredSets()
+		{
+			return RequiredSets.Count > 0;
+		}
 
 		// builds *must* have *all* of these stats
 		[JsonProperty("Minimum")]
@@ -294,6 +314,11 @@ namespace RuneOptim
 			return Threshold.NonZero();
 		}
 
+		public bool ShouldSerializeGoal()
+		{
+			return Goal.NonZero();
+		}
+
 		[JsonProperty]
 		public List<string> Teams = new List<string>();
 		public bool ShouldSerializeTeams()
@@ -315,16 +340,39 @@ namespace RuneOptim
 		[JsonIgnore]
 		public RuneUsage runeUsage;
 
-		public int autoRuneAmount = 30;
+		[JsonIgnore]
+		public static readonly int AutoRuneAmountDefault = 30;
+
+		public int autoRuneAmount = AutoRuneAmountDefault;
+
+		public bool ShouldSerializeautoRuneAmount()
+		{
+			return autoRuneAmount != AutoRuneAmountDefault;
+		}
 
 		// magically find good runes to use in the build
 		public bool autoRuneSelect = false;
 
+		public bool ShouldSerializeautoRuneSelect()
+		{
+			return autoRuneSelect;
+		}
+
 		// magically scale Minimum with Sort while the build is running
 		public bool autoAdjust = false;
 
+		public bool ShouldSerializeautoAdjust()
+		{
+			return autoAdjust;
+		}
+
 		// Save to JSON
 		public List<ulong> BannedRuneId = new List<ulong>();
+
+		public bool ShouldSerializeBannedRuneId()
+		{
+			return BannedRuneId.Any();
+		}
 
 		[JsonIgnore]
 		public List<ulong> bannedRunesTemp = new List<ulong>();
