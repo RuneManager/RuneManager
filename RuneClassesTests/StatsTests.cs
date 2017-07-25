@@ -32,7 +32,7 @@ namespace RuneOptim.Tests
         {
             var stat1 = TestData.statsFull();
             var stat2 = new Stats();
-            stat1.SetZero();
+            stat1.SetTo(0);
             Assert.AreEqual(stat2, stat2);
         }
 

@@ -202,7 +202,7 @@ namespace RuneOptim
 
 		[JsonProperty("skillup_damage")]
 		public double[] DamageSkillups = new double[8];
-
+		
 		public bool ShouldSerializeDamageSkillups()
 		{
 			return DamageSkillups.Any(d => d > 0);
@@ -225,6 +225,9 @@ namespace RuneOptim
 		public event EventHandler<StatModEventArgs> OnStatChanged;
 
 		public Stats() { }
+
+		public Stats(double i) { SetTo(i); }
+
 		// copy constructor, amrite?
 		public Stats(Stats rhs, bool copyExtra = false)
 		{
@@ -518,32 +521,6 @@ namespace RuneOptim
 			OnStatChanged?.Invoke(this, new StatModEventArgs(extra, value));
 		}
 
-		public void SetZero()
-		{
-			/* // TODO: put this back when SetTo is good
-			Accuracy = 0;
-			Attack = 0;
-			CritDamage = 0;
-			CritRate = 0;
-			Defense = 0;
-			Health = 0;
-			Resistance = 0;
-			Speed = 0;
-
-			EffectiveHP = 0;
-			EffectiveHPDefenseBreak = 0;
-			DamagePerSpeed = 0;
-			AverageDamage = 0;
-			MaxDamage = 0;*/
-
-			foreach (var a in Build.statAll)
-			{
-				this[a] = 0;
-			}
-
-			DamageSkillups = new double[8];
-		}
-
 		public double Sum()
 		{
 			return Accuracy
@@ -798,6 +775,32 @@ namespace RuneOptim
 				return false;
 
 			return true;
+		}
+
+		public void SetTo(double v)
+		{
+			/* // TODO: put this back when SetTo is good
+			Accuracy = 0;
+			Attack = 0;
+			CritDamage = 0;
+			CritRate = 0;
+			Defense = 0;
+			Health = 0;
+			Resistance = 0;
+			Speed = 0;
+
+			EffectiveHP = 0;
+			EffectiveHPDefenseBreak = 0;
+			DamagePerSpeed = 0;
+			AverageDamage = 0;
+			MaxDamage = 0;*/
+
+			foreach (var a in Build.statAll)
+			{
+				this[a] = v;
+			}
+
+			DamageSkillups = new double[8];
 		}
 
 		public Stats SetTo(Stats rhs)

@@ -286,7 +286,7 @@ namespace RuneOptim
 		// builds *must* have *all* of these stats
 		[JsonProperty("Minimum")]
 		public Stats Minimum = new Stats();
-
+		
 		// builds *mustn't* exceed *any* of these stats
 		[JsonProperty("Maximum")]
 		public Stats Maximum = new Stats();
@@ -475,7 +475,7 @@ namespace RuneOptim
 				return 0;
 			if (outvals == null)
 				outvals = new Stats();
-			outvals.SetZero();
+			outvals.SetTo(0);
 
 			double pts = 0;
 			// dodgy hack for indexing in Generate ListView
