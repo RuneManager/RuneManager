@@ -173,7 +173,11 @@ namespace RuneService
 			}
 
 			private void OnExpire(object state) {
+#if DEBUG
+				Console.ForegroundColor = ConsoleColor.DarkBlue;
 				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + " -- " + this.requestUri.Host + " Expired");
+				Console.ForegroundColor = ConsoleColor.Gray;
+#endif
 				if (SocketBP != null) {
 					SocketBP.CloseSocket();
 					SocketBP = null;
@@ -192,7 +196,6 @@ namespace RuneService
 			}
 
 			protected override void OnReceiveRequest(HttpRequestLine e) {
-				timer = new System.Threading.Timer(new System.Threading.TimerCallback(OnExpire), null, 300 * 1000, System.Threading.Timeout.Infinite);
 #if DEBUG
 				Console.ForegroundColor = ConsoleColor.DarkBlue;
 				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + " -> " + RequestLine
@@ -200,11 +203,13 @@ namespace RuneService
 				);
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
-				requestUri = RequestLine.Uri;
-				if (blacklistHosts.Contains(requestUri.Host))
+				if (blacklistHosts.Contains(RequestLine.Uri.Host))
 					SocketBP.CloseSocket();
 
 				var method = e.Method.ToUpper();
+				if (method != "CONNECT") {
+					timer = new System.Threading.Timer(new System.Threading.TimerCallback(OnExpire), null, 300 * 1000, System.Threading.Timeout.Infinite);
+				}
 				if ((method == "POST" || method == "PUT" || method == "PATCH")) {
 					if (skipHosts.Contains(e.Uri.Host))
 						return;
