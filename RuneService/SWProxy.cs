@@ -28,7 +28,7 @@ namespace RuneService
 			"pasta.esfile.duapps.com", "analytics.app-adforce.jp", "push.qpyou.cn", "activeuser.qpyou.cn", "mlog.appguard.co.kr" // SW init
 		};
 
-		private static List<string> blacklistUris = new List<string> {
+		private static List<string> blacklistHosts = new List<string> {
 			"hmma.baidu.com", "conf.international.baidu.com", "rts.mobula.sdk.duapps.com", "www.estrongs.com",
 		};
 
@@ -167,20 +167,43 @@ namespace RuneService
 			private string decRequest;
 			private Uri requestUri;
 			private JObject req;
+			private System.Threading.Timer timer;
 
-			public ProxyHandler(HttpSocket clientSocket) : base(clientSocket) { }
+			public ProxyHandler(HttpSocket clientSocket) : base(clientSocket) {
+			}
+
+			private void OnExpire(object state) {
+				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + " -- " + this.requestUri.Host + " Expired");
+				if (SocketBP != null) {
+					SocketBP.CloseSocket();
+					SocketBP = null;
+				}
+				if (SocketPS != null) {
+					SocketPS.CloseSocket();
+					SocketPS = null;
+				}
+				State.bPersistConnectionBP = false;
+				State.bPersistConnectionPS = false;
+				State.NextStep = null;
+			}
 
 			public static ProxyHandler OnConnection(HttpSocket clientSocket) {
 				return new ProxyHandler(clientSocket);
 			}
 
 			protected override void OnReceiveRequest(HttpRequestLine e) {
+				timer = new System.Threading.Timer(new System.Threading.TimerCallback(OnExpire), null, 300 * 1000, System.Threading.Timeout.Infinite);
 #if DEBUG
 				Console.ForegroundColor = ConsoleColor.DarkBlue;
-				Console.WriteLine("-> " + RequestLine + (RequestHeaders.Referer != null ? ", Referer: " + RequestHeaders.Referer : ""));
+				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + " -> " + RequestLine
+					+ (RequestHeaders.Referer != null ? ", Referer: " + RequestHeaders.Referer : "")
+				);
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
 				requestUri = RequestLine.Uri;
+				if (blacklistHosts.Contains(requestUri.Host))
+					SocketBP.CloseSocket();
+
 				var method = e.Method.ToUpper();
 				if ((method == "POST" || method == "PUT" || method == "PATCH")) {
 					if (skipHosts.Contains(e.Uri.Host))
@@ -207,16 +230,12 @@ namespace RuneService
 				}
 			}
 
-			//protected override void ReadRequest() {
-			//	base.ReadRequest();
-				//Console.WriteLine(SocketBP.ReadAsciiLine());
-				//Console.WriteLine(Encoding.UTF8.GetString(SocketBP.Buffer, 0, Array.IndexOf(SocketBP.Buffer, (byte)0)));
-			//}
-
 			protected override void OnReceiveResponse() {
 #if DEBUG
 				Console.ForegroundColor = ConsoleColor.DarkBlue;
-				Console.WriteLine("<- " + ResponseStatusLine + ", " + requestUri.AbsoluteUri + " Content-Length: " + (ResponseHeaders.ContentLength ?? 0));
+				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId + " <- " + ResponseStatusLine + ", " + requestUri.AbsoluteUri
+					+ (ResponseHeaders.ContentLength != null ? " Content-Length: " + ResponseHeaders.ContentLength.ToString() : "")
+				);
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
 				if (RequestLine.Method == "GET" || RequestLine.Method == "POST") {
@@ -305,6 +324,12 @@ namespace RuneService
 								});
 								thr.Start();
 							}
+						}
+					}
+				}
+				if (ResponseStatusLine.StatusCode == HttpStatus.OK && RequestHeaders.Headers.ContainsKey("accept-encoding")) {
+					if (!ResponseHeaders.Headers.ContainsKey("content-encoding")) {
+						if (!(requestUri.AbsoluteUri.Contains("summonerswar") && requestUri.AbsoluteUri.Contains("/api/gateway"))) {
 						}
 					}
 				}

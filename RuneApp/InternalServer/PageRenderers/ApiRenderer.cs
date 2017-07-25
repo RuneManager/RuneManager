@@ -26,23 +26,19 @@ namespace RuneApp.InternalServer
 
 				if (req.AcceptTypes?.Contains("application/json") ?? false)
 				{
-					//return new HttpResponseMessage() {
-					//	Content = new StringContent("{\"endpoints\":[\"runes\",\"monsters\"], \"version\":\"0.4.2.0\",\"baseurl\":\"" + req.UserHostName + "\"}")
-					//};
 					return new SwaggerJsRenderer().Render(req, uri);
 				}
+				// yaml?
 
 				return returnHtml(
 					new ServedResult[] {
 						new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"/css/reset.css\"" } } },
 						new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/2.2.4/css/screen.css\"" } } },
 						//new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"/css/swagger.css\"" } } },
-						//https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/2.2.4/css/screen.css
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"object-assign-pollyfill.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"http://code.jquery.com/jquery-1.8.0.js\"" } } },
-						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"http://swagger-ui.dev.inphinity.com.au/jquery-1.8.0.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"jquery.slideto.min.js\"" } } },
-						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"jquery.wiggle.min.js\"" } } },
+						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"jquery.wiggle.min.js\"" } } },	// Do we need this?
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"jquery.ba-bbq.min.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"https://cdnjs.cloudflare.com/ajax/libs/lodash-compat/3.10.1/lodash.min.js\"" } } },
@@ -60,10 +56,7 @@ Backbone.View = (function(View) {
 	});
 })(Backbone.View);
 " } },
-						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"/scripts/swagger.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/2.2.4/swagger-ui.js\"" } } },
-						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"http://swagger-ui.dev.inphinity.com.au/swagger-ui.js\"" } } },
-						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"/scripts/swagger-client.js\"" } } },
 						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"highlight.9.1.0.pack.js\"" } } },
 						//new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"highlight.9.1.0.pack_extended.js\"" } } },
 						new ServedResult("script") { contentDic = { { "type", "\"application/javascript\"" }, { "src", "\"https://cdnjs.cloudflare.com/ajax/libs/json-editor/0.7.22/jsoneditor.js\"" } } },
@@ -73,24 +66,23 @@ Backbone.View = (function(View) {
 //setTimeout(function() {
 $(function () {
 window.swaggerUi = new SwaggerUi({
-	url: ""http://" + req.UserHostName + @"/api/swagger.json"",
-	dom_id: ""swagger-ui-container"",
+	url: 'http://" + req.UserHostName + @"/api/swagger.json',
+	dom_id: 'swagger-ui-container',
 	//booleanValues: ['true', 'false'],
 	supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
 	useJQuery: true,
 	onComplete: function(swaggerApi, swaggerUi) {
-		console.log(""Swagger loaded"");
+		console.log('Swaggered');
 	},
 	onFailure: function(data) {
-		console.log(""Unable to Load SwaggerUI"");
+		console.log('Unable to Load SwaggerUI');
 	},
 	docExpansion: 'list',
 	jsonEditor: false,
-	//apisSorter: null, // default to server
 	defaultModelRendering: 'schema',
 	showRequestHeaders: false,
 	//oauth2RedirectUrl: window.location.href.replace('index', 'o2c-html').split('#')[0],
-	//sorter : ""alpha""
+	//sorter : 'alpha'
 	highlightSizeThreshold: 1
 });
 //window.swaggerUi.options.validatorUrl = '';
