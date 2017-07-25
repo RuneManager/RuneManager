@@ -17,7 +17,31 @@ namespace RuneApp
 	public partial class BuildWizard : Form
 	{
 		Build build;
+		object loadLock = new object();
 		bool loading = true;
+
+		bool Loading
+		{
+			get { lock (loadLock) { return loading; } }
+			set { lock (loadLock) { loading = value; } }
+		}
+
+		bool CanLoad
+		{
+			get
+			{
+				lock (loadLock)
+				{
+					if (loading) return false;
+					else
+					{
+						loading = true;
+						return true;
+					}
+				}
+			}
+		}
+
 		ListViewItem defTemplate = null;
 
 		static List<Build> templateList = null;
@@ -59,17 +83,25 @@ namespace RuneApp
 			this.lbPrebuild.Text = "Prebuild Template for " + build.mon.FullName;
 
 			defTemplate = addTemplate(new Build() { MonName = "<None>" }, prebuildList.Groups[0]);
-
-			pullTemplates(TemplateList);
+			new System.Threading.Thread(() =>
+			{
+				pullTemplates(TemplateList);
+			}).Start();
 
 			prebuildList.Select();
 			defTemplate.Selected = true;
 		}
 
+		// Hack for matching unawake to woke
+		bool MatchMostlyId(int lhs, int rhs)
+		{
+			return lhs == rhs || lhs - 10 == rhs || lhs == rhs - 10;
+		}
+
 		void pullTemplates(IEnumerable<Build> templates, int forceGroup = 0)
 		{
 			// load more
-			foreach (var b in templates.Where(t => t.MonId == 0 || (int)t.MonId == build.mon.monsterTypeId))
+			foreach (var b in templates.Where(t => t.MonId == 0 || MatchMostlyId((int)t.MonId, build.mon.monsterTypeId)))
 			{
 				if (b.ID == -1)
 				{
@@ -122,17 +154,21 @@ namespace RuneApp
 				else
 				{
 					var gid = forceGroup == 0 ? b.ID : forceGroup;
-					var group = prebuildList.Groups.Count > gid ? prebuildList.Groups[gid] : null;
-					if (b.Teams.Count > 0)
+					ListViewGroup group = null;
+					Invoke((MethodInvoker)delegate
 					{
-						group = prebuildList.Groups.Cast<ListViewGroup>().FirstOrDefault(g => g.Header == b.Teams.First());
-						if (group == null)
+						group = prebuildList.Groups.Count > gid ? prebuildList.Groups[gid] : null;
+						if (b.Teams.Count > 0)
 						{
-							group = new ListViewGroup(b.Teams.First());
-							prebuildList.Groups.Add(group);
+							group = prebuildList.Groups.Cast<ListViewGroup>().FirstOrDefault(g => g.Header == b.Teams.First());
+							if (group == null)
+							{
+								group = new ListViewGroup(b.Teams.First());
+								prebuildList.Groups.Add(group);
+							}
 						}
-					}
-					addTemplate(b, group);
+						addTemplate(b, group);
+					});
 				}
 			}
 
@@ -150,31 +186,39 @@ namespace RuneApp
 
 		private void RecheckPreview()
 		{
-			if (loading) return;
-			loading = true;
-			runeDial.Loadout = null;
-			build.RunesUseLocked = cPreviewLocked.Checked;
-			build.autoRuneSelect = true;
-			build.RunesUseEquipped = true;
-			build.autoRuneAmount = 8;
+			if (!CanLoad) return;
 
-			build.GenRunes(Program.data);
-			if (build.runes.Any(rs => rs.Length > 10))
-				return;
-			var res = build.GenBuilds();
-			if (res == BuildResult.Success && build.Best != null)
+			try
 			{
-				runeDial.Loadout = build.Best.Current;
-				statPreview.Stats.SetTo(build.Best.GetStats());
-				statPreview.RecheckExtras();
-			}
-			else
-			{
-				// TODO: warning
-			}
+				runeDial.Loadout = null;
+				build.RunesUseLocked = cPreviewLocked.Checked;
+				build.autoRuneSelect = true;
+				build.RunesUseEquipped = true;
+				build.autoRuneAmount = 8;
 
-			build.autoRuneSelect = false;
-			loading = false;
+				build.GenRunes(Program.data);
+				if (build.runes.Any(rs => rs.Length > 10))
+					return;
+				var res = build.GenBuilds();
+
+				if (res == BuildResult.Success && build.Best != null)
+				{
+					runeDial.Loadout = build.Best.Current;
+					statPreview.Stats.SetTo(build.Best.GetStats());
+					statPreview.RecheckExtras();
+				}
+				else
+				{
+					// TODO: warning
+				}
+
+				build.autoRuneSelect = false;
+			}
+			catch { }
+			finally
+			{
+				Loading = false;
+			}
 		}
 
 		private void BuildWizard_Load(object sender, EventArgs e)
@@ -191,7 +235,7 @@ namespace RuneApp
 			statScore.Stats.OnStatChanged += CalcStats_OnStatChanged;
 			statScore.Stats.OnStatChanged += ScoreStats_OnStatChanged;
 
-			loading = false;
+			Loading = false;
 		}
 
 		private void BuildWizard_FormClosing(object sender, FormClosingEventArgs e)
@@ -219,7 +263,7 @@ namespace RuneApp
 
 		private void cShowWizard_CheckedChanged(object sender, EventArgs e)
 		{
-			if (loading) return;
+			if (Loading) return;
 
 			Program.Settings.ShowBuildWizard = cShowWizard.Checked;
 			Program.Settings.Save();
@@ -227,40 +271,47 @@ namespace RuneApp
 
 		private void prebuildList_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			loading = true;
-			var item = prebuildList.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
-			if (item == null) return;
-
-			cShowWizard.Enabled = (item == defTemplate);
-			if (!cShowWizard.Enabled && !cShowWizard.Checked)
-				cShowWizard.Checked = true;
-
-			var tb = item.Tag as Build;
-			if (tb == null) return;
-			
-			build.AllowBroken = tb.AllowBroken;
-			build.Minimum.SetTo(tb.Minimum);
-			build.Maximum.SetTo(tb.Maximum);
-			if (tb.Threshold.NonZero())
-				build.Threshold.SetTo(tb.Threshold);
-			else
-				build.Threshold.SetTo(new Stats() {
-					Accuracy = 85,
-					Resistance = 100,
-					CritRate = 100,
-				});
-			build.Goal.SetTo(tb.Goal);
-			build.Sort.SetTo(tb.Sort);
-			for (int i = 0; i < build.slotStats.Length; i++)
+			if (!CanLoad) return;
+			try
 			{
-				build.slotStats[i].Clear();
-				build.slotStats[i].AddRange(tb.slotStats[i]);
+				var item = prebuildList.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+				if (item == null) return;
+
+				cShowWizard.Enabled = (item == defTemplate);
+				if (!cShowWizard.Enabled && !cShowWizard.Checked)
+					cShowWizard.Checked = true;
+
+				var tb = item.Tag as Build;
+				if (tb == null) return;
+
+				build.AllowBroken = tb.AllowBroken;
+				build.Minimum.SetTo(tb.Minimum);
+				build.Maximum.SetTo(tb.Maximum);
+				if (tb.Threshold.NonZero())
+					build.Threshold.SetTo(tb.Threshold);
+				else
+					build.Threshold.SetTo(new Stats()
+					{
+						Accuracy = 85,
+						Resistance = 100,
+						CritRate = 100,
+					});
+				build.Goal.SetTo(tb.Goal);
+				build.Sort.SetTo(tb.Sort);
+				for (int i = 0; i < build.slotStats.Length; i++)
+				{
+					build.slotStats[i].Clear();
+					build.slotStats[i].AddRange(tb.slotStats[i]);
+				}
+				build.BuildSets.Clear();
+				build.BuildSets.AddRange(tb.BuildSets);
+				build.RequiredSets.Clear();
+				build.RequiredSets.AddRange(tb.RequiredSets);
 			}
-			build.BuildSets.Clear();
-			build.BuildSets.AddRange(tb.BuildSets);
-			build.RequiredSets.Clear();
-			build.RequiredSets.AddRange(tb.RequiredSets);
-			loading = false;
+			finally
+			{
+				Loading = false;
+			}
 			RecheckPreview();
 		}
 
