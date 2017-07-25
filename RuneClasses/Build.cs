@@ -678,7 +678,7 @@ namespace RuneOptim
 						if (!mstat.Awakened && mstat.AwakenRef != null)
 						{
 							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Awakening"));
-							mon = mstat.AwakenRef.Download().GetMon(mon, false);
+							mon = mstat.AwakenRef.Download().GetMon(mon);
 						}
 					}
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloaded"));
@@ -690,7 +690,7 @@ namespace RuneOptim
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloading 40 def"));
 					var mref = MonsterStat.FindMon(mon);
 					if (mref != null)
-						mon = mref.Download().GetMon(mon, false);
+						mon = mref.Download().GetMon(mon);
 				}
 			}
 			catch (Exception e)

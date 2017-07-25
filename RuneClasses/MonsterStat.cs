@@ -49,8 +49,8 @@ namespace RuneOptim
 		{
 			get
 			{
-				if (monStats == null && File.Exists(global::RuneOptim.Properties.Resources.BaseStatsJSON))
-					monStats = JsonConvert.DeserializeObject<List<MonsterStat>>(File.ReadAllText(global::RuneOptim.Properties.Resources.BaseStatsJSON));
+				if (monStats == null)
+					monStats = StatReference.AskSWApi<List<MonsterStat>>("https://swarfarm.com/api/bestiary");
 				return monStats;
 			}
 		}
@@ -66,99 +66,43 @@ namespace RuneOptim
 
 		public static StatReference FindMon(Monster mon)
 		{
-			return FindMon(mon.Name);
+			return FindMon(mon.Name, mon.Element.ToString());
 		}
 
-		public static StatReference FindMon(string name)
+		public static StatReference FindMon(string name, string element = null)
 		{
 			if (MonStats == null)
 				return null;
-
-			int bracketInd = name.IndexOf('(');
-			string element = "";
-
-			if (bracketInd > 0)
-			{
-				element = name.Substring(bracketInd + 1, name.Length - bracketInd - 2).Trim();
-				name = name.Substring(0, bracketInd).Trim();
-			}
-
-			RuneLog.Info("searching for \"" + name + "\"");
-			if (element == "")
+			
+			RuneLog.Info($"searching for \"{name} ({element})\"");
+			if (element == null)
 				return MonStats.FirstOrDefault(m => m.name == name);
 			else
 				return MonStats.FirstOrDefault(m => m.name == name && m.element.ToString() == element);
 		}
-
-		public static MonsterStat Download(StatReference refer)
+		
+		public Monster GetMon(Monster mon)
 		{
-			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(refer.URL);
-			req.Accept = "application/json";
-
-			string resp;
-
-			var wresp = req.GetResponse();
-			var respStr = wresp.GetResponseStream();
-
-			if (respStr == null)
+			return new Monster()
 			{
-				return null;
-			}
-
-			using (var stream = new StreamReader(respStr))
-			{
-				resp = stream.ReadToEnd();
-			}
-
-			var ret = JsonConvert.DeserializeObject<MonsterStat>(resp);
-
-			return ret;
-		}
-
-		public Monster GetMon(StatReference mref, Monster mon)
-		{
-			//var mstat = mref.Download();
-			return GetMon(mon);
-		}
-
-		public Monster GetMon(Monster mon, bool copy = true)
-		{
-			if (copy)
-			{
-				return new Monster()
-				{
-					Id = mon.Id,
-					priority = mon.priority,
-					Current = mon.Current,
-					Accuracy = Accuracy,
-					Attack = Attack,
-					CritDamage = CritDamage,
-					CritRate = CritRate,
-					Defense = Defense,
-					Health = Health,
-					level = 40,
-					Resistance = Resistance,
-					Speed = Speed,
+				Id = mon.Id,
+				priority = mon.priority,
+				Current = mon.Current,
+				Accuracy = Accuracy,
+				Attack = Attack,
+				CritDamage = CritDamage,
+				CritRate = CritRate,
+				Defense = Defense,
+				Health = Health,
+				level = 40,
+				Resistance = Resistance,
+				Speed = Speed,
 				Element = element,
 				Name = name,
 				downloaded = true,
+				monsterTypeId = monsterTypeId,
 				_skilllist = mon._skilllist.ToList()
-				};
-			}
-
-			mon.Accuracy = Accuracy;
-			mon.Attack = Attack;
-			mon.CritDamage = CritDamage;
-			mon.CritRate = CritRate;
-			mon.Defense = Defense;
-			mon.Health = Health;
-			mon.level = 40;
-			mon.Resistance = Resistance;
-			mon.Speed = Speed;
-			mon.Name = (Awakened ? name : name + " (" + element.ToString() + ")");
-			mon.downloaded = true;
-
-			return mon;
+			};
 		}
 	}
 
@@ -166,8 +110,8 @@ namespace RuneOptim
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Element
 	{
-		[EnumMember(Value = "")]
-		Null = 0,
+		[EnumMember(Value = "Pure")]
+		Pure = 0,
 
 		[EnumMember(Value = "Water")]
 		Water = 1,
@@ -189,8 +133,8 @@ namespace RuneOptim
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Archetype
 	{
-		[EnumMember(Value = "")]
-		Null = 0,
+		[EnumMember(Value = "None")]
+		None = 0,
 
 		[EnumMember(Value = "Attack")]
 		Attack = 1,
@@ -222,26 +166,44 @@ namespace RuneOptim
 
 		[JsonProperty("element")]
 		public Element element;
-		
+
+		static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
+
+		public static T AskSWApi<T>(string location)
+		{
+			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache") + ".json";
+			var data = "";
+			if (apiObjs.ContainsKey(location))
+			{
+				return (T)apiObjs[location];
+			}
+			if (File.Exists(fpath) && new FileInfo(fpath).CreationTime < DateTime.Now.AddDays(-7))
+			{
+				File.Delete(fpath);
+			}
+			if (!File.Exists(fpath))
+			{
+				Directory.CreateDirectory(new FileInfo(fpath).Directory.FullName);
+				using (WebClient client = new WebClient())
+				{
+					client.Headers["accept"] = "application/json";
+					data = client.DownloadString(location);
+					File.WriteAllText(fpath, data);
+				}
+			}
+			else
+			{
+				data = File.ReadAllText(fpath);
+			}
+			if (string.IsNullOrWhiteSpace(data))
+				return default(T);
+			apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
+			return (T)apiObjs[location];
+		}
+
 		public MonsterStat Download()
 		{
-			HttpWebRequest req = (HttpWebRequest)WebRequest.Create(URL);
-			req.Accept = "application/json";
-
-			string resp;
-
-			var wresp = req.GetResponse();
-			var respStr = wresp.GetResponseStream();
-
-			if (respStr == null)
-				return null;
-
-			using (var stream = new StreamReader(respStr))
-			{
-				resp = stream.ReadToEnd();
-			}
-
-			return JsonConvert.DeserializeObject<MonsterStat>(resp);
+			return AskSWApi<MonsterStat>(URL);
 		}
 	}
 
@@ -255,6 +217,9 @@ namespace RuneOptim
 
 		[JsonProperty("base_stars")]
 		public int grade;
+
+		[JsonProperty("com2us_id")]
+		public int monsterTypeId;
 
 		[JsonProperty("fusion_food")]
 		public bool isFusion;
