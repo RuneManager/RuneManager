@@ -139,8 +139,10 @@ namespace RuneOptim
 					level = 40,
 					Resistance = Resistance,
 					Speed = Speed,
-					Name = (Awakened ? name : name + " (" + element.ToString() + ")"),
-					downloaded = true
+				Element = element,
+				Name = name,
+				downloaded = true,
+				_skilllist = mon._skilllist.ToList()
 				};
 			}
 

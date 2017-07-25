@@ -574,7 +574,7 @@ function hackLots(prop, num, on) {
 
 				public override string ToString()
 				{
-					return mon.Name;
+					return mon.FullName;
 				}
 
 				public ulong Id

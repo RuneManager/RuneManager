@@ -1627,7 +1627,7 @@ namespace RuneOptim
 					}
 					// cull here instead
 					if (!RunesUseEquipped)
-						runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedName == mon.Name) || r.Swapped).ToArray();
+						runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped).ToArray();
 					if (!RunesUseLocked)
 						runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
 				}

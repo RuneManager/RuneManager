@@ -65,7 +65,7 @@ namespace RuneApp.InternalServer
 					var m = Program.data.GetMonster(mid);
 					if (m == null)
 						return returnHtml(null, "missingno");
-					return returnHtml(null, (m.Locked ? "L " : "") + m.Name + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
+					return returnHtml(null, (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
 				}
 				else
 				{
@@ -123,14 +123,14 @@ namespace RuneApp.InternalServer
 			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).ToList();
 
-			var trashOnes = unlocked.Where(m => m.Grade == 1 && m.Name != "Devilmon" && !m.Name.Contains("Angelmon")).ToList();
+			var trashOnes = unlocked.Where(m => m.Grade == 1 && m.FullName != "Devilmon" && !m.FullName.Contains("Angelmon")).ToList();
 			unlocked = unlocked.Except(trashOnes).ToList();
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
 			var rem = new List<Monster>();
 			foreach (var m in locked.OrderByDescending(m => 1/(bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
-				.ThenBy(m => m._attribute)
+				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
 				.ThenBy(m => m.loadOrder))
 			{
@@ -153,7 +153,7 @@ namespace RuneApp.InternalServer
 						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j]))
 						{
 							pieces[monbase + j].Quantity -= getPiecesRequired(pieces[monbase + j]);
-							pairs[m].Add(new Monster() { Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
+							pairs[m].Add(new Monster() { FullName = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
 						}
 					}
 				}
@@ -164,14 +164,14 @@ namespace RuneApp.InternalServer
 			mm = mm.Except(pairs.SelectMany(p => p.Value));
 			mm = mm.Except(rem);
 			
-			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && m.Name != "Devilmon" && !m.Name.Contains("Angelmon"))).ToList();
+			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && m.FullName != "Devilmon" && !m.FullName.Contains("Angelmon"))).ToList();
 			mm = mm.Except(trashOnes);
 
 			mm = mm.OrderByDescending(m => !unlocked.Contains(m))
 				.ThenByDescending(m => m.Locked)
 				.ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
-				.ThenBy(m => m._attribute)
+				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
 				.ThenBy(m => m.loadOrder)
 				;
@@ -187,7 +187,7 @@ namespace RuneApp.InternalServer
 					contentList = {
 						new ServedResult("span") { contentList = { renderMonLink(m, "build") } }, nl }
 				};
-				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -203,11 +203,11 @@ namespace RuneApp.InternalServer
 				var li = new ServedResult("li")
 				{
 					contentList = { ((unlocked.Contains(m)) ?
-					("TRASH: " + m.Name + " " + m.Grade + "* " + m.level ) :
+					("TRASH: " + m.FullName + " " + m.Grade + "* " + m.level ) :
 					renderMonLink(m, "mon")), nl }
 				};
 				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
-					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -227,7 +227,7 @@ namespace RuneApp.InternalServer
 		{
 			ServedResult sr = new ServedResult("li");
 			
-			sr.contentList.Add(f.mon.Name + " " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
+			sr.contentList.Add(f.mon.FullName + " " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
 			if (f.food.Any())
 			{
 				var rr = new ServedResult("ul");
@@ -295,7 +295,7 @@ namespace RuneApp.InternalServer
 			res.contentList.Add(
 				new ServedResult("a") {
 				contentDic = { { "href", "\"monsters/" + m.Id + "\"" } },
-				contentList = { m.Name + " " + +m.Grade + "* " + m.level} });
+				contentList = { m.FullName + " " + +m.Grade + "* " + m.level} });
 			res.contentList.Add((m.Locked ? " <span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal);
 			return res;
 		}
@@ -336,7 +336,7 @@ namespace RuneApp.InternalServer
 
 			// list skillups
 			var nl = new ServedResult("ul");
-			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.Name + " " + mo.Grade + "* " + mo.level } }));
+			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
 			if (nl.contentList.Count == 0)
 				nl.name = "br";
 

@@ -560,7 +560,7 @@ namespace RuneApp
 			mon.Current.Leader = build.leader;
 			Stats cur = mon.GetStats();
 			if (mon.Id != 0)
-				monLabel.Text = "Build for " + mon.Name + " (" + mon.Id + ")";
+				monLabel.Text = "Build for " + mon.FullName + " (" + mon.Id + ")";
 			else
 				monLabel.Text = "Build for " + build.MonName + " (" + mon.Id + ")";
 
@@ -787,7 +787,7 @@ namespace RuneApp
 
 		private void refreshStats(Monster mon, Stats cur)
 		{
-			statName.Text = mon.Name;
+			statName.Text = mon.FullName;
 			statID.Text = mon.Id.ToString();
 			statLevel.Text = mon.level.ToString();
 
@@ -1965,7 +1965,7 @@ namespace RuneApp
 			if (leaderTypeBox.SelectedIndex == 0)
 			{
 				leaderAmountBox.Enabled = false;
-				build.leader.SetZero();
+				build.leader.SetTo(0);
 			}
 			else
 			{
@@ -1984,7 +1984,7 @@ namespace RuneApp
 		{
 			if (loading)
 				return;
-			build.leader.SetZero();
+			build.leader.SetTo(0);
 			var lv = (LeaderType.LeaderValue)leaderAmountBox.SelectedItem;
 			switch (lv.type)
 			{
@@ -2066,8 +2066,8 @@ namespace RuneApp
 				{
 					build.mon = ms.retMon;
 					build.MonId = build.mon.Id;
-					build.MonName = build.mon.Name;
-					monLabel.Text = "Build for " + build.mon.Name + " (" + build.mon.Id + ")";
+					build.MonName = build.mon.FullName;
+					monLabel.Text = "Build for " + build.mon.FullName + " (" + build.mon.Id + ")";
 					refreshStats(build.mon, build.mon.GetStats());
 				}
 			}

@@ -207,7 +207,7 @@ namespace RuneApp
 						else
 						{
 							b.mon = new Monster();
-							b.mon.Name = b.MonName;
+							b.mon.FullName = b.MonName;
 						}
 					}
 					break;
@@ -433,19 +433,19 @@ namespace RuneApp
 			// TODO: fix this mess
 			foreach (Build bb in builds)
 			{
-				if (bb.mon != null && bb.mon.Name != "Missingno")
+				if (bb.mon != null && bb.mon.FullName != "Missingno")
 				{
-					if (!bb.DownloadAwake || Program.data.GetMonster(bb.mon.Name).Name != "Missingno")
+					if (!bb.DownloadAwake || (Program.data.GetMonster(bb.mon.FullName) != null && Program.data.GetMonster(bb.mon.FullName).FullName != "Missingno"))
 					{
-						bb.MonName = bb.mon.Name;
+						bb.MonName = bb.mon.FullName;
 						bb.MonId = bb.mon.Id;
 					}
 					else
 					{
-						if (Program.data.GetMonster(bb.mon.Id).Name != "Missingno")
+						if (Program.data.GetMonster(bb.mon.Id).FullName != "Missingno")
 						{
 							bb.MonId = bb.mon.Id;
-							bb.MonName = Program.data.GetMonster(bb.mon.Id).Name;
+							bb.MonName = Program.data.GetMonster(bb.mon.Id).FullName;
 						}
 					}
 				}

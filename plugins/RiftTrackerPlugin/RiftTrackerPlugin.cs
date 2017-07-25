@@ -49,13 +49,13 @@ namespace RiftTrackerPlugin
 				foreach (var m in allMons.SelectMany(q => q.Value.Select(r => r.Value.Value)))
 				{
 					var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
-					m.Name = MonsterName(tid);
+					m.FullName = MonsterName(tid);
 
 					foreach (var r in m.Runes)
 					{
 						r.PrebuildAttributes();
 						m.ApplyRune(r);
-						r.AssignedName = m.Name;
+						r.AssignedName = m.FullName;
 						r.Assigned = m;
 					}
 				}
@@ -92,50 +92,50 @@ namespace RiftTrackerPlugin
 			foreach (var m in mons)
 			{
 				var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
-				m.Name = MonsterName(tid);
+				m.FullName = MonsterName(tid);
 				
 				foreach (var r in m.Runes)
 				{
 					r.PrebuildAttributes();
 					m.ApplyRune(r);
-					r.AssignedName = m.Name;
+					r.AssignedName = m.FullName;
 					r.Assigned = m;
 				}
 
 				if (!matchCount.ContainsKey(riftstats.RiftDungeonId))
 					matchCount.Add(riftstats.RiftDungeonId, new Dictionary<string, Dictionary<string, int>>());
-				if (!matchCount[riftstats.RiftDungeonId].ContainsKey(m.Name))
-					matchCount[riftstats.RiftDungeonId].Add(m.Name, new Dictionary<string, int>());
+				if (!matchCount[riftstats.RiftDungeonId].ContainsKey(m.FullName))
+					matchCount[riftstats.RiftDungeonId].Add(m.FullName, new Dictionary<string, int>());
 				foreach (var mm in mons)
 				{
-					if (mm.Name == "Missingno")
+					if (mm.FullName == "Missingno")
 					{
 						tid = long.Parse(mm.monsterTypeId.ToString().Substring(0, mm.monsterTypeId.ToString().Length-2) + "1" + mm.monsterTypeId.ToString().Last());
-						mm.Name = MonsterName(tid);
+						mm.FullName = MonsterName(tid);
 					}
 
-					if (m.Name == mm.Name)
+					if (m.FullName == mm.FullName)
 						continue;
 
-					if (!matchCount[riftstats.RiftDungeonId][m.Name].ContainsKey(mm.Name))
-						matchCount[riftstats.RiftDungeonId][m.Name].Add(mm.Name, 0);
-					if (!matchCount[riftstats.RiftDungeonId].ContainsKey(mm.Name))
-						matchCount[riftstats.RiftDungeonId].Add(mm.Name, new Dictionary<string, int>());
-					if (!matchCount[riftstats.RiftDungeonId][mm.Name].ContainsKey(m.Name))
-						matchCount[riftstats.RiftDungeonId][mm.Name].Add(m.Name, 0);
+					if (!matchCount[riftstats.RiftDungeonId][m.FullName].ContainsKey(mm.FullName))
+						matchCount[riftstats.RiftDungeonId][m.FullName].Add(mm.FullName, 0);
+					if (!matchCount[riftstats.RiftDungeonId].ContainsKey(mm.FullName))
+						matchCount[riftstats.RiftDungeonId].Add(mm.FullName, new Dictionary<string, int>());
+					if (!matchCount[riftstats.RiftDungeonId][mm.FullName].ContainsKey(m.FullName))
+						matchCount[riftstats.RiftDungeonId][mm.FullName].Add(m.FullName, 0);
 
 
-					matchCount[riftstats.RiftDungeonId][m.Name][mm.Name]++;
-					matchCount[riftstats.RiftDungeonId][mm.Name][m.Name]++;
+					matchCount[riftstats.RiftDungeonId][m.FullName][mm.FullName]++;
+					matchCount[riftstats.RiftDungeonId][mm.FullName][m.FullName]++;
 				}
 
 				//if (!allMons.ContainsKey(riftstats.RiftDungeonId))
 				//	allMons[riftstats.RiftDungeonId] = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
 				//var riftMons = allMons[riftstats.RiftDungeonId];
 
-				if (!allMons.ContainsKey(m.Name))
-					allMons.Add(m.Name, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
-				var monList = allMons[m.Name];
+				if (!allMons.ContainsKey(m.FullName))
+					allMons.Add(m.FullName, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
+				var monList = allMons[m.FullName];
 				monList[riftstats.WizardId] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
 			}
 

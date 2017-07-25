@@ -203,7 +203,7 @@ namespace RuneOptim
 						mon.loadOrder = monLoaded++;
 						if (mon.Name == null)
 						{
-							mon.Name = mon._attribute + " " + MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
+							mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
 						}
 						// Add the runes contained in the Monsters JSON definition to the Rune pool
 						foreach (var r in mon.Runes)
@@ -219,7 +219,7 @@ namespace RuneOptim
 						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id))
 						{
 							mon.ApplyRune(rune);
-							rune.AssignedName = mon.Name;
+							rune.AssignedName = mon.FullName;
 							rune.Assigned = mon;
 						}
 
@@ -282,9 +282,9 @@ namespace RuneOptim
 		{
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetMonster " + num + "th " + name + " from " + Monsters.Count);
-			Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.Name == name);
+			Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.FullName == name);
 			if (mon == null)
-				mon = Monsters.FirstOrDefault(m => m.Name == name);
+				mon = Monsters.FirstOrDefault(m => m.FullName == name);
 			if (mon != null)
 				return mon;
 			return null;

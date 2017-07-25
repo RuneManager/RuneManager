@@ -14,17 +14,29 @@ namespace RuneOptim
 	// The monster stores its base stats in its base class
 	public class Monster : Stats, IComparable<Monster>
 	{
-		[JsonIgnore]
+		[JsonProperty("name")]
 		private string name = "Missingno";
 
-		[JsonIgnore]
 		public string Name
+		{
+			get
+			{
+				return name;
+			}
+			set
+			{
+				name = value;
+			}
+		}
+
+		[JsonIgnore]
+		public string FullName
 		{
 			get
 			{
 				if (IsHomunculus)
 					return HomunculusName;
-				return name;
+				return (awakened == 1 ? "" : Element.ToString() + " ") + name;
 			}
 			set
 			{
@@ -75,7 +87,7 @@ namespace RuneOptim
 		}
 
 		[JsonProperty("attribute")]
-		public Element _attribute;
+		public Element Element;
 
 		[JsonProperty("skills")]
 		public IList<Skill> _skilllist = new List<Skill>();
@@ -130,7 +142,7 @@ namespace RuneOptim
 			int cost = 0;
 			for (int i = 0; i < 6; i++)
 			{
-				if (l.Runes[i] != null && l.Runes[i].AssignedName != Name)
+				if (l.Runes[i] != null && l.Runes[i].AssignedName != FullName)
 				{
 					// unequip current rune
 					if (Current.Runes[i] != null)
@@ -155,12 +167,12 @@ namespace RuneOptim
 		// copy down!
 		public Monster(Monster rhs, bool loadout = false) : base(rhs)
 		{
-			Name = rhs.Name;
+			FullName = rhs.FullName;
 			Id = rhs.Id;
 			level = rhs.level;
 			monsterTypeId = rhs.monsterTypeId;
 			Grade = rhs.Grade;
-			_attribute = rhs._attribute;
+			Element = rhs.Element;
 			_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
 			priority = rhs.priority;
 			downloaded = rhs.downloaded;
@@ -288,7 +300,7 @@ namespace RuneOptim
 
 		public override string ToString()
 		{
-			return Id + " " + Name + " lvl. " + level;
+			return Id + " " + FullName + " lvl. " + level;
 		}
 
 		int IComparable<Monster>.CompareTo(Monster rhs)
@@ -297,7 +309,7 @@ namespace RuneOptim
 			if (comp != 0) return comp;
 			comp = rhs.level - level;
 			if (comp != 0) return comp;
-			comp = (int)_attribute - (int)rhs._attribute;
+			comp = (int)Element - (int)rhs.Element;
 			if (comp != 0) return comp;
 			comp = rhs.awakened - awakened;
 			if (comp != 0) return comp;

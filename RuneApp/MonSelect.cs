@@ -20,7 +20,7 @@ namespace RuneApp
                     pri = mon.priority.ToString();
 
                 ListViewItem item = new ListViewItem(new string[]{
-                    mon.Name,
+                    mon.FullName,
                     mon.Id.ToString(),
                     pri,
                 });

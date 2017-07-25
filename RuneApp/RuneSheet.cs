@@ -185,7 +185,7 @@ namespace RuneApp
 				string hl = ws.Name + "!A1";
 				if (hl.IndexOf(' ') != -1)
 					hl = "'" + ws.Name + "'!A1";
-				runeSheet.Cells[build.priority + 1, linkCol].Hyperlink = new ExcelHyperLink(hl, mon.Name);
+				runeSheet.Cells[build.priority + 1, linkCol].Hyperlink = new ExcelHyperLink(hl, mon.FullName);
 				runeSheet.Cells[build.priority + 1, linkCol].Style.Font.UnderLine = true;
 				runeSheet.Cells[build.priority + 1, linkCol].Style.Font.Color.SetColor(Color.Blue);
 
@@ -418,7 +418,7 @@ namespace RuneApp
 
 			do
 			{
-				wsname = mon.Name + (ptries == 0 ? "" : ptries.ToString());
+				wsname = mon.FullName + (ptries == 0 ? "" : ptries.ToString());
 				ws = excelSheets.FirstOrDefault(w => w.Name == wsname);
 
 				if (ws != null)
@@ -428,7 +428,7 @@ namespace RuneApp
 					if ((!string.IsNullOrWhiteSpace(pids) && ulong.TryParse(pids, out pid) && pid == mon.Id))
 					{
 						ind = ws.Index;
-						excelSheets.Delete(mon.Name + (ptries == 0 ? "" : ptries.ToString()));
+						excelSheets.Delete(mon.FullName + (ptries == 0 ? "" : ptries.ToString()));
 						ws = null;
 					}
 					else
@@ -867,7 +867,7 @@ namespace RuneApp
 								ws.Cells[row, col].Value = r.AssignedName;
 							break;
 						case "Mon":
-							ws.Cells[row, col].Value = m?.Name;
+							ws.Cells[row, col].Value = m?.FullName;
 							break;
 						case "Flats":
 							ws.Cells[row, col].Value = r.FlatCount();

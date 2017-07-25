@@ -51,7 +51,7 @@ namespace RuneApp.InternalServer
 							if (mp != null)
 							{
 								var mon = Program.data.GetMonster((ulong)mp.MonsterId);
-								Master.Log.Debug("mon " + mon?.Name);
+								Master.Log.Debug("mon " + mon?.FullName);
 								if (mon == null)
 								{
 									var name = mp.MonsterTypeId.ToString();
@@ -64,7 +64,7 @@ namespace RuneApp.InternalServer
 								}
 								else
 								{
-									table += mon.Name + " " + mon.Grade + "*";
+									table += mon.FullName + " " + mon.Grade + "*";
 								}
 							}
 							table += "</td>";
@@ -83,7 +83,7 @@ namespace RuneApp.InternalServer
 							if (mp != null)
 							{
 								var mon = Program.data.GetMonster((ulong)mp.MonsterId);
-								Master.Log.Debug("mon " + mon?.Name);
+								Master.Log.Debug("mon " + mon?.FullName);
 								if (mon == null)
 								{
 									var name = mp.MonsterTypeId.ToString();
@@ -96,7 +96,7 @@ namespace RuneApp.InternalServer
 								}
 								else
 								{
-									table += mon.Name + " " + mon.Grade + "*";
+									table += mon.FullName + " " + mon.Grade + "*";
 								}
 							}
 							table += "</td>";
