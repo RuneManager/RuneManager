@@ -203,7 +203,8 @@ namespace RuneService
 				);
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
-				if (blacklistHosts.Contains(RequestLine.Uri.Host))
+				requestUri = RequestLine.Uri;	// NOTE: used by ReceiveResponse
+				if (blacklistHosts.Contains(requestUri.Host))
 					SocketBP.CloseSocket();
 
 				var method = e.Method.ToUpper();
@@ -243,12 +244,12 @@ namespace RuneService
 				);
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
-				if (RequestLine.Method == "GET" || RequestLine.Method == "POST") {
-					if (ResponseStatusLine.StatusCode == HttpStatus.OK && ResponseHeaders.Headers.ContainsKey("content-type")) {
-						if (skipHosts.Contains(requestUri.Host))
-							return;
+				if (ResponseStatusLine.StatusCode == HttpStatus.OK && ResponseHeaders.Headers.ContainsKey("content-type")) {
+					if (skipHosts.Contains(requestUri.Host))
+						return;
 
-						if (requestUri.AbsoluteUri.Contains("summonerswar") && requestUri.AbsoluteUri.Contains("/api/gateway")) {
+					if (requestUri.AbsoluteUri.Contains("summonerswar") && requestUri.AbsoluteUri.Contains("/api/gateway")) {
+						if (RequestLine.Method == "GET" || RequestLine.Method == "POST") {
 							byte[] response = GetContent();
 
 							// From now on, the default State.NextStep ( == SendResponse()
@@ -331,10 +332,13 @@ namespace RuneService
 							}
 						}
 					}
-				}
-				if (ResponseStatusLine.StatusCode == HttpStatus.OK && RequestHeaders.Headers.ContainsKey("accept-encoding")) {
-					if (!ResponseHeaders.Headers.ContainsKey("content-encoding")) {
-						if (!(requestUri.AbsoluteUri.Contains("summonerswar") && requestUri.AbsoluteUri.Contains("/api/gateway"))) {
+					else if (RequestHeaders.Headers.ContainsKey("accept-encoding")) {
+						if (!ResponseHeaders.Headers.ContainsKey("content-encoding") && !ResponseHeaders.Headers.ContainsKey("transfer-encoding")) {
+							// read response data
+							// compress
+							// add content-encoding header
+							// add Vary: Accept-Encoding
+							// (re)set content-length header
 						}
 					}
 				}
