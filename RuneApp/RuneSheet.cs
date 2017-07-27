@@ -715,7 +715,7 @@ namespace RuneApp
 			List<string> colHead = new List<string>();
 
 			// ,MType,Points,FlatPts
-			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
+			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,VPM,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
 			{
 				colHead.Add(th);
 				ws.Cells[row, col].Value = th; col++;
@@ -841,7 +841,11 @@ namespace RuneApp
 							break;
 						case "Eff":
 							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-							ws.Cells[row, col].Value = r.Efficiency;
+							ws.Cells[row, col].Value = r.BarionEfficiency;
+							break;
+						case "VPM":
+							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+							ws.Cells[row, col].Value = r.VivoPrestoModel;
 							break;
 						case "Used":
 							switch ((int)r.manageStats.GetOrAdd("In", 0))
@@ -889,7 +893,7 @@ namespace RuneApp
 								if (r.ScoreATK() < 0.5
 									&& r.ScoreHP() < 0.5
 									&& r.ScoreRune() < 0.5
-									&& r.Efficiency < 0.5
+									&& r.BarionEfficiency < 0.5
 									&& r.manageStats.GetOrAdd("Keep", 0) < 40)
 								{
 									ws.Cells[row, col].Value = "Sell";
@@ -1175,8 +1179,8 @@ namespace RuneApp
 			keep -= r.FlatCount();
 			formula += "-" + (heads.Contains("Flats") ? "RuneTable[[#This Row],[Flats]]" : r.FlatCount().ToString()) + "";
 
-			keep += r.Efficiency * 5;
-			formula += "+" + (heads.Contains("Eff") ? "RuneTable[[#This Row],[Eff]]" : r.Efficiency.ToString(System.Globalization.CultureInfo.CurrentUICulture)) + "*5";
+			keep += r.BarionEfficiency * 5;
+			formula += "+" + (heads.Contains("Eff") ? "RuneTable[[#This Row],[Eff]]" : r.BarionEfficiency.ToString(System.Globalization.CultureInfo.CurrentUICulture)) + "*5";
 
 			keep += r.ScoreRune() * Math.Max(r.ScoreHP(), r.ScoreATK()) * 20;
 			/**/

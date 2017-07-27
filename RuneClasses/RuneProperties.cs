@@ -41,7 +41,7 @@ namespace RuneOptim
 		}.ToImmutableArray();
 
 		[JsonIgnore]
-		public double Efficiency
+		public double BarionEfficiency
 		{
 			get
 			{
@@ -58,6 +58,54 @@ namespace RuneOptim
 
 				num /= 1.8;
 				return num;
+			}
+		}
+
+		public static readonly ImmutableDictionary<Attr, double> VivoMod = new Dictionary<Attr, double>()
+		{
+			{ Attr.HealthFlat, 110 },
+			{ Attr.HealthPercent, 1 },
+			{ Attr.AttackFlat, 7 },
+			{ Attr.AttackPercent, 1 },
+			{ Attr.DefenseFlat, 6 },
+			{ Attr.DefensePercent, 1 },
+			{ Attr.Speed, 0.85 },
+			{ Attr.SpeedPercent, 0.85 },
+			{ Attr.CritRate, 1 },
+			{ Attr.CritDamage, 1 },
+			{ Attr.Resistance, 1 },
+			{ Attr.Accuracy, 1 }
+		}.ToImmutableDictionary();
+
+		[JsonIgnore]
+		public double VivoPrestoModel
+		{
+			get
+			{
+				double vv = 0;
+				// penalty for Grade
+				double scale = 1 / VivoMod[Main.Type] / RuneProperties.MainValues[Main.Type][5][15];
+				double tv = RuneProperties.MainValues[Main.Type][Grade - 1][15] - RuneProperties.MainValues[Main.Type][5][15];
+				vv += tv * scale;
+
+				// transform each sub into a percentage of a 6*15 rune.
+				if (Innate != null && Innate.Type != Attr.Null)
+				{
+					scale = 1 / VivoMod[Innate.Type] / RuneProperties.MainValues[Innate.Type][5][15];
+					vv += Innate.Value * scale;
+				}
+				foreach (var s in Subs)
+				{
+					if (s != null && s.Type != Attr.Null)
+					{
+						scale = 1 / VivoMod[s.Type] / RuneProperties.MainValues[s.Type][5][15];
+						vv += s.Value * scale;
+					}
+				}
+
+				// Bonus for under-levelled
+				vv += (4 - Math.Min(4, Level/3)) * 0.07;
+				return vv;
 			}
 		}
 	}

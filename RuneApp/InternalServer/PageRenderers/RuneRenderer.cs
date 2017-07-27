@@ -64,7 +64,7 @@ namespace RuneApp.InternalServer
 				rcont.contentList.AddRange(Program.data.Runes
 					.Where(r => r != null)
 					.OrderByDescending(r => calcSort(r))
-					.ThenByDescending(r => r.Efficiency * (12 - Math.Min(12, r.Level)))
+					.ThenByDescending(r => r.BarionEfficiency * (12 - Math.Min(12, r.Level)))
 					.Select(r => renderRune(r)).ToArray());
 
 				return returnHtml(new ServedResult[] {
@@ -116,7 +116,7 @@ function hackLots(prop, num, on) {
 				}
 				double ret = r.manageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
 
-				ret *= r.Efficiency;
+				ret *= r.BarionEfficiency;
 				ret /= (b?.priority ?? 0 + 100);
 				ret *= 1 + Math.Sqrt(r.manageStats.GetOrAdd("LoadFilt", 0) / (r.manageStats.GetOrAdd("LoadGen", 0) + 1000));
 				ret *= 10000;
