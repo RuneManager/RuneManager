@@ -914,7 +914,7 @@ namespace RuneApp
 					foreach (Build bbb in toRun)
 					{
 						runBuild(bbb, Program.Settings.MakeStats);
-						if (runToken.IsCancellationRequested)
+						if (runToken.IsCancellationRequested || bbb.Best == null)
 							break;
 					}
 
@@ -1045,7 +1045,7 @@ namespace RuneApp
 			{
 				if (zipData == null)
 				{
-					var fs = new FileStream("data\\unit.zip", FileMode.Open);
+					using (var fs = new FileStream("data\\unit.zip", FileMode.Open))
 					using (var ms = new MemoryStream())
 					{
 						fs.CopyTo(ms);
