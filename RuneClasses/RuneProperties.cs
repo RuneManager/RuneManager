@@ -460,7 +460,7 @@ namespace RuneOptim
 			new RuneMainStatValue(3,4/(double)3),
 			new RuneMainStatValue(4,1.5),
 			new RuneMainStatValue(5,2),
-			new RuneMainStatValue(7,3),
+			new RuneMainStatValue(7,2),
 		}.ToImmutableArray();
 
 		public static readonly ImmutableArray<RuneMainStatValue> MainValues_Flat = new RuneMainStatValue[] {
@@ -522,7 +522,7 @@ namespace RuneOptim
 			{Attr.HealthFlat, MainValues_HPflat },
 			{Attr.AttackFlat, MainValues_Flat },
 			{Attr.DefenseFlat, MainValues_Flat },
-			{Attr.Speed,MainValues_Speed },
+			{Attr.Speed, MainValues_Speed },
 
 			{Attr.HealthPercent, MainValues_Percent },
 			{Attr.AttackPercent, MainValues_Percent },
