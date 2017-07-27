@@ -74,6 +74,32 @@ namespace RuneApp
 			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
 
+		public static StyleEventArgs CurrentStyle()
+		{
+			return new StyleEventArgs() { };
+		}
+
+		public static void SetStyle(StyleEventArgs newStyle)
+		{
+			Program.Settings.ForeColour = newStyle.ForeColor;
+			Program.Settings.BackColour = newStyle.BackColor;
+			Program.Settings.Save();
+			StyleChanged(null, newStyle);
+		}
+		
+		public static void SubscribeStyle(EventHandler<StyleEventArgs> func)
+		{
+			StyleChanged += func;
+			func(null, CurrentStyle());
+		}
+
+		public static void UnsubscribeStyle(EventHandler<StyleEventArgs> func)
+		{
+			StyleChanged -= func;
+		}
+
+		public static event EventHandler<StyleEventArgs> StyleChanged;
+
 		public static event EventHandler<PrintToEventArgs> BuildsProgressTo;
 
 		/// <summary>

@@ -5,13 +5,11 @@
 	using System.Threading.Tasks;
 	using System.Windows.Forms;
 	using System.IO;
-	using Newtonsoft.Json;
 	using RuneOptim;
 	using System.Threading;
 	using System.Diagnostics;
 	using System.Net;
 	using System.Reflection;
-	using System.Configuration;
 
 namespace RuneApp
 {
@@ -47,13 +45,15 @@ namespace RuneApp
 		//public static Configuration config {  get { return Program.config; } }
 		public static log4net.ILog Log { get { return Program.log; } }
 
-		public Main()	
+		public Main()
 		{
 			InitializeComponent();
 			Log.Info("Initialized Main");
 			Instance = this;
 
 			currentMain = this;
+
+			Program.SubscribeStyle(ApplyStyle);
 
 			useRunesCheck.Checked = Program.Settings.UseEquipped;
 
@@ -152,6 +152,11 @@ namespace RuneApp
 			}
 
 			#endregion
+		}
+
+		private void ApplyStyle(object sender, StyleEventArgs e)
+		{
+			e.ApplyToControl(this);
 		}
 
 		private void AddShrine(string stat, int num, int value, ToolStripMenuItem owner)
@@ -863,13 +868,13 @@ namespace RuneApp
 						{
 							item.SubItems[2].Text = bb.mon.FullName;
 							item.SubItems[4].Text = bb.mon.Id.ToString();
-							item.ForeColor = bb.runePrediction.Any(p => p.Value.Value) ? Color.Purple : Color.Black;
+							item.ForeColor = bb.runePrediction.Any(p => p.Value.Value) ? Color.Purple : Program.CurrentStyle().ForeColor;
 							if (bb.mon != before)
 							{
 								// TODO: check tag?
 								var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.FullName));
 								if (lv1li != null)
-									lv1li.ForeColor = before.inStorage ? Color.Gray : Color.Black;
+									lv1li.ForeColor = before.inStorage ? Color.Gray : Program.CurrentStyle().ForeColor;
 
 								lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.FullName));
 								if (lv1li != null)
@@ -915,7 +920,7 @@ namespace RuneApp
 						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.FullName));
 						if (lv1li != null)
 						{
-							lv1li.ForeColor = Color.Black;
+							lv1li.ForeColor = Program.CurrentStyle().ForeColor;
 							// can't tell is was in storage, name is mangled on load
 						}
 					}
@@ -1390,7 +1395,7 @@ namespace RuneApp
 				maxPri = Program.builds.Max(b => b.priority) + 1;
 			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => new ListViewItem()
 			{
-				ForeColor = mon.inStorage ? Color.Gray : Color.Black,
+				ForeColor = mon.inStorage ? Color.Gray : Program.CurrentStyle().ForeColor,
 				Text = mon.FullName,
 				SubItems = {
 					mon.Grade.ToString(),
@@ -1653,7 +1658,7 @@ namespace RuneApp
 					c *= b.runes[5].Length;
 
 					// I get about 4mil/sec, and can be bothered to wait 10 - 25 seconds
-					li.SubItems[0].ForeColor = Color.Black;
+					li.SubItems[0].ForeColor = Program.CurrentStyle().ForeColor;
 					if (c > 4000000 * 25)
 						li.SubItems[0].ForeColor = Color.Red;
 					else if (c > 4000000 * 10)

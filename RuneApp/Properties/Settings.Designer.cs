@@ -238,5 +238,29 @@ namespace RuneApp.Properties {
                 this["OnlyGrind6Legs"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ControlText")]
+        public global::System.Drawing.Color ForeColour {
+            get {
+                return ((global::System.Drawing.Color)(this["ForeColour"]));
+            }
+            set {
+                this["ForeColour"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Control")]
+        public global::System.Drawing.Color BackColour {
+            get {
+                return ((global::System.Drawing.Color)(this["BackColour"]));
+            }
+            set {
+                this["BackColour"] = value;
+            }
+        }
     }
 }

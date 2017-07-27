@@ -218,6 +218,13 @@
     <Compile Include="Controls\StatColumn.Designer.cs">
       <DependentUpon>StatColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\StyledToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\StyledToolStripMenuItem.Designer.cs">
+      <DependentUpon>StyledToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\StyleEventArgs.cs" />
     <Compile Include="Controls\TransparentControl.cs">
       <SubType>Component</SubType>
     </Compile>
