@@ -36,6 +36,7 @@ namespace RuneApp
 		};
 
 		static readonly string[] tabNames = { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
+		static readonly SlotIndex[] tabIndexes = { SlotIndex.Global, SlotIndex.Odd, SlotIndex.Even, SlotIndex.Two, SlotIndex.Four, SlotIndex.Six, SlotIndex.One, SlotIndex.Three, SlotIndex.Five };
 		
 		private ToolTip tooltipNoSorting = new ToolTip();
 		private ToolTip tooltipBadRuneFilter = new ToolTip();
@@ -230,7 +231,6 @@ namespace RuneApp
 					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
 					textBox.TextChanged += global_TextChanged;
 					textBox.TextChanged += Total_TextChanged;
-					//textBox.Enabled = false;
 					x += colWidth;
 
 					groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, cc.ToString());
@@ -240,7 +240,6 @@ namespace RuneApp
 
 					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
 					textBox.TextChanged += global_TextChanged;
-					//textBox.Enabled = false;
 					x += colWidth;
 
 					groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, "0");
@@ -248,12 +247,10 @@ namespace RuneApp
 
 					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
 					textBox.TextChanged += global_TextChanged;
-					//textBox.Enabled = false;
 					x += colWidth;
 
 					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
 					textBox.TextChanged += global_TextChanged;
-					//textBox.Enabled = false;
 
 					y += rowHeight;
 				}
@@ -277,8 +274,9 @@ namespace RuneApp
 			Label label;
 			Control textBox;
 			// put the grid on all the tabs
-			foreach (var tab in tabNames)
+			for (int t = 0; t < tabNames.Length; t++)
 			{
+				var tab = tabNames[t];
 				TabPage page = tabControl1.TabPages["tab" + tab];
 				page.Tag = tab;
 
@@ -289,11 +287,14 @@ namespace RuneApp
 				ComboBox filterJoin = new ComboBox();
 				filterJoin.DropDownStyle = ComboBoxStyle.DropDownList;
 				filterJoin.FormattingEnabled = true;
-				filterJoin.Items.AddRange(new object[] { "Or", "And", "Sum" });
+				filterJoin.Items.AddRange(Enum.GetValues(typeof(FilterType)).Cast<FilterType>().OrderBy(f => f).Cast<object>().ToArray());
 				filterJoin.Location = new Point(298, 6);
 				filterJoin.Name = tab + "join";
 				filterJoin.Size = new Size(72, 21);
-				filterJoin.SelectedIndex = 0;
+				FilterType filter = FilterType.None;
+				if (build.runeScoring.ContainsKey(tabIndexes[t]))
+					filter = build.runeScoring[tabIndexes[t]].Key;
+				filterJoin.SelectedItem = filter;
 
 				filterJoin.SelectionChangeCommitted += filterJoin_SelectedIndexChanged;
 				filterJoin.Tag = tab;
@@ -354,6 +355,7 @@ namespace RuneApp
 
 					textBox = page.Controls.MakeControl<TextBox>(tab + stat, "test", x, y - 2);
 					textBox.TextChanged += global_TextChanged;
+					textBox.Enabled = RuneAttributeFilterEnabled(filter);
 					x += colWidth;
 
 					page.Controls.MakeControl<Label>(tab + "r", stat + "test", x, y, 30, 20, ">=");
@@ -372,7 +374,7 @@ namespace RuneApp
 				textBox = page.Controls.MakeControl<TextBox>(tab, "test", x, y - 2);
 				textBox.TextChanged += global_TextChanged;
 				// default scoring is OR which doesn't need this box
-				textBox.Enabled = false;
+				textBox.Enabled = RuneSumFilterEnabled(filter);
 				x += colWidth;
 
 				page.Controls.MakeControl<Label>(tab, "Check", x, y, 60, 14);
@@ -512,6 +514,32 @@ namespace RuneApp
 			return tab;
 		}
 
+		private bool RuneAttributeFilterEnabled(FilterType and) {
+			switch (and) {
+				case FilterType.None:
+				case FilterType.Sum:
+				case FilterType.SumN:
+					return false;
+				case FilterType.Or:
+				case FilterType.And:
+				default:
+					return true;
+			}
+		}
+
+		private bool RuneSumFilterEnabled(FilterType and) {
+			switch (and) {
+				case FilterType.None:
+				case FilterType.Or:
+				case FilterType.And:
+					return false;
+				case FilterType.Sum:
+				case FilterType.SumN:
+				default:
+					return true;
+			}
+		}
+
 		// when the scoring type changes
 		private void filterJoin_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -523,10 +551,10 @@ namespace RuneApp
 			foreach (var stat in Build.statNames)
 			{
 				ctrl = tab.Controls.Find(tabName + stat + "test", false).FirstOrDefault();
-				if (ctrl != null) ctrl.Enabled = (box.SelectedIndex != 2);
-				ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
-				if (ctrl != null) ctrl.Enabled = (box.SelectedIndex == 2);
+				if (ctrl != null) ctrl.Enabled = RuneAttributeFilterEnabled((FilterType)box.SelectedItem);
 			}
+			ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
+			if (ctrl != null) ctrl.Enabled = RuneSumFilterEnabled((FilterType)box.SelectedItem);
 
 			double? test = null;
 			double temp;
@@ -535,13 +563,15 @@ namespace RuneApp
 				test = temp;
 
 			if (!build.runeScoring.ContainsKey(ExtensionMethods.GetIndex(tabName)))
-				build.runeScoring.Add(ExtensionMethods.GetIndex(tabName), new KeyValuePair<int, double?>(box.SelectedIndex, test));
-			build.runeScoring[ExtensionMethods.GetIndex(tabName)] = new KeyValuePair<int, double?>(box.SelectedIndex, test);
+				build.runeScoring.Add(ExtensionMethods.GetIndex(tabName), new KeyValuePair<FilterType, double?>((FilterType)box.SelectedItem, test));
+			build.runeScoring[ExtensionMethods.GetIndex(tabName)] = new KeyValuePair<FilterType, double?>((FilterType)box.SelectedItem, test);
 
 			// TODO: trim the ZERO nodes on the tree
 
 			// retest the rune
-			TestRune(runeTest);
+			//TestRune(runeTest);
+
+			UpdateGlobal();
 		}
 
 		// When the window is told to appear (hopefully we have everything)
@@ -692,23 +722,23 @@ namespace RuneApp
 				// find that box
 				ComboBox box = (ComboBox)ctab.Controls.Find(ctab.Tag + "join", true).FirstOrDefault();
 				// manually kajigger it
-				box.SelectedIndex = tab.Value.Key;
+				box.SelectedItem = tab.Value.Key;
+				Control ctrl;
 				foreach (var stat in Build.statNames)
 				{
-					Control ctrl;
 					foreach (var type in new string[] { "flat", "perc" })
 					{
 						if (type == "perc" && stat == "SPD")
 							continue;
 						if (type == "flat" && (stat == "ACC" || stat == "RES" || stat == "CD" || stat == "CR"))
 							continue;
-						ctrl = ctab.Controls.Find(ctab.Tag + stat + type, true).FirstOrDefault();
+						//ctrl = ctab.Controls.Find(ctab.Tag + stat + type, true).FirstOrDefault();
 					}
 					ctrl = ctab.Controls.Find(ctab.Tag + stat + "test", true).FirstOrDefault();
-					ctrl.Enabled = (box.SelectedIndex != 2);
-					ctrl = ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
-					ctrl.Enabled = (box.SelectedIndex == 2);
+					ctrl.Enabled = RuneAttributeFilterEnabled((FilterType)box.SelectedItem);
 				}
+				ctrl = ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
+				ctrl.Enabled = RuneSumFilterEnabled((FilterType)box.SelectedItem);
 
 				var tb = (TextBox)ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
 				if (tab.Value.Value != 0)
@@ -1234,7 +1264,7 @@ namespace RuneApp
 					// if there is a non-zero
 					if (build.runeFilters[tabdex].Any(r => r.Value.NonZero))
 					{
-						build.runeScoring.Add(tabdex, new KeyValuePair<int, double?>(0, null));
+						build.runeScoring.Add(tabdex, new KeyValuePair<FilterType, double?>(FilterType.None, null));
 					}
 				}
 				if (build.runeScoring.ContainsKey(tabdex))
@@ -1248,7 +1278,7 @@ namespace RuneApp
 					if (double.TryParse(ctrlTest?.Text, out tempval))
 						testVal = tempval;
 
-					build.runeScoring[tabdex] = new KeyValuePair<int, double?>(kv.Key, testVal);
+					build.runeScoring[tabdex] = new KeyValuePair<FilterType, double?>(kv.Key, testVal);
 					
 				}
 				TextBox tb = (TextBox)Controls.Find(tab + "raise", true).FirstOrDefault();
@@ -1614,15 +1644,15 @@ namespace RuneApp
 			}
 
 			var kv = build.runeScoring[tabdex];
-			int scoring = kv.Key;
-			if (scoring == 1)
+			FilterType scoring = kv.Key;
+			if (scoring == FilterType.And)
 				res = true;
 
 			double points = 0;
 			foreach (var stat in Build.statNames)
 			{
 				bool s = GetPts(rune, tab, stat, ref points, fake ?? 0, pred);
-				if (scoring == 1)
+				if (scoring == FilterType.And)
 					res &= s;
 				else if (scoring == 0)
 					res |= s;
@@ -1633,9 +1663,10 @@ namespace RuneApp
 			if (ctrl != null)
 				ctrl.Text = res.ToString();
 
-			if (scoring == 2)
-			{
+			if (scoring == FilterType.Sum || scoring == FilterType.SumN)
 				ctrl.Text = points.ToString("#.##");
+			if (scoring == FilterType.Sum)
+			{
 				ctrl.ForeColor = Color.Red;
 				if (points >= build.runeScoring[tabdex].Value)
 					ctrl.ForeColor = Color.Green;
@@ -1716,62 +1747,60 @@ namespace RuneApp
 			
 			foreach (var tbf in build.runeFilters)
 			{
-				if (build.runeScoring.ContainsKey(tbf.Key))
-				{
-					int and = build.runeScoring[tbf.Key].Key;
+				if (build.runeScoring.ContainsKey(tbf.Key)) {
+					FilterType and = build.runeScoring[tbf.Key].Key;
 					double sum = 0;
 
-					foreach (var rbf in tbf.Value)
-					{
+					foreach (var rbf in tbf.Value) {
 						if (rbf.Value.Flat.HasValue)
 							sum += rbf.Value.Flat.Value;
 						if (rbf.Value.Percent.HasValue)
 							sum += rbf.Value.Percent.Value;
-						if (and != 2)
-						{
-							if (rbf.Value.Test == 0)
-							{
-								if (rbf.Value.Flat > 0 || rbf.Value.Percent > 0)
-								{
-									if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key))
-									{
+						switch (and) {
+							case FilterType.Or:
+							case FilterType.And:
+								if (rbf.Value.Test == 0) {
+									if (rbf.Value.Flat > 0 || rbf.Value.Percent > 0) {
+										if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key)) {
+											var tab = tabControl1.TabPages["tab" + tbf.Key];
+											tabControl1.SelectTab(tab);
+											var ctrl = tab.Controls.Find(tbf.Key + rbf.Key + "test", false).FirstOrDefault();
+											tooltipBadRuneFilter.IsBalloon = true;
+											tooltipBadRuneFilter.Show(string.Empty, ctrl);
+											tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
+											return true;
+										}
+									}
+								}
+								else {
+									if (rbf.Value.Flat + rbf.Value.Percent == 0) {
 										var tab = tabControl1.TabPages["tab" + tbf.Key];
 										tabControl1.SelectTab(tab);
-										var ctrl = tab.Controls.Find(tbf.Key + rbf.Key + "test", false).FirstOrDefault();
+										var ctrl = tab.Controls.Find(tbf.Key + rbf.Key, false).FirstOrDefault();
 										tooltipBadRuneFilter.IsBalloon = true;
 										tooltipBadRuneFilter.Show(string.Empty, ctrl);
-										tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
+										tooltipBadRuneFilter.Show("Counts for what?", ctrl, 0);
 										return true;
 									}
 								}
-							}
-							else
-							{
-								if (rbf.Value.Flat + rbf.Value.Percent == 0)
-								{
+								break;
+						}
+					}
+					switch (and) {
+						case FilterType.Sum:
+						case FilterType.SumN:
+							if (sum > 0 && build.runeScoring[tbf.Key].Value == 0) {
+								if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key)) {
 									var tab = tabControl1.TabPages["tab" + tbf.Key];
 									tabControl1.SelectTab(tab);
-									var ctrl = tab.Controls.Find(tbf.Key + rbf.Key, false).FirstOrDefault();
+									var ctrl = tab.Controls.Find(tbf.Key + "test", false).FirstOrDefault();
 									tooltipBadRuneFilter.IsBalloon = true;
 									tooltipBadRuneFilter.Show(string.Empty, ctrl);
-									tooltipBadRuneFilter.Show("Counts for what?", ctrl, 0);
+									tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
 									return true;
 								}
 							}
-						}
-					}
-					if (and == 2 && sum > 0 && build.runeScoring[tbf.Key].Value == 0)
-					{
-						if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key))
-						{
-							var tab = tabControl1.TabPages["tab" + tbf.Key];
-							tabControl1.SelectTab(tab);
-							var ctrl = tab.Controls.Find(tbf.Key + "test", false).FirstOrDefault();
-							tooltipBadRuneFilter.IsBalloon = true;
-							tooltipBadRuneFilter.Show(string.Empty, ctrl);
-							tooltipBadRuneFilter.Show("GEQ how much?", ctrl, 0);
-							return true;
-						}
+							break;
 					}
 				}
 			}

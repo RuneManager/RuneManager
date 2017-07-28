@@ -59,6 +59,14 @@ namespace RuneOptim
 		BadRune = 4,
 	}
 
+	public enum FilterType {
+		None = -1,
+		Or = 0,
+		And = 1,
+		Sum = 2,
+		SumN = 3
+	}
+
 	// The heavy lifter
 	// Contains most of the data needed to outline build requirements
 	public class Build
@@ -226,15 +234,15 @@ namespace RuneOptim
 		// tab, TYPE, test
 		[JsonProperty("runeScoring")]
 		[JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
-		public Dictionary<SlotIndex, KeyValuePair<int, double?>> runeScoring = new Dictionary<SlotIndex, KeyValuePair<int, double?>>();
+		public Dictionary<SlotIndex, KeyValuePair<FilterType, double?>> runeScoring = new Dictionary<SlotIndex, KeyValuePair<FilterType, double?>>();
 
 		public bool ShouldSerializeruneScoring()
 		{
-			Dictionary<SlotIndex, KeyValuePair<int, double?>> nscore = new Dictionary<SlotIndex, KeyValuePair<int, double?>>();
+			Dictionary<SlotIndex, KeyValuePair<FilterType, double?>> nscore = new Dictionary<SlotIndex, KeyValuePair<FilterType, double?>>();
 			foreach (var tabPair in runeScoring)
 			{
 				if (tabPair.Value.Key != 0 || tabPair.Value.Value != null)
-					nscore.Add(tabPair.Key, new KeyValuePair<int, double?>(tabPair.Value.Key, tabPair.Value.Value));
+					nscore.Add(tabPair.Key, new KeyValuePair<FilterType, double?>(tabPair.Value.Key, tabPair.Value.Value));
 			}
 			runeScoring = nscore;
 
@@ -1280,7 +1288,7 @@ namespace RuneOptim
 		//Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, 
 		public bool RunFilters(int slot, out Stats rFlat, out Stats rPerc, out Stats rTest)
 		{
-			bool blank = true;
+			bool hasFilter = false;
 			rFlat = new Stats();
 			rPerc = new Stats();
 			rTest = new Stats();
@@ -1333,11 +1341,11 @@ namespace RuneOptim
 						rPerc[stat] = rf.Percent.Value;
 					if (rf.Test.HasValue)
 						rTest[stat] = rf.Test.Value;
-					blank = false;
+					hasFilter = true;
 				}
 			}
 
-			return blank;
+			return hasFilter;
 		}
 
 		public int GetFakeLevel(Rune r)
@@ -1369,35 +1377,27 @@ namespace RuneOptim
 			double? testVal;
 			Stats rFlat, rPerc, rTest;
 
-			// if there where no filters with data
-			bool blank = RunFilters(slot, out rFlat, out rPerc, out rTest);//true;
-			int and = LoadFilters(slot, out testVal);
-			double ret = 0;
-			if (!blank)
+			FilterType and = LoadFilters(slot, out testVal);
+			if (RunFilters(slot, out rFlat, out rPerc, out rTest))
 			{
-				if (and == 0)
-				{
-					if (r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs))
-						ret = 1;
-				}
-				else if (and == 1)
-				{
-					if (r.And(rFlat, rPerc, rTest, raiseTo, predictSubs))
-						ret = 1;
-				}
-				else if (and == 2)
-				{
-					ret = r.Test(rFlat, rPerc, raiseTo, predictSubs);
+				switch (and) {
+					case FilterType.Or:
+						return (r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs)) ? 1 : 0;
+					case FilterType.And:
+						return (r.And(rFlat, rPerc, rTest, raiseTo, predictSubs)) ? 1 : 0;
+					case FilterType.Sum:
+					case FilterType.SumN:
+						return r.Test(rFlat, rPerc, raiseTo, predictSubs);
 				}
 			}
-			return ret;
+			return 0;
 		}
-
-		public int LoadFilters(int slot, out double? testVal)
+		
+		public FilterType LoadFilters(int slot, out double? testVal)
 		{
 			// which tab we pulled the filter from
 			testVal = null;
-			int and = 0;
+			FilterType and = 0;
 
 			// TODO: check what inheriting SUM (eg. Odd and 3) does
 			// TODO: check what inheriting AND/OR then SUM (or visa versa)
@@ -1406,11 +1406,12 @@ namespace RuneOptim
 			if (runeScoring.ContainsKey(SlotIndex.Global))
 			{
 				var kv = runeScoring[SlotIndex.Global];
-				if (runeFilters.ContainsKey(SlotIndex.Global))
-					and = kv.Key;
-				if (kv.Key == 2 && kv.Value != null)
-				{
-					testVal = kv.Value;
+				if (kv.Key != FilterType.None) {
+					if (runeFilters.ContainsKey(SlotIndex.Global))
+						and = kv.Key;
+					if (kv.Value != null) {
+						testVal = kv.Value;
+					}
 				}
 			}
 			// is it and odd or even slot?
@@ -1418,11 +1419,12 @@ namespace RuneOptim
 			if (runeScoring.ContainsKey(tmk))
 			{
 				var kv = runeScoring[tmk];
-				if (runeFilters.ContainsKey(tmk))
-					and = kv.Key;
-				if (kv.Key == 2 && kv.Value != null)
-				{
-					testVal = kv.Value;
+				if (kv.Key != FilterType.None) {
+					if (runeFilters.ContainsKey(tmk))
+						and = kv.Key;
+					if (kv.Value != null) {
+						testVal = kv.Value;
+					}
 				}
 			}
 			// turn the 0-5 to a 1-6
@@ -1430,11 +1432,12 @@ namespace RuneOptim
 			if (runeScoring.ContainsKey(tmk))
 			{
 				var kv = runeScoring[tmk];
-				if (runeFilters.ContainsKey(tmk))
-					and = kv.Key;
-				if (kv.Key == 2 && kv.Value != null)
-				{
-					testVal = kv.Value;
+				if (kv.Key != FilterType.None) {
+					if (runeFilters.ContainsKey(tmk))
+						and = kv.Key;
+					if (kv.Value != null) {
+						testVal = kv.Value;
+					}
 				}
 			}
 
@@ -1443,13 +1446,10 @@ namespace RuneOptim
 
 		public Predicate<Rune> RuneScoring(int slot, int raiseTo = 0, bool predictSubs = false)
 		{
-			// default fail OR
-			Predicate<Rune> slotTest = r => false;
-
 			// the value to test SUM against
 			double? testVal;
 
-			int and = LoadFilters(slot, out testVal);
+			FilterType and = LoadFilters(slot, out testVal);
 
 			// this means that runes won't get in unless they meet at least 1 criteria
 
@@ -1458,25 +1458,18 @@ namespace RuneOptim
 			Stats rFlat, rPerc, rTest;
 
 			// if there where no filters with data
-			bool blank = RunFilters(slot, out rFlat, out rPerc, out rTest);//true;
+			if (!RunFilters(slot, out rFlat, out rPerc, out rTest))
+				return r => true;
 
 			// no filter data = use all
-			if (blank)
-				slotTest = r => true;
-			else
-			{
-				// Set the test based on the type found
-				if (and == 0)
-				{
-					slotTest = r => r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs);
-				}
-				else if (and == 1)
-				{
-					slotTest = r => r.And(rFlat, rPerc, rTest, raiseTo, predictSubs);
-				}
-				else if (and == 2)
-				{
-					slotTest = r => {
+			// Set the test based on the type found
+			switch (and) {
+				case FilterType.Or:
+					return r => r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs);
+				case FilterType.And:
+					return r => r.And(rFlat, rPerc, rTest, raiseTo, predictSubs);
+				case FilterType.Sum:
+					return r => {
 						if (!System.Diagnostics.Debugger.IsAttached)
 							RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
 						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
@@ -1484,9 +1477,17 @@ namespace RuneOptim
 							RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
 						return vv >= testVal;
 					};
-				}
+				case FilterType.SumN:
+					return r => {
+						if (!System.Diagnostics.Debugger.IsAttached)
+							RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
+						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
+						if (!System.Diagnostics.Debugger.IsAttached)
+							RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
+						return true;
+					};
 			}
-			return slotTest;
+			return r => false;
 		}
 
 		// Try to determine the subs required to meet the minimum. Will guess Evens by: Slot, Health%, Attack%, Defense%
@@ -1729,6 +1730,9 @@ namespace RuneOptim
 						Predicate<Rune> slotTest = RuneScoring(i + 1, (slotFakes[i] ?? 0), slotPred[i]);
 
 						runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
+						double? n;
+						if (LoadFilters(i + 1, out n) == FilterType.SumN)
+							runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
 
 						if (BuildSaveStats)
 						{
