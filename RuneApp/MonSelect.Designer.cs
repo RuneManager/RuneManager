@@ -77,7 +77,7 @@
 			// btn_select
 			// 
 			this.btn_select.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btn_select.Location = new System.Drawing.Point(206, 556);
+			this.btn_select.Location = new System.Drawing.Point(125, 556);
 			this.btn_select.Name = "btn_select";
 			this.btn_select.Size = new System.Drawing.Size(75, 23);
 			this.btn_select.TabIndex = 2;
@@ -88,7 +88,7 @@
 			// btn_cancel
 			// 
 			this.btn_cancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btn_cancel.Location = new System.Drawing.Point(125, 556);
+			this.btn_cancel.Location = new System.Drawing.Point(206, 556);
 			this.btn_cancel.Name = "btn_cancel";
 			this.btn_cancel.Size = new System.Drawing.Size(75, 23);
 			this.btn_cancel.TabIndex = 2;
@@ -98,13 +98,15 @@
 			// 
 			// MonSelect
 			// 
+			this.AcceptButton = this.btn_select;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.CancelButton = this.btn_cancel;
 			this.ClientSize = new System.Drawing.Size(293, 591);
 			this.Controls.Add(this.btn_cancel);
 			this.Controls.Add(this.btn_select);
 			this.Controls.Add(this.dataMonsterList);
-			this.Icon = App.Icon;
+			this.Icon = global::RuneApp.App.Icon;
 			this.Name = "MonSelect";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "MonSelect";

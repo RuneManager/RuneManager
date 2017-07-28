@@ -38,8 +38,8 @@
 			this.runeStats = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
 			this.toolStripButton4 = new System.Windows.Forms.ToolStripButton();
-			this.button3 = new System.Windows.Forms.Button();
-			this.button1 = new System.Windows.Forms.Button();
+			this.btnSelect = new System.Windows.Forms.Button();
+			this.btnCancel = new System.Windows.Forms.Button();
 			this.runeBox1 = new RuneApp.RuneBox();
 			this.toolStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -129,29 +129,30 @@
 			this.toolStripButton4.Size = new System.Drawing.Size(23, 22);
 			this.toolStripButton4.Text = "toolStripButton3";
 			// 
-			// button3
+			// btnSelect
 			// 
-			this.button3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button3.Location = new System.Drawing.Point(556, 545);
-			this.button3.Margin = new System.Windows.Forms.Padding(2);
-			this.button3.Name = "button3";
-			this.button3.Size = new System.Drawing.Size(61, 24);
-			this.button3.TabIndex = 19;
-			this.button3.Text = "Select";
-			this.button3.UseVisualStyleBackColor = true;
-			this.button3.Click += new System.EventHandler(this.button3_Click);
+			this.btnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSelect.Location = new System.Drawing.Point(491, 545);
+			this.btnSelect.Margin = new System.Windows.Forms.Padding(2);
+			this.btnSelect.Name = "btnSelect";
+			this.btnSelect.Size = new System.Drawing.Size(61, 24);
+			this.btnSelect.TabIndex = 19;
+			this.btnSelect.Text = "Select";
+			this.btnSelect.UseVisualStyleBackColor = true;
+			this.btnSelect.Click += new System.EventHandler(this.button3_Click);
 			// 
-			// button1
+			// btnCancel
 			// 
-			this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button1.Location = new System.Drawing.Point(491, 545);
-			this.button1.Margin = new System.Windows.Forms.Padding(2);
-			this.button1.Name = "button1";
-			this.button1.Size = new System.Drawing.Size(61, 24);
-			this.button1.TabIndex = 20;
-			this.button1.Text = "Cancel";
-			this.button1.UseVisualStyleBackColor = true;
-			this.button1.Click += new System.EventHandler(this.button1_Click);
+			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.btnCancel.Location = new System.Drawing.Point(556, 545);
+			this.btnCancel.Margin = new System.Windows.Forms.Padding(2);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(61, 24);
+			this.btnCancel.TabIndex = 20;
+			this.btnCancel.Text = "Cancel";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler(this.button1_Click);
 			// 
 			// runeBox1
 			// 
@@ -165,15 +166,17 @@
 			// 
 			// RuneSelect
 			// 
+			this.AcceptButton = this.btnSelect;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.CancelButton = this.btnCancel;
 			this.ClientSize = new System.Drawing.Size(628, 580);
 			this.Controls.Add(this.runeBox1);
-			this.Controls.Add(this.button1);
-			this.Controls.Add(this.button3);
+			this.Controls.Add(this.btnCancel);
+			this.Controls.Add(this.btnSelect);
 			this.Controls.Add(this.toolStrip1);
 			this.Controls.Add(this.listView2);
-			this.Icon = App.Icon;
+			this.Icon = global::RuneApp.App.Icon;
 			this.Name = "RuneSelect";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "RuneSelect";
@@ -194,8 +197,8 @@
         private System.Windows.Forms.ColumnHeader runesMValue;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripButton toolStripButton4;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button btnSelect;
+        private System.Windows.Forms.Button btnCancel;
         private RuneBox runeBox1;
         private System.Windows.Forms.ColumnHeader runesPoints;
         private System.Windows.Forms.ColumnHeader runeStats;

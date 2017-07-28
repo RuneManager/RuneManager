@@ -300,7 +300,7 @@
 			// btnHelp
 			// 
 			this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnHelp.Location = new System.Drawing.Point(569, 355);
+			this.btnHelp.Location = new System.Drawing.Point(12, 355);
 			this.btnHelp.Name = "btnHelp";
 			this.btnHelp.Size = new System.Drawing.Size(45, 23);
 			this.btnHelp.TabIndex = 90;
