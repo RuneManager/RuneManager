@@ -2,13 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
-using System.Runtime.Serialization;
-using Newtonsoft.Json.Converters;
-using System.Collections;
 using System.Collections.Concurrent;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public partial class Rune : RuneLink
 	{
 		#region JSON Props

@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	public partial class Help : Form
 	{
 		public string url = null;

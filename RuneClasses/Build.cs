@@ -8,12 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
-using Newtonsoft.Json.Converters;
-using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public class RuneUsage
 	{
 		// the runes legit used 

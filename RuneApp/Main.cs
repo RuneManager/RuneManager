@@ -1,20 +1,17 @@
-﻿	using System;
-	using System.Collections.Generic;
-	using System.Drawing;
-	using System.Linq;
-	using System.Threading.Tasks;
-	using System.Windows.Forms;
-	using System.IO;
-	using Newtonsoft.Json;
-	using RuneOptim;
-	using System.Threading;
-	using System.Diagnostics;
-	using System.Net;
-	using System.Reflection;
-	using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.IO;
+using RuneOptim;
+using System.Threading;
+using System.Diagnostics;
+using System.Net;
+using System.Reflection;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	public partial class Main : Form
 	{
 		string filelink = "";

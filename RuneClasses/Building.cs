@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public class Building
 	{
 		[JsonProperty("building_id")]

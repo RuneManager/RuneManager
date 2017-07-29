@@ -5,11 +5,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
-using System.Collections;
-using System.Collections.Concurrent;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public partial class Rune
 	{
 		public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { RuneSet.Energy, // Health

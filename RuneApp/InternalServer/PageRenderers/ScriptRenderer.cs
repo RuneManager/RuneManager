@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RuneApp.InternalServer
-{
+namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer
 	{
 		[PageAddressRender("scripts")]

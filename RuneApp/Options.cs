@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	public partial class Options : Form
 	{
 		Dictionary<string, CheckBox> checks = new Dictionary<string, CheckBox>();

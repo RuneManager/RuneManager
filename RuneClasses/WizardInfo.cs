@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public class WizardInfo
 	{
 		[JsonProperty("wizard_id")]

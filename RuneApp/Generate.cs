@@ -3,12 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
 
-namespace RuneApp
-{
+namespace RuneApp {
 
 	// Generates a bunch of builds to preview the stats
 	public partial class Generate : Form

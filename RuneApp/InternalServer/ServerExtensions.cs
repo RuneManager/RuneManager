@@ -4,11 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace RuneApp.InternalServer
-{
+namespace RuneApp.InternalServer {
 	public abstract class PageRenderer
 	{
 		public abstract HttpResponseMessage Render(HttpListenerRequest req, string[] uri);
