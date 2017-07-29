@@ -1012,8 +1012,7 @@ namespace RuneApp
 		static byte[] zipData = null;
 		static object fslock = new object();
 
-		public static Image GetMonPortrait(int monsterTypeId)
-		{
+		public static Image GetMonPortrait(int monsterTypeId) {
 			if (monPortraitMap == null)
 				monPortraitMap = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(File.ReadAllText("data\\unitmap.json"));
 
@@ -1021,49 +1020,43 @@ namespace RuneApp
 
 			int a, b, c;
 
-			if (monPortraitMap.ContainsKey(monsterTypeId.ToString()))
-			{
+			if (monPortraitMap.ContainsKey(monsterTypeId.ToString())) {
 				var idl = monPortraitMap[monsterTypeId.ToString()];
 				a = idl[0];
 				c = idl[1];
 				b = idl[2];
 			}
-			else if (!monPortraitMap.ContainsKey(baseId.ToString()))
-			{
+			else if (!monPortraitMap.ContainsKey(baseId.ToString())) {
 				return RuneApp.InternalServer.InternalServer.mon_spot;
 			}
-			else
-			{
+			else {
 				var woke = (monsterTypeId / 10) % 10;
 				var idl = monPortraitMap[baseId.ToString()];
 				a = idl[woke * 2];
 				b = idl[woke * 2 + 1];
 				c = monsterTypeId % 10 - 1;
 			}
-			
-			lock (fslock)
-			{
-				if (zipData == null)
-				{
+
+			lock (fslock) {
+				if (zipData == null) {
 					using (var fs = new FileStream("data\\unit.zip", FileMode.Open))
-					using (var ms = new MemoryStream())
-					{
+					using (var ms = new MemoryStream()) {
 						fs.CopyTo(ms);
 						zipData = ms.ToArray();
 					}
 				}
+			}
 
-				using (var zip = new System.IO.Compression.ZipArchive(new MemoryStream(zipData)))
-				{
-					var e = $"unit_icon_{a:D4}_{c}_{b}";
-					var ze = zip.Entries.FirstOrDefault(n => Path.GetFileNameWithoutExtension(n.Name) == e);
-					if (ze == null)
-						return RuneApp.InternalServer.InternalServer.mon_spot;
+			using (var zip = new System.IO.Compression.ZipArchive(new MemoryStream(zipData))) {
+				var e = $"unit_icon_{a:D4}_{c}_{b}";
+				var ze = zip.Entries.FirstOrDefault(n => Path.GetFileNameWithoutExtension(n.Name) == e);
+				if (ze == null)
+					return RuneApp.InternalServer.InternalServer.mon_spot;
 
-					return Image.FromStream(ze.Open());
-				}
+				return Image.FromStream(ze.Open());
 			}
 		}
+
 
 		#region Extension Methods
 		public static bool IsConnected(this Socket socket)

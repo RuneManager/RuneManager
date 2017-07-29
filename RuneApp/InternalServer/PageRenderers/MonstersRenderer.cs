@@ -47,7 +47,7 @@ namespace RuneApp.InternalServer
 							img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 							//return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
 
-							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png") };
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png"), Headers = { { "Cache-Control", "public, max-age=31536000" } } };
 						}
 					}
 					catch (Exception e)
@@ -123,7 +123,7 @@ namespace RuneApp.InternalServer
 			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).ToList();
 
-			var trashOnes = unlocked.Where(m => m.Grade == 1 && m.FullName != "Devilmon" && !m.FullName.Contains("Angelmon")).ToList();
+			var trashOnes = unlocked.Where(m => m.Grade == 1 && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon")).ToList();
 			unlocked = unlocked.Except(trashOnes).ToList();
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
@@ -135,25 +135,62 @@ namespace RuneApp.InternalServer
 				.ThenBy(m => m.loadOrder))
 			{
 				pairs.Add(m, new List<Monster>());
-				int i = m.SkillupsTotal - m.SkillupsLevel;
+				int i = Math.Min(m.Grade, m.SkillupsTotal - m.SkillupsLevel);
 				for (; i > 0; i--)
 				{
-					var um = unlocked.FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+					Monster um = null;
+					if (m.level == m.Grade * 5 + 10)
+						um = unlocked
+							 .Where(ul => (ul.Grade == m.Grade && ul.level == 1) || ul.Grade == m.Grade - 1)
+							 .OrderByDescending(ul => ul.level)
+							 .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+					else
+						um = unlocked
+								.Where(ul => ul.level == 1)
+								.OrderBy(ul => ul.Grade)
+								.FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+
 					if (um == null)
 						break;
 					pairs[m].Add(um);
 					rem.Add(um);
 					unlocked.Remove(um);
 				}
-				for (; i > 0; i--)
-				{
+			}
+			foreach (var m in locked.OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+				.ThenByDescending(m => m.level)
+				.ThenBy(m => m.Element)
+				.ThenByDescending(m => m.awakened)
+				.ThenBy(m => m.loadOrder)) {
+				if (!pairs.ContainsKey(m))
+					pairs.Add(m, new List<Monster>());
+				int i = m.SkillupsTotal - m.SkillupsLevel;
+				for (; i > 0; i--) {
+					Monster um = null;
+					if (m.level == m.Grade * 5 + 10)
+						um = unlocked
+							 .OrderByDescending(ul => ul.Grade == m.Grade && ul.level == 1)
+							 .ThenByDescending(ul => ul.Grade == m.Grade - 1)
+							 .ThenByDescending(ul => ul.level)
+							 .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+					else
+						um = unlocked
+								.Where(ul => ul.level == 1)
+								.OrderBy(ul => ul.Grade)
+								.FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+
+					if (um == null)
+						break;
+					pairs[m].Add(um);
+					rem.Add(um);
+					unlocked.Remove(um);
+				}
+				for (; i > 0; i--) {
 					int monbase = (m.monsterTypeId / 100) * 100;
-					for (int j = 1; j < 4; j++)
-					{
-						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j]))
-						{
+					for (int j = 1; j < 6; j++) {
+						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j])) {
 							pieces[monbase + j].Quantity -= getPiecesRequired(pieces[monbase + j]);
-							pairs[m].Add(new Monster() { FullName = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
+							pairs[m].Add(new Monster() { Element = pieces[monbase + j].Element, Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
 						}
 					}
 				}
@@ -164,7 +201,7 @@ namespace RuneApp.InternalServer
 			mm = mm.Except(pairs.SelectMany(p => p.Value));
 			mm = mm.Except(rem);
 			
-			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && m.FullName != "Devilmon" && !m.FullName.Contains("Angelmon"))).ToList();
+			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon"))).ToList();
 			mm = mm.Except(trashOnes);
 
 			mm = mm.OrderByDescending(m => !unlocked.Contains(m))
