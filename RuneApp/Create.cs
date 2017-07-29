@@ -599,8 +599,8 @@ namespace RuneApp
 
 			checkDL6star.Checked = build.DownloadStats;
 			checkDLawake.Checked = build.DownloadAwake;
-			checkElementAdvantage.Checked = build.HasElementalAdvantage;
 			checkDL6star.Enabled = !checkDLawake.Checked;
+			extraCritBox.SelectedIndex = build.ExtraCritRate / 15;
 
 			check_autoRunes.Checked = build.autoRuneSelect;
 
@@ -2125,8 +2125,9 @@ namespace RuneApp
 			build.BuildSets.CollectionChanged -= BuildSets_CollectionChanged;
 		}
 
-		private void checkElementAdvantage_CheckedChanged(object sender, EventArgs e) {
-			build.HasElementalAdvantage = checkElementAdvantage.Checked;
+		private void extraCritBox_SelectedIndexChanged(object sender, EventArgs e) {
+			// TODO: uncheese
+			build.ExtraCritRate = extraCritBox.SelectedIndex * 15;
 		}
 	}
 }

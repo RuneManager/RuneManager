@@ -137,13 +137,13 @@ namespace RuneOptim
 		public bool OnDefense = false;
 
 		[JsonIgnore]
-		public override bool HasElementalAdvantage {
+		public override int ExtraCritRate {
 			get {
-				return base.HasElementalAdvantage;
+				return base.ExtraCritRate;
 			}
 			set {
 				changeStats = true;
-				base.HasElementalAdvantage = value;
+				base.ExtraCritRate = value;
 			}
 		}
 

@@ -198,25 +198,25 @@ namespace RuneOptim {
 			return DownloadAwake;
 		}
 
-		[JsonProperty("elementaladvantage")]
-		private bool hasElementalAdvantage = false;
+		[JsonProperty("extra_crit_rate")]
+		private int extraCritRate = 0;
 
 		[JsonIgnore]
-		public bool HasElementalAdvantage {
+		public int ExtraCritRate {
 			get {
 				if (mon != null)
-					mon.HasElementalAdvantage = hasElementalAdvantage;
-				return hasElementalAdvantage;
+					mon.ExtraCritRate = extraCritRate;
+				return extraCritRate;
 			}
 			set {
-				hasElementalAdvantage = value;
+				extraCritRate = value;
 				if (mon != null)
-					mon.HasElementalAdvantage = value;
+					mon.ExtraCritRate = value;
 			}
 		}
 
-		public bool ShouldSerializehasElementalAdvantage() {
-			return hasElementalAdvantage;
+		public bool ShouldSerializeextraCritRate() {
+			return extraCritRate > 0;
 		}
 		// Magical (and probably bad) tree structure for rune slot stat filters
 		// tab, stat, FILTER
@@ -669,7 +669,7 @@ namespace RuneOptim {
 			bool[] slotPred = new bool[6];
 			GetPrediction(slotFakes, slotPred);
 
-			mon.HasElementalAdvantage = hasElementalAdvantage;
+			mon.ExtraCritRate = extraCritRate;
 			Monster test = new Monster(mon);
 			test.Current.Shrines = shrines;
 			test.Current.Leader = leader;
@@ -819,7 +819,7 @@ namespace RuneOptim {
 				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
 				loads.Clear();
-				mon.HasElementalAdvantage = hasElementalAdvantage;
+				mon.ExtraCritRate = extraCritRate;
 				mon.GetStats();
 				mon.DamageFormula?.Invoke(mon);
 
