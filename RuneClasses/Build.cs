@@ -201,14 +201,17 @@ namespace RuneOptim {
 		[JsonProperty("elementaladvantage")]
 		private bool hasElementalAdvantage = false;
 
+		[JsonIgnore]
 		public bool HasElementalAdvantage {
 			get {
-				mon.HasElementalAdvantage = hasElementalAdvantage;
+				if (mon != null)
+					mon.HasElementalAdvantage = hasElementalAdvantage;
 				return hasElementalAdvantage;
 			}
 			set {
 				hasElementalAdvantage = value;
-				mon.HasElementalAdvantage = value;
+				if (mon != null)
+					mon.HasElementalAdvantage = value;
 			}
 		}
 
