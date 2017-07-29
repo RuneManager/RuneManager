@@ -202,10 +202,21 @@ namespace RuneOptim
 		}
 
 		[JsonProperty("elementaladvantage")]
-		public bool HasElementalAdvantage = false;
+		private bool hasElementalAdvantage = false;
 
-		public bool ShouldSerializeHasElementalAdvantage() {
-			return HasElementalAdvantage;
+		public bool HasElementalAdvantage {
+			get {
+				mon.HasElementalAdvantage = hasElementalAdvantage;
+				return hasElementalAdvantage;
+			}
+			set {
+				hasElementalAdvantage = value;
+				mon.HasElementalAdvantage = value;
+			}
+		}
+
+		public bool ShouldSerializehasElementalAdvantage() {
+			return hasElementalAdvantage;
 		}
 		// Magical (and probably bad) tree structure for rune slot stat filters
 		// tab, stat, FILTER
@@ -658,6 +669,7 @@ namespace RuneOptim
 			bool[] slotPred = new bool[6];
 			GetPrediction(slotFakes, slotPred);
 
+			mon.HasElementalAdvantage = hasElementalAdvantage;
 			Monster test = new Monster(mon);
 			test.Current.Shrines = shrines;
 			test.Current.Leader = leader;
@@ -807,6 +819,7 @@ namespace RuneOptim
 				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
 				loads.Clear();
+				mon.HasElementalAdvantage = hasElementalAdvantage;
 				mon.GetStats();
 				mon.DamageFormula?.Invoke(mon);
 

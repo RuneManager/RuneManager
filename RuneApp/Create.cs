@@ -599,6 +599,7 @@ namespace RuneApp
 
 			checkDL6star.Checked = build.DownloadStats;
 			checkDLawake.Checked = build.DownloadAwake;
+			checkElementAdvantage.Checked = build.HasElementalAdvantage;
 			checkDL6star.Enabled = !checkDLawake.Checked;
 
 			check_autoRunes.Checked = build.autoRuneSelect;

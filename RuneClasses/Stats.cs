@@ -223,7 +223,15 @@ namespace RuneOptim
 		public int[] SkillupMax = new int[8];
 
 		[JsonIgnore]
-		public bool HasElementalAdvantage = false;
+		private bool hasElementalAdvantage = false;
+		public virtual bool HasElementalAdvantage {
+			get {
+				return hasElementalAdvantage;
+			}
+			set {
+				hasElementalAdvantage = value;
+			}
+		}
 
 		public event EventHandler<StatModEventArgs> OnStatChanged;
 
@@ -250,6 +258,7 @@ namespace RuneOptim
 			//rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
 			_skillsFormula = rhs._skillsFormula;
 			DamageSkillups = rhs.DamageSkillups;
+			HasElementalAdvantage = rhs.HasElementalAdvantage;
 
 			if (copyExtra)
 			{
@@ -768,13 +777,13 @@ namespace RuneOptim
 			if (ExtraValue(Attr.MaxDamage) < rhs.MaxDamage)
 				return false;
 
-			if (_skillsFormula[0] != null && _skillsFormula[0](this) < rhs.DamageSkillups[0])
+			if (_skillsFormula[0] != null && GetSkillDamage(Attr.AverageDamage, 0) < rhs.DamageSkillups[0])
 				return false;
-			if (_skillsFormula[1] != null && _skillsFormula[1](this) < rhs.DamageSkillups[1])
+			if (_skillsFormula[1] != null && GetSkillDamage(Attr.AverageDamage, 1) < rhs.DamageSkillups[1])
 				return false;
-			if (_skillsFormula[2] != null && _skillsFormula[2](this) < rhs.DamageSkillups[2])
+			if (_skillsFormula[2] != null && GetSkillDamage(Attr.AverageDamage, 2) < rhs.DamageSkillups[2])
 				return false;
-			if (_skillsFormula[3] != null && _skillsFormula[3](this) < rhs.DamageSkillups[3])
+			if (_skillsFormula[3] != null && GetSkillDamage(Attr.AverageDamage, 3) < rhs.DamageSkillups[3])
 				return false;
 
 			return true;

@@ -116,7 +116,7 @@ namespace RuneOptim
 		private Stats curStats = null;
 
 		[JsonIgnore]
-		private bool chaStats = true;
+		private bool changeStats = true;
 
 		[JsonIgnore]
 		public bool inStorage = false;
@@ -135,6 +135,17 @@ namespace RuneOptim
 
 		[JsonIgnore]
 		public bool OnDefense = false;
+
+		[JsonIgnore]
+		public override bool HasElementalAdvantage {
+			get {
+				return base.HasElementalAdvantage;
+			}
+			set {
+				changeStats = true;
+				base.HasElementalAdvantage = value;
+			}
+		}
 
 		public int SwapCost(Loadout l)
 		{
@@ -187,7 +198,7 @@ namespace RuneOptim
 		public void ApplyRune(Rune rune, int checkOn = 2)
 		{
 			Current.AddRune(rune, checkOn);
-			chaStats = true;
+			changeStats = true;
 		}
 
 		private static MonsterDefinitions.Monster[] skillList = null;
@@ -215,12 +226,12 @@ namespace RuneOptim
 		// NOTE: the monster will contain it's base stats
 		public Stats GetStats()
 		{
-			if (chaStats || Current.Changed)
+			if (changeStats || Current.Changed)
 			{
 				checkSkillups();
 
 				curStats = Current.GetStats(this);
-				chaStats = false;
+				changeStats = false;
 			}
 
 			return curStats;
