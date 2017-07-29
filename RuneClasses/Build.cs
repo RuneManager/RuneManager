@@ -201,6 +201,12 @@ namespace RuneOptim
 			return DownloadAwake;
 		}
 
+		[JsonProperty("elementaladvantage")]
+		public bool HasElementalAdvantage = false;
+
+		public bool ShouldSerializeHasElementalAdvantage() {
+			return HasElementalAdvantage;
+		}
 		// Magical (and probably bad) tree structure for rune slot stat filters
 		// tab, stat, FILTER
 		[JsonProperty("runeFilters")]
@@ -521,7 +527,8 @@ namespace RuneOptim
 			{
 				if (current.SkillFunc[j] != null)
 				{
-					double vv = current.SkillFunc[j](current);
+					double vv = //current.SkillFunc[j](current);
+						current.GetSkillDamage(Attr.AverageDamage, j);
 					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (Sort.DamageSkillups[j] != 0)
 					{

@@ -105,22 +105,24 @@ namespace RuneApp
 
 			#region Labels
 
+			int yStart = 410;
+
 			Label l = new Label();
-			l.Location = new Point(4 + 50, 400 - 18);
+			l.Location = new Point(4 + 50, yStart - 18);
 			l.Name = "compBefore";
 			l.Text = "Before";
 			l.Size = new Size(50, 14);
 			groupBox1.Controls.Add(l);
 
 			l = new Label();
-			l.Location = new Point(4 + 100, 400 - 18);
+			l.Location = new Point(4 + 100, yStart - 18);
 			l.Name = "compAfter";
 			l.Text = "After";
 			l.Size = new Size(50, 14);
 			groupBox1.Controls.Add(l);
 
 			l = new Label();
-			l.Location = new Point(4 + 150, 400 - 18);
+			l.Location = new Point(4 + 150, yStart - 18);
 			l.Name = "compDiff";
 			l.Text = "Difference";
 			l.Size = new Size(60, 14);
@@ -131,16 +133,16 @@ namespace RuneApp
 			var labelPrefixes = new string[] { "Pts" }.Concat(Build.statNames).Concat(Build.extraNames);
 			foreach (var s in labelPrefixes)
 			{
-				groupBox1.Controls.MakeControl<Label>(s, "compStat", 4 + xx, 400 + yy, 50, 14, s);
+				groupBox1.Controls.MakeControl<Label>(s, "compStat", 4 + xx, yStart + yy, 50, 14, s);
 				xx += 50;
 
-				groupBox1.Controls.MakeControl<Label>(s, "compBefore", 4 + xx, 400 + yy, 50, 14, "");
+				groupBox1.Controls.MakeControl<Label>(s, "compBefore", 4 + xx, yStart + yy, 50, 14, "");
 				xx += 50;
 
-				groupBox1.Controls.MakeControl<Label>(s, "compAfter", 4 + xx, 400 + yy, 50, 14, "");
+				groupBox1.Controls.MakeControl<Label>(s, "compAfter", 4 + xx, yStart + yy, 50, 14, "");
 				xx += 50;
 				
-				groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, 400 + yy, 150, 14, "");
+				groupBox1.Controls.MakeControl<Label>(s, "compDiff", 4 + xx, yStart + yy, 150, 14, "");
 
 				if (s == "SPD")
 					yy += 4;

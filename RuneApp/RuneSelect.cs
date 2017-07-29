@@ -19,7 +19,7 @@ namespace RuneApp
 		public Func<Rune, long> sortFunc = r => (long)r.Id;
 		public string runeStatKey = null;
 
-		public string slot = "";
+		public SlotIndex slot = SlotIndex.Global;
 
 		public RuneSelect()
 		{
@@ -28,7 +28,7 @@ namespace RuneApp
 			Shown += RuneSelect_Shown;
 
 			var sorter = new ListViewSort();
-			listView2.ListViewItemSorter = sorter;
+			listRunes.ListViewItemSorter = sorter;
 
 		}
 
@@ -45,14 +45,8 @@ namespace RuneApp
 				{
 					points = build.ScoreRune(rune, build.GetFakeLevel(rune), false);
 
-					if (rune.Slot % 2 == 0)
-					{
-						if (build.slotStats[rune.Slot - 1].Count > 0)
-						{
-							if (!build.slotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
-								continue;
-						}
-					}
+					if (rune.Slot % 2 == 0 && build.slotStats[rune.Slot - 1].Any() && !build.slotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
+						continue;
 				}
 
 				ListViewItem item = new ListViewItem(new string[]{
@@ -72,27 +66,27 @@ namespace RuneApp
 				item.Tag = rune;
 				
 
-				listView2.Items.Add(item);
+				listRunes.Items.Add(item);
 			}
 			if (build != null)
 			{
-				listView2.Columns[5].Width = 50;
+				listRunes.Columns[5].Width = 50;
 
 				// Find all the runes in the build for the slot
 				List<Rune> fr = new List<Rune>();
 				switch (slot)
 				{
-					case "Evens":
+					case SlotIndex.Even:
 						fr.AddRange(build.runes[1]);
 						fr.AddRange(build.runes[3]);
 						fr.AddRange(build.runes[5]);
 						break;
-					case "Odds":
+					case SlotIndex.Odd:
 						fr.AddRange(build.runes[0]);
 						fr.AddRange(build.runes[2]);
 						fr.AddRange(build.runes[4]);
 						break;
-					case "Global":
+					case SlotIndex.Global:
 						fr.AddRange(build.runes[0]);
 						fr.AddRange(build.runes[1]);
 						fr.AddRange(build.runes[2]);
@@ -101,29 +95,14 @@ namespace RuneApp
 						fr.AddRange(build.runes[5]);
 						break;
 					default:
-						int slotn = int.Parse(slot)-1;
-						fr.AddRange(build.runes[slotn]);
-						
+						fr.AddRange(build.runes[(int)slot - 1]);
 						break;
 				}
 				// find the chosen runes in the list and colour them in
-				foreach (Rune r in fr.OrderBy(sortFunc))
-				{
-					foreach (ListViewItem li in listView2.Items)
-					{
-						Rune rt = (Rune)li.Tag;
-						if (rt != null)
-						{
-							if (rt.Id < r.Id)
-								continue;
-							
-							if (rt.Id == r.Id && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName))
-							{
-								li.ForeColor = Color.Black;
-
-								break;
-							}
-						}
+				foreach (ListViewItem li in listRunes.Items) {
+					Rune rt = (Rune)li.Tag;
+					if (rt != null && fr.Contains(rt) && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName)) {
+						li.ForeColor = Color.Black;
 					}
 				}
 			}
@@ -133,20 +112,23 @@ namespace RuneApp
 			{
 				ShowRune(returnedRune);
 				// find the precious
-				foreach (ListViewItem li in listView2.Items)
+				foreach (ListViewItem li in listRunes.Items)
 				{
 					if (li.Tag != null && ((Rune)li.Tag).Equals(returnedRune))
-						listView2.SelectedIndices.Add(li.Index);
+						listRunes.SelectedIndices.Add(li.Index);
 				}
 			}
+
+			((ListViewSort)listRunes.ListViewItemSorter).OrderBy(runesPoints.Index, false);
+			listRunes.Sort();
 		}
 
 		// preview the selected rune
 		private void listView2_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (listView2.FocusedItem != null)
+			if (listRunes.FocusedItem != null)
 			{
-				var item = listView2.FocusedItem;
+				var item = listRunes.FocusedItem;
 				if (item.Tag != null)
 				{
 					Rune rune = (Rune)item.Tag;
@@ -165,9 +147,9 @@ namespace RuneApp
 		// return the highlighted rune
 		private void button3_Click(object sender, EventArgs e)
 		{
-			if (listView2.SelectedItems.Count > 0)
+			if (listRunes.SelectedItems.Count > 0)
 			{
-				returnedRune = (Rune)listView2.SelectedItems[0].Tag;
+				returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
 				DialogResult = DialogResult.OK;
 				Close();
 			}
@@ -183,9 +165,9 @@ namespace RuneApp
 		// return the selected rune
 		private void listView2_DoubleClick(object sender, EventArgs e)
 		{
-			if (listView2.SelectedItems.Count > 0)
+			if (listRunes.SelectedItems.Count > 0)
 			{
-				returnedRune = (Rune)listView2.SelectedItems[0].Tag;
+				returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
 				DialogResult = DialogResult.OK;
 				Close();
 			}

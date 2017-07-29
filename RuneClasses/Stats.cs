@@ -222,6 +222,9 @@ namespace RuneOptim
 		[JsonIgnore]
 		public int[] SkillupMax = new int[8];
 
+		[JsonIgnore]
+		public bool HasElementalAdvantage = false;
+
 		public event EventHandler<StatModEventArgs> OnStatChanged;
 
 		public Stats() { }
@@ -362,15 +365,15 @@ namespace RuneOptim
 
 			if (type == Attr.MaxDamage)
 			{
-				return mult * (1 + CritDamage + DamageSkillups[skillNum] * 0.01);
+				return mult * (1 + CritDamage * 0.01 + DamageSkillups[skillNum] * 0.01);
 			}
 			else if (type == Attr.AverageDamage)
 			{
-				return mult * (1 + CritDamage * CritRate + DamageSkillups[skillNum] * 0.01);
+				return mult * (1 + CritDamage * 0.01 * Math.Min(100, CritRate + (HasElementalAdvantage ? 15 : 0)) * 0.01 + DamageSkillups[skillNum] * 0.01);
 			}
 			else if (type == Attr.DamagePerSpeed)
 			{
-				return mult * (1 + CritDamage * CritRate + DamageSkillups[skillNum] * 0.01) * Speed / SkillTimes[skillNum];
+				return mult * (1 + CritDamage * 0.01 * Math.Min(100, CritRate + (HasElementalAdvantage ? 15 : 0)) * 0.01 + DamageSkillups[skillNum] * 0.01) * Speed / SkillTimes[skillNum];
 			}
 
 			return mult;
@@ -451,7 +454,7 @@ namespace RuneOptim
 				case Attr.DamagePerSpeed:
 					return ExtraValue(Attr.AverageDamage) * Speed / 100;
 				case Attr.AverageDamage:
-					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate + (HasElementalAdvantage ? 15 : 0), 100) / 100);
 				case Attr.MaxDamage:
 					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100);
 				default:

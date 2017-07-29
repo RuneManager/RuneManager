@@ -52,6 +52,9 @@ namespace RuneOptim
 		[JsonProperty("wizard_id")]
 		public ulong WizardId = 0;
 
+		[JsonProperty("extra")]
+		public int _extra;
+
 		#endregion
 
 		#region Nicer getters for stats by type

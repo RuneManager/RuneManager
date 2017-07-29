@@ -896,7 +896,7 @@
 			// runeDial
 			// 
 			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(-12, 193);
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
 			this.runeDial.Name = "runeDial";
 			this.runeDial.Size = new System.Drawing.Size(225, 188);
 			this.runeDial.TabIndex = 51;

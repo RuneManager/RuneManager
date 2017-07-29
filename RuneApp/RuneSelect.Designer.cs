@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-			this.listView2 = new System.Windows.Forms.ListView();
+			this.listRunes = new System.Windows.Forms.ListView();
 			this.runesSet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -44,13 +44,13 @@
 			this.toolStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
-			// listView2
+			// listRunes
 			// 
-			this.listView2.AllowColumnReorder = true;
-			this.listView2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+			this.listRunes.AllowColumnReorder = true;
+			this.listRunes.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.listView2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+			this.listRunes.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.runesSet,
             this.runesID,
             this.runesGrade,
@@ -58,19 +58,19 @@
             this.runesMValue,
             this.runesPoints,
             this.runeStats});
-			this.listView2.FullRowSelect = true;
-			this.listView2.Location = new System.Drawing.Point(11, 27);
-			this.listView2.Margin = new System.Windows.Forms.Padding(2);
-			this.listView2.MultiSelect = false;
-			this.listView2.Name = "listView2";
-			this.listView2.Size = new System.Drawing.Size(385, 542);
-			this.listView2.Sorting = System.Windows.Forms.SortOrder.Ascending;
-			this.listView2.TabIndex = 1;
-			this.listView2.UseCompatibleStateImageBehavior = false;
-			this.listView2.View = System.Windows.Forms.View.Details;
-			this.listView2.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
-			this.listView2.SelectedIndexChanged += new System.EventHandler(this.listView2_SelectedIndexChanged);
-			this.listView2.DoubleClick += new System.EventHandler(this.listView2_DoubleClick);
+			this.listRunes.FullRowSelect = true;
+			this.listRunes.Location = new System.Drawing.Point(11, 27);
+			this.listRunes.Margin = new System.Windows.Forms.Padding(2);
+			this.listRunes.MultiSelect = false;
+			this.listRunes.Name = "listRunes";
+			this.listRunes.Size = new System.Drawing.Size(385, 542);
+			this.listRunes.Sorting = System.Windows.Forms.SortOrder.Ascending;
+			this.listRunes.TabIndex = 1;
+			this.listRunes.UseCompatibleStateImageBehavior = false;
+			this.listRunes.View = System.Windows.Forms.View.Details;
+			this.listRunes.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+			this.listRunes.SelectedIndexChanged += new System.EventHandler(this.listView2_SelectedIndexChanged);
+			this.listRunes.DoubleClick += new System.EventHandler(this.listView2_DoubleClick);
 			// 
 			// runesSet
 			// 
@@ -175,7 +175,7 @@
 			this.Controls.Add(this.btnCancel);
 			this.Controls.Add(this.btnSelect);
 			this.Controls.Add(this.toolStrip1);
-			this.Controls.Add(this.listView2);
+			this.Controls.Add(this.listRunes);
 			this.Icon = global::RuneApp.App.Icon;
 			this.Name = "RuneSelect";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -189,7 +189,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView listView2;
+        private System.Windows.Forms.ListView listRunes;
         private System.Windows.Forms.ColumnHeader runesSet;
         private System.Windows.Forms.ColumnHeader runesID;
         private System.Windows.Forms.ColumnHeader runesGrade;

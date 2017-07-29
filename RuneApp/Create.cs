@@ -213,14 +213,14 @@ namespace RuneApp
 			{
 				if (build?.mon?.SkillFunc?[i] != null)
 				{
-					var ff = build.mon.SkillFunc[i];
+					//var ff = build.mon.SkillFunc[i]; build.mon.GetSkillDamage(Attr.AverageDamage, i);
 					string stat = "monskill" + i;
 					x = 4;
 					groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i+1));
 					x += colWidth;
 
-					double aa = ff(build.mon);
-					double cc = ff(build.mon.GetStats());
+					double aa = build.mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
+					double cc = build.mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
 
 					groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, aa.ToString());
 					x += colWidth;
@@ -588,6 +588,7 @@ namespace RuneApp
 
 			Monster mon = build.mon;
 			mon.Current.Leader = build.leader;
+			mon.Current.Shrines = build.shrines;
 			Stats cur = mon.GetStats();
 			if (mon.Id != 0)
 				monLabel.Text = "Build for " + mon.FullName + " (" + mon.Id + ")";
@@ -884,12 +885,12 @@ namespace RuneApp
 			{
 				if (build?.mon?.SkillFunc?[i] != null)
 				{
-					var ff = build.mon.SkillFunc[i];
+					//var ff = build.mon.SkillFunc[i];
 					string stat = "monskill" + i;
 					Attr aaa = Attr.Skill1 + i;
 
-					double aa = ff(build.mon);
-					double cc = ff(build.mon.GetStats());
+					double aa = build.mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
+					double cc = build.mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
 
 					var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
 					ctrlBase.Text = aa.ToString();
@@ -1240,7 +1241,7 @@ namespace RuneApp
 			{
 				rs.returnedRune = build.mon.Current.Runes[e.Slot - 1];
 				rs.build = build;
-				rs.slot = e.Slot.ToString();
+				rs.slot = (SlotIndex)e.Slot;
 				rs.runes = build.runes[e.Slot - 1];
 				rs.ShowDialog();
 			}
@@ -1705,7 +1706,7 @@ namespace RuneApp
 						break;
 				}
 
-				ff.slot = tabControl1.SelectedTab.Text;
+				ff.slot =  (SlotIndex)Enum.Parse(typeof(SlotIndex), tabControl1.SelectedTab.Text);
 
 				ff.runes = ff.runes.Where(r => build.BuildSets.Contains(r.Set));
 
@@ -2121,6 +2122,10 @@ namespace RuneApp
 				testWindow.Close();
 			build.RequiredSets.CollectionChanged -= RequiredSets_CollectionChanged;
 			build.BuildSets.CollectionChanged -= BuildSets_CollectionChanged;
+		}
+
+		private void checkElementAdvantage_CheckedChanged(object sender, EventArgs e) {
+			build.HasElementalAdvantage = checkElementAdvantage.Checked;
 		}
 	}
 }

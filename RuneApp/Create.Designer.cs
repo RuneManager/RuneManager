@@ -28,15 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup28 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup29 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup30 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup31 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup32 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup33 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup34 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup35 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup36 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
 			this.check_autoBuild = new System.Windows.Forms.CheckBox();
@@ -98,6 +98,7 @@
 			this.tab5 = new System.Windows.Forms.TabPage();
 			this.label1 = new System.Windows.Forms.Label();
 			this.button1 = new System.Windows.Forms.Button();
+			this.checkElementAdvantage = new System.Windows.Forms.CheckBox();
 			this.groupBox1.SuspendLayout();
 			this.groupBox2.SuspendLayout();
 			this.toolStrip1.SuspendLayout();
@@ -123,6 +124,7 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.checkElementAdvantage);
 			this.groupBox1.Controls.Add(this.check_autoBuild);
 			this.groupBox1.Controls.Add(this.check_autoRunes);
 			this.groupBox1.Controls.Add(this.btnDLawake);
@@ -552,16 +554,16 @@
 			this.setList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
 			this.setList.FullRowSelect = true;
-			listViewGroup1.Header = "Required";
-			listViewGroup1.Name = "listViewGroup3";
-			listViewGroup2.Header = "Included";
-			listViewGroup2.Name = "listViewGroup1";
-			listViewGroup3.Header = "Excluded";
-			listViewGroup3.Name = "listViewGroup2";
+			listViewGroup28.Header = "Required";
+			listViewGroup28.Name = "listViewGroup3";
+			listViewGroup29.Header = "Included";
+			listViewGroup29.Name = "listViewGroup1";
+			listViewGroup30.Header = "Excluded";
+			listViewGroup30.Name = "listViewGroup2";
 			this.setList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup28,
+            listViewGroup29,
+            listViewGroup30});
 			this.setList.Location = new System.Drawing.Point(6, 44);
 			this.setList.Name = "setList";
 			this.setList.Size = new System.Drawing.Size(111, 644);
@@ -697,13 +699,13 @@
 			// 
 			this.priStat2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-			listViewGroup4.Header = "Include";
-			listViewGroup4.Name = "listViewGroup1";
-			listViewGroup5.Header = "Excluded";
-			listViewGroup5.Name = "listViewGroup2";
+			listViewGroup31.Header = "Include";
+			listViewGroup31.Name = "listViewGroup1";
+			listViewGroup32.Header = "Excluded";
+			listViewGroup32.Name = "listViewGroup2";
 			this.priStat2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup4,
-            listViewGroup5});
+            listViewGroup31,
+            listViewGroup32});
 			this.priStat2.Location = new System.Drawing.Point(3, 241);
 			this.priStat2.Name = "priStat2";
 			this.priStat2.Size = new System.Drawing.Size(123, 256);
@@ -733,13 +735,13 @@
 			// 
 			this.priStat4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-			listViewGroup6.Header = "Include";
-			listViewGroup6.Name = "listViewGroup1";
-			listViewGroup7.Header = "Excluded";
-			listViewGroup7.Name = "listViewGroup2";
+			listViewGroup33.Header = "Include";
+			listViewGroup33.Name = "listViewGroup1";
+			listViewGroup34.Header = "Excluded";
+			listViewGroup34.Name = "listViewGroup2";
 			this.priStat4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup6,
-            listViewGroup7});
+            listViewGroup33,
+            listViewGroup34});
 			this.priStat4.Location = new System.Drawing.Point(3, 241);
 			this.priStat4.Name = "priStat4";
 			this.priStat4.Size = new System.Drawing.Size(123, 256);
@@ -769,13 +771,13 @@
 			// 
 			this.priStat6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-			listViewGroup8.Header = "Include";
-			listViewGroup8.Name = "listViewGroup1";
-			listViewGroup9.Header = "Excluded";
-			listViewGroup9.Name = "listViewGroup2";
+			listViewGroup35.Header = "Include";
+			listViewGroup35.Name = "listViewGroup1";
+			listViewGroup36.Header = "Excluded";
+			listViewGroup36.Name = "listViewGroup2";
 			this.priStat6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup8,
-            listViewGroup9});
+            listViewGroup35,
+            listViewGroup36});
 			this.priStat6.Location = new System.Drawing.Point(3, 241);
 			this.priStat6.Name = "priStat6";
 			this.priStat6.Size = new System.Drawing.Size(123, 256);
@@ -838,6 +840,17 @@
 			this.button1.Text = "Runes";
 			this.button1.UseVisualStyleBackColor = true;
 			this.button1.Click += new System.EventHandler(this.button1_Click);
+			// 
+			// checkElementAdvantage
+			// 
+			this.checkElementAdvantage.AutoSize = true;
+			this.checkElementAdvantage.Location = new System.Drawing.Point(305, 520);
+			this.checkElementAdvantage.Name = "checkElementAdvantage";
+			this.checkElementAdvantage.Size = new System.Drawing.Size(96, 17);
+			this.checkElementAdvantage.TabIndex = 93;
+			this.checkElementAdvantage.Text = "Ele Advantage";
+			this.checkElementAdvantage.UseVisualStyleBackColor = true;
+			this.checkElementAdvantage.CheckedChanged += new System.EventHandler(this.checkElementAdvantage_CheckedChanged);
 			// 
 			// Create
 			// 
@@ -935,5 +948,6 @@
 		private System.Windows.Forms.CheckBox check_autoRunes;
         private System.Windows.Forms.CheckBox check_autoBuild;
 		private RuneDial runeDial;
+		private System.Windows.Forms.CheckBox checkElementAdvantage;
 	}
 }

@@ -130,7 +130,6 @@ namespace RuneOptim
 		[JsonIgnore]
 		public int loadOrder = int.MaxValue;
 
-
 		[JsonIgnore]
 		public bool IsRep = false;
 

@@ -116,7 +116,7 @@ namespace RuneOptim
 						if (Id > 10000)
 						{
 							if (Save.MonIdNames.ContainsKey(Id / 100))
-								return (Element)(Id % 10) + " " + Save.MonIdNames[Id / 100] + " ";
+								return Save.MonIdNames[Id / 100] + " ";
 							return "Missingno " + Id;
 						}
 						break;
@@ -124,6 +124,14 @@ namespace RuneOptim
 						return ((MaterialType)Id).ToString();
 				}
 				return "N/A" + Id;
+			}
+		}
+
+		public Element Element {
+			get {
+				if (Type == ItemType.SummoningPieces && Id > 10000 && Save.MonIdNames.ContainsKey(Id / 100))
+					return (Element)(Id % 10);
+				return Element.Pure;
 			}
 		}
 
