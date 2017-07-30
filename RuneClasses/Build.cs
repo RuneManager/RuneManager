@@ -1645,8 +1645,7 @@ namespace RuneOptim {
 				rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !bannedRunesTemp.Any(b => b == r.Id));
 			}
 
-
-			if (BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4))
+			if ((BuildSets.Any() || RequiredSets.Any()) && BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4))
 			{
 				// if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
 				rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
