@@ -86,6 +86,26 @@ namespace RuneOptim
 			}
 		}
 
+		private static Dictionary<int, MonsterDefinitions.Skill> skillDefs = null;
+		private static Dictionary<int, MonsterDefinitions.Skill> SkillDefs {
+			get {
+				if (skillDefs == null) {
+					skillDefs = new Dictionary<int, MonsterDefinitions.Skill>();
+					foreach (var item in SkillList) {
+						foreach (var skill in item.Skills) {
+							if (!skillDefs.ContainsKey(skill.Com2usId))
+								skillDefs.Add(skill.Com2usId, skill);
+						}
+						foreach (var skill in item.HomunculusSkills) {
+							if (!skillDefs.ContainsKey(skill.Skill.Com2usId))
+								skillDefs.Add(skill.Skill.Com2usId, skill.Skill);
+						}
+					}
+				}
+				return skillDefs;
+			}
+		}
+
 		[JsonProperty("attribute")]
 		public Element Element;
 
@@ -246,10 +266,13 @@ namespace RuneOptim
 				int skdmg = 0;
 				int i = 0;
 
-				foreach (var ss in MonDefs[monsterTypeId].Skills)
+				foreach (var si in _skilllist)
 				{
+					if (!SkillDefs.ContainsKey(si.SkillId ?? 0))
+						continue;
+					var ss = SkillDefs[si.SkillId ?? 0];
 					var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
-					if (df.props.Count > 0) //ss.Cooltime != null && 
+					if (df.props.Count > 0)
 					{
 						var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level ?? 0);
 						this.SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
@@ -423,6 +446,9 @@ namespace MonsterDefinitions
 		public RuneOptim.Archetype Archetype;
 		[JsonProperty("base_stars")]
 		public int BaseStars;
+		public override string ToString() {
+			return ((Com2usId / 10) % 10 == 0 ? Element + " " : "") + Name;
+		}
 	}
 
 	public class SkillEff
