@@ -472,7 +472,7 @@ namespace RuneOptim {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0))
 				{
 					if (!System.Diagnostics.Debugger.IsAttached)
-						RuneLog.Info(attr + ": " + this[attr, fake, pred] + "/" + rPerc[attr] + (this[attr, fake, pred] / rPerc[attr]));
+						RuneLog.Debug(attr + ": " + this[attr, fake, pred] + "/" + rPerc[attr] + (this[attr, fake, pred] / rPerc[attr]));
 					val += this[attr, fake, pred] / rPerc[attr];
 				}
 			}
@@ -481,7 +481,7 @@ namespace RuneOptim {
 				if (!rFlat[attr].EqualTo(0))
 				{
 					if (!System.Diagnostics.Debugger.IsAttached)
-						RuneLog.Info(attr + ": " + this[attr, fake, pred] + "/" + rFlat[attr] + (this[attr, fake, pred] / rFlat[attr]));
+						RuneLog.Debug(attr + ": " + this[attr, fake, pred] + "/" + rFlat[attr] + (this[attr, fake, pred] / rFlat[attr]));
 					val += this[attr, fake, pred] / rFlat[attr];
 				}
 			}

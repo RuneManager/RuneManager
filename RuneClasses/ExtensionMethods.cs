@@ -25,32 +25,37 @@ namespace RuneOptim
 	[Flags]
 	public enum LogSeverity
 	{
-		Any =	0x00000000,
+		None =	0x00000000,
 
 
-
-		Info =	0x10000000,
-		Debug = 0x01000000,
-		Error = 0x00100000,
+		Verbose = 0x10000000,
+		Debug	= 0x01000000,
+		Info	= 0x00100000,
+		Error	= 0x00010000,
 	}
 
 	public static class RuneLog
 	{
 		public static System.IO.TextWriter logTo = Console.Out;
-		public static LogSeverity CurrentSeverity = LogSeverity.Any;
+		public static LogSeverity CurrentSeverity =
+#if DEBUG
+			LogSeverity.Debug;
+#else
+			LogSeverity.Info;
+#endif
 
 		public static void Log(LogSeverity sev, string str,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null)
 		{
-			if (sev.HasFlag(CurrentSeverity))
+			if (CurrentSeverity >= sev)
 			{
 				logTo.WriteLine(System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str);
 			}
 		}
 
-		public static void Info(string str, LogSeverity sev = LogSeverity.Any,
+		public static void Info(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null)
@@ -58,7 +63,7 @@ namespace RuneOptim
 			Log(sev | LogSeverity.Info, str, lineNumber, caller, filepath);
 		}
 
-		public static void Debug(string str, LogSeverity sev = LogSeverity.Any,
+		public static void Debug(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null)
@@ -66,7 +71,7 @@ namespace RuneOptim
 			Log(sev | LogSeverity.Debug, str, lineNumber, caller, filepath);
 		}
 
-		public static void Error(string str, LogSeverity sev = LogSeverity.Any,
+		public static void Error(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null)
