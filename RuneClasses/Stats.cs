@@ -8,23 +8,6 @@ using System.Linq.Expressions;
 namespace RuneOptim
 {
 	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
-	sealed class SkillAttrAttribute : Attribute
-	{
-		readonly string attrName;
-
-		public SkillAttrAttribute(string name)
-		{
-			this.attrName = name;
-		}
-
-		public string Attr
-		{
-			get { return attrName; }
-		}
-
-	}
-
-	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
 	sealed class AttrFieldAttribute : Attribute
 	{
 		readonly Attr attrName;
@@ -46,13 +29,6 @@ namespace RuneOptim
 	public enum Attr
 	{
 		[EnumMember(Value = "-")]
-		[SkillAttr("DICE")]
-		[SkillAttr("DIE_RATE")]
-		[SkillAttr("ATTACK_CUR_HP_RATE")]
-		[SkillAttr("TARGET_CUR_HP_RATE")]
-		[SkillAttr("ATTACK_LV")]
-		[SkillAttr("ATTACK_WIZARD_LIFE_RATE")]
-		[SkillAttr("LIFE_SHARE_TARGET")]
 		Neg = -1, 
 
 		[EnumMember(Value = "")]
@@ -60,26 +36,18 @@ namespace RuneOptim
 		Null = 0,
 
 		[EnumMember(Value = "HP flat")]
-		[SkillAttr("HP")]
-		[SkillAttr("ATTACK_CUR_HP")]
-		[SkillAttr("ATTACK_TOT_HP")]
-		[SkillAttr("ATTACK_LOSS_HP")]
-		[SkillAttr("TARGET_TOT_HP")]
-		[SkillAttr("LIFE_SHARE_ALL")]
 		HealthFlat = 1,
 
 		[EnumMember(Value = "HP%")]
 		HealthPercent = 2,
 
 		[EnumMember(Value = "ATK flat")]
-		[SkillAttr("ATK")]
 		AttackFlat = 3,
 
 		[EnumMember(Value = "ATK%")]
 		AttackPercent = 4,
 
 		[EnumMember(Value = "DEF flat")]
-		[SkillAttr("DEF")]
 		DefenseFlat = 5,
 
 		[EnumMember(Value = "DEF%")]
@@ -89,8 +57,6 @@ namespace RuneOptim
 		SpeedPercent = 7,
 
 		[EnumMember(Value = "SPD")]
-		[SkillAttr("ATTACK_SPEED")]
-		[SkillAttr("TARGET_SPEED")]
 		Speed = 8,
 
 		[EnumMember(Value = "CRate")]

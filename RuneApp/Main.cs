@@ -952,7 +952,11 @@ namespace RuneApp {
 			{
 				if (!IsDisposed)
 				{
-					var lvi = buildList.Items.Cast<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build).ID == b.ID);
+					var lvi = buildList.Items.Cast<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
+					if (lvi == null)
+						return;
+					while (lvi.SubItems.Count < 4)
+						lvi.SubItems.Add("");
 					lvi.SubItems[3].Text = str;
 				}
 			});
