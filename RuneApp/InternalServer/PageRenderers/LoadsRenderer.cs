@@ -192,7 +192,8 @@ namespace RuneApp.InternalServer {
 					while (!cmon.storage && cmon.runesDesired.Any(rd => rd.current != cmon))
 					{
 						var r = cmon.runesDesired.FirstOrDefault(rd => rd.current != cmon);
-						if (r.current?.storage ?? false)
+						// don't need to take out
+						/*if (r.current?.storage ?? false)
 						{
 							if (!HasBoxSpace)
 							{
@@ -204,8 +205,8 @@ namespace RuneApp.InternalServer {
 								maximum = Program.data.WizardInfo.UnitSlots.Number,
 								message = "Need Rune {0}/{1}, " + StoreNum + "/" + Program.data.WizardInfo.UnitDepositorySlots.Number });
 							r.current.storage = false;
-						}
-						if (!r.current?.storage ?? false)
+						}*/
+						if (r.current != null)//!r.current?.storage ?? false)
 						{
 							if (!HasRuneSpace)
 								break;
@@ -543,6 +544,7 @@ function hackLots(prop, num, on) {
 					}
 					else if (action == ActionType.RuneOut)
 					{
+						return new ServedResult("span");
 						ret.contentList.Add(ServeImageClass($"/monsters/{mon.monsterTypeId}.png", "mon-portrait"));
 						ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
 						foreach (var r in manyRunes)

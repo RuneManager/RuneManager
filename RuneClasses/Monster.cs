@@ -167,6 +167,8 @@ namespace RuneOptim
 			}
 		}
 
+		public event EventHandler<EventArgs> OnRunesChanged;
+
 		public int SwapCost(Loadout l)
 		{
 			int cost = 0;
@@ -219,6 +221,13 @@ namespace RuneOptim
 		{
 			Current.AddRune(rune, checkOn);
 			changeStats = true;
+			OnRunesChanged?.Invoke(this, null);
+		}
+
+		public void RemoveRune(int slot) {
+			Current.RemoveRune(slot);
+			changeStats = true;
+			OnRunesChanged?.Invoke(this, null);
 		}
 
 		private static MonsterDefinitions.Monster[] skillList = null;

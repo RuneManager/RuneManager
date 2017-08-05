@@ -377,8 +377,8 @@ namespace RuneOptim
 
 			changed = true;
 
-			if (runes[rune.Slot - 1] == null)
-				runeCount++;
+			RemoveRune(rune.Slot);
+			runeCount++;
 			
 			runes[rune.Slot - 1] = rune;
 			if (runeCount % checkOn == 0)

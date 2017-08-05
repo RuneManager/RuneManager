@@ -10,9 +10,9 @@ namespace RunePlugin.Response
 	public class UnequipRuneResponse : SWResponse
 	{
 		[JsonProperty("rune")]
-		RuneOptim.Rune Rune;
+		public RuneOptim.Rune Rune;
 
 		[JsonProperty("unit_info")]
-		RuneOptim.Monster Monster;
+		public RuneOptim.Monster Monster;
 	}
 }

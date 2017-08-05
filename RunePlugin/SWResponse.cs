@@ -46,6 +46,12 @@ namespace RunePlugin
 					return obj.ToObject<BattleRiftDungeonResultResponse>();
 				case "GetBestClearRiftDungeon":
 					return obj.ToObject<GetBestClearRiftDungeonResponse>();
+				case "EquipRune":
+					return obj.ToObject<EquipRuneResponse>();
+				case "UnequipRune":
+					return obj.ToObject<UnequipRuneResponse>();
+				case "EquipRuneList":
+					return obj.ToObject<EquipRuneListResponse>();
 				default:
 					return obj.ToObject<SWResponse>();
 			}
@@ -56,5 +62,4 @@ namespace RunePlugin
 			throw new NotImplementedException();
 		}
 	}
-
 }

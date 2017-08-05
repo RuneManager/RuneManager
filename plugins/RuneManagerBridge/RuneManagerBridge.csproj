@@ -48,6 +48,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\RuneClasses\RuneClasses.csproj">
+      <Project>{8CDB42ED-C6F7-4915-9A10-6161ECA4ADC6}</Project>
+      <Name>RuneClasses</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\RunePlugin\RunePlugin.csproj">
       <Project>{fa95cac9-ad93-4cfa-b3d9-0674be156d5a}</Project>
       <Name>RunePlugin</Name>

@@ -49,6 +49,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response\BattleRiftDungeonResultResponse.cs" />
     <Compile Include="Request\BattleRiftDungeonStartRequest.cs" />
+    <Compile Include="Response\EquipRuneListResponse.cs" />
     <Compile Include="Response\EquipRuneResponse.cs" />
     <Compile Include="Response\GetBestClearRiftDungeonResponse.cs" />
     <Compile Include="Response\UnequipRuneResponse.cs" />

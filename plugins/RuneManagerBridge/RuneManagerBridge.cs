@@ -15,33 +15,72 @@ namespace RuneManagerBridge
 	{
 		public override void ProcessRequest(object sender, SWEventArgs args)
 		{
+			// TODO: onload check if RM is running and ask for defs
 			if (args.Request.Command == SWCommand.EquipRune)
 			{
 				var eqr = args.ResponseAs<EquipRuneResponse>();
-				var apir = HttpWebRequest.CreateHttp("http://localhost:7676/api");
-				apir.Accept = "application/json";
-				var aresp = apir.GetResponse();
+				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + eqr.Monster.Id);
+				api.Accept = "application/json";
+				api.Method = "POST";
+				using (var str = new StreamWriter(api.GetRequestStream())) {
+					str.Write(JsonConvert.SerializeObject(eqr.Monster));
+				}
+				var aresp = api.GetResponse();
 				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
-				var api = JsonConvert.DeserializeObject<Api>(astr);
+				Console.WriteLine(astr);
 			}
 			else if (args.Request.Command == SWCommand.UnequipRune)
 			{
 				var uqr = args.ResponseAs<UnequipRuneResponse>();
-				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api");
+				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + uqr.Monster.Id);
 				api.Accept = "application/json";
-
+				api.Method = "POST";
+				using (var str = new StreamWriter(api.GetRequestStream())) {
+					str.Write(JsonConvert.SerializeObject(uqr.Monster));
+				}
+				var aresp = api.GetResponse();
+				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
+				Console.WriteLine(astr);
+			}
+			else if (args.Request.Command == SWCommand.EquipRuneList) {
+				var eqlr = args.ResponseAs<EquipRuneListResponse>();
+				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + eqlr.TargetMonster.Id);
+				api.Accept = "application/json";
+				api.Method = "POST";
+				using (var str = new StreamWriter(api.GetRequestStream())) {
+					str.Write(JsonConvert.SerializeObject(eqlr.TargetMonster));
+				}
+				var aresp = api.GetResponse();
+				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
+				Console.WriteLine(astr);
+				foreach (var m in eqlr.SourceMonsters) {
+					api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + m.Key);
+					api.Accept = "application/json";
+					api.Method = "POST";
+					using (var str = new StreamWriter(api.GetRequestStream())) {
+						str.Write(JsonConvert.SerializeObject(m.Value));
+					}
+					aresp = api.GetResponse();
+					astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
+					Console.WriteLine(astr);
+				}
 			}
 		}
 	}
 
+	// TODO: Swagger or swhat?
 	public class Api
 	{
 		[JsonProperty("version")]
 		public string Version;
-		[JsonProperty("endpoints")]
-		public string[] Endpoints;
-		[JsonProperty("baseurl")]
-		public string BaseUrl;
+		[JsonProperty("paths")]
+		public Dictionary<string, ApiPath> Paths;
+		[JsonProperty("host")]
+		public string Host;
+
+	}
+
+	public class ApiPath {
 
 	}
 }

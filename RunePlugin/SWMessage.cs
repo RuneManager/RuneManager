@@ -44,11 +44,13 @@ namespace RunePlugin
 		public int WizardId;
 	}
 
+
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum SWCommand
 	{
 		Unhandled,
 		EquipRune,
+		EquipRuneList,
 		UnequipRune,
 		HubUserLogin,
 		GetGuildWarBattleLogByGuildId,

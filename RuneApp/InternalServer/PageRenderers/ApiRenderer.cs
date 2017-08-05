@@ -1,7 +1,10 @@
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using Newtonsoft.Json;
+using RuneOptim;
 
 namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer
@@ -163,15 +166,44 @@ function log() {
 			public class MonstersRenderer : PageRenderer
 			{
 				[HttpMethod("POST")]
-				public HttpResponseMessage PostMethod(HttpListenerRequest req)
+				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+					Monster mon = null;
+					ulong id = 0;
+					if (uri.Length > 0) {
+						ulong.TryParse(uri[0], out id);
+					}
+					using (var str = new StreamReader(req.InputStream)) {
+						var raw = str.ReadToEnd();
+						mon = JsonConvert.DeserializeObject<Monster>(raw);
+					}
+					if (id == 0)
+						id = mon.Id;
+
+
+					Program.UpdateMonster(mon);
+
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "POST", id.ToString() } } }.ToJson()) };
 				}
 
 				[HttpMethod("PUT")]
-				public HttpResponseMessage PutMethod(HttpListenerRequest req)
+				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+					Monster mon = null;
+					ulong id = 0;
+					if (uri.Length > 0) {
+						ulong.TryParse(uri[0], out id);
+					}
+					using (var str = new StreamReader(req.InputStream)) {
+						var raw = str.ReadToEnd();
+						mon = JsonConvert.DeserializeObject<Monster>(raw);
+					}
+					if (id == 0)
+						id = mon.Id;
+
+					Program.UpdateMonster(mon);
+
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("PUT") { contentDic = { { "PUT", id.ToString() } } }.ToJson()) };
 				}
 
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
@@ -179,10 +211,10 @@ function log() {
 					switch (req.HttpMethod)
 					{
 						case "PUT":
-							return PutMethod(req);
+							return PutMethod(req, uri);
 
 						case "POST":
-							return PostMethod(req);
+							return PostMethod(req, uri);
 
 						case "GET":
 							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{GET}") };

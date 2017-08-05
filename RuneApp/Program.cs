@@ -263,6 +263,12 @@ namespace RuneApp
 			{
 #endif
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
+
+				if (data.isModified) {
+					Console.WriteLine("Loaded data has been touched, untouching...");
+					data.isModified = false;
+				}
+
 				// TODO: trash
 				for (int i = 0; i < Deco.ShrineStats.Length; i++)
 				{
@@ -948,7 +954,11 @@ namespace RuneApp
 			if (File.Exists(Program.Settings.SaveLocation))
 			{
 				// backup, just in case
-				File.Copy(Program.Settings.SaveLocation, Path.ChangeExtension(Program.Settings.SaveLocation, ".backup.json"));
+				string fname = Path.ChangeExtension(Program.Settings.SaveLocation, ".backup.json");
+				int i = 2;
+				while (File.Exists(fname))
+					fname = Path.ChangeExtension(Program.Settings.SaveLocation, ".backup" + (i++) + ".json");
+				File.Copy(Program.Settings.SaveLocation, fname);
 			}
 
 			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data, Formatting.Indented));
@@ -994,6 +1004,28 @@ namespace RuneApp
 		{
 			var m = data.GetMonster(mon.Id);
 			// TODO: modify stats and trigger callbacks
+
+			for (int i = 0; i < 6; i++) {
+				var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
+				var rr = m.Current.Runes.FirstOrDefault(r => r?.Slot - 1 == i);
+				if (rl != null)
+				{
+					var rune = data.GetRune(rl.Id);
+					if (rune.AssignedId != m.Id && rune.AssignedId > 0) {
+						var om = data.GetMonster(rune.AssignedId);
+						om.RemoveRune(rune.Slot);
+					}
+					rune.AssignedId = m.Id;
+					rune.Assigned = m;
+					rune.AssignedName = m.FullName;
+					if (rune != m.Current.Runes[i]) {
+						m.ApplyRune(rune);
+					}
+				}
+				else {
+					m.RemoveRune(i + 1);
+				}
+			}
 
 			data.isModified = true;
 		}

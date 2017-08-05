@@ -345,6 +345,11 @@ namespace RuneApp {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					foreach (var l in e.NewItems.Cast<Loadout>())
 					{
+						var mm = Program.builds.FirstOrDefault(b => b.ID == l.BuildID)?.mon;
+						if (mm != null) {
+							mm.OnRunesChanged += Mm_OnRunesChanged;
+						}
+
 						checkLocked();
 						Invoke((MethodInvoker)delegate
 						{
@@ -362,6 +367,11 @@ namespace RuneApp {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 					foreach (var l in e.OldItems.Cast<Loadout>())
 					{
+						var mm = Program.builds.FirstOrDefault(b => b.ID == l.BuildID)?.mon;
+						if (mm != null) {
+							mm.OnRunesChanged -= Mm_OnRunesChanged;
+						}
+
 						Invoke((MethodInvoker)delegate
 						{
 							loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => li.Tag == l).Remove();
@@ -372,6 +382,17 @@ namespace RuneApp {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				default:
 					throw new NotImplementedException();
+			}
+		}
+
+		private void Mm_OnRunesChanged(object sender, EventArgs e) {
+			var bb = Program.builds.FirstOrDefault(b => b.mon != null && b.mon == (sender as Monster));
+			if (bb != null) {
+				var l = Program.loads.FirstOrDefault(lo => lo.BuildID == bb.ID);
+				Invoke((MethodInvoker)delegate {
+					ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+					ListViewItemLoad(nli, l);
+				});
 			}
 		}
 
