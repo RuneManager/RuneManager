@@ -129,9 +129,14 @@ namespace RuneApp.InternalServer {
 					mo.storage = true;
 				}
 
+				int giveUp = mons.Count * 2;
 				// while things to do
 				while (mons.Any(m => !m.IsGood))
 				{
+					giveUp--;
+					if (giveUp <= 0)
+						break;
+
 					// put the mons we don't need into storage
 					if (HasStoreSpace && BoxNum >= Program.data.WizardInfo.UnitSlots.Number / 10 * 9)
 					{

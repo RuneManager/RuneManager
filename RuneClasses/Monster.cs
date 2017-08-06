@@ -224,10 +224,11 @@ namespace RuneOptim
 			OnRunesChanged?.Invoke(this, null);
 		}
 
-		public void RemoveRune(int slot) {
-			Current.RemoveRune(slot);
+		public Rune RemoveRune(int slot) {
+			var r = Current.RemoveRune(slot);
 			changeStats = true;
 			OnRunesChanged?.Invoke(this, null);
+			return r;
 		}
 
 		private static MonsterDefinitions.Monster[] skillList = null;

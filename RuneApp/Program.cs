@@ -1013,7 +1013,10 @@ namespace RuneApp
 					var rune = data.GetRune(rl.Id);
 					if (rune.AssignedId != m.Id && rune.AssignedId > 0) {
 						var om = data.GetMonster(rune.AssignedId);
-						om.RemoveRune(rune.Slot);
+						var rm = om.RemoveRune(rune.Slot);
+						rm.Assigned = null;
+						rm.AssignedId = 0;
+						rm.AssignedName = "Unassigned";
 					}
 					rune.AssignedId = m.Id;
 					rune.Assigned = m;
@@ -1023,7 +1026,10 @@ namespace RuneApp
 					}
 				}
 				else {
-					m.RemoveRune(i + 1);
+					var rm = m.RemoveRune(i + 1);
+					rm.Assigned = null;
+					rm.AssignedId = 0;
+					rm.AssignedName = "Unassigned";
 				}
 			}
 

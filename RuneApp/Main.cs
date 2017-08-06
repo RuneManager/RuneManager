@@ -1011,8 +1011,14 @@ namespace RuneApp {
 			if (Program.data.Monsters != null)
 				foreach (Monster mon in Program.data.Monsters)
 				{
-					for (int i = 1; i < 7; i++)
-						mon.Current.RemoveRune(i);
+					for (int i = 1; i < 7; i++) {
+						var r = mon.Current.RemoveRune(i);
+						if (r != null) {
+							r.Assigned = null;
+							r.AssignedId = 0;
+							r.AssignedName = "";
+						}
+					}
 				}
 
 			if (Program.data.Runes != null)
@@ -1251,6 +1257,7 @@ namespace RuneApp {
 						continue;
 
 					r.AssignedId = 0;
+					r.Assigned = null;
 					r.AssignedName = "Inventory";
 				}
 			}

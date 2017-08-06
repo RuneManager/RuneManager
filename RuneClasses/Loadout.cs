@@ -395,11 +395,7 @@ namespace RuneOptim
 			changed = true;
 
 			var r = runes[slot - 1];
-
-			r.Assigned = null;
-			r.AssignedId = 0;
-			r.AssignedName = "";
-
+			
 			runes[slot - 1] = null;
 			runeCount--;
 			CheckSets();
