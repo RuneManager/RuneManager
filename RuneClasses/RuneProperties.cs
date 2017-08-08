@@ -689,10 +689,13 @@ namespace RuneOptim {
 		public int BaseValue = -1;
 
 		[ListProperty(2)]
-		public int __int2 = -1;
+		public int Enchanted = -1;
 
 		[ListProperty(3)]
 		public int GrindBonus = -1;
+
+		[JsonIgnore]
+		public bool IsEnchanted { get { return Enchanted == 1; } }
 
 		[JsonIgnore]
 		private int _calcVal = -1;
@@ -743,7 +746,7 @@ namespace RuneOptim {
 				else if (index == 1)
 					return BaseValue;
 				else if (index == 2)
-					return __int2;
+					return Enchanted;
 				else if (index == 3)
 					return GrindBonus;
 				return -1;
@@ -756,7 +759,7 @@ namespace RuneOptim {
 				else if (index == 1)
 					BaseValue = value ?? -1;
 				else if (index == 2)
-					__int2 = value ?? -1;
+					Enchanted = value ?? -1;
 				else if (index == 3)
 					GrindBonus = value ?? -1;
 			}
@@ -768,8 +771,8 @@ namespace RuneOptim {
 				Type = (Attr)item;
 			else if (BaseValue == -1)
 				BaseValue = item ?? -1;
-			else if (__int2 == -1)
-				__int2 = item ?? -1;
+			else if (Enchanted == -1)
+				Enchanted = item ?? -1;
 			else if (GrindBonus == -1)
 				GrindBonus = item ?? -1;
 			else
@@ -780,7 +783,7 @@ namespace RuneOptim {
 		{
 			rhs.Type = Type;
 			rhs.BaseValue = BaseValue;
-			rhs.__int2 = __int2;
+			rhs.Enchanted = Enchanted;
 			rhs.GrindBonus = GrindBonus;
 		}
 		#endregion

@@ -84,7 +84,7 @@ namespace RuneService
 
 			try
 			{
-				string monData = File.ReadAllText(path + "/monsterNames.json");
+				string monData = File.ReadAllText(path + "/data/monsterNames.json");
 				SWReference.MonsterNameMap = JsonConvert.DeserializeObject<Dictionary<string, string>>(monData);
 			}
 			catch { };

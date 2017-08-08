@@ -249,11 +249,6 @@ namespace RuneOptim
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					foreach (var r in e.NewItems.Cast<Rune>())
 					{
-						foreach (var s in r.Subs)
-						{
-							if (s.__int2 != 0)
-								throw new Exception("What is this?\r\nPlease give me your savefile :)");
-						}
 						r.PrebuildAttributes();
 					}
 					break;

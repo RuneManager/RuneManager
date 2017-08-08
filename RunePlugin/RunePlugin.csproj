@@ -62,7 +62,7 @@
     <Compile Include="SWResponse.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="monsterNames.json">
+    <None Include="data\monsterNames.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

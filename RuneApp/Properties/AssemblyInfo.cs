@@ -33,4 +33,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // TODO: This annoys Settings
 //[assembly: AssemblyVersion("0.5.*")]
-[assembly: AssemblyInformationalVersion("0.5.0.1")]
+[assembly: AssemblyInformationalVersion("0.5.1.0")]
