@@ -78,11 +78,7 @@ namespace RuneApp {
 			this.lbPrebuild.Text = "Prebuild Template for " + build.mon.FullName;
 
 			defTemplate = addTemplate(new Build() { MonName = "<None>" }, prebuildList.Groups[0]);
-			new System.Threading.Thread(() =>
-			{
-				pullTemplates(TemplateList);
-			}).Start();
-
+			
 			prebuildList.Select();
 			defTemplate.Selected = true;
 		}
@@ -91,6 +87,13 @@ namespace RuneApp {
 		bool MatchMostlyId(int lhs, int rhs)
 		{
 			return lhs == rhs || lhs - 10 == rhs || lhs == rhs - 10;
+		}
+
+		string GetNiceName(string name) {
+			foreach (var c in Path.GetInvalidFileNameChars()) {
+				name = name.Replace(c, '_');
+			}
+			return name;
 		}
 
 		void pullTemplates(IEnumerable<Build> templates, int forceGroup = 0)
@@ -113,10 +116,20 @@ namespace RuneApp {
 							string data = null;
 							if (b.MonName.ToLower().Contains("http"))
 							{
-								using (WebClient client = new WebClient())
-								{
-									data = client.DownloadString(b.MonName);
-									fGroup = 2;
+								Directory.CreateDirectory("cache");
+								fGroup = 2;
+								var fname = "cache/" + GetNiceName(b.MonName);
+								if (File.Exists(fname) && new FileInfo(fname).CreationTime > DateTime.Now.AddDays(-2))
+									File.Delete(fname);
+								
+								if (File.Exists(fname)) {
+										data = File.ReadAllText(fname);
+								}
+								else {
+									using (WebClient client = new WebClient()) {
+										data = client.DownloadString(b.MonName);
+										File.WriteAllText(fname, data);
+									}
 								}
 							}
 							else
@@ -229,6 +242,10 @@ namespace RuneApp {
 			statPreview.Stats.OnStatChanged += CalcStats_OnStatChanged;
 			statScore.Stats.OnStatChanged += CalcStats_OnStatChanged;
 			statScore.Stats.OnStatChanged += ScoreStats_OnStatChanged;
+
+			new System.Threading.Thread(() => {
+				pullTemplates(TemplateList);
+			}).Start();
 
 			Loading = false;
 		}

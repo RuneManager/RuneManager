@@ -1,4 +1,4 @@
-0.5.0.0
+0.5.1.0
 https://github.com/Skibisky/RuneManager/releases/latest
 Build Wizard has the builds for monsters from the top 2000 players on EU.
 Interal Webserver fun. Try localhost:7676 today!
