@@ -108,6 +108,16 @@ namespace RuneApp
 		static void Main()
 		{
 			ReadConfig();
+			try {
+				if (Settings.UpgradeRequired) {
+					Settings.Upgrade();
+					Settings.UpgradeRequired = false;
+					Settings.Save();
+				}
+			}
+			catch (Exception e) {
+				log.Error("Failure upgrading settings.", e);
+			}
 
 			builds.CollectionChanged += Builds_CollectionChanged;
 			loads.CollectionChanged += Loads_CollectionChanged;
@@ -212,6 +222,7 @@ namespace RuneApp
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:

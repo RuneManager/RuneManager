@@ -445,6 +445,19 @@ namespace RuneApp {
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var b in e.OldItems.Cast<Build>()) {
+						var bli = buildList.Items.Cast<ListViewItem>().FirstOrDefault(lvi => b.Equals(lvi.Tag));
+						buildList.Items.Remove(bli);
+
+						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.FullName));
+						if (lv1li != null) {
+							lv1li.ForeColor = Color.Black;
+							if ((lv1li.Tag as Monster)?.inStorage ?? false)
+								lv1li.ForeColor = Color.Gray;
+
+						}
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
@@ -928,16 +941,10 @@ namespace RuneApp {
 			{
 				foreach (ListViewItem li in lis)
 				{
-					buildList.Items.Remove(li);
 					Build b = (Build)li.Tag;
 					if (b != null)
 					{
-						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.FullName));
-						if (lv1li != null)
-						{
-							lv1li.ForeColor = Color.Black;
-							// can't tell is was in storage, name is mangled on load
-						}
+						Program.builds.Remove(b);
 					}
 				}
 			}
