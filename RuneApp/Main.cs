@@ -10,6 +10,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.Net;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace RuneApp {
 	public partial class Main : Form
@@ -186,9 +187,7 @@ namespace RuneApp {
 					return;
 
 				Program.data.shrines[stat] = tag.Value;
-
-				Program.Settings["shrine" + stat] = tag.Value;
-				Program.Settings.Save();
+				File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.data.shrines));
 			}
 		}
 

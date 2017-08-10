@@ -271,29 +271,20 @@ namespace RuneApp
 
 #if !DEBUG
 			try
-			{
 #endif
+			{
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
 
 				if (data.isModified) {
 					Console.WriteLine("Loaded data has been touched, untouching...");
 					data.isModified = false;
 				}
-
-				// TODO: trash
-				for (int i = 0; i < Deco.ShrineStats.Length; i++)
-				{
-					var stat = Deco.ShrineStats[i];
-
-					if (DoesSettingExist("shrine" + stat))
-					{
-						int val = (int)Settings["shrine" + stat];
-						Program.data.shrines[stat] = val;
-						int level = (int)Math.Floor(val / Deco.ShrineLevel[i]);
-					}
+				
+				if (File.Exists("shrine_overwrite.json")) {
+					Program.data.shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
 				}
-#if !DEBUG
 			}
+#if !DEBUG
 			catch (Exception e)
 			{
 				File.WriteAllText("error_save.txt", e.ToString());
