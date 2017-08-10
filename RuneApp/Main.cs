@@ -27,6 +27,7 @@ namespace RuneApp {
 		bool plsDie = false;
 		bool isRunning = false;
 		public static Help help = null;
+		public static Irene irene = null;
 
 		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
 
@@ -41,6 +42,7 @@ namespace RuneApp {
 		List<string> extraTeams = new List<string>();
 
 		public static Main Instance = null;
+
 
 		//public static Configuration config {  get { return Program.config; } }
 		public static log4net.ILog Log { get { return Program.log; } }
@@ -314,6 +316,10 @@ namespace RuneApp {
 
 			if (Program.Settings.StartUpHelp)
 				OpenHelp();
+
+			if (irene == null)
+				irene = new Irene(this);
+			irene.Show(this);
 		}
 
 		private void Program_saveFileTouched(object sender, EventArgs e)
@@ -336,6 +342,8 @@ namespace RuneApp {
 		{
 			ProgressToList(e.build, e.Message);
 		}
+
+
 
 		private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
@@ -1180,15 +1188,18 @@ namespace RuneApp {
 			Program.runeSheet.StatsExcelRunes(false);
 		}
 
-		private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
-		{
-			using (var f = new Options())
-			{
+		public void ShowOptions() {
+			using (var f = new Options()) {
 				f.ShowDialog();
 				findGoodRunes.Enabled = Program.Settings.MakeStats;
 				if (!Program.Settings.MakeStats)
 					findGoodRunes.Checked = false;
 			}
+		}
+
+		private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			ShowOptions();
 		}
 
 		private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e)

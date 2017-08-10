@@ -98,7 +98,6 @@
 			this.HealthLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
 			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -179,12 +178,15 @@
 			this.updateCurrent = new System.Windows.Forms.Label();
 			this.menu_buildlist = new System.Windows.Forms.ContextMenuStrip(this.components);
 			this.teamToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.runeEquipped = new RuneApp.RuneBox();
-			this.runeInventory = new RuneApp.RuneBox();
 			this.findGoodRunes = new System.Windows.Forms.CheckBox();
 			this.fileBox = new System.Windows.Forms.GroupBox();
 			this.btnRefreshSave = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
+			this.toolStripCopyright = new System.Windows.Forms.ToolStripStatusLabel();
+			this.toolStripSpacer = new System.Windows.Forms.ToolStripStatusLabel();
+			this.runeInventory = new RuneApp.RuneBox();
+			this.runeEquipped = new RuneApp.RuneBox();
+			this.runeDial = new RuneApp.RuneDial();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -263,7 +265,9 @@
 			// 
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
-            this.toolStripStatusLabel2});
+            this.toolStripStatusLabel2,
+            this.toolStripCopyright,
+            this.toolStripSpacer});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 708);
 			this.statusStrip1.Name = "statusStrip1";
 			this.statusStrip1.Padding = new System.Windows.Forms.Padding(1, 0, 10, 0);
@@ -892,17 +896,6 @@
 			this.label2.Size = new System.Drawing.Size(35, 13);
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
-			// 
-			// runeDial
-			// 
-			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(8, 201);
-			this.runeDial.Name = "runeDial";
-			this.runeDial.Size = new System.Drawing.Size(225, 188);
-			this.runeDial.TabIndex = 51;
-			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
 			// 
 			// tabControl1
 			// 
@@ -1712,28 +1705,6 @@
 			this.teamToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
 			this.teamToolStripMenuItem.Text = "Team";
 			// 
-			// runeEquipped
-			// 
-			this.runeEquipped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.runeEquipped.Location = new System.Drawing.Point(885, 320);
-			this.runeEquipped.Name = "runeEquipped";
-			this.runeEquipped.Size = new System.Drawing.Size(215, 179);
-			this.runeEquipped.TabIndex = 20;
-			this.runeEquipped.TabStop = false;
-			this.runeEquipped.Visible = false;
-			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
-			// 
-			// runeInventory
-			// 
-			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.runeInventory.Location = new System.Drawing.Point(885, 135);
-			this.runeInventory.Name = "runeInventory";
-			this.runeInventory.Size = new System.Drawing.Size(215, 179);
-			this.runeInventory.TabIndex = 20;
-			this.runeInventory.TabStop = false;
-			this.runeInventory.Visible = false;
-			this.runeInventory.OnClickHide += new System.EventHandler(this.lbCloseInventory_Click);
-			// 
 			// findGoodRunes
 			// 
 			this.findGoodRunes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1778,6 +1749,55 @@
 			this.label1.Size = new System.Drawing.Size(193, 13);
 			this.label1.TabIndex = 0;
 			this.label1.Text = "A change has been made to your save.";
+			// 
+			// toolStripCopyright
+			// 
+			this.toolStripCopyright.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.toolStripCopyright.Name = "toolStripCopyright";
+			this.toolStripCopyright.Size = new System.Drawing.Size(593, 17);
+			this.toolStripCopyright.Spring = true;
+			this.toolStripCopyright.Text = "Images belong to Com2Us";
+			this.toolStripCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// toolStripSpacer
+			// 
+			this.toolStripSpacer.Name = "toolStripSpacer";
+			this.toolStripSpacer.Size = new System.Drawing.Size(593, 17);
+			this.toolStripSpacer.Spring = true;
+			this.toolStripSpacer.Text = "_";
+			// 
+			// runeInventory
+			// 
+			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.runeInventory.Location = new System.Drawing.Point(885, 135);
+			this.runeInventory.Name = "runeInventory";
+			this.runeInventory.Size = new System.Drawing.Size(215, 179);
+			this.runeInventory.TabIndex = 20;
+			this.runeInventory.TabStop = false;
+			this.runeInventory.Visible = false;
+			this.runeInventory.OnClickHide += new System.EventHandler(this.lbCloseInventory_Click);
+			// 
+			// runeEquipped
+			// 
+			this.runeEquipped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.runeEquipped.Location = new System.Drawing.Point(885, 320);
+			this.runeEquipped.Name = "runeEquipped";
+			this.runeEquipped.Size = new System.Drawing.Size(215, 179);
+			this.runeEquipped.TabIndex = 20;
+			this.runeEquipped.TabStop = false;
+			this.runeEquipped.Visible = false;
+			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
+			// 
+			// runeDial
+			// 
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.Size = new System.Drawing.Size(225, 188);
+			this.runeDial.TabIndex = 51;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
 			// 
 			// Main
 			// 
@@ -2007,6 +2027,8 @@
 		private System.Windows.Forms.ColumnHeader columnHeader3;
 		private System.Windows.Forms.ColumnHeader columnHeader4;
 		private System.Windows.Forms.ColumnHeader columnHeader5;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripCopyright;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripSpacer;
 	}
 }
 

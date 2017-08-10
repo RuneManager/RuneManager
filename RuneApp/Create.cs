@@ -586,6 +586,8 @@ namespace RuneApp
 			// warning, now loading
 			loading = true;
 
+			Main.irene.Show();
+
 			Monster mon = build.mon;
 			mon.Current.Leader = build.leader;
 			mon.Current.Shrines = build.shrines;

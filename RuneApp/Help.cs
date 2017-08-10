@@ -5,6 +5,14 @@ namespace RuneApp {
 	public partial class Help : Form
 	{
 		public string url = null;
+		public string Url {
+			get {
+				return webBrowser1.Url.ToString().Replace("file:///" + Environment.CurrentDirectory.Replace("\\", "/") + "/User Manual/", "");
+			}
+			set {
+				webBrowser1.Navigate(Environment.CurrentDirectory + "\\User Manual\\" + value);
+			}
+		}
 
 		public Help()
 		{

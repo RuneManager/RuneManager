@@ -103,6 +103,9 @@
     <Compile Include="BuildWizard.Designer.cs">
       <DependentUpon>BuildWizard.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\RichTextBoxEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Create.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -151,6 +154,12 @@
       <DependentUpon>Themes.resx</DependentUpon>
     </Compile>
     <Compile Include="Controls\ListViewSort.cs" />
+    <Compile Include="Irene.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Irene.Designer.cs">
+      <DependentUpon>Irene.cs</DependentUpon>
+    </Compile>
     <Compile Include="LoadSaveDialogue.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -253,6 +262,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Themes.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Irene.resx">
+      <DependentUpon>Irene.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="LoadSaveDialogue.resx">
       <DependentUpon>LoadSaveDialogue.cs</DependentUpon>
@@ -481,7 +493,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="User Manual\guide\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="Resources\accuracy.png" />
     <Content Include="InternalServer\runes.css" />
@@ -518,15 +532,28 @@
     <None Include="Resources\move_left.png" />
     <None Include="Resources\move_right.png" />
     <None Include="Resources\mon_spot.png" />
+    <None Include="Resources\npc_irene_01.png" />
+    <None Include="Resources\npc_irene_02.png" />
+    <None Include="Resources\npc_irene_03.png" />
+    <None Include="Resources\npc_irene_04.png" />
+    <None Include="Resources\npc_irene_05.png" />
+    <None Include="Resources\npc_irene_06.png" />
+    <None Include="Resources\npc_irene_07.png" />
+    <None Include="Resources\npc_irene_08.png" />
+    <None Include="Resources\npc_irene_09.png" />
     <Content Include="Resources\resume.png" />
     <Content Include="Resources\runedial.png" />
     <None Include="Resources\tolerance.png" />
+    <None Include="Resources\Speech.png" />
     <Content Include="Resources\toMon.png" />
     <Content Include="Resources\unlocked.png" />
     <Content Include="Resources\unlockedYes.png" />
     <Content Include="Resources\upto.png" />
     <Content Include="..\RuneApp.ico" />
     <Content Include="User Manual\build.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="User Manual\help\Irene.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="User Manual\images\add.png">
