@@ -161,7 +161,7 @@ namespace RuneApp.InternalServer {
 				.ThenBy(m => m.loadOrder)) {
 				if (!pairs.ContainsKey(m))
 					pairs.Add(m, new List<Monster>());
-				int i = m.SkillupsTotal - m.SkillupsLevel;
+				int i = m.SkillupsTotal - m.SkillupsLevel - pairs[m].Count;
 				for (; i > 0; i--) {
 					Monster um = null;
 					if (m.level == m.Grade * 5 + 10)
@@ -182,14 +182,21 @@ namespace RuneApp.InternalServer {
 					rem.Add(um);
 					unlocked.Remove(um);
 				}
-				for (; i > 0; i--) {
-					int monbase = (m.monsterTypeId / 100) * 100;
+				bool[] zerop = new bool[5];
+				while (i > 0 && !zerop.All(p => p)) {
 					for (int j = 1; j < 6; j++) {
+						int monbase = (m.monsterTypeId / 100) * 100;
 						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j])) {
 							pieces[monbase + j].Quantity -= getPiecesRequired(pieces[monbase + j]);
 							pairs[m].Add(new Monster() { Element = pieces[monbase + j].Element, Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
+							i--;
 						}
+						else
+							zerop[j-1] = true;
+						if (i <= 0)
+							break;
 					}
+
 				}
 			}
 
