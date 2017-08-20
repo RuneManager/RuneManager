@@ -193,9 +193,9 @@ namespace RuneApp.InternalServer {
 							rr.current = null;
 						}
 					}
-					
 					while (!cmon.storage && cmon.runesDesired.Any(rd => rd.current != cmon))
 					{
+						
 						var r = cmon.runesDesired.FirstOrDefault(rd => rd.current != cmon);
 						// don't need to take out
 						/*if (r.current?.storage ?? false)

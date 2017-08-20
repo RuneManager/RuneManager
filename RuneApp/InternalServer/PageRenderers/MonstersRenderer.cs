@@ -254,12 +254,13 @@ namespace RuneApp.InternalServer {
 				return li;
 			}));
 
-			var food = trashOnes.Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
+			//
+			var food = trashOnes.OrderBy(t => t.Grade).ThenBy(t => t.Element).ThenBy(t => t.monsterTypeId).Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
 			food = makeFood(2, food);
 			food = makeFood(3, food);
 			food = makeFood(4, food);
 
-			list.contentList.AddRange(food.Select(f => recurseFood(f)).ToList());
+			list.contentList.AddRange(food.OrderByDescending(f => f.food.Count).ThenByDescending(f => f.fakeLevel).Select(f => recurseFood(f)).ToList());
 
 			return list;
 		}
