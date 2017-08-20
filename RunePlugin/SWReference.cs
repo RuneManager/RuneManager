@@ -14,6 +14,9 @@ namespace RunePlugin
 		{
 			get
 			{
+				if (monsterNameMap == null && System.IO.File.Exists("data/monsterNames.json")) {
+					monsterNameMap = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, string>>(System.IO.File.ReadAllText("data/monsterNames.json"));
+				}
 				return monsterNameMap;
 			}
 			set
