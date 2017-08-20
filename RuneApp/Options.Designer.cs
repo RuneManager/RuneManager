@@ -51,6 +51,7 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
+			this.cIreneStart = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -69,6 +70,7 @@
 			this.tabPage1.Controls.Add(this.cHelpStart);
 			this.tabPage1.Controls.Add(this.cOtherUpdate);
 			this.tabPage1.Controls.Add(this.label3);
+			this.tabPage1.Controls.Add(this.cIreneStart);
 			this.tabPage1.Controls.Add(this.cBuildWizard);
 			this.tabPage1.Controls.Add(this.cColorTeams);
 			this.tabPage1.Controls.Add(this.cDisplayGray);
@@ -308,6 +310,17 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
+			// cIreneStart
+			// 
+			this.cIreneStart.AutoSize = true;
+			this.cIreneStart.Location = new System.Drawing.Point(246, 111);
+			this.cIreneStart.Name = "cIreneStart";
+			this.cIreneStart.Size = new System.Drawing.Size(118, 17);
+			this.cIreneStart.TabIndex = 1;
+			this.cIreneStart.Text = "Show Irene on start";
+			this.cIreneStart.UseVisualStyleBackColor = true;
+			this.cIreneStart.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// Options
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -352,5 +365,6 @@
 		private System.Windows.Forms.CheckBox cInternalServer;
 		private System.Windows.Forms.CheckBox cBuildWizard;
 		private System.Windows.Forms.CheckBox cWatchSave;
+		private System.Windows.Forms.CheckBox cIreneStart;
 	}
 }

@@ -250,5 +250,17 @@ namespace RuneApp.Properties {
                 this["UpgradeRequired"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowIreneOnStart {
+            get {
+                return ((bool)(this["ShowIreneOnStart"]));
+            }
+            set {
+                this["ShowIreneOnStart"] = value;
+            }
+        }
     }
 }

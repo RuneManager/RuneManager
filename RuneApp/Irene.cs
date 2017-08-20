@@ -99,6 +99,8 @@ namespace RuneApp {
 						break;
 					case "Leave until called":
 						this.Hide();
+						Program.Settings.ShowIreneOnStart = false;
+						Program.Settings.Save();
 						break;
 				}
 			}

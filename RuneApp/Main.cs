@@ -319,7 +319,8 @@ namespace RuneApp {
 
 			if (irene == null)
 				irene = new Irene(this);
-			irene.Show(this);
+			if (Program.Settings.ShowIreneOnStart)
+				irene.Show(this);
 		}
 
 		private void Program_saveFileTouched(object sender, EventArgs e)
@@ -342,8 +343,6 @@ namespace RuneApp {
 		{
 			ProgressToList(e.build, e.Message);
 		}
-
-
 
 		private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
