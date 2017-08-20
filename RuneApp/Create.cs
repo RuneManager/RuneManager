@@ -586,7 +586,8 @@ namespace RuneApp
 			// warning, now loading
 			loading = true;
 
-			Main.irene.Show();
+			if (Program.Settings.ShowIreneOnStart)
+				Main.irene.Show();
 
 			Monster mon = build.mon;
 			mon.Current.Leader = build.leader;
