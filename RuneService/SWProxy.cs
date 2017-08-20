@@ -224,9 +224,11 @@ namespace RuneService
 						decRequest = decryptRequest(bodyString, e.Uri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 						try {
 							req = JsonConvert.DeserializeObject<JObject>(decRequest);
+#if DEBUG
 							if (!Directory.Exists("Json"))
 								Directory.CreateDirectory("Json");
 							File.WriteAllText($"Json\\{req["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", JsonConvert.SerializeObject(req, Formatting.Indented));
+#endif
 							Console.ForegroundColor = ConsoleColor.DarkGray;
 							Console.WriteLine($">{req["command"]}");
 							Console.ForegroundColor = ConsoleColor.Gray;
@@ -270,9 +272,11 @@ namespace RuneService
 
 							try {
 								var resp = JsonConvert.DeserializeObject<JObject>(decResponse);
+#if DEBUG
 								if (!Directory.Exists("Json"))
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{resp["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", JsonConvert.SerializeObject(resp, Formatting.Indented));
+#endif
 								Console.ForegroundColor = ConsoleColor.DarkGray;
 								Console.WriteLine($"<{resp["command"]}");
 								Console.ForegroundColor = ConsoleColor.Gray;
@@ -322,10 +326,10 @@ namespace RuneService
 									}
 									catch (Exception ex)
 									{
-										Console.WriteLine($"Failed triggering plugin {ex.Source} with exception: {ex.GetType().Name}");
-	#if DEBUG
+										Console.WriteLine($"Failed triggering plugin {ex.Source} with {ex.GetType().Name}: {ex.Message}");
+#if DEBUG
 										Console.WriteLine(ex.StackTrace);
-	#endif
+#endif
 									}
 								});
 								thr.Start();
