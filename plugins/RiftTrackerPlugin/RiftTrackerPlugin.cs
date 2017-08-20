@@ -49,13 +49,13 @@ namespace RiftTrackerPlugin
 				foreach (var m in allMons.SelectMany(q => q.Value.Select(r => r.Value.Value)))
 				{
 					var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
-					m.FullName = MonsterName(tid);
+					m.Name = MonsterName(tid);
 
 					foreach (var r in m.Runes)
 					{
 						r.PrebuildAttributes();
 						m.ApplyRune(r);
-						r.AssignedName = m.FullName;
+						r.AssignedName = m.Name;
 						r.Assigned = m;
 					}
 				}
@@ -92,50 +92,50 @@ namespace RiftTrackerPlugin
 			foreach (var m in mons)
 			{
 				var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
-				m.FullName = MonsterName(tid);
+				m.Name = MonsterName(tid);
 				
 				foreach (var r in m.Runes)
 				{
 					r.PrebuildAttributes();
 					m.ApplyRune(r);
-					r.AssignedName = m.FullName;
+					r.AssignedName = m.Name;
 					r.Assigned = m;
 				}
 
 				if (!matchCount.ContainsKey(riftstats.RiftDungeonId))
 					matchCount.Add(riftstats.RiftDungeonId, new Dictionary<string, Dictionary<string, int>>());
-				if (!matchCount[riftstats.RiftDungeonId].ContainsKey(m.FullName))
-					matchCount[riftstats.RiftDungeonId].Add(m.FullName, new Dictionary<string, int>());
+				if (!matchCount[riftstats.RiftDungeonId].ContainsKey(m.Name))
+					matchCount[riftstats.RiftDungeonId].Add(m.Name, new Dictionary<string, int>());
 				foreach (var mm in mons)
 				{
-					if (mm.FullName == "Missingno")
+					if (mm.Name == "Missingno")
 					{
 						tid = long.Parse(mm.monsterTypeId.ToString().Substring(0, mm.monsterTypeId.ToString().Length-2) + "1" + mm.monsterTypeId.ToString().Last());
-						mm.FullName = MonsterName(tid);
+						mm.Name = MonsterName(tid);
 					}
 
-					if (m.FullName == mm.FullName)
+					if (m.Name == mm.Name)
 						continue;
 
-					if (!matchCount[riftstats.RiftDungeonId][m.FullName].ContainsKey(mm.FullName))
-						matchCount[riftstats.RiftDungeonId][m.FullName].Add(mm.FullName, 0);
-					if (!matchCount[riftstats.RiftDungeonId].ContainsKey(mm.FullName))
-						matchCount[riftstats.RiftDungeonId].Add(mm.FullName, new Dictionary<string, int>());
-					if (!matchCount[riftstats.RiftDungeonId][mm.FullName].ContainsKey(m.FullName))
-						matchCount[riftstats.RiftDungeonId][mm.FullName].Add(m.FullName, 0);
+					if (!matchCount[riftstats.RiftDungeonId][m.Name].ContainsKey(mm.Name))
+						matchCount[riftstats.RiftDungeonId][m.Name].Add(mm.Name, 0);
+					if (!matchCount[riftstats.RiftDungeonId].ContainsKey(mm.Name))
+						matchCount[riftstats.RiftDungeonId].Add(mm.Name, new Dictionary<string, int>());
+					if (!matchCount[riftstats.RiftDungeonId][mm.Name].ContainsKey(m.Name))
+						matchCount[riftstats.RiftDungeonId][mm.Name].Add(m.Name, 0);
 
 
-					matchCount[riftstats.RiftDungeonId][m.FullName][mm.FullName]++;
-					matchCount[riftstats.RiftDungeonId][mm.FullName][m.FullName]++;
+					matchCount[riftstats.RiftDungeonId][m.Name][mm.Name]++;
+					//matchCount[riftstats.RiftDungeonId][mm.Name][m.Name]++;
 				}
 
 				//if (!allMons.ContainsKey(riftstats.RiftDungeonId))
 				//	allMons[riftstats.RiftDungeonId] = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
 				//var riftMons = allMons[riftstats.RiftDungeonId];
 
-				if (!allMons.ContainsKey(m.FullName))
-					allMons.Add(m.FullName, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
-				var monList = allMons[m.FullName];
+				if (!allMons.ContainsKey(m.Name))
+					allMons.Add(m.Name, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
+				var monList = allMons[m.Name];
 				monList[riftstats.WizardId] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
 			}
 
@@ -165,8 +165,7 @@ namespace RiftTrackerPlugin
 			excelPack = new ExcelPackage(excelFile);
 			Dictionary<string, int> mcount = new Dictionary<string, int>();
 
-			foreach (var montype in allMons)
-			{
+			foreach (var montype in allMons) {
 				int row = 1;
 				int col = 1;
 					
@@ -290,12 +289,19 @@ namespace RiftTrackerPlugin
 					var range = thissheet.Cells[1, 1, row - 1, headsize - 1];
 					if (tables.FirstOrDefault(t => t.Name == cc.Key.Replace(" ", "_")) == null)
 						tables.Add(range, cc.Key.Replace(" ", "_"));
+					else {
+						var newRange = new ExcelAddress(1, 1, row - 1, headsize - 1).ToString();
+
+						var tableElement = tables.FirstOrDefault(t => t.Name == cc.Key.Replace(" ", "_")).TableXml.DocumentElement;
+						tableElement.Attributes["ref"].Value = newRange;
+						tableElement["autoFilter"].Attributes["ref"].Value = newRange;
+
+					}
 				}
 				catch { }
 				excelPack.Workbook.Worksheets.MoveToStart(cc.Key);
 			}
 
-			
 			foreach (var rd in matchCount)
 			{
 				
@@ -360,9 +366,14 @@ namespace RiftTrackerPlugin
 				}
 				excelPack.Workbook.Worksheets.MoveToStart(rd.Key.ToString());
 			}
-			if (excelPack.Workbook.Worksheets.Count > 0)
-				excelPack.Save();
-			Console.WriteLine("Saved riftstats");
+			try {
+				if (excelPack.Workbook.Worksheets.Count > 0)
+					excelPack.Save();
+				Console.WriteLine("Saved riftstats");
+			}
+			catch (Exception e) {
+				Console.WriteLine("Failed saving riftstats because " + e.GetType() + ": " + e.Message);
+			}
 		}
 	}
 }
