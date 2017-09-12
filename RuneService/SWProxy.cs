@@ -38,8 +38,12 @@ namespace RuneService
 		public SWProxy() { }
 
 		public void Start() {
-			LoadPlugins("plugins");
+			LoadPlugins(AppDomain.CurrentDomain.BaseDirectory + "plugins");
 
+			if (Program.Args.ContainsKey("port")) {
+				listenPort = (int)Program.Args["port"];
+			}
+			
 			server = new TcpServer(listenPort, false) { BindAddress = IPAddress.Any /* Overrides ipv6=false */ };
 			ProxyHandler.Plugins = SWResponse;	// :(
 			server.Start(ProxyHandler.OnConnection);
@@ -78,10 +82,10 @@ namespace RuneService
 		{
 			if (!Directory.Exists(path))
 			{
-				Console.WriteLine("No plugin directory");
+				Console.WriteLine("No plugin directory: " + path);
 				return;
 			}
-
+			Console.WriteLine("Loading plugins from " + path);
 			try
 			{
 				string monData = File.ReadAllText(path + "/data/monsterNames.json");
