@@ -81,6 +81,14 @@ namespace RuneOptim
 			GuildDefenseUnits.CollectionChanged += GuildDefenseUnits_CollectionChanged;
 		}
 
+		public static int getPiecesRequired(int monsterTypeId) {
+			var a = monsterTypeId / 100;
+			var b = Save.MonIdNames[a];
+			var c = MonsterStat.BaseStars(b);
+			var d = InventoryItem.PiecesRequired(c);
+			return d;
+		}
+
 		private void GuildDefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)

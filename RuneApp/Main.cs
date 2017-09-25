@@ -294,7 +294,7 @@ namespace RuneApp {
 						{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
 						{ "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
 						{ "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
-						{ "PvP", new List<string> { "AO", "AD", "GWO", "GWD" } },
+						{ "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA" } },
 
 						{ "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
 						{ "ToA", new List<string> { "ToAN", "ToAH" } }

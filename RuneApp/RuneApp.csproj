@@ -137,6 +137,7 @@
     </Compile>
     <Compile Include="InternalServer\PageRenderers\ApiRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\CssRenderer.cs" />
+    <Compile Include="InternalServer\PageRenderers\GoalsRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\LoadsRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\MonstersRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\RiftRenderer.cs" />

@@ -13,33 +13,41 @@ namespace RuneApp.InternalServer {
 		[PageAddressRender("monsters")]
 		public class MonstersRenderer : PageRenderer
 		{
-			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-			{
-				if (uri.Length == 0)
-				{
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+				if (uri.Length == 0) {
 					return returnHtml(new ServedResult[]{
 						new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
 						new ServedResult("script")
 						{
 							contentDic = { { "type", "\"application/javascript\"" } },
-							contentList = { @"function showhide(id) {
+							contentList = { $@"function showhide(id) {{
 	var ee = document.getElementById(id);
 	if (ee.style.display == 'none')
 		ee.style.display = 'block';
 	else
 		ee.style.display = 'none';
-}" }
+}}
+function popBox(id) {{
+	var frame = document.getElementById(""frame"");
+	var ele = document.getElementById(id);
+	frame.src = ""/monsters/"" + id;
+	frame.style.position = ""absolute"";
+	frame.style.left = ""500px"";
+	frame.style.display = 'block';
+	frame.style.top = (ele.getBoundingClientRect().top + window.scrollY) + ""px"";
+}}
+function closeBox() {{
+	window.location.refresh();
+}}
+" }
 						}
-					}, renderMagicList());
+					}, renderMagicList(), new ServedResult("iframe") { contentDic = { { "id", "frame" }, { "style", "'display: none;'" } } });
 				}
 
-				if (uri.Length > 0 && uri[0].Contains(".png"))
-				{
+				if (uri.Length > 0 && uri[0].Contains(".png")) {
 					var res = uri[0].Replace(".png", "").ToLower();
-					try
-					{
-						using (var stream = new MemoryStream())
-						{
+					try {
+						using (var stream = new MemoryStream()) {
 							var img = Program.GetMonPortrait(int.Parse(res));
 							img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
 							//return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
@@ -47,22 +55,39 @@ namespace RuneApp.InternalServer {
 							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png"), Headers = { { "Cache-Control", "public, max-age=31536000" } } };
 						}
 					}
-					catch (Exception e)
-					{
+					catch (Exception e) {
 						Program.log.Error(e.GetType() + " " + e.Message);
 					}
 				}
 
 				ulong mid = 0;
-				if (ulong.TryParse(uri[0], out mid))
-				{
+				if (ulong.TryParse(uri[0], out mid)) {
 					if (Program.data == null)
 						return returnHtml(null, "missingdata");
 					// got Monster Id
 					var m = Program.data.GetMonster(mid);
 					if (m == null)
 						return returnHtml(null, "missingno");
-					return returnHtml(null, (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
+					return returnHtml(new ServedResult[] {
+						new ServedResult("script") {
+							contentDic = { { "type", "\"application/javascript\"" } },
+							contentList = { $@"function performAction(action, params) {{
+var http = new XMLHttpRequest();
+var url = ""/api/monsters/{mid}?action="" + action;
+http.open(""POST"", url, true);
+
+//Send the proper header information along with the request
+http.setRequestHeader(""Content-type"", ""application/json"");
+http.setRequestHeader(""Accept"", ""application/json"");
+
+http.onreadystatechange = function() {{//Call a function when the state changes.
+	if (http.readyState == 4 && http.status == 200) {{
+		window.location.reload();
+	}}
+}}
+http.send(params);
+				}}" } }
+					}, renderMonster(m));
 				}
 				else
 				{
@@ -77,17 +102,29 @@ namespace RuneApp.InternalServer {
 			}
 		}
 
-		static int getPiecesRequired(InventoryItem p)
-		{
-			var a = p.Id / 100;
-			var b = Save.MonIdNames[a];
-			var c = MonsterStat.BaseStars(b);
-			var d = InventoryItem.PiecesRequired(c);
-			return d;
-		}
+		#region Monster Management
+		static ServedResult renderMonster(Monster mon) {
+			var div = new ServedResult("div") {
+				contentList = {
+					renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{mon.monsterTypeId}.png\"" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
+					new ServedResult("br"),
+					new ServedResult("span") { contentList = { mon.Id.ToString() } },
+					new ServedResult("br"),
+				}
+			};
+			if (Program.goals.ReservedIds.Contains(mon.Id))
+				div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('unreserve');" } }, contentList = { "Unreserve" } });
+			else
+				div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('reserve');" } }, contentList = { "Reserve" } });
 
-		static ServedResult renderMagicList()
-		{
+
+			return div;
+			//return (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } };
+		}
+		#endregion
+
+		#region Monster List
+		static ServedResult renderMagicList() {
 			// return all completed loads on top, in progress build, unrun builds, mons with no builds
 			ServedResult list = new ServedResult("ul");
 			list.contentList = new List<ServedResult>();
@@ -96,45 +133,42 @@ namespace RuneApp.InternalServer {
 
 			var pieces = Program.data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces)
 				.Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => p.Id);
-			foreach (var p in pieces)
-			{
-				pieces[p.Key].Quantity -= getPiecesRequired(p.Value);
+			foreach (var p in pieces) {
+				pieces[p.Key].Quantity -= Save.getPiecesRequired(p.Value.Id);
 			}
-			pieces = pieces.Where(p => p.Value.Quantity > getPiecesRequired(p.Value)).ToDictionary(p => p.Key, p => p.Value);
+			pieces = pieces.Where(p => p.Value.Quantity > Save.getPiecesRequired(p.Value.Id)).ToDictionary(p => p.Key, p => p.Value);
 
 			var ll = Program.loads;
 			var ldic = ll.ToDictionary(l => l.BuildID);
 
 			var bq = Program.builds.Where(b => !ldic.ContainsKey(b.ID));
 			var bb = new List<Build>();
-			foreach (var b in bq)
-			{
+			foreach (var b in bq) {
 				if (!bb.Any(u => u.MonId == b.MonId))
 					bb.Add(b);
 			}
 
 			var bdic = bb.ToDictionary(b => b.MonId);
 
-			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id));
+			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null);
+			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
-			var locked = Program.data.Monsters.Where(m => m.Locked).ToList();
-			var unlocked = Program.data.Monsters.Except(locked).ToList();
+			var locked = Program.data.Monsters.Where(m => m.Locked).Except(reserved).ToList();
+			var unlocked = Program.data.Monsters.Except(locked).Except(reserved).ToList();
 
 			var trashOnes = unlocked.Where(m => m.Grade == 1 && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon")).ToList();
 			unlocked = unlocked.Except(trashOnes).ToList();
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
 			var rem = new List<Monster>();
-			foreach (var m in locked.OrderByDescending(m => 1/(bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+			foreach (var m in locked.OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
-				.ThenBy(m => m.loadOrder))
-			{
+				.ThenBy(m => m.loadOrder)) {
 				pairs.Add(m, new List<Monster>());
 				int i = Math.Min(m.Grade, m.SkillupsTotal - m.SkillupsLevel);
-				for (; i > 0; i--)
-				{
+				for (; i > 0; i--) {
 					Monster um = null;
 					if (m.level == m.Grade * 5 + 10)
 						um = unlocked
@@ -186,13 +220,13 @@ namespace RuneApp.InternalServer {
 				while (i > 0 && !zerop.All(p => p)) {
 					for (int j = 1; j < 6; j++) {
 						int monbase = (m.monsterTypeId / 100) * 100;
-						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= getPiecesRequired(pieces[monbase + j])) {
-							pieces[monbase + j].Quantity -= getPiecesRequired(pieces[monbase + j]);
+						if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= Save.getPiecesRequired(pieces[monbase + j].Id)) {
+							pieces[monbase + j].Quantity -= Save.getPiecesRequired(pieces[monbase + j].Id);
 							pairs[m].Add(new Monster() { Element = pieces[monbase + j].Element, Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
 							i--;
 						}
 						else
-							zerop[j-1] = true;
+							zerop[j - 1] = true;
 						if (i <= 0)
 							break;
 					}
@@ -204,7 +238,7 @@ namespace RuneApp.InternalServer {
 			mm = mm.Except(Program.builds.Select(b => b.mon));
 			mm = mm.Except(pairs.SelectMany(p => p.Value));
 			mm = mm.Except(rem);
-			
+
 			trashOnes = trashOnes.Concat(mm.Where(m => !pairs.ContainsKey(m) && !m.Locked && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon"))).ToList();
 			mm = mm.Except(trashOnes);
 
@@ -219,8 +253,7 @@ namespace RuneApp.InternalServer {
 
 			list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
 
-			list.contentList.AddRange(bb.Select(b =>
-			{
+			list.contentList.AddRange(bb.Select(b => {
 				var m = b.mon;
 				var nl = new ServedResult("ul");
 				var li = new ServedResult("li")
@@ -228,15 +261,14 @@ namespace RuneApp.InternalServer {
 					contentList = {
 						new ServedResult("span") { contentList = { renderMonLink(m, "build") } }, nl }
 				};
-				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
 			}
 			));
 
-			list.contentList.AddRange(mm.Select(m =>
-			{
+			list.contentList.AddRange(mm.Select(m => {
 				var nl = new ServedResult("ul");
 				var stars = new StringBuilder();
 				for (int s = 0; s < m.Grade; s++)
@@ -244,13 +276,33 @@ namespace RuneApp.InternalServer {
 				var li = new ServedResult("li")
 				{
 					contentList = { ((unlocked.Contains(m)) ?
-					("TRASH: " + m.FullName + " " + m.Grade + "* " + m.level ) :
+					renderMonLink(m, "TRASH: ", LinkRenderOptions.Grade | LinkRenderOptions.Level) :
 					renderMonLink(m, "mon")), nl }
 				};
 				if (!unlocked.Contains(m) && pairs.ContainsKey(m))
-					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
+				return li;
+			}));
+			list.contentList.AddRange(reserved.GroupBy(mg => mg.monsterTypeId).Select(mg => {
+				var li = new ServedResult("li");
+				li.contentList.Add(new ServedResult(mg.Count() > 1 ? "a" : "span") {
+					contentDic = { { "href", "\"javascript:showhide('g" + mg.First().Id + "')\"" } },
+					contentList = { "Reserved:" }
+				});
+				li.contentList.Add(renderMonLink(mg.First(), mg.Count() + "x ", LinkRenderOptions.All));
+				if (mg.Count() > 1) {
+					li.contentList.Add(new ServedResult("ul") {
+						contentDic = {
+							{ "id", "g" + mg.First().Id.ToString() },
+							{ "style" , "'display: none;'"}
+						},
+						contentList = mg.Skip(1).Select(m => {
+							return new ServedResult("li") { contentList = { renderMonLink(m) } };
+						}).ToList()
+					});
+				}
 				return li;
 			}));
 
@@ -268,8 +320,8 @@ namespace RuneApp.InternalServer {
 		static ServedResult recurseFood(Food f)
 		{
 			ServedResult sr = new ServedResult("li");
-			
-			sr.contentList.Add(f.mon.FullName + " " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
+			sr.contentList.Add(renderMonLink(f.mon, null, LinkRenderOptions.None));
+			sr.contentList.Add(" " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
 			if (f.food.Any())
 			{
 				var rr = new ServedResult("ul");
@@ -327,18 +379,47 @@ namespace RuneApp.InternalServer {
 			public int fakeLevel;
 		}
 
-		public static ServedResult renderMonLink(Monster m, string prefix = null, bool renderPortrait = true)
+		[Flags]
+		public enum LinkRenderOptions {
+			None = 0,
+			Portrait = 1,
+			Grade = 2,
+			Level = 4,
+			Skillups = 8,
+			Locked = 16,
+			All = Portrait | Grade | Level | Locked | Skillups
+		}
+		public static ServedResult renderMonLink(Monster m, ServedResult prefix = null, LinkRenderOptions renderOptions = LinkRenderOptions.All, bool linkify = true)
 		{
 			var res = new ServedResult("span");
 			if (prefix != null)
 				res.contentList.Add(prefix);
-			if (renderPortrait)
+			if ((renderOptions & LinkRenderOptions.Portrait) == LinkRenderOptions.Portrait)
 				res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
-			res.contentList.Add(
-				new ServedResult("a") {
-				contentDic = { { "href", "\"monsters/" + m.Id + "\"" } },
-				contentList = { m.FullName + " " + +m.Grade + "* " + m.level} });
-			res.contentList.Add((m.Locked ? " <span class=\"locked\">L</span>" : "") + " " + m.SkillupsLevel + "/" + m.SkillupsTotal);
+			var str = m.FullName;
+			var suff = "";
+			if (m.Name.Contains("Pieces")) {
+				res.contentList.Add(new ServedResult("span") {
+					contentList = { str }
+				});
+			}
+			else {
+				if ((renderOptions & LinkRenderOptions.Grade) == LinkRenderOptions.Grade)
+					str += " " + m.Grade + "*";
+				if ((renderOptions & LinkRenderOptions.Level) == LinkRenderOptions.Level)
+					str += " " + m.level;
+				res.contentList.Add(new ServedResult(linkify ? "a" : "span") {
+					//contentDic = { { "href", "\"monsters/" + m.Id + "\"" } },
+					contentDic = { { "href", "'javascript:popBox(" + m.Id + ")'" }, { "id", m.Id.ToString() } },
+					contentList = { str }
+				});
+				if ((renderOptions & LinkRenderOptions.Locked) == LinkRenderOptions.Locked)
+					suff += (m.Locked ? " <span class=\"locked\">L</span>" : "");
+				if ((renderOptions & LinkRenderOptions.Skillups) == LinkRenderOptions.Skillups)
+					suff += " " + m.SkillupsLevel + "/" + m.SkillupsTotal;
+			}
+
+			res.contentList.Add(suff);
 			return res;
 		}
 
@@ -378,7 +459,7 @@ namespace RuneApp.InternalServer {
 
 			// list skillups
 			var nl = new ServedResult("ul");
-			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { "- " + mo.FullName + " " + mo.Grade + "* " + mo.level } }));
+			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
 			if (nl.contentList.Count == 0)
 				nl.name = "br";
 
@@ -388,6 +469,6 @@ namespace RuneApp.InternalServer {
 
 			return li;
 		}
-
+		#endregion
 	}
 }

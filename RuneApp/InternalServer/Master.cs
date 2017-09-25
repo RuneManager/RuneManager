@@ -260,6 +260,7 @@ namespace RuneApp.InternalServer {
 					new ServedResult("a") { contentDic = { { "href", "monsters" } }, contentList = { "Monster list" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "builds" } }, contentList = { "Build list" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "loads" } }, contentList = { "Load list" } }, "<br/>",
+					new ServedResult("a") { contentDic = { { "href", "goals" } }, contentList = { "Goal tracking" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "rift" } }, contentList = { "Rift Best Clear" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "css" } }, contentList = { "Choose a theme!" } }, "<br/>",
 					"<br/>");
@@ -273,7 +274,7 @@ namespace RuneApp.InternalServer {
 		protected static HttpResponseMessage return404()
 		{
 			// TODO:
-			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("404 lol") };
+			return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("404 lol") };
 		}
 
 		protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body)

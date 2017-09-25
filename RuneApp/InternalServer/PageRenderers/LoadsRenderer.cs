@@ -521,7 +521,7 @@ function hackLots(prop, num, on) {
 				{
 					var ret = new ServedResult("li");
 
-					ret.contentList.Add(Master.renderMonLink(mon, action.ToString(), false));
+					ret.contentList.Add(Master.renderMonLink(mon, action.ToString(), LinkRenderOptions.All ^ LinkRenderOptions.Portrait));
 					ret.contentList.Add(" " + string.Format(message, amount, maximum) + "<br/>");
 
 					manyMons.Sort();

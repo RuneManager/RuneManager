@@ -49,6 +49,8 @@ namespace RuneApp
 
 		public static event EventHandler<bool> OnRuneUpdate;
 
+		public static Goals goals;
+
 		public static Properties.Settings Settings
 		{
 			get
@@ -142,6 +144,9 @@ namespace RuneApp
 				watchSave();
 
 			RuneLog.logTo = new progLogger();
+
+			// TODO: find a better place to put this
+			LoadGoals();
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
@@ -238,12 +243,12 @@ namespace RuneApp
 		/// </summary>
 		public static LoadSaveResult FindSave()
 		{
-			string[] files;
+			string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
 			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
 			{
 				return LoadSave(Program.Settings.SaveLocation);
 			}
-			else if ((files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json")).Any())
+			else if (files.Any())
 			{
 				if (files.Count() > 1)
 					return LoadSaveResult.FileNotFound;
@@ -293,7 +298,7 @@ namespace RuneApp
 				throw new Exception("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 			}
 #endif
-			return LoadSaveResult.Success;//text.Length;
+			return LoadSaveResult.Success;
 		}
 
 		private static void watchSave()
@@ -369,7 +374,7 @@ namespace RuneApp
 			catch (Exception e)
 			{
 				File.WriteAllText("error_build.txt", e.ToString());
-				throw new Exception("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
+				throw new InvalidOperationException("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
 			}
 #endif
 
@@ -555,6 +560,41 @@ namespace RuneApp
 				}
 			}
 			loads.Clear();
+		}
+
+		public static LoadSaveResult SaveGoals(string filename = "goals.json") {
+			log.Info($"Saving loads to {filename}");
+
+			try {
+				// keep a single recent backup
+				var str = JsonConvert.SerializeObject(goals, Formatting.Indented);
+				File.WriteAllText(filename, str);
+				return LoadSaveResult.Success;
+			}
+			catch (Exception e) {
+				log.Error($"Error while saving loads {e.GetType()}", e);
+				throw;
+			}
+			return LoadSaveResult.Failure;
+		}
+
+		public static LoadSaveResult LoadGoals(string filename = "goals.json") {
+			try {
+				if (File.Exists(filename)) {
+					string text = File.ReadAllText(filename);
+					goals = JsonConvert.DeserializeObject<Goals>(text);
+				}
+				else {
+					goals = new Goals();
+				}
+				return LoadSaveResult.Success;
+			}
+			catch (Exception e) {
+				log.Error($"Error while loading goals {e.GetType()}", e);
+				File.WriteAllText("error_goals.txt", e.ToString());
+				throw;
+			}
+			return LoadSaveResult.Failure;
 		}
 
 		public static void BuildPriority(Build build, int deltaPriority)

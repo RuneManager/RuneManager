@@ -881,7 +881,7 @@
 			this.Icon = global::RuneApp.App.Icon;
 			this.Margin = new System.Windows.Forms.Padding(2);
 			this.Name = "Create";
-			this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Create";
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Create_FormClosing);
 			this.Shown += new System.EventHandler(this.Create_Shown);
