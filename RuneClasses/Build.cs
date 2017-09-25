@@ -1750,8 +1750,15 @@ namespace RuneOptim {
 
 						runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
 						double? n;
-						if (LoadFilters(i + 1, out n) == FilterType.SumN)
-							runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
+						if (LoadFilters(i + 1, out n) == FilterType.SumN) {
+							var nInc = Math.Max(runes[i].GroupBy(r => r.Set).Count(rs => !RequiredSets.Contains(rs.Key)),
+								runes[i].GroupBy(r => r.Set).Count(rs => RequiredSets.Contains(rs.Key)));
+							runes[i] = runes[i].Where(r => !RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(1, (int)(n ?? 30) / nInc)))
+								.Concat(runes[i].Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, 2 * (int)(n ?? 30) / nInc)))).Distinct().ToArray();
+
+							//runes[i] = runes[i].GroupBy(r => r.Set).SelectMany(rg => rg.Take((int)(n ?? 30))).ToArray();
+							//runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
+						}
 
 						if (BuildSaveStats)
 						{
