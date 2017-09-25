@@ -228,11 +228,13 @@ namespace RuneService
 						decRequest = decryptRequest(bodyString, e.Uri.AbsolutePath.Contains("_c2.php") ? 2 : 1);
 						try {
 							req = JsonConvert.DeserializeObject<JObject>(decRequest);
-#if DEBUG
 							if (!Directory.Exists("Json"))
 								Directory.CreateDirectory("Json");
-							File.WriteAllText($"Json\\{req["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.req.json", JsonConvert.SerializeObject(req, Formatting.Indented));
+							File.WriteAllText($"Json\\{req["command"]}" + 
+#if DEBUG
+							"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
 #endif
+							".req.json", JsonConvert.SerializeObject(req, Formatting.Indented));
 							Console.ForegroundColor = ConsoleColor.DarkGray;
 							Console.WriteLine($">{req["command"]}");
 							Console.ForegroundColor = ConsoleColor.Gray;
@@ -276,11 +278,13 @@ namespace RuneService
 
 							try {
 								var resp = JsonConvert.DeserializeObject<JObject>(decResponse);
-#if DEBUG
 								if (!Directory.Exists("Json"))
 									Directory.CreateDirectory("Json");
-								File.WriteAllText($"Json\\{resp["command"]}_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.resp.json", JsonConvert.SerializeObject(resp, Formatting.Indented));
+								File.WriteAllText($"Json\\{resp["command"]}" + 
+#if DEBUG
+								"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
 #endif
+								".resp.json", JsonConvert.SerializeObject(resp, Formatting.Indented));
 								Console.ForegroundColor = ConsoleColor.DarkGray;
 								Console.WriteLine($"<{resp["command"]}");
 								Console.ForegroundColor = ConsoleColor.Gray;

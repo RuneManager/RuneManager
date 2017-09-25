@@ -1,4 +1,6 @@
 using System.IO;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -173,16 +175,49 @@ function log() {
 					if (uri.Length > 0) {
 						ulong.TryParse(uri[0], out id);
 					}
-					using (var str = new StreamReader(req.InputStream)) {
-						var raw = str.ReadToEnd();
-						mon = JsonConvert.DeserializeObject<Monster>(raw);
+					if (req.QueryString.Count == 0) {
+						using (var str = new StreamReader(req.InputStream)) {
+							var raw = str.ReadToEnd();
+							mon = JsonConvert.DeserializeObject<Monster>(raw);
+						}
+						if (id == 0)
+							id = mon.Id;
+
+						if (uri.Length == 0) {
+							Program.AddMonster(mon);
+							return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
+						}
+						else {
+							Program.UpdateMonster(mon);
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "updated", id.ToString() } } }.ToJson()) };
+						}
 					}
-					if (id == 0)
-						id = mon.Id;
-
-
-					Program.UpdateMonster(mon);
-
+					else if (req.QueryString.GetValues("action").Length > 0) {
+						mon = Program.data.GetMonster(id);
+						if (mon == null) {
+							return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "nonexistant", id.ToString() } } }.ToJson()) };
+						}
+						switch (req.QueryString.GetValues("action").First()) {
+							case "reserve":
+								if (!Program.goals.ReservedIds.Contains(id)) {
+									Program.goals.ReservedIds.Add(id);
+									Program.SaveGoals();
+								}
+								break;
+							case "unreserve":
+								Program.goals.ReservedIds.Remove(id);
+								Program.SaveGoals();
+								break;
+							case "lock":
+								mon.Locked = true;
+								Program.data.isModified = true;
+								break;
+							case "unlock":
+								mon.Locked = false;
+								Program.data.isModified = true;
+								break;
+						}
+					}
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "POST", id.ToString() } } }.ToJson()) };
 				}
 
@@ -206,6 +241,23 @@ function log() {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("PUT") { contentDic = { { "PUT", id.ToString() } } }.ToJson()) };
 				}
 
+				[HttpMethod("DELETE")]
+				public HttpResponseMessage DeleteMethod(HttpListenerRequest req, string[] uri) {
+					Monster mon = null;
+					ulong id = 0;
+					if (uri.Length > 0) {
+						ulong.TryParse(uri[0], out id);
+					}
+
+					mon = Program.data.GetMonster(id);
+					if (mon != null) {
+						Program.data.Monsters.Remove(mon);
+						Program.data.isModified = true;
+						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
+					}
+					return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
+				}
+
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
 				{
 					switch (req.HttpMethod)
@@ -215,6 +267,9 @@ function log() {
 
 						case "POST":
 							return PostMethod(req, uri);
+
+						case "DELETE":
+							return DeleteMethod(req, uri);
 
 						case "GET":
 							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{GET}") };
@@ -227,15 +282,54 @@ function log() {
 			public class RunesRenderer : PageRenderer
 			{
 				[HttpMethod("POST")]
-				public HttpResponseMessage PostMethod(HttpListenerRequest req)
+				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+					Rune rune = null;
+					ulong id = 0;
+					if (uri.Length > 0) {
+						ulong.TryParse(uri[0], out id);
+					}
+					if (req.QueryString.Count == 0) {
+						using (var str = new StreamReader(req.InputStream)) {
+							var raw = str.ReadToEnd();
+							rune = JsonConvert.DeserializeObject<Rune>(raw);
+						}
+						if (id == 0)
+							id = rune.Id;
+
+						if (uri.Length == 0) {
+							Program.AddRune(rune);
+							return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
+						}
+						else {
+							Program.UpdateRune(rune);
+							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "updated", id.ToString() } } }.ToJson()) };
+						}
+					}
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "POST", id.ToString() } } }.ToJson()) };
 				}
 
 				[HttpMethod("PUT")]
-				public HttpResponseMessage PutMethod(HttpListenerRequest req)
+				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri)
 				{
-					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{POST}") };
+					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{PUT}") };
+				}
+
+				[HttpMethod("DELETE")]
+				public HttpResponseMessage DeleteMethod(HttpListenerRequest req, string[] uri) {
+					Rune rune = null;
+					ulong id = 0;
+					if (uri.Length > 0) {
+						ulong.TryParse(uri[0], out id);
+					}
+
+					rune = Program.data.GetRune(id);
+					if (rune != null) {
+						Program.data.Runes.Remove(rune);
+						Program.data.isModified = true;
+						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
+					}
+					return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
 				}
 
 				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
@@ -243,10 +337,11 @@ function log() {
 					switch (req.HttpMethod)
 					{
 						case "PUT":
-							return PutMethod(req);
-
+							return PutMethod(req, uri);
 						case "POST":
-							return PostMethod(req);
+							return PostMethod(req, uri);
+						case "DELETE":
+							return DeleteMethod(req, uri);
 						case "GET":
 							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{GET}") };
 					}

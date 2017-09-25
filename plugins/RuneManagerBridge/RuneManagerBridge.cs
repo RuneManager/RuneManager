@@ -8,79 +8,154 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using RunePlugin;
 using RunePlugin.Response;
+using RunePlugin.Request;
 
 namespace RuneManagerBridge
 {
 	public class RuneManagerBridge : SWPlugin
 	{
-		public override void ProcessRequest(object sender, SWEventArgs args)
-		{
-			// TODO: onload check if RM is running and ask for defs
-			if (args.Request.Command == SWCommand.EquipRune)
-			{
-				var eqr = args.ResponseAs<EquipRuneResponse>();
-				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + eqr.Monster.Id);
-				api.Accept = "application/json";
-				api.Method = "POST";
-				using (var str = new StreamWriter(api.GetRequestStream())) {
-					str.Write(JsonConvert.SerializeObject(eqr.Monster));
-				}
-				var aresp = api.GetResponse();
-				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
-				Console.WriteLine(astr);
+		RuneManagerApi api;
+		bool isConnected;
+
+		public override void OnLoad() {
+			Dictionary<string, string> settings = new Dictionary<string, string>() { { "baseUri", "http://localhost:7676" } };
+			if (File.Exists(PluginDataDirectory + "\\settings.json")) {
+				settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(PluginDataDirectory + "\\settings.json"));
 			}
-			else if (args.Request.Command == SWCommand.UnequipRune)
-			{
-				var uqr = args.ResponseAs<UnequipRuneResponse>();
-				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + uqr.Monster.Id);
-				api.Accept = "application/json";
-				api.Method = "POST";
-				using (var str = new StreamWriter(api.GetRequestStream())) {
-					str.Write(JsonConvert.SerializeObject(uqr.Monster));
-				}
-				var aresp = api.GetResponse();
-				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
-				Console.WriteLine(astr);
+			else
+				File.WriteAllText(PluginDataDirectory + "\\settings.json", JsonConvert.SerializeObject(settings));
+
+			Console.WriteLine("RuneManager bridge connecting to " + settings["baseUri"]);
+			api = new RuneManagerApi(settings["baseUri"]);
+			isConnected = true;
+			try {
+				api.TestConnection();
 			}
-			else if (args.Request.Command == SWCommand.EquipRuneList) {
-				var eqlr = args.ResponseAs<EquipRuneListResponse>();
-				var api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + eqlr.TargetMonster.Id);
-				api.Accept = "application/json";
-				api.Method = "POST";
-				using (var str = new StreamWriter(api.GetRequestStream())) {
-					str.Write(JsonConvert.SerializeObject(eqlr.TargetMonster));
-				}
-				var aresp = api.GetResponse();
-				var astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
-				Console.WriteLine(astr);
-				foreach (var m in eqlr.SourceMonsters) {
-					api = HttpWebRequest.CreateHttp("http://localhost:7676/api/monsters/" + m.Key);
-					api.Accept = "application/json";
-					api.Method = "POST";
-					using (var str = new StreamWriter(api.GetRequestStream())) {
-						str.Write(JsonConvert.SerializeObject(m.Value));
-					}
-					aresp = api.GetResponse();
-					astr = new StreamReader(aresp.GetResponseStream()).ReadToEnd();
-					Console.WriteLine(astr);
-				}
+			catch (Exception e) {
+				Console.WriteLine("RuneManager bridge failed with " + e.GetType() + ": " + e.Message);
 			}
 		}
-	}
 
-	// TODO: Swagger or swhat?
-	public class Api
-	{
-		[JsonProperty("version")]
-		public string Version;
-		[JsonProperty("paths")]
-		public Dictionary<string, ApiPath> Paths;
-		[JsonProperty("host")]
-		public string Host;
+		public override void ProcessRequest(object sender, SWEventArgs args)
+		{
+			if (!isConnected)
+				return;
 
-	}
+			try {
+				// TODO: onload check if RM is running and ask for defs
+				switch (args.Request.Command) {
 
-	public class ApiPath {
+					#region Monster Loadouting
+					case SWCommand.EquipRune:
+						Console.WriteLine(api.MonsterPost(args.ResponseAs<EquipRuneResponse>().Monster));
+						break;
+					case SWCommand.EquipRuneList:
+						Console.WriteLine(api.MonsterPost(args.ResponseAs<EquipRuneListResponse>().TargetMonster));
+						foreach (var m in args.ResponseAs<EquipRuneListResponse>().SourceMonsters)
+							Console.WriteLine(api.MonsterPost(m.Value));
+						break;
+					case SWCommand.UnequipRune:
+						Console.WriteLine(api.MonsterPost(args.ResponseAs<UnequipRuneResponse>().Monster));
+						break;
+					case SWCommand.LockUnit:
+						Console.WriteLine(api.MonsterAction(args.ResponseAs<LockUnitResponse>().UnitId, "lock"));
+						break;
+					case SWCommand.UnlockUnit:
+						Console.WriteLine(api.MonsterAction(args.ResponseAs<UnlockUnitResponse>().UnitId, "unlock"));
+						break;
+					#endregion
 
+					#region Monster Summon/XP
+					case SWCommand.BattleDungeonResult: {
+							var resp = args.ResponseAs<BattleDungeonResultResponse>();
+
+							var rune = resp.Reward?.Crate?.Rune;
+							if (rune != null) {
+								Console.WriteLine(api.RunePost(rune));
+							}
+							var mon = resp.Reward?.Crate?.Monster;
+							if (mon != null) {
+								Console.WriteLine(api.MonsterPost(mon));
+							}
+							/*var craft = resp.Reward?.Crate?.Craft;
+							if (craft != null) {
+								Console.WriteLine(api.CraftPost(craft));
+							}*/
+
+							foreach (var m in resp.Monsters)
+								Console.WriteLine(api.MonsterPost(m));
+						}
+						break;
+					case SWCommand.BattleScenarioResult: {
+							var resp = args.ResponseAs<BattleScenarioResultResponse>();
+
+							var rune = resp.Reward?.Crate?.Rune;
+							if (rune != null) {
+								Console.WriteLine(api.RunePost(rune));
+							}
+							var mon = resp.Reward?.Crate?.Monster;
+							if (mon != null) {
+								Console.WriteLine(api.MonsterPost(mon));
+							}
+							/*var craft = resp.Reward?.Crate?.Craft;
+							if (craft != null) {
+								Console.WriteLine(api.CraftPost(craft));
+							}*/
+
+							foreach (var m in resp.Monsters)
+								Console.WriteLine(api.MonsterPost(m));
+						}
+						break;
+					case SWCommand.SummonUnit:
+						foreach (var m in args.ResponseAs<SummonUnitResponse>().Monsters)
+							Console.WriteLine(api.MonsterPost(m));
+						break;
+					case SWCommand.SacrificeUnit:
+						Console.WriteLine(api.MonsterPost(args.ResponseAs<SacrificeUnitResponse>().Target));
+						foreach (var m in args.RequestAs<SacrificeUnitRequest>().Sources)
+							Console.WriteLine(api.MonsterDelete(m.Id));
+						break;
+					case SWCommand.UpdateUnitExpGained:
+						foreach (var m in args.ResponseAs<UpdateUnitExpGainedResponse>().UpdatedMonsters)
+							Console.WriteLine(api.MonsterPost(m));
+						break;
+					case SWCommand.UpgradeUnit:
+						Console.WriteLine(api.MonsterPost(args.ResponseAs<UpgradeUnitResponse>().Target));
+						foreach (var m in args.RequestAs<UpgradeUnitRequest>().Sources)
+							Console.WriteLine(api.MonsterDelete(m.Id));
+						break;
+					#endregion
+
+					case SWCommand.UpgradeRune: {
+							var req = args.RequestAs<UpgradeRuneRequest>();
+							var resp = args.ResponseAs<UpgradeRuneResponse>();
+							if (req.CurrentLevel != resp.Rune.Level) {
+								Console.WriteLine(api.RunePost(resp.Rune));
+							}
+						}
+						break;
+					/*case SWCommand.SellRuneCraftItem:
+						foreach (var r in args.ResponseAs<SellRuneCraftItemResponse>().SoldCrafts)
+							Console.WriteLine(api.CraftDelete(r.ItemId));
+						break;*/
+					case SWCommand.SellRune:
+						foreach (var r in args.ResponseAs<SellRuneResponse>().SoldRunes)
+							Console.WriteLine(api.RuneDelete(r.Id));
+						break;
+				}
+			}
+			catch (WebException we) when (we.Status == WebExceptionStatus.ConnectFailure) {
+				Console.WriteLine("RuneManager bridge connection failure.");
+			}
+			catch (WebException we) {
+
+				Console.WriteLine("RuneManager bridge WebException " + we.Message + Environment.NewLine + we.Status);
+				Console.WriteLine(we.TargetSite + ": " + we.Source + Environment.NewLine + we.StackTrace);
+				this.isConnected = false;
+			}
+			catch (Exception e) {
+				Console.WriteLine("RuneManager bridge failed with " + e.GetType() + ": " + e.Message);
+			}
+		}
 	}
 }
