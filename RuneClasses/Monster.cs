@@ -67,30 +67,30 @@ namespace RuneOptim
 		[JsonProperty("create_time")]
 		public DateTime? createdOn = null;
 
-		private static Dictionary<int, MonsterDefinitions.Monster> monDefs = null;
+		private static Dictionary<int, MonsterStat> monDefs = null;
 
-		private static Dictionary<int, MonsterDefinitions.Monster> MonDefs
+		private static Dictionary<int, MonsterStat> MonDefs
 		{
 			get
 			{
 				if (monDefs == null)
 				{
-					monDefs = new Dictionary<int, MonsterDefinitions.Monster>();
+					monDefs = new Dictionary<int, MonsterStat>();
 					foreach (var item in SkillList)
 					{
-						if (!monDefs.ContainsKey(item.Com2usId))
-							monDefs.Add(item.Com2usId, item);
+						if (!monDefs.ContainsKey(item.monsterTypeId))
+							monDefs.Add(item.monsterTypeId, item);
 					}
 				}
 				return monDefs;
 			}
 		}
 
-		private static Dictionary<int, MonsterDefinitions.Skill> skillDefs = null;
-		private static Dictionary<int, MonsterDefinitions.Skill> SkillDefs {
+		private static Dictionary<int, SkillDef> skillDefs = null;
+		private static Dictionary<int, SkillDef> SkillDefs {
 			get {
 				if (skillDefs == null) {
-					skillDefs = new Dictionary<int, MonsterDefinitions.Skill>();
+					skillDefs = new Dictionary<int, SkillDef>();
 					foreach (var item in SkillList) {
 						foreach (var skill in item.Skills) {
 							if (!skillDefs.ContainsKey(skill.Com2usId))
@@ -231,14 +231,14 @@ namespace RuneOptim
 			return r;
 		}
 
-		private static MonsterDefinitions.Monster[] skillList = null;
+		private static MonsterStat[] skillList = null;
 
-		private static MonsterDefinitions.Monster[] SkillList
+		private static MonsterStat[] SkillList
 		{
 			get
 			{
 				if (skillList == null)
-					Monster.skillList = JsonConvert.DeserializeObject<MonsterDefinitions.Monster[]>(File.ReadAllText(global::RuneOptim.Properties.Resources.SkillsJSON));
+					Monster.skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(global::RuneOptim.Properties.Resources.SkillsJSON));
 
 				return skillList;
 			}
@@ -274,19 +274,21 @@ namespace RuneOptim
 				MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
 				int skdmg = 0;
-				int i = 0;
+				int i = -1;
 
 				foreach (var si in _skilllist)
 				{
+					i++;
+					this.SkillupLevel[i] = _skilllist[i].Level ?? 0;
+					this.SkillupMax[i] = this.SkillupLevel[i];
 					if (!SkillDefs.ContainsKey(si.SkillId ?? 0))
 						continue;
 					var ss = SkillDefs[si.SkillId ?? 0];
 					var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
 					if (df.props.Count > 0)
 					{
-						var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level ?? 0);
+						var levels = ss.LevelProgressDescription.Split('\n').Take((_skilllist[i].Level - 1) ?? 0);
 						this.SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
-						this.SkillupLevel[i] = _skilllist[i].Level ?? 0;
 						var ct = levels.Count(s => s == "Cooltime Turn -1");
 						int cooltime = (ss.Cooltime ?? 1) - ct;
 						this.SkillTimes[i] = cooltime;
@@ -297,14 +299,14 @@ namespace RuneOptim
 
 						this._skillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(Stats.statType), Stats.statType).Compile();
 
-						df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
-						df.props.Add(new MonsterDefinitions.MultiplierValue(cooltime));
-						average.props.Add(new MonsterDefinitions.MultiplierValue(df));
 						if (i != 0)
 						{
-							average.props[i - 1].op = MonsterDefinitions.MultiplierOperator.Add;
+							df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
+							df.props.Add(new MonsterDefinitions.MultiplierValue(cooltime));
+							if (average.props.Any())
+								average.props.Last().op = MonsterDefinitions.MultiplierOperator.Add;
 						}
-						i++;
+						average.props.Add(new MonsterDefinitions.MultiplierValue(df));
 					}
 				}
 				this.damageFormula = average;
@@ -435,87 +437,5 @@ namespace RuneOptim
 			}
 			throw new NotImplementedException();
 		}
-	}
-}
-
-namespace MonsterDefinitions
-{
-	public class Entry
-	{
-		[JsonProperty("url")]
-		public string URL;
-		[JsonProperty("pk")]
-		public int Pk;
-		[JsonProperty("com2us_id")]
-		public int Com2usId;
-		[JsonProperty("name")]
-		public string Name;
-		[JsonProperty("element")]
-		public RuneOptim.Element Element;
-		[JsonProperty("archetype")]
-		public RuneOptim.Archetype Archetype;
-		[JsonProperty("base_stars")]
-		public int BaseStars;
-		public override string ToString() {
-			return ((Com2usId / 10) % 10 == 0 ? Element + " " : "") + Name;
-		}
-	}
-
-	public class SkillEff
-	{
-		[JsonProperty("name")]
-		public string Name;
-		[JsonProperty("is_buff")]
-		public bool IsBuff;
-	}
-
-	public class Skill
-	{
-		[JsonProperty("pk")]
-		public int Pk;
-		[JsonProperty("com2us_id")]
-		public int Com2usId;
-		[JsonProperty("name")]
-		public string Name;
-		[JsonProperty("cooltime")]
-		public int? Cooltime;
-		[JsonProperty("hits")]
-		public int? Hits;
-		[JsonProperty("passive")]
-		public bool Passive;
-		[JsonProperty("level_progress_description")]
-		public string LevelProgressDescription;
-		[JsonProperty("multiplier_formula_raw")]
-		public string MultiplierFormulaRaw;
-		[JsonProperty("skill_effect")]
-		public SkillEff[] SkillEffect;
-	}
-
-	public class Material
-	{
-		[JsonProperty("name")]
-		public string Name;
-		[JsonProperty("quantity")]
-		public int Quantity;
-	}
-
-	public class HomuSkill
-	{
-		[JsonProperty("skill")]
-		public Skill Skill;
-		[JsonProperty("craft_materials")]
-		public Material[] CraftMaterials;
-		[JsonProperty("mana_cost")]
-		public int ManaCost;
-		[JsonProperty("prerequisites")]
-		public int[] Prerequisites;
-	}
-
-	public class Monster : Entry
-	{
-		[JsonProperty("skills")]
-		public Skill[] Skills;
-		[JsonProperty("homunculus_skills")]
-		public HomuSkill[] HomunculusSkills;
 	}
 }

@@ -652,8 +652,8 @@ namespace RuneOptim {
 					// download the current (unawakened monster)
 					var mstat = mref.Download();
 					// if the retrieved mon is unawakened, get the awakened
-					if (!mstat.Awakened && mstat.AwakenRef != null)
-						mon = mstat.AwakenRef.Download().GetMon(mon);
+					if (!mstat.Awakened && mstat.AwakenTo != null)
+						mon = mstat.AwakenTo.Download().GetMon(mon);
 				}
 			}
 			// getting awakened also gets level 40, so...
@@ -750,10 +750,10 @@ namespace RuneOptim {
 						var mstat = mref.Download();
 						BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Reading stats"));
 						// if the retrieved mon is unawakened, get the awakened
-						if (!mstat.Awakened && mstat.AwakenRef != null)
+						if (!mstat.Awakened && mstat.AwakenTo != null)
 						{
 							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Awakening"));
-							mon = mstat.AwakenRef.Download().GetMon(mon);
+							mon = mstat.AwakenTo.Download().GetMon(mon);
 						}
 					}
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloaded"));

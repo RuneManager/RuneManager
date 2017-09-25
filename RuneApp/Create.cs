@@ -2068,9 +2068,9 @@ namespace RuneApp
 			if (mref != null)
 			{
 				var mstat = mref.Download();
-				if (!mstat.Awakened && mstat.AwakenRef != null)
+				if (!mstat.Awakened && mstat.AwakenTo != null)
 				{
-					mstat = mstat.AwakenRef.Download();
+					mstat = mstat.AwakenTo.Download();
 					var newmon = mstat.GetMon(build.mon);
 					build.mon = newmon;
 					refreshStats(newmon, newmon.GetStats());
