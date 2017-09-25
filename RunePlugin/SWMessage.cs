@@ -44,6 +44,53 @@ namespace RunePlugin
 		public int WizardId;
 	}
 
+	public class ClearRecord {
+		[JsonProperty("is_new_record")]
+		public bool NewRecord;
+
+		[JsonProperty("current_time")]
+		public long Current;
+
+		[JsonProperty("best_time")]
+		public long Best;
+	}
+	
+	public class DungeonReward {
+		[JsonProperty("mana")]
+		public int Mana;
+
+		[JsonProperty("crystal")]
+		public int Crystal;
+
+		[JsonProperty("energy")]
+		public int Energy;
+
+		[JsonProperty("crate")]
+		public RewardCrate Crate;
+
+		[JsonProperty("item_list")]
+		public RuneOptim.InventoryItem[] Items;
+	}
+
+	public class RewardCrate {
+		[JsonProperty("rune")]
+		public RuneOptim.Rune Rune;
+
+		[JsonProperty("craft_stuff")]
+		public RuneOptim.Craft Craft;
+
+		[JsonProperty("material")]
+		public RuneOptim.InventoryItem Material;
+
+		//[JsonProperty("material")]
+		//public RuneOptim.InventoryItem[] Materials;
+
+		[JsonProperty("summon_pieces")]
+		public RuneOptim.InventoryItem[] SummoningPieces;
+
+		[JsonProperty("unit_info")]
+		public RuneOptim.Monster Monster;
+	}
 
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum SWCommand
@@ -55,5 +102,18 @@ namespace RunePlugin
 		HubUserLogin,
 		GetGuildWarBattleLogByGuildId,
 		GetGuildWarBattleLogByWizardId,
+		LockUnit,
+		UnlockUnit,
+		SummonUnit,
+		BattleScenarioResult,
+		BattleDungeonResult,
+		SellRune,
+		SacrificeUnit,
+		SellRuneCraftItem,
+		UpgradeUnit,
+		UpdateUnitExpGained,
+		BattleRiftDungeonResult,
+		GetBestClearRiftDungeon,
+		UpgradeRune,
 	}
 }

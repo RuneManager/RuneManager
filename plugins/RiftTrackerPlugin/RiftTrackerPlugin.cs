@@ -14,9 +14,6 @@ namespace RiftTrackerPlugin
 {
 	public class RiftTrackerPlugin : RunePlugin.SWPlugin
 	{
-		string riftdir = Environment.CurrentDirectory + "\\Plugins\\RiftTrackerPlugin";
-		string teamsdir = Environment.CurrentDirectory + "\\Plugins\\RiftTrackerPlugin\\Rift Teams";
-
 		Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>> allMons = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
 
 		Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>> matchCount = new Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>();
@@ -25,16 +22,16 @@ namespace RiftTrackerPlugin
 
 		public override void OnLoad()
 		{
-			if (!Directory.Exists(riftdir))
-				Directory.CreateDirectory(riftdir);
-			if (!Directory.Exists(teamsdir))
-				Directory.CreateDirectory(teamsdir);
-			if (!Directory.Exists(teamsdir + "\\Archive"))
-				Directory.CreateDirectory(teamsdir + "\\Archive");
+			if (!Directory.Exists(PluginDataDirectory))
+				Directory.CreateDirectory(PluginDataDirectory);
+			if (!Directory.Exists(PluginDataDirectory + "\\Rift Teams"))
+				Directory.CreateDirectory(PluginDataDirectory + "\\Rift Teams");
+			if (!Directory.Exists(PluginDataDirectory + "\\Rift Teams\\Archive"))
+				Directory.CreateDirectory(PluginDataDirectory + "\\Rift Teams\\Archive");
 
-			if (File.Exists(riftdir + "\\allMons.gz"))
+			if (File.Exists(PluginDataDirectory + "\\allMons.gz"))
 			{
-				using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(riftdir + "\\allMons.gz")))
+				using (MemoryStream ms = new MemoryStream(File.ReadAllBytes(PluginDataDirectory + "\\allMons.gz")))
 				{
 					using (System.IO.Compression.GZipStream gz = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Decompress))
 					{
@@ -60,14 +57,14 @@ namespace RiftTrackerPlugin
 					}
 				}
 			}
-			if (File.Exists(riftdir + "\\matchCount.json"))
-				matchCount = JsonConvert.DeserializeObject<Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>>(File.ReadAllText(riftdir + "\\matchCount.json"));
+			if (File.Exists(PluginDataDirectory + "\\matchCount.json"))
+				matchCount = JsonConvert.DeserializeObject<Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>>(File.ReadAllText(PluginDataDirectory + "\\matchCount.json"));
 
-			var files = Directory.GetFiles(teamsdir, "*.json");
+			var files = Directory.GetFiles(PluginDataDirectory + "\\Rift Teams", "*.json");
 			foreach (var f in files)
 			{
 				ProcessDeck(File.ReadAllText(f));
-				File.Move(f, teamsdir + "\\Archive\\" + new FileInfo(f).Name);
+				File.Move(f, PluginDataDirectory + "\\Rift Teams\\Archive\\" + new FileInfo(f).Name);
 			}
 			loading = false;
 			SaveStuff();
@@ -155,12 +152,12 @@ namespace RiftTrackerPlugin
 					gz.Flush();
 				}
 				ms.Flush();
-				File.WriteAllBytes(riftdir + "\\allMons.gz", ms.ToArray());
+				File.WriteAllBytes(PluginDataDirectory + "\\allMons.gz", ms.ToArray());
 			}
 
-			File.WriteAllText(riftdir + "\\matchCount.json", JsonConvert.SerializeObject(matchCount));
+			File.WriteAllText(PluginDataDirectory + "\\matchCount.json", JsonConvert.SerializeObject(matchCount));
 
-			FileInfo excelFile = new FileInfo(riftdir + @"\riftstats.xlsx");
+			FileInfo excelFile = new FileInfo(PluginDataDirectory + @"\riftstats.xlsx");
 			ExcelPackage excelPack = null;
 			excelPack = new ExcelPackage(excelFile);
 			Dictionary<string, int> mcount = new Dictionary<string, int>();

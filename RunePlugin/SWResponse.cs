@@ -7,12 +7,6 @@ namespace RunePlugin
 {
 	public class SWResponse : SWMessage
 	{
-		//public string Command;
-		//public int ret_code;
-		//public int tvalue;
-		//public int tvaluelocal;
-		//public string tzone;
-
 		[JsonProperty("ret_code")]
 		public int ReturnCode;
 
@@ -39,22 +33,46 @@ namespace RunePlugin
 		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
 		{
 			var obj = JObject.Load(reader);
-			var com = obj["command"].ToString();
-			switch (com)
-			{
-				case "BattleRiftDungeonResult":
-					return obj.ToObject<BattleRiftDungeonResultResponse>();
-				case "GetBestClearRiftDungeon":
-					return obj.ToObject<GetBestClearRiftDungeonResponse>();
-				case "EquipRune":
-					return obj.ToObject<EquipRuneResponse>();
-				case "UnequipRune":
-					return obj.ToObject<UnequipRuneResponse>();
-				case "EquipRuneList":
-					return obj.ToObject<EquipRuneListResponse>();
-				default:
-					return obj.ToObject<SWResponse>();
+			SWCommand com;
+			if (Enum.TryParse(obj["command"].ToString(), out com)) {
+				switch (com) {
+					case SWCommand.BattleDungeonResult:
+						return obj.ToObject<BattleDungeonResultResponse>();
+					case SWCommand.BattleRiftDungeonResult:
+						return obj.ToObject<BattleRiftDungeonResultResponse>();
+					case SWCommand.BattleScenarioResult:
+						return obj.ToObject<BattleScenarioResultResponse>();
+					case SWCommand.EquipRune:
+						return obj.ToObject<EquipRuneResponse>();
+					case SWCommand.EquipRuneList:
+						return obj.ToObject<EquipRuneListResponse>();
+					case SWCommand.GetBestClearRiftDungeon:
+						return obj.ToObject<GetBestClearRiftDungeonResponse>();
+					case SWCommand.LockUnit:
+						return obj.ToObject<LockUnitResponse>();
+					case SWCommand.SacrificeUnit:
+						return obj.ToObject<SacrificeUnitResponse>();
+					case SWCommand.SellRune:
+						return obj.ToObject<SellRuneResponse>();
+					case SWCommand.SellRuneCraftItem:
+						return obj.ToObject<SellRuneResponse>();
+					case SWCommand.SummonUnit:
+						return obj.ToObject<SummonUnitResponse>();
+					case SWCommand.UnequipRune:
+						return obj.ToObject<UnequipRuneResponse>();
+					case SWCommand.UnlockUnit:
+						return obj.ToObject<UnlockUnitResponse>();
+					case SWCommand.UpdateUnitExpGained:
+						return obj.ToObject<UpdateUnitExpGainedResponse>();
+					case SWCommand.UpgradeRune:
+						return obj.ToObject<UpgradeRuneResponse>();
+					case SWCommand.UpgradeUnit:
+						return obj.ToObject<UpgradeUnitResponse>();
+					default:
+						return obj.ToObject<SWResponse>();
+				}
 			}
+			return obj.ToObject<SWResponse>();
 		}
 
 		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)

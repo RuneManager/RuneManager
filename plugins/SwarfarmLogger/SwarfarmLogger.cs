@@ -14,8 +14,9 @@ namespace SwarfarmLogger
 {
 	public class SwarfarmLogger : SWPlugin
 	{
-		static string commands_url = "https://swarfarm.com/data/log/accepted_commands/";
-		static string log_url = "https://swarfarm.com/data/log/upload/";
+		static string base_url = "https://swarfarm.com";
+		static string commands_url { get { return base_url + "/data/log/accepted_commands/"; } }
+		static string log_url { get { return base_url + "/data/log/upload/"; } }
 
 		static Dictionary<string, SWFCommand> commands = null;
 		public static Dictionary<string, SWFCommand> Commands
@@ -43,7 +44,17 @@ namespace SwarfarmLogger
 
 		public override void OnLoad()
 		{
-			Console.WriteLine("Loaded " + Commands.Count + " commands from SWFarm");
+			if (!Directory.Exists(PluginDataDirectory)) {
+				Directory.CreateDirectory(PluginDataDirectory);
+			}
+			if (!File.Exists(PluginDataDirectory + "\\settings.cfg"))
+				File.WriteAllText(PluginDataDirectory + "\\settings.cfg", JsonConvert.SerializeObject(new Dictionary<string, string>() { { "base_url", base_url } }));
+			else {
+				var settings = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(PluginDataDirectory + "\\settings.cfg"));
+				base_url = settings["base_url"];
+			}
+
+			Console.WriteLine("Loaded " + Commands.Count + " commands from SWFarm " + base_url);
 			//System.Net.ServicePointManager.Expect100Continue = false;
 		}
 

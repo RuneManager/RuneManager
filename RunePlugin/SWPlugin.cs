@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,6 +10,14 @@ namespace RunePlugin
 {
 	public abstract class SWPlugin
 	{
+		public string PluginDataDirectory {
+			get {
+				if (!Directory.Exists(Environment.CurrentDirectory + "\\Plugins\\" + this.GetType().Name))
+					Directory.CreateDirectory(Environment.CurrentDirectory + "\\Plugins\\" + this.GetType().Name);
+				return Environment.CurrentDirectory + "\\Plugins\\" + this.GetType().Name;
+			}
+		}
+
 		public virtual void OnLoad() { }
 
 		public virtual void OnUnload() { }
