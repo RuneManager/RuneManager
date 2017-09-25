@@ -369,20 +369,22 @@ namespace RuneOptim
 		#endregion
 
 		// Put the rune on the build
-		public void AddRune(Rune rune, int checkOn = 2)
+		public Rune AddRune(Rune rune, int checkOn = 2)
 		{
 			// don't bother if not a rune
 			if (rune == null)
-				return;
+				return null;
 
 			changed = true;
 
-			RemoveRune(rune.Slot);
+			var old = RemoveRune(rune.Slot);
+
+			runes[rune.Slot - 1] = rune;
 			runeCount++;
 			
-			runes[rune.Slot - 1] = rune;
 			if (runeCount % checkOn == 0)
 				CheckSets();
+			return old;
 		}
 
 		// Removes the rune from slot

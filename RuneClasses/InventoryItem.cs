@@ -4,6 +4,7 @@ namespace RuneOptim
 {
 	public enum ItemType
 	{
+		WizardInfo = 0,
 		Scrolls = 9,
 		Essence = 11,
 		SummoningPieces = 12,
@@ -11,6 +12,16 @@ namespace RuneOptim
 		_Nineteen = 19,
 		Material = 29,
 		_ThirtySeven = 37,
+	}
+
+	// hax for teh lulz
+	public enum WizardType {
+		Mana,
+		Crystal,
+		EnergyMax,
+		UnitSlotMax,
+		DepositorySlotMax,
+		CostumePoint
 	}
 
 	public enum ScrollType
@@ -46,6 +57,7 @@ namespace RuneOptim
 		WindHigh,
 		LightHigh,
 		DarkHigh,
+		MagicHigh
 	}
 
 	public enum MaterialType
@@ -108,6 +120,8 @@ namespace RuneOptim
 			{
 				switch (Type)
 				{
+					case ItemType.WizardInfo:
+						return ((WizardType)Id).ToString();
 					case ItemType.Scrolls:
 						return ((ScrollType)Id).ToString();
 					case ItemType.Essence:

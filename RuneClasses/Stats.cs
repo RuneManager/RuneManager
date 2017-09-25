@@ -423,15 +423,15 @@ namespace RuneOptim
 			switch (extra)
 			{
 				case Attr.EffectiveHP:
-					return Health / ((1000 / (1000 + Defense * 3)));
+					return Health * (1140 + Defense * 3.5) * 0.001;
 				case Attr.EffectiveHPDefenseBreak:
-					return Health / ((1000 / (1000 + Defense * 3 * 0.3)));
+					return Health * (1140 + Defense * 3.5 * 0.3) * 0.001;
 				case Attr.DamagePerSpeed:
-					return ExtraValue(Attr.AverageDamage) * Speed / 100;
+					return ExtraValue(Attr.AverageDamage) * Speed * 0.01;
 				case Attr.AverageDamage:
-					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate + ExtraCritRate, 100) / 100);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage * 0.01 * Math.Min(CritRate + ExtraCritRate, 100) * 0.01);
 				case Attr.MaxDamage:
-					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage * 0.01);
 				default:
 					throw new NotImplementedException();
 			}

@@ -231,7 +231,7 @@ namespace MonsterDefinitions {
 				case MultiAttr.TargetSpeed:
 					return 200;
 				case MultiAttr.TargetHealth:
-					return 25000;
+					return 200000; // If you're max-healthing, probably Giants/Dragon/Water dungeon
 				case MultiAttr.MissingHealth:
 					return 0.66;
 				case MultiAttr.CurrentHealth:

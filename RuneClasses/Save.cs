@@ -208,7 +208,8 @@ namespace RuneOptim
 						// Add the runes contained in the Monsters JSON definition to the Rune pool
 						foreach (var r in mon.Runes)
 						{
-							Runes.Add(r);
+							if (!Runes.Any(ru => ru.Id == r.Id))
+								Runes.Add(r);
 						}
 						mon.Current.Shrines = shrines;
 
@@ -247,12 +248,30 @@ namespace RuneOptim
 			switch (e.Action)
 			{
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+
 					foreach (var r in e.NewItems.Cast<Rune>())
 					{
+						var rems = Runes.Where(ru => ru.Id == r.Id).ToList();
+						foreach (var ru in rems) {
+							if (ru != r) {
+								Runes.Remove(ru);
+								var mon = ru.Assigned ?? r.Assigned;
+								if (mon.Id == r.AssignedId && mon.Current.Runes[r.Slot - 1] != r) {
+									mon.ApplyRune(r);
+									r.Assigned = mon;
+								}
+							}
+						}
 						r.PrebuildAttributes();
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var r in e.OldItems.Cast<Rune>()) {
+						if (r.Assigned != null) {
+							r.Assigned.RemoveRune(r.Slot);
+						}
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
