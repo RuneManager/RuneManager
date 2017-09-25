@@ -129,6 +129,8 @@ namespace RuneOptim {
 			}
 		}
 
+		public event EventHandler<EventArgs> OnUpdate; 
+
 		public Rune()
 		{
 			Main = new RuneAttr();
@@ -138,7 +140,7 @@ namespace RuneOptim {
 			Subs = new List<RuneAttr>();
 		}
 		
-		public void CopyTo(Rune rhs, bool keepLocked, Monster newAssigned = null)
+		public void CopyTo(Rune rhs, bool keepLocked, Monster newAssigned)
 		{
 			// TODO
 			rhs.Freeze();
@@ -152,25 +154,34 @@ namespace RuneOptim {
 				rhs.Locked = Locked;
 			rhs._occupiedType = _occupiedType;
 			rhs.SellValue = SellValue;
-			if (rhs.AssignedName != AssignedName && Assigned != null)
-			{
-				if (rhs.Assigned.Current.Runes[rhs.Slot - 1] == rhs)
-					rhs.Assigned.Current.RemoveRune(rhs.Slot - 1);
-				newAssigned.Current.AddRune(rhs);
-				Assigned = newAssigned;
-			}
-			rhs.AssignedName = AssignedName;
 
-
-			Main.CopyTo(rhs.Main);
-			Innate.CopyTo(rhs.Innate);
-			for (int i = 0; i < Math.Min(Subs.Count, rhs.Subs.Count); i++)
-			{
-				Subs[i].CopyTo(rhs.Subs[i]);
+			Main.CopyTo(ref rhs.Main);
+			//rhs.Main.CopyFrom(Main);
+			Innate.CopyTo(ref rhs.Innate);
+			for (int i = 0; i < Math.Min(Subs.Count, rhs.Subs.Count); i++) {
+				rhs.Subs[i].CopyFrom(Subs[i]);
 			}
 
 			rhs.Unfreeze();
 			rhs.PrebuildAttributes();
+
+			if (rhs.AssignedId != AssignedId)
+			{
+				if (AssignedId == 0) {
+					rhs.AssignedName = "Inventory";
+					rhs.Assigned = null;
+				}
+				else {
+					if (rhs.Assigned.Current.Runes[rhs.Slot - 1] == rhs)
+						rhs.Assigned.Current.RemoveRune(rhs.Slot - 1);
+					newAssigned.Current.AddRune(rhs);
+					rhs.Assigned = newAssigned;
+				}
+			}
+
+			if (rhs.Assigned != null) {
+				rhs.Assigned.RefreshStats();
+			}
 		}
 
 		protected void Freeze()
@@ -502,6 +513,7 @@ namespace RuneOptim {
 			HealthPercent = PrebuildAttribute(Attr.HealthPercent);
 			Resistance = PrebuildAttribute(Attr.Resistance);
 			Speed = PrebuildAttribute(Attr.Speed);
+			OnUpdate?.Invoke(this, null);
 		}
 
 		private int[] PrebuildAttribute(Attr a)

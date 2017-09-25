@@ -762,6 +762,7 @@ namespace RuneOptim {
 					Enchanted = value ?? -1;
 				else if (index == 3)
 					GrindBonus = value ?? -1;
+				OnChange(1, value);
 			}
 		}
 
@@ -779,13 +780,23 @@ namespace RuneOptim {
 				throw new IndexOutOfRangeException();
 		}
 
-		internal void CopyTo(RuneAttr rhs)
+		internal void CopyTo(ref RuneAttr rhs)
 		{
 			rhs.Type = Type;
 			rhs.BaseValue = BaseValue;
 			rhs.Enchanted = Enchanted;
 			rhs.GrindBonus = GrindBonus;
+			rhs.OnChange(0, 0);
 		}
+
+		internal void CopyFrom(RuneAttr lhs) {
+			Type = lhs.Type;
+			BaseValue = lhs.BaseValue;
+			Enchanted = lhs.Enchanted;
+			GrindBonus = lhs.GrindBonus;
+			OnChange(0, 0);
+		}
+
 		#endregion
 	}
 

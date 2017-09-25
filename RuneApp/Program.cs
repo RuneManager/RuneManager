@@ -47,6 +47,8 @@ namespace RuneApp
 
 		public static Save data;
 
+		public static event EventHandler<bool> OnRuneUpdate;
+
 		public static Properties.Settings Settings
 		{
 			get
@@ -968,22 +970,29 @@ namespace RuneApp
 
 		public static void AddMonster(Monster mon)
 		{
-			if (mon.WizardId == data.WizardInfo.Id)
-			{
-				data.Monsters.Add(mon);
+			if (data.Monsters.Any(m => m.Id == mon.Id)) {
+				UpdateMonster(mon);
+				return;
 			}
 
-			data.isModified = true;
+			if (mon.WizardId == data.WizardInfo.Id) {
+				data.Monsters.Add(mon);
+				data.isModified = true;
+			}
 		}
 
 		public static void AddRune(Rune rune)
 		{
-			if (rune.WizardId == data.WizardInfo.Id)
-			{
-				data.Runes.Add(rune);
+			if (data.Runes.Any(r => r.Id == rune.Id)) {
+				UpdateRune(rune);
+				return;
 			}
 
-			data.isModified = true;
+			if (rune.WizardId == data.WizardInfo.Id) {
+				data.Runes.Add(rune);
+				data.isModified = true;
+				OnRuneUpdate?.Invoke(rune, false);
+			}
 		}
 
 		public static void DeleteMonster(Monster mon)
@@ -1000,6 +1009,7 @@ namespace RuneApp
 			data.Runes.Remove(r);
 
 			data.isModified = true;
+			OnRuneUpdate?.Invoke(rune, true);
 		}
 
 		public static void UpdateMonster(Monster mon)
@@ -1024,14 +1034,21 @@ namespace RuneApp
 					rune.Assigned = m;
 					rune.AssignedName = m.FullName;
 					if (rune != m.Current.Runes[i]) {
-						m.ApplyRune(rune);
+						var rm = m.ApplyRune(rune);
+						if (rm != null) {
+							rm.Assigned = null;
+							rm.AssignedId = 0;
+							rm.AssignedName = "Unassigned";
+						}
 					}
 				}
 				else {
 					var rm = m.RemoveRune(i + 1);
-					rm.Assigned = null;
-					rm.AssignedId = 0;
-					rm.AssignedName = "Unassigned";
+					if (rm != null) {
+						rm.Assigned = null;
+						rm.AssignedId = 0;
+						rm.AssignedName = "Unassigned";
+					}
 				}
 			}
 
@@ -1045,6 +1062,7 @@ namespace RuneApp
 			rune.CopyTo(r, keepLocked, newAssigned);
 
 			data.isModified = true;
+			OnRuneUpdate?.Invoke(r, false);
 		}
 
 		static Dictionary<string, int[]> monPortraitMap = null;

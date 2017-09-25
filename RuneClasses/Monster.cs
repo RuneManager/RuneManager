@@ -217,11 +217,12 @@ namespace RuneOptim
 		}
 
 		// put this rune on the current build
-		public void ApplyRune(Rune rune, int checkOn = 2)
+		public Rune ApplyRune(Rune rune, int checkOn = 2)
 		{
-			Current.AddRune(rune, checkOn);
+			var old = Current.AddRune(rune, checkOn);
 			changeStats = true;
 			OnRunesChanged?.Invoke(this, null);
+			return old;
 		}
 
 		public Rune RemoveRune(int slot) {
@@ -229,6 +230,12 @@ namespace RuneOptim
 			changeStats = true;
 			OnRunesChanged?.Invoke(this, null);
 			return r;
+		}
+
+		public void RefreshStats() {
+			changeStats = true;
+			GetStats();
+			OnRunesChanged?.Invoke(this, null);
 		}
 
 		private static MonsterStat[] skillList = null;

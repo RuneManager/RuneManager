@@ -38,6 +38,8 @@
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.toolStripCopyright = new System.Windows.Forms.ToolStripStatusLabel();
+			this.toolStripSpacer = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStrip1 = new System.Windows.Forms.ToolStrip();
 			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
 			this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -98,6 +100,7 @@
 			this.HealthLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
 			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -182,11 +185,9 @@
 			this.fileBox = new System.Windows.Forms.GroupBox();
 			this.btnRefreshSave = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
-			this.toolStripCopyright = new System.Windows.Forms.ToolStripStatusLabel();
-			this.toolStripSpacer = new System.Windows.Forms.ToolStripStatusLabel();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.runeDial = new RuneApp.RuneDial();
+			this.runesLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -286,6 +287,22 @@
 			this.toolStripStatusLabel2.Name = "toolStripStatusLabel2";
 			this.toolStripStatusLabel2.Size = new System.Drawing.Size(64, 17);
 			this.toolStripStatusLabel2.Text = "Unequip: 0";
+			// 
+			// toolStripCopyright
+			// 
+			this.toolStripCopyright.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
+			this.toolStripCopyright.Name = "toolStripCopyright";
+			this.toolStripCopyright.Size = new System.Drawing.Size(1206, 17);
+			this.toolStripCopyright.Spring = true;
+			this.toolStripCopyright.Text = "Images belong to Com2Us";
+			this.toolStripCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// toolStripSpacer
+			// 
+			this.toolStripSpacer.Name = "toolStripSpacer";
+			this.toolStripSpacer.Size = new System.Drawing.Size(12, 17);
+			this.toolStripSpacer.Spring = true;
+			this.toolStripSpacer.Text = "_";
 			// 
 			// toolStrip1
 			// 
@@ -897,6 +914,17 @@
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
 			// 
+			// runeDial
+			// 
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.Size = new System.Drawing.Size(225, 188);
+			this.runeDial.TabIndex = 51;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			// 
 			// tabControl1
 			// 
 			this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1067,7 +1095,8 @@
             this.runesID,
             this.runesGrade,
             this.runesMType,
-            this.runesMValue});
+            this.runesMValue,
+            this.runesLevel});
 			this.dataRuneList.FullRowSelect = true;
 			this.dataRuneList.Location = new System.Drawing.Point(0, 25);
 			this.dataRuneList.Margin = new System.Windows.Forms.Padding(2);
@@ -1090,6 +1119,7 @@
 			// 
 			// runesID
 			// 
+			this.runesID.DisplayIndex = 4;
 			this.runesID.Text = "ID";
 			this.runesID.Width = 40;
 			// 
@@ -1106,6 +1136,7 @@
 			// 
 			// runesMValue
 			// 
+			this.runesMValue.DisplayIndex = 5;
 			this.runesMValue.Text = "MainValue";
 			// 
 			// tabBuilds
@@ -1750,22 +1781,6 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "A change has been made to your save.";
 			// 
-			// toolStripCopyright
-			// 
-			this.toolStripCopyright.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
-			this.toolStripCopyright.Name = "toolStripCopyright";
-			this.toolStripCopyright.Size = new System.Drawing.Size(593, 17);
-			this.toolStripCopyright.Spring = true;
-			this.toolStripCopyright.Text = "Images belong to Com2Us";
-			this.toolStripCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-			// 
-			// toolStripSpacer
-			// 
-			this.toolStripSpacer.Name = "toolStripSpacer";
-			this.toolStripSpacer.Size = new System.Drawing.Size(593, 17);
-			this.toolStripSpacer.Spring = true;
-			this.toolStripSpacer.Text = "_";
-			// 
 			// runeInventory
 			// 
 			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1788,16 +1803,11 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
-			// runeDial
+			// runesLevel
 			// 
-			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(8, 201);
-			this.runeDial.Name = "runeDial";
-			this.runeDial.Size = new System.Drawing.Size(225, 188);
-			this.runeDial.TabIndex = 51;
-			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runesLevel.DisplayIndex = 1;
+			this.runesLevel.Text = "Level";
+			this.runesLevel.Width = 40;
 			// 
 			// Main
 			// 
@@ -2029,6 +2039,7 @@
 		private System.Windows.Forms.ColumnHeader columnHeader5;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripCopyright;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripSpacer;
+		private System.Windows.Forms.ColumnHeader runesLevel;
 	}
 }
 

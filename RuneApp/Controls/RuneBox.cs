@@ -15,6 +15,8 @@ namespace RuneApp
 			InitializeComponent();
 		}
 
+		public ulong RuneId { get; set; }
+
 		public void SetRune(Rune rune)
 		{
 			lbMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
@@ -25,12 +27,14 @@ namespace RuneApp
 			lb4.Text = Rune.StringIt(rune.Subs, 3);
 			lbLevel.Text = rune.Level.ToString();
 			lbMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
+			RuneId = rune.Id;
 			runeControl.SetRune(rune);
 		}
 
 		public void SetCraft(Craft craft)
 		{
 			lbMain.Text = craft.Set.ToString() + " " + craft.Stat + " " + craft.Type.ToString();
+			RuneId = craft.ItemId;
 			runeControl.SetCraft(craft);
 		}
 

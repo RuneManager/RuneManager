@@ -198,6 +198,7 @@ namespace RuneApp {
 			#region Watch collections and try loading
 			Program.saveFileTouched += Program_saveFileTouched;
 			Program.builds.CollectionChanged += Builds_CollectionChanged;
+			Program.OnRuneUpdate += Program_OnRuneUpdate;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
 
@@ -430,6 +431,50 @@ namespace RuneApp {
 				nli.SubItems[5].BackColor = Color.Orange;
 		}
 
+		private void Program_OnRuneUpdate(object sender, bool deleted) {
+			var rune = sender as Rune;
+			if (rune != null) {
+				Invoke((MethodInvoker)delegate {
+					var nli = dataRuneList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Rune).Id == rune.Id);
+					if (deleted) {
+						if (nli != null)
+							dataRuneList.Items.Remove(nli);
+						return;
+					}
+
+					bool add = nli == null;
+					ListViewItemRune(rune, nli);
+					if (add)
+						dataRuneList.Items.Add(nli);
+
+					if (this.runeInventory.RuneId == rune.Id)
+						runeInventory.SetRune(rune);
+					if (this.runeEquipped.RuneId == rune.Id)
+						runeEquipped.SetRune(rune);
+					if (displayMon.Id == rune.AssignedId)
+						ShowMon(displayMon);
+				});
+			}
+		}
+
+		private ListViewItem ListViewItemRune(Rune rune, ListViewItem nli = null) {
+			if (nli == null)
+				nli = new ListViewItem();
+			nli.Tag = rune;
+			nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+
+			while (nli.SubItems.Count < 6)
+				nli.SubItems.Add("");
+
+			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
+			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
+			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
+			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));
+			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, rune.Main.Value.ToString());
+			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, rune.Level.ToString());
+			return nli;
+		}
+		
 		private void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -731,18 +776,8 @@ namespace RuneApp {
 
 			if (Program.data?.Runes == null) return;
 
-			foreach (Rune rune in Program.data.Runes.Where(p.Invoke))
-			{
-				ListViewItem item = new ListViewItem(new string[]{
-					rune.Set.ToString(),
-					rune.Id.ToString(),
-					rune.Grade.ToString(),
-					Rune.StringIt(rune.Main.Type, true),
-					rune.Main.Value.ToString()
-				});
-				item.Tag = rune;
-				item.BackColor = rune.Locked ? Color.Red : Color.Transparent;
-				dataRuneList.Items.Add(item);
+			foreach (Rune rune in Program.data.Runes.Where(p.Invoke)) {
+				dataRuneList.Items.Add(ListViewItemRune(rune));
 			}
 		}
 
@@ -1459,19 +1494,8 @@ namespace RuneApp {
 				}
 			}).ToArray());
 
-			foreach (Rune rune in Program.data.Runes)
-			{
-				ListViewItem item = new ListViewItem(new string[]{
-					rune.Set.ToString(),
-					rune.Id.ToString(),
-					rune.Grade.ToString(),
-					Rune.StringIt(rune.Main.Type, true),
-					rune.Main.Value.ToString()
-				});
-				item.Tag = rune;
-				if (rune.Locked)
-					item.BackColor = Color.Red;
-				dataRuneList.Items.Add(item);
+			foreach (Rune rune in Program.data.Runes) {
+				dataRuneList.Items.Add(ListViewItemRune(rune));
 			}
 			checkLocked();
 			ColorMonsWithBuilds();
