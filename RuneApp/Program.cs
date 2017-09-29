@@ -1120,7 +1120,7 @@ namespace RuneApp
 		static byte[] zipData = null;
 		static object fslock = new object();
 
-		public static Image GetMonPortrait(int monsterTypeId) {
+		public static string GetMonIconName(int monsterTypeId) {
 			if (monPortraitMap == null)
 				monPortraitMap = JsonConvert.DeserializeObject<Dictionary<string, int[]>>(File.ReadAllText("data\\unitmap.json"));
 
@@ -1135,7 +1135,7 @@ namespace RuneApp
 				b = idl[2];
 			}
 			else if (!monPortraitMap.ContainsKey(baseId.ToString())) {
-				return RuneApp.InternalServer.InternalServer.mon_spot;
+				return null;
 			}
 			else {
 				var woke = (monsterTypeId / 10) % 10;
@@ -1144,25 +1144,15 @@ namespace RuneApp
 				b = idl[woke * 2 + 1];
 				c = monsterTypeId % 10 - 1;
 			}
+			return $"unit_icon_{a:D4}_{c}_{b}";
+		}
 
-			lock (fslock) {
-				if (zipData == null) {
-					using (var fs = new FileStream("data\\unit.zip", FileMode.Open))
-					using (var ms = new MemoryStream()) {
-						fs.CopyTo(ms);
-						zipData = ms.ToArray();
-					}
-				}
-			}
+		public static Image GetMonPortrait(int monsterTypeId) {
+			var e = GetMonIconName(monsterTypeId);
+			if (string.IsNullOrWhiteSpace(e))
+				return RuneApp.InternalServer.InternalServer.mon_spot;
 
-			using (var zip = new System.IO.Compression.ZipArchive(new MemoryStream(zipData))) {
-				var e = $"unit_icon_{a:D4}_{c}_{b}";
-				var ze = zip.Entries.FirstOrDefault(n => Path.GetFileNameWithoutExtension(n.Name) == e);
-				if (ze == null)
-					return RuneApp.InternalServer.InternalServer.mon_spot;
-
-				return Image.FromStream(ze.Open());
-			}
+			return Image.FromFile("data/unit/" + e + ".png");
 		}
 
 

@@ -458,13 +458,15 @@ namespace RuneApp {
 			nli.ForeColor = mon.inStorage ? Color.Gray : Color.Black;
 			nli.Text = mon.FullName;
 
-			while (nli.SubItems.Count < 4)
+			while (nli.SubItems.Count < 6)
 				nli.SubItems.Add("");
 
 			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, mon.FullName);
 			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, mon.Grade.ToString());
 			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.priority.ToString("#"));
 			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
+			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
+			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
 			return nli;
 		}
 
@@ -1421,6 +1423,12 @@ namespace RuneApp {
 
 			ShowStats(cur, mon);
 			ShowLoadout(mon.Current);
+
+			var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.monsterTypeId) + ".png";
+			if (File.Exists(fname))
+				monImage.ImageLocation = fname;
+			else
+				monImage.Image = RuneApp.InternalServer.InternalServer.mon_spot;
 		}
 
 		private void ShowLoadout(Loadout l)

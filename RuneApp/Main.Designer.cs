@@ -35,6 +35,8 @@
 			this.colMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.colMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.colMonID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.colMonLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
 			this.toolStripStatusLabel2 = new System.Windows.Forms.ToolStripStatusLabel();
@@ -62,6 +64,7 @@
 			this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
 			this.userManualHelpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.monImage = new System.Windows.Forms.PictureBox();
 			this.statLevel = new System.Windows.Forms.Label();
 			this.statID = new System.Windows.Forms.Label();
 			this.statName = new System.Windows.Forms.Label();
@@ -100,7 +103,6 @@
 			this.HealthLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
 			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -121,6 +123,7 @@
 			this.runesGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesMType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesMValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.runesLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tabBuilds = new System.Windows.Forms.TabPage();
 			this.listView4 = new System.Windows.Forms.ListView();
 			this.buildID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -187,10 +190,11 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.runesLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.runeDial = new RuneApp.RuneDial();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)(this.monImage)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.tabMonsters.SuspendLayout();
 			this.toolStrip2.SuspendLayout();
@@ -226,7 +230,9 @@
             this.colMonName,
             this.colMonGrade,
             this.colMonPriority,
-            this.colMonID});
+            this.colMonID,
+            this.colMonType,
+            this.colMonLevel});
 			this.dataMonsterList.FullRowSelect = true;
 			this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
 			this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
@@ -242,7 +248,7 @@
 			// 
 			// colMonName
 			// 
-			this.colMonName.DisplayIndex = 2;
+			this.colMonName.DisplayIndex = 3;
 			this.colMonName.Text = "Name";
 			this.colMonName.Width = 130;
 			// 
@@ -259,8 +265,21 @@
 			// 
 			// colMonID
 			// 
+			this.colMonID.DisplayIndex = 4;
 			this.colMonID.Text = "ID";
 			this.colMonID.Width = 0;
+			// 
+			// colMonType
+			// 
+			this.colMonType.DisplayIndex = 5;
+			this.colMonType.Text = "TypeID";
+			this.colMonType.Width = 0;
+			// 
+			// colMonLevel
+			// 
+			this.colMonLevel.DisplayIndex = 2;
+			this.colMonLevel.Text = "Lvl";
+			this.colMonLevel.Width = 30;
 			// 
 			// statusStrip1
 			// 
@@ -466,6 +485,7 @@
 			// 
 			// groupBox1
 			// 
+			this.groupBox1.Controls.Add(this.monImage);
 			this.groupBox1.Controls.Add(this.statLevel);
 			this.groupBox1.Controls.Add(this.statID);
 			this.groupBox1.Controls.Add(this.statName);
@@ -514,6 +534,16 @@
 			this.groupBox1.TabIndex = 6;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Stats";
+			// 
+			// monImage
+			// 
+			this.monImage.Image = RuneApp.InternalServer.InternalServer.mon_spot;
+			this.monImage.Location = new System.Drawing.Point(189, 13);
+			this.monImage.Name = "monImage";
+			this.monImage.Size = new System.Drawing.Size(50, 50);
+			this.monImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+			this.monImage.TabIndex = 52;
+			this.monImage.TabStop = false;
 			// 
 			// statLevel
 			// 
@@ -914,17 +944,6 @@
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
 			// 
-			// runeDial
-			// 
-			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(8, 201);
-			this.runeDial.Name = "runeDial";
-			this.runeDial.Size = new System.Drawing.Size(225, 188);
-			this.runeDial.TabIndex = 51;
-			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			// 
 			// tabControl1
 			// 
 			this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1138,6 +1157,12 @@
 			// 
 			this.runesMValue.DisplayIndex = 5;
 			this.runesMValue.Text = "MainValue";
+			// 
+			// runesLevel
+			// 
+			this.runesLevel.DisplayIndex = 1;
+			this.runesLevel.Text = "Level";
+			this.runesLevel.Width = 40;
 			// 
 			// tabBuilds
 			// 
@@ -1786,6 +1811,7 @@
 			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeInventory.Location = new System.Drawing.Point(885, 135);
 			this.runeInventory.Name = "runeInventory";
+			this.runeInventory.RuneId = ((ulong)(0ul));
 			this.runeInventory.Size = new System.Drawing.Size(215, 179);
 			this.runeInventory.TabIndex = 20;
 			this.runeInventory.TabStop = false;
@@ -1797,17 +1823,23 @@
 			this.runeEquipped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeEquipped.Location = new System.Drawing.Point(885, 320);
 			this.runeEquipped.Name = "runeEquipped";
+			this.runeEquipped.RuneId = ((ulong)(0ul));
 			this.runeEquipped.Size = new System.Drawing.Size(215, 179);
 			this.runeEquipped.TabIndex = 20;
 			this.runeEquipped.TabStop = false;
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
-			// runesLevel
+			// runeDial
 			// 
-			this.runesLevel.DisplayIndex = 1;
-			this.runesLevel.Text = "Level";
-			this.runesLevel.Width = 40;
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.Size = new System.Drawing.Size(225, 188);
+			this.runeDial.TabIndex = 51;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
 			// 
 			// Main
 			// 
@@ -1839,6 +1871,7 @@
 			this.menuStrip1.PerformLayout();
 			this.groupBox1.ResumeLayout(false);
 			this.groupBox1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)(this.monImage)).EndInit();
 			this.tabControl1.ResumeLayout(false);
 			this.tabMonsters.ResumeLayout(false);
 			this.tabMonsters.PerformLayout();
@@ -2040,6 +2073,9 @@
 		private System.Windows.Forms.ToolStripStatusLabel toolStripCopyright;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripSpacer;
 		private System.Windows.Forms.ColumnHeader runesLevel;
+		private System.Windows.Forms.ColumnHeader colMonType;
+		private System.Windows.Forms.ColumnHeader colMonLevel;
+		private System.Windows.Forms.PictureBox monImage;
 	}
 }
 
