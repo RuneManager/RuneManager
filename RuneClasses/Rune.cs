@@ -108,6 +108,7 @@ namespace RuneOptim {
 		[JsonIgnore]
 		private bool? setIs4;
 
+		[JsonIgnore]
 		public bool SetIs4
 		{
 			get

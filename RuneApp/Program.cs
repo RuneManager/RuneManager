@@ -48,6 +48,7 @@ namespace RuneApp
 		public static Save data;
 
 		public static event EventHandler<bool> OnRuneUpdate;
+		public static event EventHandler<bool> OnMonsterUpdate;
 
 		public static Goals goals;
 
@@ -1018,6 +1019,7 @@ namespace RuneApp
 			if (mon.WizardId == data.WizardInfo.Id) {
 				data.Monsters.Add(mon);
 				data.isModified = true;
+				OnMonsterUpdate?.Invoke(mon, false);
 			}
 		}
 
@@ -1041,6 +1043,7 @@ namespace RuneApp
 			data.Monsters.Remove(m);
 
 			data.isModified = true;
+			OnMonsterUpdate?.Invoke(mon, true);
 		}
 
 		public static void DeleteRune(Rune rune)
@@ -1055,11 +1058,15 @@ namespace RuneApp
 		public static void UpdateMonster(Monster mon)
 		{
 			var m = data.GetMonster(mon.Id);
+			if (m == null) {
+				AddMonster(mon);
+				return;
+			}
+
 			// TODO: modify stats and trigger callbacks
 
 			for (int i = 0; i < 6; i++) {
 				var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
-				var rr = m.Current.Runes.FirstOrDefault(r => r?.Slot - 1 == i);
 				if (rl != null)
 				{
 					var rune = data.GetRune(rl.Id);
@@ -1082,7 +1089,7 @@ namespace RuneApp
 						}
 					}
 				}
-				else {
+				else if (m != null) {
 					var rm = m.RemoveRune(i + 1);
 					if (rm != null) {
 						rm.Assigned = null;
@@ -1093,11 +1100,14 @@ namespace RuneApp
 			}
 
 			data.isModified = true;
+			OnMonsterUpdate?.Invoke(mon, false);
 		}
 
 		public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null)
 		{
 			var r = data.GetRune(rune.Id);
+			if (r == null)
+				return;
 			// TODO: modify stats and trigger callbacks
 			rune.CopyTo(r, keepLocked, newAssigned);
 

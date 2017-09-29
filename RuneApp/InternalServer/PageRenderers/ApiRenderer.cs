@@ -183,7 +183,7 @@ function log() {
 						if (id == 0)
 							id = mon.Id;
 
-						if (uri.Length == 0) {
+						if (uri.Length == 0 || Program.data.GetMonster(id) == null) {
 							Program.AddMonster(mon);
 							return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
 						}
@@ -210,10 +210,12 @@ function log() {
 								break;
 							case "lock":
 								mon.Locked = true;
+								Program.data.LockedUnits.Add(mon.Id);
 								Program.data.isModified = true;
 								break;
 							case "unlock":
 								mon.Locked = false;
+								Program.data.LockedUnits.Remove(mon.Id);
 								Program.data.isModified = true;
 								break;
 						}
@@ -284,6 +286,9 @@ function log() {
 				[HttpMethod("POST")]
 				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri)
 				{
+					if (Program.data == null) {
+						return return404();
+					}
 					Rune rune = null;
 					ulong id = 0;
 					if (uri.Length > 0) {
@@ -297,7 +302,7 @@ function log() {
 						if (id == 0)
 							id = rune.Id;
 
-						if (uri.Length == 0) {
+						if (uri.Length == 0 || Program.data.GetRune(id) == null) {
 							Program.AddRune(rune);
 							return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
 						}

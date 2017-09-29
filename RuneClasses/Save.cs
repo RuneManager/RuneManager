@@ -243,6 +243,16 @@ namespace RuneOptim
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var m in e.OldItems.Cast<Monster>()) {
+						foreach (var r in m.Current.Runes) {
+							if (r != null) {
+								r.Assigned = null;
+								r.AssignedId = 0;
+								r.AssignedName = "Inventory";
+							}
+						}
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:

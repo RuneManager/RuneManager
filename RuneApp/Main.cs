@@ -11,6 +11,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Reflection;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace RuneApp {
 	public partial class Main : Form
@@ -199,6 +200,7 @@ namespace RuneApp {
 			Program.saveFileTouched += Program_saveFileTouched;
 			Program.builds.CollectionChanged += Builds_CollectionChanged;
 			Program.OnRuneUpdate += Program_OnRuneUpdate;
+			Program.OnMonsterUpdate += Program_OnMonsterUpdate;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
 
@@ -403,6 +405,24 @@ namespace RuneApp {
 			}
 		}
 
+		private ListViewItem ListViewItemRune(Rune rune, ListViewItem nli = null) {
+			if (nli == null)
+				nli = new ListViewItem();
+			nli.Tag = rune;
+			nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+
+			while (nli.SubItems.Count < 6)
+				nli.SubItems.Add("");
+
+			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
+			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
+			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
+			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));
+			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, rune.Main.Value.ToString());
+			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, rune.Level.ToString());
+			return nli;
+		}
+
 		private void ListViewItemLoad(ListViewItem nli, Loadout l)
 		{
 			Build b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
@@ -430,6 +450,45 @@ namespace RuneApp {
 			else if (l.Time / (double)1000 > 30)
 				nli.SubItems[5].BackColor = Color.Orange;
 		}
+		
+		private ListViewItem ListViewItemMonster(Monster mon, ListViewItem nli = null) {
+			if (nli == null)
+				nli = new ListViewItem();
+			nli.Tag = mon;
+			nli.ForeColor = mon.inStorage ? Color.Gray : Color.Black;
+			nli.Text = mon.FullName;
+
+			while (nli.SubItems.Count < 4)
+				nli.SubItems.Add("");
+
+			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, mon.FullName);
+			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, mon.Grade.ToString());
+			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.priority.ToString("#"));
+			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
+			return nli;
+		}
+
+		private void Program_OnMonsterUpdate(object sender, bool deleted) {
+			var mon = sender as Monster;
+			if (mon != null) {
+				Invoke((MethodInvoker)delegate {
+					var nli = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
+					if (deleted) {
+						if (nli != null)
+							dataMonsterList.Items.Remove(nli);
+						return;
+					}
+
+					bool add = nli == null;
+					nli = ListViewItemMonster(mon, nli);
+					if (add)
+						dataMonsterList.Items.Add(nli);
+
+					if (displayMon?.Id == mon.Id)
+						ShowMon(displayMon);
+				});
+			}
+		}
 
 		private void Program_OnRuneUpdate(object sender, bool deleted) {
 			var rune = sender as Rune;
@@ -443,7 +502,7 @@ namespace RuneApp {
 					}
 
 					bool add = nli == null;
-					ListViewItemRune(rune, nli);
+					nli = ListViewItemRune(rune, nli);
 					if (add)
 						dataRuneList.Items.Add(nli);
 
@@ -451,30 +510,12 @@ namespace RuneApp {
 						runeInventory.SetRune(rune);
 					if (this.runeEquipped.RuneId == rune.Id)
 						runeEquipped.SetRune(rune);
-					if (displayMon.Id == rune.AssignedId)
+					if (displayMon?.Id == rune.AssignedId)
 						ShowMon(displayMon);
 				});
 			}
 		}
 
-		private ListViewItem ListViewItemRune(Rune rune, ListViewItem nli = null) {
-			if (nli == null)
-				nli = new ListViewItem();
-			nli.Tag = rune;
-			nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
-
-			while (nli.SubItems.Count < 6)
-				nli.SubItems.Add("");
-
-			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
-			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
-			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
-			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));
-			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, rune.Main.Value.ToString());
-			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, rune.Level.ToString());
-			return nli;
-		}
-		
 		private void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
 		{
 			switch (e.Action)
@@ -546,13 +587,13 @@ namespace RuneApp {
 			var str = "";
 			for (int i = 0; i < b.Teams.Count; i++)
 			{
-				str = string.Join(", ", b.Teams.Take(i));
-				if (!string.IsNullOrWhiteSpace(str))
-					str += ", ";
-				str += (b.Teams.Count - i).ToString();
+				var sb = new StringBuilder(string.Join(", ", b.Teams.Take(i)));
+				if (!string.IsNullOrWhiteSpace(sb.ToString()))
+					sb.Append(", ");
+				sb.Append(b.Teams.Count - i);
 				var tstr = string.Join(", ", b.Teams.Take(i+1));
 				if (this.CreateGraphics().MeasureString(tstr + "...", buildList.Font).Width > sz - 10)
-					break;
+					return sb.ToString();
 				str = tstr;
 			}
 
@@ -1470,17 +1511,10 @@ namespace RuneApp {
 			int maxPri = 0;
 			if (Program.builds.Count > 0)
 				maxPri = Program.builds.Max(b => b.priority) + 1;
-			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => new ListViewItem()
-			{
-				ForeColor = mon.inStorage ? Color.Gray : Color.Black,
-				Text = mon.FullName,
-				SubItems = {
-					mon.Grade.ToString(),
-					(mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0)).ToString("#"),
-					mon.Id.ToString()
-				},
-				Tag = mon,
-			}).ToArray());
+			foreach (var mon in Program.data.Monsters) {
+				mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0);
+			}
+			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
 			dataCraftList.Items.AddRange(Program.data.Crafts.Select(craft => new ListViewItem()
 			{

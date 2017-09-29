@@ -232,7 +232,7 @@ namespace RuneService
 								Directory.CreateDirectory("Json");
 							File.WriteAllText($"Json\\{req["command"]}" + 
 #if DEBUG
-							"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
+							$"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
 #endif
 							".req.json", JsonConvert.SerializeObject(req, Formatting.Indented));
 							Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -282,7 +282,7 @@ namespace RuneService
 									Directory.CreateDirectory("Json");
 								File.WriteAllText($"Json\\{resp["command"]}" + 
 #if DEBUG
-								"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
+								$"_{DateTime.Now.ToString("yyyyMMddHHmmssfff")}" + 
 #endif
 								".resp.json", JsonConvert.SerializeObject(resp, Formatting.Indented));
 								Console.ForegroundColor = ConsoleColor.DarkGray;

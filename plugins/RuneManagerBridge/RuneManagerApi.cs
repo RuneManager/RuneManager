@@ -30,7 +30,12 @@ namespace RuneManagerBridge {
 			var api = WebRequest.CreateHttp(baseUri + "/api/monsters/" +id.ToString());
 			api.Accept = "application/json";
 			api.Method = "DELETE";
-			return new StreamReader(api.GetResponse().GetResponseStream()).ReadToEnd();
+			try {
+				return new StreamReader(api.GetResponse().GetResponseStream()).ReadToEnd();
+			}
+			catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("404")) {
+				return new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+			}
 		}
 
 		public string TestConnection() {
@@ -63,7 +68,12 @@ namespace RuneManagerBridge {
 			var api = WebRequest.CreateHttp(baseUri + "/api/runes/" +id.ToString());
 			api.Accept = "application/json";
 			api.Method = "DELETE";
-			return new StreamReader(api.GetResponse().GetResponseStream()).ReadToEnd();
+			try {
+				return new StreamReader(api.GetResponse().GetResponseStream()).ReadToEnd();
+			}
+			catch (WebException ex) when (ex.Status == WebExceptionStatus.ProtocolError && ex.Message.Contains("404")) {
+				return new StreamReader(ex.Response.GetResponseStream()).ReadToEnd();
+			}
 		}
 
 	}
