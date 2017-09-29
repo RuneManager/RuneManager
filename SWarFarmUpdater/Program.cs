@@ -49,7 +49,8 @@ namespace SWFarmLoader {
 	class Program {
 		static void Main(string[] args) {
 #if true
-			GetData();
+			Console.Write("Press Y for new data: ");
+			GetData(Console.ReadKey().Key == ConsoleKey.Y);
 #else
 			var list = JsonConvert.DeserializeObject<Monster[]>(File.ReadAllText("skills.json"));
 			var mm = list.FirstOrDefault(l => l.Name == "Theomars");
@@ -66,15 +67,15 @@ namespace SWFarmLoader {
 #endif
 		}
 
-		static void GetData() {
+		static void GetData(bool refetch = false) {
 			try {
 				List<MonsterStat> monsters = new List<MonsterStat>();
-				var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary");
+				var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary", refetch);
 				int i = 0;
 				foreach (var it in list) {
 					Console.CursorLeft = 0;
 					Console.Write($"{i * 100.0 / list.Length:0.##}% "); i++;
-					var mm = StatReference.AskSWApi<MonsterStat>(it.URL);
+					var mm = StatReference.AskSWApi<MonsterStat>(it.URL, refetch);
 					monsters.Add(mm);
 				}
 				/*

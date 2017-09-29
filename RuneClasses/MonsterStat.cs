@@ -246,16 +246,16 @@ namespace RuneOptim {
 
 		static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
 
-		public static T AskSWApi<T>(string location) {
+		public static T AskSWApi<T>(string location, bool refetch = false) {
 			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache") + ".json";
 			var data = "";
 			if (apiObjs.ContainsKey(location)) {
 				return (T)apiObjs[location];
 			}
-			if (File.Exists(fpath) && new FileInfo(fpath).CreationTime < DateTime.Now.AddDays(-7)) {
+			if (File.Exists(fpath) && new FileInfo(fpath).CreationTime < DateTime.Now.AddDays(-30)) {
 				File.Delete(fpath);
 			}
-			if (!File.Exists(fpath)) {
+			if (!File.Exists(fpath) || refetch) {
 				Directory.CreateDirectory(new FileInfo(fpath).Directory.FullName);
 				using (WebClient client = new WebClient()) {
 					client.Headers["accept"] = "application/json";

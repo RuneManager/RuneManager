@@ -1064,6 +1064,19 @@ namespace RuneApp
 			}
 
 			// TODO: modify stats and trigger callbacks
+			m.level = mon.level;
+			m.Grade = mon.Grade;
+			m.monsterTypeId = mon.monsterTypeId;
+
+			foreach (var attr in Build.statEnums) {
+				m[attr] = mon[attr];
+			}
+
+			for (int i = 0; i < mon._skilllist.Count; i++) {
+				m._skilllist[i].Level = mon._skilllist[i].Level;
+			}
+			m.damageFormula = null;
+			m.RefreshStats();
 
 			for (int i = 0; i < 6; i++) {
 				var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
@@ -1100,7 +1113,7 @@ namespace RuneApp
 			}
 
 			data.isModified = true;
-			OnMonsterUpdate?.Invoke(mon, false);
+			OnMonsterUpdate?.Invoke(m, false);
 		}
 
 		public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null)
