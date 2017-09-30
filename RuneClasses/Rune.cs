@@ -159,7 +159,9 @@ namespace RuneOptim {
 			Main.CopyTo(ref rhs.Main);
 			//rhs.Main.CopyFrom(Main);
 			Innate.CopyTo(ref rhs.Innate);
-			for (int i = 0; i < Math.Min(Subs.Count, rhs.Subs.Count); i++) {
+			while (rhs.Subs.Count < Subs.Count)
+				rhs.Subs.Add(new RuneAttr());
+			for (int i = 0; i < Subs.Count; i++) {
 				rhs.Subs[i].CopyFrom(Subs[i]);
 			}
 

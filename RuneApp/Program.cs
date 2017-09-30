@@ -995,6 +995,9 @@ namespace RuneApp
 		{
 			// tag the save as a modified save
 			Program.data.isModified = true;
+			var l = Program.data.Runes.Where(r => r.Locked);
+			foreach (var r in l)
+				r.Locked = false;
 
 			if (File.Exists(Program.Settings.SaveLocation))
 			{
@@ -1007,6 +1010,9 @@ namespace RuneApp
 			}
 
 			File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data, Formatting.Indented));
+
+			foreach (var r in l)
+				r.Locked = true;
 		}
 
 		public static void AddMonster(Monster mon)

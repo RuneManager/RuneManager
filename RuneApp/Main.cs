@@ -1079,17 +1079,23 @@ namespace RuneApp {
 			Program.RunBuilds(false, -1);
 		}
 
-		private void CheckSaveChanges()
+		private DialogResult CheckSaveChanges()
 		{
-			if (Program.data.isModified && MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question) == DialogResult.Yes)
-			{
+			if (!Program.data.isModified)
+				return DialogResult.Yes;
+					 
+			var res = MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+			if (res == DialogResult.Yes)
 				Program.SaveData();
-			}
+			return res;
 		}
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e)
 		{
-			CheckSaveChanges();
+			if (CheckSaveChanges() == DialogResult.Cancel) {
+				e.Cancel = true;
+				return;
+			}
 			Program.BuildsProgressTo -= Program_BuildsProgressTo;
 			Program.SaveBuilds();
 		}
