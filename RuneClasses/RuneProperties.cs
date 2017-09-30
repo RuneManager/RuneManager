@@ -86,14 +86,14 @@ namespace RuneOptim {
 				vv += tv * scale;
 
 				// transform each sub into a percentage of a 6*15 rune.
-				if (Innate != null && Innate.Type != Attr.Null)
+				if (Innate != null && Innate.Type > Attr.Null)
 				{
 					scale = 1 / VivoMod[Innate.Type] / RuneProperties.MainValues[Innate.Type][5][15];
 					vv += Innate.Value * scale;
 				}
 				foreach (var s in Subs)
 				{
-					if (s != null && s.Type != Attr.Null)
+					if (s != null && s.Type > Attr.Null)
 					{
 						scale = 1 / VivoMod[s.Type] / RuneProperties.MainValues[s.Type][5][15];
 						vv += s.Value * scale;
@@ -120,13 +120,13 @@ namespace RuneOptim {
 		public static int FlatCount(this Rune rune)
 		{
 			int count = 0;
-			if (rune.Subs.Count == 0 || rune.Subs[0].Type == Attr.Null) return count;
+			if (rune.Subs.Count == 0 || rune.Subs[0].Type <= Attr.Null) return count;
 			count += (rune.Subs[0].Type == Attr.HealthFlat || rune.Subs[0].Type == Attr.DefenseFlat || rune.Subs[0].Type == Attr.AttackFlat) ? 1 : 0;
-			if (rune.Subs.Count == 1 || rune.Subs[1].Type == Attr.Null) return count;
+			if (rune.Subs.Count == 1 || rune.Subs[1].Type <= Attr.Null) return count;
 			count += (rune.Subs[1].Type == Attr.HealthFlat || rune.Subs[1].Type == Attr.DefenseFlat || rune.Subs[1].Type == Attr.AttackFlat) ? 1 : 0;
-			if (rune.Subs.Count == 2 || rune.Subs[2].Type == Attr.Null) return count;
+			if (rune.Subs.Count == 2 || rune.Subs[2].Type <= Attr.Null) return count;
 			count += (rune.Subs[2].Type == Attr.HealthFlat || rune.Subs[2].Type == Attr.DefenseFlat || rune.Subs[2].Type == Attr.AttackFlat) ? 1 : 0;
-			if (rune.Subs.Count == 3 || rune.Subs[3].Type == Attr.Null) return count;
+			if (rune.Subs.Count == 3 || rune.Subs[3].Type <= Attr.Null) return count;
 			count += (rune.Subs[3].Type == Attr.HealthFlat || rune.Subs[3].Type == Attr.DefenseFlat || rune.Subs[3].Type == Attr.AttackFlat) ? 1 : 0;
 
 			return count;
@@ -176,7 +176,7 @@ namespace RuneOptim {
 			foreach (var sub in subs)
 			{
 				// if null
-				if (sub == Attr.Null)
+				if (sub <= Attr.Null)
 				{
 					r += 1 / (double)3;
 					continue;
@@ -265,7 +265,7 @@ namespace RuneOptim {
 			double r = 0;
 			foreach (var sub2 in subs)
 			{
-				if (sub == sub2 || sub2 == Attr.Null)
+				if (sub == sub2 || sub2 <= Attr.Null)
 					continue;
 
 				if ((subt == AttributeCategory.Offensive && attackSubs.Contains(sub2))
@@ -438,7 +438,7 @@ namespace RuneOptim {
 
 		public static double GetEfficiency(this Rune rune, Attr a, int val)
 		{
-			if (a == Attr.Null)
+			if (a <= Attr.Null)
 				return 0;
 			if (a == Attr.HealthFlat || a == Attr.AttackFlat || a == Attr.DefenseFlat)
 				return val / (double)2 / (5 * subUpgrades[a][rune.Grade - 1].Max);
@@ -460,6 +460,7 @@ namespace RuneOptim {
 
 		private static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
 		{
+			{Attr.Neg, 1 },
 			{Attr.Null, 1 },
 			{Attr.HealthFlat, 1875 },
 			{Attr.AttackFlat, 100 },

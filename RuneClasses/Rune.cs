@@ -312,14 +312,14 @@ namespace RuneOptim {
 
 		public static string StringIt(Attr type, int? val)
 		{
-			if (type == Attr.Null || !val.HasValue)
+			if (type <= Attr.Null || !val.HasValue)
 				return "";
 			return StringIt(type, val.Value);
 		}
 
 		public static string StringIt(Attr type, int val)
 		{
-			if (type == Attr.Null)
+			if (type <= Attr.Null)
 				return "";
 
 			string ret = StringIt(type);
@@ -403,10 +403,10 @@ namespace RuneOptim {
 			// Here, if a subs type is null, there is not further subs (it's how runes work), so we quit early.
 			if (!PredictSubs)
 			{
-				if (Subs.Count > 0 && (Subs[0].Type == stat || Subs[0].Type == Attr.Null)) return Subs[0].Value;
-				else if (Subs.Count > 1 && (Subs[1].Type == stat || Subs[1].Type == Attr.Null)) return Subs[1].Value;
-				else if (Subs.Count > 2 && (Subs[2].Type == stat || Subs[2].Type == Attr.Null)) return Subs[2].Value;
-				else if (Subs.Count > 3 && (Subs[3].Type == stat || Subs[3].Type == Attr.Null)) return Subs[3].Value;
+				if (Subs.Count > 0 && (Subs[0].Type == stat || Subs[0].Type <= Attr.Null)) return Subs[0].Value;
+				else if (Subs.Count > 1 && (Subs[1].Type == stat || Subs[1].Type <= Attr.Null)) return Subs[1].Value;
+				else if (Subs.Count > 2 && (Subs[2].Type == stat || Subs[2].Type <= Attr.Null)) return Subs[2].Value;
+				else if (Subs.Count > 3 && (Subs[3].Type == stat || Subs[3].Type <= Attr.Null)) return Subs[3].Value;
 			}
 			else
 			{

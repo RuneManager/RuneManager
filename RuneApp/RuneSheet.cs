@@ -911,7 +911,7 @@ namespace RuneApp
 							ws.Cells[row, col].Value = r.Main.Value.ToString() + " " + r.Main.Type.ToGameString();
 							break;
 						case "Innate":
-							if (r.Innate != null)
+							if (r.Innate != null && r.Innate.Type > Attr.Null)
 								ws.Cells[row, col].Value = r.Innate.Value.ToString() + " " + r.Innate.Type.ToGameString();
 							break;
 						case "1":

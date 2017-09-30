@@ -83,7 +83,7 @@ namespace RuneApp
 
 			public override string ToString()
 			{
-				if (type == Attr.Null) return "(None)";
+				if (type <= Attr.Null) return "(None)";
 				return type.ToString();
 			}
 		}

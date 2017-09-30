@@ -164,7 +164,7 @@ namespace MonsterDefinitions {
 				if (key == MultiAttr.Neg)
 					return Expression.Constant(1.0);
 				var attr = GetAttr(key);
-				if (attr == RuneOptim.Attr.Null)
+				if (attr <= RuneOptim.Attr.Null)
 					return Expression.Constant(GetAttrValue(key));
 				else if (attr < RuneOptim.Attr.Null)
 					return Expression.Multiply(Expression.Property(statType, "Item", Expression.Constant((RuneOptim.Attr)(-(int)attr))), Expression.Constant(GetAttrValue(key)));

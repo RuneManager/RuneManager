@@ -198,7 +198,7 @@ function hackLots(prop, num, on) {
 					});
 
 				var propdiv = new ServedResult("div") { contentDic = { { "class", "\"rune-box-right\"" } } };
-				if (r.Innate != null && r.Innate.Type != RuneOptim.Attr.Null)
+				if (r.Innate != null && r.Innate.Type > RuneOptim.Attr.Null)
 				{
 					propdiv.contentList.Add(new ServedResult("div")
 					{
@@ -216,7 +216,7 @@ function hackLots(prop, num, on) {
 				hidediv.contentList.Add("<br/>");
 				for (int i = 0; i < 4; i++)
 				{
-					if (r.Subs == null || r.Subs.Count <= i || r.Subs[i].Type == Attr.Null)
+					if (r.Subs == null || r.Subs.Count <= i || r.Subs[i].Type <= Attr.Null)
 						continue;
 					var s = r.Subs[i];
 					hidediv.contentList.Add(new ServedResult("span")

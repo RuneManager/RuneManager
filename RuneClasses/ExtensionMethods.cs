@@ -141,6 +141,8 @@ namespace RuneOptim
 		{
 			switch (attr)
 			{
+				case Attr.Neg:
+					return "neg";
 				case Attr.Null:
 					return "null";
 				case Attr.Accuracy:
@@ -233,6 +235,7 @@ namespace RuneOptim
 		{
 			switch (attr)
 			{
+				case Attr.Neg:
 				case Attr.Null:
 				case Attr.ExtraStat:
 				case Attr.EffectiveHP:

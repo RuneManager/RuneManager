@@ -1589,7 +1589,7 @@ namespace RuneOptim {
 			// go back 6,4,2 for putting things in
 			for (int i = 2; i >= 0; i--)
 			{
-				if (evenSlots[i] == Attr.Null)
+				if (evenSlots[i] <= Attr.Null)
 				{
 					if (ret.Health > 50)
 					{
