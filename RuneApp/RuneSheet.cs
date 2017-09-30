@@ -574,19 +574,22 @@ namespace RuneApp
 				ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
 				if (load?.Runes != null)
 				{
+					double d;
+					r.manageStats.TryGetValue("cbp" + build.ID, out d);
+					ws.Cells[row, col].Value = d;
 					if (load.Runes.Contains(r))
 					{
-						ws.Cells[row, col].Value = "Best";
+						//ws.Cells[row, col].Value = "Best";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
 					}
 					else if (second.Contains(r))
 					{
-						ws.Cells[row, col].Value = "Second";
+						//ws.Cells[row, col].Value = "Second";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
 					}
 					else if (good.Contains(r))
 					{
-						ws.Cells[row, col].Value = "Good";
+						//ws.Cells[row, col].Value = "Good";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
 					}
 					else

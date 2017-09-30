@@ -1087,11 +1087,13 @@ namespace RuneOptim {
 														r.manageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
 														runeUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
 														r.manageStats.AddOrUpdate("currentBuildPoints", curScore, (k, v) => Math.Max(v, curScore));
+														r.manageStats.AddOrUpdate("cbp" + this.ID, curScore, (k, v) => Math.Max(v, curScore));
 													}
 													else
 													{
 														r.manageStats.AddOrUpdate("LoadFilt", 0.001, (s, d) => { return d + 0.001; });
 														runeUsage.runesOkay.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
+														r.manageStats.AddOrUpdate("cbp" + this.ID, curScore, (k, v) => Math.Max(v, curScore * 0.9));
 													}
 												}
 											}
