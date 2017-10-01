@@ -182,10 +182,13 @@ namespace RuneApp
 				dlBtnX = x;
 				x += colWidth;
 
-
-
 				groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, stat);
 				x += colWidth;
+
+				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Goal", x, y, 40, 20);
+				textBox.TextChanged += global_TextChanged;
+				x += colWidth;
+
 
 				genX = x;
 
@@ -234,6 +237,10 @@ namespace RuneApp
 					x += colWidth;
 
 					groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, cc.ToString());
+					x += colWidth;
+
+					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Goal", x, y, 40, 20);
+					textBox.TextChanged += global_TextChanged;
 					x += colWidth;
 
 					genX = x;
@@ -840,6 +847,8 @@ namespace RuneApp
 				var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
 				ctrlCurrent.Text = cur[stat].ToString();
 
+				var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
+
 				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 
 				var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
@@ -848,6 +857,8 @@ namespace RuneApp
 
 				if (build.Minimum[stat] > 0)
 					ctrlTotal.Text = build.Minimum[stat].ToString();
+				if (!build.Goal[stat].EqualTo(0))
+					ctrlGoal.Text = build.Goal[stat].ToString();
 				if (!build.Sort[stat].EqualTo(0))
 					ctrlWorth.Text = build.Sort[stat].ToString();
 				if (!build.Maximum[stat].EqualTo(0))
@@ -870,6 +881,8 @@ namespace RuneApp
 				var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
 				ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
 
+				var ctrlGoal = groupBox1.Controls.Find(extra + "Goal", true).FirstOrDefault();
+
 				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
 
 				var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
@@ -878,6 +891,8 @@ namespace RuneApp
 
 				if (build.Minimum.ExtraGet(extra) > 0)
 					ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
+				if (!build.Goal.ExtraGet(extra).EqualTo(0))
+					ctrlGoal.Text = build.Goal.ExtraGet(extra).ToString();
 				if (!build.Sort.ExtraGet(extra).EqualTo(0))
 					ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
 				if (!build.Maximum.ExtraGet(extra).EqualTo(0))
@@ -906,6 +921,8 @@ namespace RuneApp
 					var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
 					ctrlCurrent.Text = cc.ToString();
 
+					var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
+
 					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 
 					var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
@@ -914,6 +931,8 @@ namespace RuneApp
 
 					if (build.Minimum.DamageSkillups[i] > 0)
 						ctrlTotal.Text = build.Minimum.DamageSkillups[i].ToString();
+					if (!build.Goal.DamageSkillups[i].EqualTo(0))
+						ctrlGoal.Text = build.Goal.DamageSkillups[i].ToString();
 					if (!build.Sort.DamageSkillups[i].EqualTo(0))
 						ctrlWorth.Text = build.Sort.DamageSkillups[i].ToString();
 					if (!build.Maximum.DamageSkillups[i].EqualTo(0))
@@ -1319,6 +1338,12 @@ namespace RuneApp
 					total = val;
 				build.Minimum[stat] = val;
 
+				var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
+				double goal = 0;
+				if (double.TryParse(ctrlGoal.Text, out val))
+					goal = val;
+				build.Maximum[stat] = val;
+
 				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 				double worth = 0;
 				if (double.TryParse(ctrlWorth.Text, out val))
@@ -1344,7 +1369,7 @@ namespace RuneApp
 				var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
 				if (worth != 0 && current != 0)
 				{
-					double pts = current;
+					double pts = current - goal;
 					if (max != 0)
 						pts = Math.Min(max, current);
 					ctrlWorthPts.Text = (pts / worth).ToString("0.##");
@@ -1359,6 +1384,13 @@ namespace RuneApp
 				if (double.TryParse(ctrlTotal.Text, out val))
 					total = val;
 				build.Minimum.ExtraSet(extra, val);
+
+				var ctrlGoal = groupBox1.Controls.Find(extra + "Goal", true).FirstOrDefault();
+				double goal = 0;
+				if (double.TryParse(ctrlGoal.Text, out val))
+					goal = val;
+				build.Sort.ExtraSet(extra, val);
+
 				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
 				double worth = 0;
 				if (double.TryParse(ctrlWorth.Text, out val))
@@ -1384,7 +1416,7 @@ namespace RuneApp
 				var ctrlWorthPts = groupBox1.Controls.Find(extra + "CurrentPts", true).FirstOrDefault();
 				if (worth != 0 && current != 0)
 				{
-					double pts = current;
+					double pts = current - goal;
 					if (max != 0)
 						pts = Math.Min(max, current);
 					ctrlWorthPts.Text = (pts / worth).ToString("0.##");
@@ -1409,6 +1441,13 @@ namespace RuneApp
 					if (double.TryParse(ctrlTotal.Text, out val))
 						total = val;
 					build.Minimum.ExtraSet(aaa, val);
+
+					var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
+					double goal = 0;
+					if (double.TryParse(ctrlGoal.Text, out val))
+						goal = val;
+					build.Sort.ExtraSet(aaa, val);
+
 					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 					double worth = 0;
 					if (double.TryParse(ctrlWorth.Text, out val))
@@ -1434,7 +1473,7 @@ namespace RuneApp
 					var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
 					if (worth != 0 && current != 0)
 					{
-						double pts = current;
+						double pts = current - goal;
 						if (max != 0)
 							pts = Math.Min(max, current);
 						ctrlWorthPts.Text = (pts / worth).ToString("0.##");

@@ -39,6 +39,7 @@
 			System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.label8 = new System.Windows.Forms.Label();
 			this.lblECR = new System.Windows.Forms.Label();
 			this.extraCritBox = new System.Windows.Forms.ComboBox();
 			this.check_autoBuild = new System.Windows.Forms.CheckBox();
@@ -125,6 +126,7 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.label8);
 			this.groupBox1.Controls.Add(this.lblECR);
 			this.groupBox1.Controls.Add(this.extraCritBox);
 			this.groupBox1.Controls.Add(this.check_autoBuild);
@@ -165,15 +167,25 @@
 			this.groupBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.groupBox1.Name = "groupBox1";
 			this.groupBox1.Padding = new System.Windows.Forms.Padding(2);
-			this.groupBox1.Size = new System.Drawing.Size(472, 730);
+			this.groupBox1.Size = new System.Drawing.Size(492, 730);
 			this.groupBox1.TabIndex = 7;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Stats";
 			// 
+			// label8
+			// 
+			this.label8.AutoSize = true;
+			this.label8.Location = new System.Drawing.Point(259, 76);
+			this.label8.Name = "label8";
+			this.label8.Size = new System.Drawing.Size(29, 13);
+			this.label8.TabIndex = 95;
+			this.label8.Text = "Goal";
+			// 
 			// lblECR
 			// 
+			this.lblECR.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.lblECR.AutoSize = true;
-			this.lblECR.Location = new System.Drawing.Point(362, 517);
+			this.lblECR.Location = new System.Drawing.Point(382, 517);
 			this.lblECR.Name = "lblECR";
 			this.lblECR.Size = new System.Drawing.Size(36, 13);
 			this.lblECR.TabIndex = 94;
@@ -181,6 +193,7 @@
 			// 
 			// extraCritBox
 			// 
+			this.extraCritBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.extraCritBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
 			this.extraCritBox.FormattingEnabled = true;
 			this.extraCritBox.Items.AddRange(new object[] {
@@ -188,7 +201,7 @@
             "15",
             "30",
             "45"});
-			this.extraCritBox.Location = new System.Drawing.Point(305, 514);
+			this.extraCritBox.Location = new System.Drawing.Point(325, 514);
 			this.extraCritBox.Name = "extraCritBox";
 			this.extraCritBox.Size = new System.Drawing.Size(51, 21);
 			this.extraCritBox.TabIndex = 93;
@@ -196,8 +209,9 @@
 			// 
 			// check_autoBuild
 			// 
+			this.check_autoBuild.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.check_autoBuild.AutoSize = true;
-			this.check_autoBuild.Location = new System.Drawing.Point(305, 616);
+			this.check_autoBuild.Location = new System.Drawing.Point(325, 616);
 			this.check_autoBuild.Name = "check_autoBuild";
 			this.check_autoBuild.Size = new System.Drawing.Size(106, 17);
 			this.check_autoBuild.TabIndex = 91;
@@ -208,8 +222,9 @@
 			// 
 			// check_autoRunes
 			// 
+			this.check_autoRunes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.check_autoRunes.AutoSize = true;
-			this.check_autoRunes.Location = new System.Drawing.Point(305, 593);
+			this.check_autoRunes.Location = new System.Drawing.Point(325, 593);
 			this.check_autoRunes.Name = "check_autoRunes";
 			this.check_autoRunes.Size = new System.Drawing.Size(115, 17);
 			this.check_autoRunes.TabIndex = 91;
@@ -219,7 +234,8 @@
 			// 
 			// btnDLawake
 			// 
-			this.btnDLawake.Location = new System.Drawing.Point(420, 567);
+			this.btnDLawake.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnDLawake.Location = new System.Drawing.Point(440, 567);
 			this.btnDLawake.Name = "btnDLawake";
 			this.btnDLawake.Size = new System.Drawing.Size(40, 21);
 			this.btnDLawake.TabIndex = 90;
@@ -229,8 +245,9 @@
 			// 
 			// checkDLawake
 			// 
+			this.checkDLawake.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkDLawake.AutoSize = true;
-			this.checkDLawake.Location = new System.Drawing.Point(305, 570);
+			this.checkDLawake.Location = new System.Drawing.Point(325, 570);
 			this.checkDLawake.Name = "checkDLawake";
 			this.checkDLawake.Size = new System.Drawing.Size(97, 17);
 			this.checkDLawake.TabIndex = 89;
@@ -240,7 +257,8 @@
 			// 
 			// btnDL6star
 			// 
-			this.btnDL6star.Location = new System.Drawing.Point(420, 540);
+			this.btnDL6star.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnDL6star.Location = new System.Drawing.Point(440, 540);
 			this.btnDL6star.Name = "btnDL6star";
 			this.btnDL6star.Size = new System.Drawing.Size(40, 21);
 			this.btnDL6star.TabIndex = 90;
@@ -250,8 +268,9 @@
 			// 
 			// checkDL6star
 			// 
+			this.checkDL6star.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.checkDL6star.AutoSize = true;
-			this.checkDL6star.Location = new System.Drawing.Point(305, 543);
+			this.checkDL6star.Location = new System.Drawing.Point(325, 543);
 			this.checkDL6star.Name = "checkDL6star";
 			this.checkDL6star.Size = new System.Drawing.Size(79, 17);
 			this.checkDL6star.TabIndex = 89;
@@ -262,7 +281,7 @@
 			// btnHelp
 			// 
 			this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnHelp.Location = new System.Drawing.Point(422, 12);
+			this.btnHelp.Location = new System.Drawing.Point(442, 12);
 			this.btnHelp.Name = "btnHelp";
 			this.btnHelp.Size = new System.Drawing.Size(45, 23);
 			this.btnHelp.TabIndex = 88;
@@ -296,7 +315,7 @@
 			// label7
 			// 
 			this.label7.AutoSize = true;
-			this.label7.Location = new System.Drawing.Point(394, 76);
+			this.label7.Location = new System.Drawing.Point(443, 76);
 			this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label7.Name = "label7";
 			this.label7.Size = new System.Drawing.Size(27, 13);
@@ -397,7 +416,7 @@
 			// label6
 			// 
 			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(346, 76);
+			this.label6.Location = new System.Drawing.Point(395, 76);
 			this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label6.Name = "label6";
 			this.label6.Size = new System.Drawing.Size(40, 13);
@@ -407,7 +426,7 @@
 			// label5
 			// 
 			this.label5.AutoSize = true;
-			this.label5.Location = new System.Drawing.Point(302, 76);
+			this.label5.Location = new System.Drawing.Point(351, 76);
 			this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label5.Name = "label5";
 			this.label5.Size = new System.Drawing.Size(22, 13);
@@ -428,7 +447,8 @@
 			// 
 			// testBuildButton
 			// 
-			this.testBuildButton.Location = new System.Drawing.Point(420, 513);
+			this.testBuildButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.testBuildButton.Location = new System.Drawing.Point(440, 513);
 			this.testBuildButton.Name = "testBuildButton";
 			this.testBuildButton.Size = new System.Drawing.Size(40, 21);
 			this.testBuildButton.TabIndex = 21;
@@ -439,7 +459,7 @@
 			// label14
 			// 
 			this.label14.AutoSize = true;
-			this.label14.Location = new System.Drawing.Point(248, 76);
+			this.label14.Location = new System.Drawing.Point(297, 76);
 			this.label14.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.label14.Name = "label14";
 			this.label14.Size = new System.Drawing.Size(36, 13);
@@ -449,7 +469,7 @@
 			// button2
 			// 
 			this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button2.Location = new System.Drawing.Point(385, 695);
+			this.button2.Location = new System.Drawing.Point(405, 695);
 			this.button2.Name = "button2";
 			this.button2.Size = new System.Drawing.Size(75, 23);
 			this.button2.TabIndex = 20;
@@ -871,7 +891,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1040, 730);
+			this.ClientSize = new System.Drawing.Size(1060, 730);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
 			this.Controls.Add(this.groupBox2);
@@ -965,5 +985,6 @@
 		private RuneDial runeDial;
 		private System.Windows.Forms.Label lblECR;
 		private System.Windows.Forms.ComboBox extraCritBox;
+		private System.Windows.Forms.Label label8;
 	}
 }
