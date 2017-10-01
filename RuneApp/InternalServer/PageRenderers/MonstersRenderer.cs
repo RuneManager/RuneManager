@@ -27,14 +27,16 @@ namespace RuneApp.InternalServer {
 	else
 		ee.style.display = 'none';
 }}
-function popBox(id) {{
-	var frame = document.getElementById(""frame"");
-	var ele = document.getElementById(id);
-	frame.src = ""/monsters/"" + id;
-	frame.style.position = ""absolute"";
-	frame.style.left = ""500px"";
-	frame.style.display = 'block';
-	frame.style.top = (ele.getBoundingClientRect().top + window.scrollY) + ""px"";
+function popBox(id, ev, ele) {{
+if (ev.button == 0 && !ev.ctrlKey && !ev.shiftKey && !ev.altKey) {{
+		var frame = document.getElementById(""frame"");
+		frame.src = ""/monsters/"" + id;
+		frame.style.position = ""absolute"";
+		frame.style.left = ""500px"";
+		frame.style.display = 'block';
+		frame.style.top = (ele.getBoundingClientRect().top + window.scrollY) + ""px"";
+		ev.preventDefault();
+	}}
 }}
 function closeBox() {{
 	window.location.refresh();
@@ -106,7 +108,7 @@ http.send(params);
 		static ServedResult renderMonster(Monster mon) {
 			var div = new ServedResult("div") {
 				contentList = {
-					renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{mon.monsterTypeId}.png\"" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
+					renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{mon.monsterTypeId}.png\"" }, { "width", "50px" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
 					new ServedResult("br"),
 					new ServedResult("span") { contentList = { mon.Id.ToString() } },
 					new ServedResult("br"),
@@ -153,7 +155,7 @@ http.send(params);
 			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null);
 			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
-			var locked = Program.data.Monsters.Where(m => m.Locked).Except(reserved).ToList();
+			var locked = Program.data.Monsters.Where(m => m.Locked).Union(bb.Select(b => b.mon)).Except(reserved).ToList();
 			var unlocked = Program.data.Monsters.Except(locked).Except(reserved).ToList();
 
 			var trashOnes = unlocked.Where(m => m.Grade == 1 && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon")).ToList();
@@ -261,7 +263,8 @@ http.send(params);
 					contentList = {
 						new ServedResult("span") { contentList = { renderMonLink(m, "build") } }, nl }
 				};
-				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
+				if (pairs.ContainsKey(m))
+					nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
 				if (nl.contentList.Count == 0)
 					nl.name = "br";
 				return li;
@@ -409,8 +412,11 @@ http.send(params);
 				if ((renderOptions & LinkRenderOptions.Level) == LinkRenderOptions.Level)
 					str += " " + m.level;
 				res.contentList.Add(new ServedResult(linkify ? "a" : "span") {
-					//contentDic = { { "href", "\"monsters/" + m.Id + "\"" } },
-					contentDic = { { "href", "'javascript:popBox(" + m.Id + ")'" }, { "id", m.Id.ToString() } },
+					contentDic = {
+						{ "id", m.Id.ToString() },
+						{ "href", "'monsters/" + m.Id + "'" },
+						{ "onclick", "'popBox(" + m.Id + ", event, this)'" },
+					},
 					contentList = { str }
 				});
 				if ((renderOptions & LinkRenderOptions.Locked) == LinkRenderOptions.Locked)
