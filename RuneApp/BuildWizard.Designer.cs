@@ -28,9 +28,9 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Default", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Custom", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Online", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Default", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Custom", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Online", System.Windows.Forms.HorizontalAlignment.Left);
 			this.cShowWizard = new System.Windows.Forms.CheckBox();
 			this.btnCreate = new System.Windows.Forms.Button();
 			this.prebuildList = new System.Windows.Forms.ListView();
@@ -50,9 +50,10 @@
 			// 
 			// cShowWizard
 			// 
+			this.cShowWizard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.cShowWizard.AutoSize = true;
 			this.cShowWizard.Enabled = false;
-			this.cShowWizard.Location = new System.Drawing.Point(12, 492);
+			this.cShowWizard.Location = new System.Drawing.Point(12, 447);
 			this.cShowWizard.Name = "cShowWizard";
 			this.cShowWizard.Size = new System.Drawing.Size(89, 17);
 			this.cShowWizard.TabIndex = 1;
@@ -63,7 +64,7 @@
 			// btnCreate
 			// 
 			this.btnCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnCreate.Location = new System.Drawing.Point(991, 486);
+			this.btnCreate.Location = new System.Drawing.Point(959, 441);
 			this.btnCreate.Name = "btnCreate";
 			this.btnCreate.Size = new System.Drawing.Size(75, 23);
 			this.btnCreate.TabIndex = 2;
@@ -73,23 +74,25 @@
 			// 
 			// prebuildList
 			// 
+			this.prebuildList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
 			this.prebuildList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.lhTemplate});
 			this.prebuildList.FullRowSelect = true;
-			listViewGroup1.Header = "Default";
-			listViewGroup1.Name = "lvgDefault";
-			listViewGroup2.Header = "Custom";
-			listViewGroup2.Name = "lvgCustom";
-			listViewGroup3.Header = "Online";
-			listViewGroup3.Name = "lvgOnline";
+			listViewGroup4.Header = "Default";
+			listViewGroup4.Name = "lvgDefault";
+			listViewGroup5.Header = "Custom";
+			listViewGroup5.Name = "lvgCustom";
+			listViewGroup6.Header = "Online";
+			listViewGroup6.Name = "lvgOnline";
 			this.prebuildList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup4,
+            listViewGroup5,
+            listViewGroup6});
 			this.prebuildList.Location = new System.Drawing.Point(12, 25);
 			this.prebuildList.MultiSelect = false;
 			this.prebuildList.Name = "prebuildList";
-			this.prebuildList.Size = new System.Drawing.Size(121, 422);
+			this.prebuildList.Size = new System.Drawing.Size(121, 410);
 			this.prebuildList.TabIndex = 3;
 			this.prebuildList.UseCompatibleStateImageBehavior = false;
 			this.prebuildList.View = System.Windows.Forms.View.Details;
@@ -111,9 +114,9 @@
 			// 
 			// cPreviewLocked
 			// 
-			this.cPreviewLocked.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.cPreviewLocked.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.cPreviewLocked.AutoSize = true;
-			this.cPreviewLocked.Location = new System.Drawing.Point(841, 282);
+			this.cPreviewLocked.Location = new System.Drawing.Point(809, 237);
 			this.cPreviewLocked.Name = "cPreviewLocked";
 			this.cPreviewLocked.Size = new System.Drawing.Size(135, 17);
 			this.cPreviewLocked.TabIndex = 8;
@@ -124,8 +127,9 @@
 			// runeBox
 			// 
 			this.runeBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.runeBox.Location = new System.Drawing.Point(809, 12);
+			this.runeBox.Location = new System.Drawing.Point(777, 12);
 			this.runeBox.Name = "runeBox";
+			this.runeBox.RuneId = ((ulong)(0ul));
 			this.runeBox.Size = new System.Drawing.Size(257, 186);
 			this.runeBox.TabIndex = 9;
 			this.runeBox.TabStop = false;
@@ -190,9 +194,9 @@
 			// 
 			// runeDial
 			// 
-			this.runeDial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.runeDial.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(841, 305);
+			this.runeDial.Location = new System.Drawing.Point(809, 260);
 			this.runeDial.Name = "runeDial";
 			this.runeDial.Size = new System.Drawing.Size(225, 175);
 			this.runeDial.TabIndex = 0;
@@ -212,7 +216,7 @@
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(1078, 521);
+			this.ClientSize = new System.Drawing.Size(1046, 476);
 			this.Controls.Add(this.runeBox);
 			this.Controls.Add(this.cPreviewLocked);
 			this.Controls.Add(this.statScore);

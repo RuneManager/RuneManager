@@ -77,6 +77,8 @@ namespace RuneApp {
 			build = newB;
 			this.lbPrebuild.Text = "Prebuild Template for " + build.mon.FullName;
 
+			build.mon.RefreshStats();
+
 			defTemplate = addTemplate(new Build() { MonName = "<None>" }, prebuildList.Groups[0]);
 			
 			prebuildList.Select();

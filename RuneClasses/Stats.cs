@@ -167,11 +167,29 @@ namespace RuneOptim
 		public double SkillupDamage = 0;
 
 		[JsonProperty("skillup_damage")]
-		public double[] DamageSkillups = new double[8];
+		private double[] damageSkillups = null;
+
+		[JsonIgnore]
+		public double[] DamageSkillups {
+			get {
+				if (damageSkillups == null)
+					damageSkillups = new double[8];
+				return damageSkillups;
+			}
+			set {
+				damageSkillups = value;
+			}
+		}
 		
-		public bool ShouldSerializeDamageSkillups()
+
+		public void DamageSkillupsSet(int ind, double val) {
+			DamageSkillups[ind] = val;
+			OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + ind, val));
+		}
+		
+		public bool ShouldSerializedamageSkillups()
 		{
-			return DamageSkillups.Any(d => d > 0);
+			return damageSkillups != null && damageSkillups.Any(d => d != 0);
 		}
 
 		[JsonProperty("skill_cooltime")]

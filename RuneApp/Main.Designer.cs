@@ -537,7 +537,7 @@
 			// 
 			// monImage
 			// 
-			this.monImage.Image = RuneApp.InternalServer.InternalServer.mon_spot;
+			this.monImage.Image = global::RuneApp.InternalServer.InternalServer.mon_spot;
 			this.monImage.Location = new System.Drawing.Point(189, 13);
 			this.monImage.Name = "monImage";
 			this.monImage.Size = new System.Drawing.Size(50, 50);

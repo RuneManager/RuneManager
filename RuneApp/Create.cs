@@ -217,7 +217,7 @@ namespace RuneApp
 				if (build?.mon?.SkillFunc?[i] != null)
 				{
 					//var ff = build.mon.SkillFunc[i]; build.mon.GetSkillDamage(Attr.AverageDamage, i);
-					string stat = "monskill" + i;
+					string stat = "Skill" + i;
 					x = 4;
 					groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i+1));
 					x += colWidth;
@@ -905,7 +905,7 @@ namespace RuneApp
 				if (build?.mon?.SkillFunc?[i] != null)
 				{
 					//var ff = build.mon.SkillFunc[i];
-					string stat = "monskill" + i;
+					string stat = "Skill" + i;
 					Attr aaa = Attr.Skill1 + i;
 
 					double aa = build.mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
@@ -1432,7 +1432,7 @@ namespace RuneApp
 				if (build?.mon?.SkillFunc?[i] != null)
 				{
 					var ff = build.mon.SkillFunc[i];
-					string stat = "monskill" + i;
+					string stat = "Skill" + i;
 					Attr aaa = Attr.Skill1 + i;
 
 					var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
@@ -1905,6 +1905,13 @@ namespace RuneApp
 
 						ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
 					}
+					for (int i = 0; i < 4; i++) {
+						var ctrlWorth = groupBox1.Controls.Find("Skill" + i + "Worth", true).FirstOrDefault();
+						if (ctrlWorth == null)
+							continue;
+
+						ctrlWorth.Text = build.Sort.DamageSkillups[i] != 0 ? build.Sort.DamageSkillups[i].ToString() : "";
+					}
 					loading = false;
 				}
 				else
@@ -1915,8 +1922,8 @@ namespace RuneApp
 						if (ctrlWorth == null)
 							continue;
 
-						int val;
-						int.TryParse(ctrlWorth.Text, out val);
+						double val;
+						double.TryParse(ctrlWorth.Text, out val);
 						build.Sort[stat] = val;
 					}
 
@@ -1926,9 +1933,19 @@ namespace RuneApp
 						if (ctrlWorth == null)
 							continue;
 
-						int val;
-						int.TryParse(ctrlWorth.Text, out val);
+						double val;
+						double.TryParse(ctrlWorth.Text, out val);
 						build.Sort.ExtraSet(extra, val);
+					}
+
+					for (int i = 0; i < 4; i++) {
+						var ctrlWorth = groupBox1.Controls.Find("Skill" + i + "Worth", true).FirstOrDefault();
+						if (ctrlWorth == null)
+							continue;
+
+						double val;
+						double.TryParse(ctrlWorth.Text, out val);
+						build.Sort.DamageSkillupsSet(i, val);
 					}
 
 				}

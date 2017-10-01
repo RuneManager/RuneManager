@@ -71,8 +71,8 @@
 			this.lbHP.Name = "lbHP";
 			this.lbHP.Size = new System.Drawing.Size(52, 13);
 			this.lbHP.TabIndex = 0;
-			this.lbHP.Text = "HP";
 			this.lbHP.Tag = RuneOptim.Attr.HealthPercent;
+			this.lbHP.Text = "HP";
 			this.lbHP.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// tbHP
@@ -95,7 +95,7 @@
 			// 
 			// tbATK
 			// 
-			this.tbATK.Location = new System.Drawing.Point(3, 42);
+			this.tbATK.Location = new System.Drawing.Point(3, 41);
 			this.tbATK.Name = "tbATK";
 			this.tbATK.Size = new System.Drawing.Size(60, 20);
 			this.tbATK.TabIndex = 1;
@@ -104,7 +104,7 @@
 			// 
 			// lbATK
 			// 
-			this.lbATK.Location = new System.Drawing.Point(6, 45);
+			this.lbATK.Location = new System.Drawing.Point(6, 44);
 			this.lbATK.Name = "lbATK";
 			this.lbATK.Size = new System.Drawing.Size(52, 13);
 			this.lbATK.TabIndex = 0;
@@ -114,7 +114,7 @@
 			// 
 			// tbDEF
 			// 
-			this.tbDEF.Location = new System.Drawing.Point(3, 68);
+			this.tbDEF.Location = new System.Drawing.Point(3, 66);
 			this.tbDEF.Name = "tbDEF";
 			this.tbDEF.Size = new System.Drawing.Size(60, 20);
 			this.tbDEF.TabIndex = 1;
@@ -123,7 +123,7 @@
 			// 
 			// lbDEF
 			// 
-			this.lbDEF.Location = new System.Drawing.Point(6, 71);
+			this.lbDEF.Location = new System.Drawing.Point(6, 69);
 			this.lbDEF.Name = "lbDEF";
 			this.lbDEF.Size = new System.Drawing.Size(52, 13);
 			this.lbDEF.TabIndex = 0;
@@ -133,7 +133,7 @@
 			// 
 			// tbSPD
 			// 
-			this.tbSPD.Location = new System.Drawing.Point(3, 94);
+			this.tbSPD.Location = new System.Drawing.Point(3, 91);
 			this.tbSPD.Name = "tbSPD";
 			this.tbSPD.Size = new System.Drawing.Size(60, 20);
 			this.tbSPD.TabIndex = 1;
@@ -142,7 +142,7 @@
 			// 
 			// lbSPD
 			// 
-			this.lbSPD.Location = new System.Drawing.Point(6, 97);
+			this.lbSPD.Location = new System.Drawing.Point(6, 94);
 			this.lbSPD.Name = "lbSPD";
 			this.lbSPD.Size = new System.Drawing.Size(52, 13);
 			this.lbSPD.TabIndex = 0;
@@ -152,7 +152,7 @@
 			// 
 			// tbCRate
 			// 
-			this.tbCRate.Location = new System.Drawing.Point(3, 131);
+			this.tbCRate.Location = new System.Drawing.Point(3, 117);
 			this.tbCRate.Name = "tbCRate";
 			this.tbCRate.Size = new System.Drawing.Size(60, 20);
 			this.tbCRate.TabIndex = 1;
@@ -161,7 +161,7 @@
 			// 
 			// lbCRate
 			// 
-			this.lbCRate.Location = new System.Drawing.Point(6, 134);
+			this.lbCRate.Location = new System.Drawing.Point(6, 120);
 			this.lbCRate.Name = "lbCRate";
 			this.lbCRate.Size = new System.Drawing.Size(52, 13);
 			this.lbCRate.TabIndex = 0;
@@ -171,7 +171,7 @@
 			// 
 			// tbCDam
 			// 
-			this.tbCDam.Location = new System.Drawing.Point(3, 157);
+			this.tbCDam.Location = new System.Drawing.Point(3, 142);
 			this.tbCDam.Name = "tbCDam";
 			this.tbCDam.Size = new System.Drawing.Size(60, 20);
 			this.tbCDam.TabIndex = 1;
@@ -180,7 +180,7 @@
 			// 
 			// lbCDam
 			// 
-			this.lbCDam.Location = new System.Drawing.Point(6, 160);
+			this.lbCDam.Location = new System.Drawing.Point(6, 145);
 			this.lbCDam.Name = "lbCDam";
 			this.lbCDam.Size = new System.Drawing.Size(52, 13);
 			this.lbCDam.TabIndex = 0;
@@ -190,7 +190,7 @@
 			// 
 			// tbRES
 			// 
-			this.tbRES.Location = new System.Drawing.Point(3, 183);
+			this.tbRES.Location = new System.Drawing.Point(3, 167);
 			this.tbRES.Name = "tbRES";
 			this.tbRES.Size = new System.Drawing.Size(60, 20);
 			this.tbRES.TabIndex = 1;
@@ -199,7 +199,7 @@
 			// 
 			// lbRES
 			// 
-			this.lbRES.Location = new System.Drawing.Point(6, 186);
+			this.lbRES.Location = new System.Drawing.Point(6, 170);
 			this.lbRES.Name = "lbRES";
 			this.lbRES.Size = new System.Drawing.Size(52, 13);
 			this.lbRES.TabIndex = 0;
@@ -209,7 +209,7 @@
 			// 
 			// tbACC
 			// 
-			this.tbACC.Location = new System.Drawing.Point(3, 209);
+			this.tbACC.Location = new System.Drawing.Point(3, 192);
 			this.tbACC.Name = "tbACC";
 			this.tbACC.Size = new System.Drawing.Size(60, 20);
 			this.tbACC.TabIndex = 1;
@@ -218,7 +218,7 @@
 			// 
 			// lbACC
 			// 
-			this.lbACC.Location = new System.Drawing.Point(6, 212);
+			this.lbACC.Location = new System.Drawing.Point(6, 195);
 			this.lbACC.Name = "lbACC";
 			this.lbACC.Size = new System.Drawing.Size(52, 13);
 			this.lbACC.TabIndex = 0;
@@ -228,7 +228,7 @@
 			// 
 			// tbEHP
 			// 
-			this.tbEHP.Location = new System.Drawing.Point(3, 244);
+			this.tbEHP.Location = new System.Drawing.Point(3, 218);
 			this.tbEHP.Name = "tbEHP";
 			this.tbEHP.Size = new System.Drawing.Size(60, 20);
 			this.tbEHP.TabIndex = 1;
@@ -237,7 +237,7 @@
 			// 
 			// lbEHP
 			// 
-			this.lbEHP.Location = new System.Drawing.Point(6, 247);
+			this.lbEHP.Location = new System.Drawing.Point(6, 221);
 			this.lbEHP.Name = "lbEHP";
 			this.lbEHP.Size = new System.Drawing.Size(52, 13);
 			this.lbEHP.TabIndex = 0;
@@ -247,7 +247,7 @@
 			// 
 			// tbEHPDB
 			// 
-			this.tbEHPDB.Location = new System.Drawing.Point(3, 270);
+			this.tbEHPDB.Location = new System.Drawing.Point(3, 243);
 			this.tbEHPDB.Name = "tbEHPDB";
 			this.tbEHPDB.Size = new System.Drawing.Size(60, 20);
 			this.tbEHPDB.TabIndex = 1;
@@ -256,7 +256,7 @@
 			// 
 			// lbEHPDB
 			// 
-			this.lbEHPDB.Location = new System.Drawing.Point(6, 273);
+			this.lbEHPDB.Location = new System.Drawing.Point(6, 246);
 			this.lbEHPDB.Name = "lbEHPDB";
 			this.lbEHPDB.Size = new System.Drawing.Size(52, 13);
 			this.lbEHPDB.TabIndex = 0;
@@ -266,7 +266,7 @@
 			// 
 			// tbDPS
 			// 
-			this.tbDPS.Location = new System.Drawing.Point(3, 296);
+			this.tbDPS.Location = new System.Drawing.Point(3, 268);
 			this.tbDPS.Name = "tbDPS";
 			this.tbDPS.Size = new System.Drawing.Size(60, 20);
 			this.tbDPS.TabIndex = 1;
@@ -275,7 +275,7 @@
 			// 
 			// lbDPS
 			// 
-			this.lbDPS.Location = new System.Drawing.Point(6, 299);
+			this.lbDPS.Location = new System.Drawing.Point(6, 271);
 			this.lbDPS.Name = "lbDPS";
 			this.lbDPS.Size = new System.Drawing.Size(52, 13);
 			this.lbDPS.TabIndex = 0;
@@ -285,7 +285,7 @@
 			// 
 			// tbAvDam
 			// 
-			this.tbAvDam.Location = new System.Drawing.Point(3, 322);
+			this.tbAvDam.Location = new System.Drawing.Point(3, 293);
 			this.tbAvDam.Name = "tbAvDam";
 			this.tbAvDam.Size = new System.Drawing.Size(60, 20);
 			this.tbAvDam.TabIndex = 1;
@@ -294,7 +294,7 @@
 			// 
 			// lbAvDam
 			// 
-			this.lbAvDam.Location = new System.Drawing.Point(6, 325);
+			this.lbAvDam.Location = new System.Drawing.Point(6, 296);
 			this.lbAvDam.Name = "lbAvDam";
 			this.lbAvDam.Size = new System.Drawing.Size(52, 13);
 			this.lbAvDam.TabIndex = 0;
@@ -304,7 +304,7 @@
 			// 
 			// tbMxDam
 			// 
-			this.tbMxDam.Location = new System.Drawing.Point(3, 348);
+			this.tbMxDam.Location = new System.Drawing.Point(3, 318);
 			this.tbMxDam.Name = "tbMxDam";
 			this.tbMxDam.Size = new System.Drawing.Size(60, 20);
 			this.tbMxDam.TabIndex = 1;
@@ -313,7 +313,7 @@
 			// 
 			// lbMxDam
 			// 
-			this.lbMxDam.Location = new System.Drawing.Point(6, 351);
+			this.lbMxDam.Location = new System.Drawing.Point(6, 321);
 			this.lbMxDam.Name = "lbMxDam";
 			this.lbMxDam.Size = new System.Drawing.Size(52, 13);
 			this.lbMxDam.TabIndex = 0;
@@ -323,69 +323,77 @@
 			// 
 			// tbSkill1
 			// 
-			this.tbSkill1.Location = new System.Drawing.Point(3, 383);
+			this.tbSkill1.Location = new System.Drawing.Point(3, 344);
 			this.tbSkill1.Name = "tbSkill1";
 			this.tbSkill1.Size = new System.Drawing.Size(60, 20);
 			this.tbSkill1.TabIndex = 1;
+			this.tbSkill1.Tag = "Skill1";
 			this.tbSkill1.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// tbSkill2
 			// 
-			this.tbSkill2.Location = new System.Drawing.Point(3, 409);
+			this.tbSkill2.Location = new System.Drawing.Point(3, 369);
 			this.tbSkill2.Name = "tbSkill2";
 			this.tbSkill2.Size = new System.Drawing.Size(60, 20);
 			this.tbSkill2.TabIndex = 1;
+			this.tbSkill2.Tag = "Skill2";
 			this.tbSkill2.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// tbSkill3
 			// 
-			this.tbSkill3.Location = new System.Drawing.Point(3, 435);
+			this.tbSkill3.Location = new System.Drawing.Point(3, 394);
 			this.tbSkill3.Name = "tbSkill3";
 			this.tbSkill3.Size = new System.Drawing.Size(60, 20);
 			this.tbSkill3.TabIndex = 1;
+			this.tbSkill3.Tag = "Skill3";
 			this.tbSkill3.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// tbSkill4
 			// 
-			this.tbSkill4.Location = new System.Drawing.Point(3, 461);
+			this.tbSkill4.Location = new System.Drawing.Point(3, 419);
 			this.tbSkill4.Name = "tbSkill4";
 			this.tbSkill4.Size = new System.Drawing.Size(60, 20);
 			this.tbSkill4.TabIndex = 1;
+			this.tbSkill4.Tag = "Skill4";
 			this.tbSkill4.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbSkill1
 			// 
-			this.lbSkill1.Location = new System.Drawing.Point(6, 386);
+			this.lbSkill1.Location = new System.Drawing.Point(6, 347);
 			this.lbSkill1.Name = "lbSkill1";
 			this.lbSkill1.Size = new System.Drawing.Size(52, 13);
 			this.lbSkill1.TabIndex = 0;
+			this.lbSkill1.Tag = "Skill1";
 			this.lbSkill1.Text = "Skill1";
 			this.lbSkill1.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// lbSkill2
 			// 
-			this.lbSkill2.Location = new System.Drawing.Point(6, 412);
+			this.lbSkill2.Location = new System.Drawing.Point(6, 372);
 			this.lbSkill2.Name = "lbSkill2";
 			this.lbSkill2.Size = new System.Drawing.Size(52, 13);
 			this.lbSkill2.TabIndex = 0;
+			this.lbSkill2.Tag = "Skill2";
 			this.lbSkill2.Text = "Skill2";
 			this.lbSkill2.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// lbSkill3
 			// 
-			this.lbSkill3.Location = new System.Drawing.Point(6, 438);
+			this.lbSkill3.Location = new System.Drawing.Point(6, 397);
 			this.lbSkill3.Name = "lbSkill3";
 			this.lbSkill3.Size = new System.Drawing.Size(52, 13);
 			this.lbSkill3.TabIndex = 0;
+			this.lbSkill3.Tag = "Skill3";
 			this.lbSkill3.Text = "Skill3";
 			this.lbSkill3.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
 			// lbSkill4
 			// 
-			this.lbSkill4.Location = new System.Drawing.Point(6, 464);
+			this.lbSkill4.Location = new System.Drawing.Point(6, 422);
 			this.lbSkill4.Name = "lbSkill4";
 			this.lbSkill4.Size = new System.Drawing.Size(52, 13);
 			this.lbSkill4.TabIndex = 0;
+			this.lbSkill4.Tag = "Skill4";
 			this.lbSkill4.Text = "Skill4";
 			this.lbSkill4.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -429,7 +437,7 @@
 			this.Controls.Add(this.tbATK);
 			this.Controls.Add(this.tbHP);
 			this.Name = "StatColumn";
-			this.Size = new System.Drawing.Size(69, 489);
+			this.Size = new System.Drawing.Size(69, 446);
 			this.Load += new System.EventHandler(this.StatColumn_Load);
 			this.ResumeLayout(false);
 			this.PerformLayout();

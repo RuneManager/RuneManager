@@ -1060,7 +1060,7 @@ namespace RuneApp {
 		public void ProgressToList(Build b, string str)
 		{
 			Program.log.Info("_" + str);
-			this.Invoke((MethodInvoker)delegate
+			this.BeginInvoke((MethodInvoker)delegate
 			{
 				if (!IsDisposed)
 				{

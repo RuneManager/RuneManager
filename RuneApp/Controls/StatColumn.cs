@@ -68,12 +68,18 @@ namespace RuneApp {
 			{
 				loading = true;
 				stats = value;
-				if (stats != null)
+				if (stats != null) {
 					stats.OnStatChanged += Stats_OnStatChanged;
+				}
 				foreach (var a in Build.statAll)
 				{
 					ChangeTextBox(a, stats?[a]);
 					ChangeLabel(a, stats?[a]);
+				}
+				foreach (var a in new Attr[] { Attr.Skill1, Attr.Skill2, Attr.Skill3, Attr.Skill4 }) {
+					ChangeTextBox(a, stats?.DamageSkillups[a - Attr.Skill1]);
+					//ChangeLabel(a, stats?.DamageSkillups[(int)a - 22]);
+					ChangeLabel(a, stats?.GetSkillDamage(Attr.AverageDamage, a - Attr.Skill1, stats));
 				}
 				if (stats != null && !ShowExtras)
 				{
@@ -128,7 +134,7 @@ namespace RuneApp {
 				if (c.Tag != null && c.Tag.ToString() == astr)
 				{
 					if (v != null)
-						c.Text = v.ToString();
+						c.Text = v != 0 ? v.ToString() : "";
 					else
 						c.Text = c.Name.Replace("tb", "");
 				}
@@ -145,7 +151,7 @@ namespace RuneApp {
 				if (c.Tag != null && c.Tag.ToString() == astr)
 				{
 					if (v != null)
-						c.Text = v.ToString();
+						c.Text = v != 0 ? v.ToString() : "";
 					else
 						c.Text = c.Name.Replace("lb", "");
 				}
@@ -177,20 +183,29 @@ namespace RuneApp {
 			if (tb != null && stats != null)
 			{
 				var tag = tb.Tag;
-				if (tag != null)
-				{
-					Attr attr;
-					double v;
-					if (Enum.TryParse(tag.ToString(), out attr) && double.TryParse(tb.Text, out v))
-					{
-						loading = true;
-						stats[attr] = v;
-						loading = false;
+				Attr attr;
+				double v;
+				if (tag != null && Enum.TryParse(tag.ToString(), out attr) && (double.TryParse(tb.Text, out v) || string.IsNullOrEmpty(tb.Text))) {
+					loading = true;
+					if (attr >= Attr.Skill1) {
+						//stats.DamageSkillups[(attr - Attr.Skill1)] = v;
+						stats.DamageSkillupsSet(attr - Attr.Skill1, v);
 					}
+					else {
+						stats[attr] = v;
+					}
+					loading = false;
 				}
-				else
-				{
-					// TODO: skills
+			}
+		}
+
+		public void SetSkills(int num) {
+			for (int i = 0; i < 4; i++) {
+				var astr = (Attr.Skill1 + i).ToString();
+				loading = true;
+				foreach (Control c in Controls) {
+					if ((c.Tag as string) != astr) continue;
+					c.Visible = i < num && ((c is TextBox && editable) || (c is Label && !editable));
 				}
 			}
 		}

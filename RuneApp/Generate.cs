@@ -37,9 +37,10 @@ namespace RuneApp {
 			int x, y;
 
 			y = 20;
+			
 			foreach (string stat in Build.statNames)
 			{
-				x = 25;
+				/*x = 25;
 				label = groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, text: stat);
 				x += 45;
 
@@ -49,12 +50,12 @@ namespace RuneApp {
 				textBox.TextChanged += textBox_TextChanged;
 
 				y += 22;
-
+				*/
 				loadoutList.Columns.Add(stat).Width = 80;
 			}
 			foreach (string extra in Build.extraNames)
 			{
-				x = 25;
+				/*x = 25;
 				label = groupBox1.Controls.MakeControl<Label>(extra, "Label", x, y, text: extra);
 				x += 45;
 
@@ -64,7 +65,7 @@ namespace RuneApp {
 				textBox.TextChanged += textBox_TextChanged;
 
 				y += 22;
-
+				*/
 				loadoutList.Columns.Add(extra).Width = 80;
 			}
 			loadoutList.Columns.Add("Skill1").Width = 80;
@@ -82,10 +83,29 @@ namespace RuneApp {
 			{
 				loadoutList.Items.Add(renderLoadoutTest(b));
 			}
-			
+
+			statColScore.Stats = build.Sort;
+			build.Sort.OnStatChanged += Sort_OnStatChanged;
+			statColScore.SetSkills(build.mon._SkillList.Count);
+
 			// Disregard locked, but honor equippedness checking
 			build.BuildPrintTo += Build_BuildPrintTo;
 			build.BuildProgTo += Build_BuildProgTo;
+		}
+
+		private void Sort_OnStatChanged(object sender, StatModEventArgs e) {
+			// if we are generating builds, don't recalculate all the builds
+			if (building) return;
+
+			// "sort" as in, recalculate the whole number
+			foreach (ListViewItem li in loadoutList.Items) {
+				ListItemSort(li);
+			}
+			var lv = loadoutList;
+			var lvs = (ListViewSort)(lv).ListViewItemSorter;
+			lvs.OnColumnClick(0, false, true);
+			// actually sort the list, on points
+			lv.Sort();
 		}
 
 		private void Build_BuildProgTo(object sender, ProgToEventArgs e)
@@ -210,6 +230,12 @@ namespace RuneApp {
 				double val;
 				double.TryParse(tb?.Text, out val);
 				build.Sort.ExtraSet(extra, val);
+			}
+			for (int i = 0; i < 4; i++) {
+				TextBox tb = (TextBox)Controls.Find("Skill" + (i + 1) + "Worth", true).FirstOrDefault();
+				double val;
+				double.TryParse(tb?.Text, out val);
+				build.Sort.DamageSkillupsSet(i, val);
 			}
 			// "sort" as in, recalculate the whole number
 			foreach (ListViewItem li in loadoutList.Items)
@@ -390,6 +416,7 @@ namespace RuneApp {
 			build.loads.CollectionChanged -= Loads_CollectionChanged;
 			build.BuildPrintTo -= Build_BuildPrintTo;
 			build.BuildProgTo -= Build_BuildProgTo;
+			build.Sort.OnStatChanged -= Sort_OnStatChanged;
 		}
 
 		private void btn_runtest_Click(object sender, EventArgs e)

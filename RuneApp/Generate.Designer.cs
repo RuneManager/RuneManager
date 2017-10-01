@@ -32,6 +32,7 @@
 			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.statColScore = new RuneApp.StatColumn();
 			this.btn_runtest = new System.Windows.Forms.Button();
 			this.btn_powerrunes = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
@@ -42,6 +43,7 @@
 			this.statusStrip1 = new System.Windows.Forms.StatusStrip();
 			this.toolStripProgressBar1 = new System.Windows.Forms.ToolStripProgressBar();
 			this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+			this.statColLabel = new RuneApp.StatColumn();
 			this.groupBox1.SuspendLayout();
 			this.statusStrip1.SuspendLayout();
 			this.SuspendLayout();
@@ -78,12 +80,13 @@
 			// 
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.statColLabel);
+			this.groupBox1.Controls.Add(this.statColScore);
 			this.groupBox1.Controls.Add(this.btn_runtest);
 			this.groupBox1.Controls.Add(this.btn_powerrunes);
 			this.groupBox1.Controls.Add(this.btnHelp);
 			this.groupBox1.Controls.Add(this.btnCancel);
 			this.groupBox1.Controls.Add(this.btnSave);
-			this.groupBox1.Controls.Add(this.runeBox);
 			this.groupBox1.Controls.Add(this.runeDial);
 			this.groupBox1.Location = new System.Drawing.Point(736, 12);
 			this.groupBox1.Name = "groupBox1";
@@ -91,6 +94,16 @@
 			this.groupBox1.TabIndex = 1;
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Scoring";
+			// 
+			// statColScore
+			// 
+			this.statColScore.Editable = true;
+			this.statColScore.Location = new System.Drawing.Point(81, 19);
+			this.statColScore.Name = "statColScore";
+			this.statColScore.Size = new System.Drawing.Size(69, 446);
+			this.statColScore.Stats = null;
+			this.statColScore.TabIndex = 105;
+			this.statColScore.Text = "";
 			// 
 			// btn_runtest
 			// 
@@ -126,6 +139,7 @@
 			// btnCancel
 			// 
 			this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 			this.btnCancel.Location = new System.Drawing.Point(179, 664);
 			this.btnCancel.Name = "btnCancel";
 			this.btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -147,8 +161,9 @@
 			// 
 			// runeBox
 			// 
-			this.runeBox.Location = new System.Drawing.Point(6, 472);
+			this.runeBox.Location = new System.Drawing.Point(467, 503);
 			this.runeBox.Name = "runeBox";
+			this.runeBox.RuneId = ((ulong)(0ul));
 			this.runeBox.Size = new System.Drawing.Size(248, 186);
 			this.runeBox.TabIndex = 104;
 			this.runeBox.TabStop = false;
@@ -159,7 +174,7 @@
 			// runeDial
 			// 
 			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(-13, 309);
+			this.runeDial.Location = new System.Drawing.Point(6, 483);
 			this.runeDial.Name = "runeDial";
 			this.runeDial.Size = new System.Drawing.Size(225, 175);
 			this.runeDial.TabIndex = 103;
@@ -188,6 +203,15 @@
 			this.toolStripStatusLabel1.Size = new System.Drawing.Size(118, 17);
 			this.toolStripStatusLabel1.Text = "toolStripStatusLabel1";
 			// 
+			// statColLabel
+			// 
+			this.statColLabel.Location = new System.Drawing.Point(6, 19);
+			this.statColLabel.Name = "statColLabel";
+			this.statColLabel.Size = new System.Drawing.Size(69, 446);
+			this.statColLabel.Stats = null;
+			this.statColLabel.TabIndex = 106;
+			this.statColLabel.Text = "";
+			// 
 			// Generate
 			// 
 			this.AcceptButton = this.btnSave;
@@ -195,6 +219,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.CancelButton = this.btnCancel;
 			this.ClientSize = new System.Drawing.Size(1008, 730);
+			this.Controls.Add(this.runeBox);
 			this.Controls.Add(this.statusStrip1);
 			this.Controls.Add(this.groupBox1);
 			this.Controls.Add(this.loadoutList);
@@ -228,5 +253,7 @@
         private System.Windows.Forms.Button btn_runtest;
 		private RuneDial runeDial;
 		private RuneBox runeBox;
+		private StatColumn statColScore;
+		private StatColumn statColLabel;
 	}
 }
