@@ -453,6 +453,13 @@ namespace RuneOptim {
 			}
 		}
 
+		[JsonIgnore]
+		public bool IsRunning_Unsafe {
+			get {
+				return isRunning;
+			}
+		}
+
 		private bool GetRunningHandle()
 		{
 			lock (isRunLock)
@@ -494,58 +501,59 @@ namespace RuneOptim {
 		}
 
 		// build the scoring function
-		public double CalcScore(Stats current, Stats outvals = null, Action<string, int> writeTo = null)
-		{
+		public double CalcScore(Stats current, Stats outvals = null, Action<string, int> writeTo = null) {
 			if (current == null)
 				return 0;
-			if (outvals == null)
-				outvals = new Stats();
-			outvals.SetTo(0);
+			//if (outvals == null)
+			//	outvals = new Stats();
+			if (outvals != null)
+				outvals.SetTo(0);
 
-			double pts = 0;
+			string str;
+			double vv, v2, pts = 0;
 			// dodgy hack for indexing in Generate ListView
 			int i = 2;
-			foreach (Attr stat in Build.statAll)
-			{
-				if (!stat.HasFlag(Attr.ExtraStat))
-				{
-					double vv = current[stat];
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (Sort[stat] != 0)
-					{
-						outvals[stat] = ((Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat])) - Goal[stat]) / Sort[stat];
-						str = outvals[stat].ToString("0.#") + " (" + current[stat] + ")";
-						pts += outvals[stat];
-					}
-					writeTo?.Invoke(str, i);
-					i++;
+			foreach (Attr stat in Build.statEnums) {
+				vv = current[stat];
+				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+				if (Sort[stat] != 0) {
+					v2 = ((Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat])) - Goal[stat]) / Sort[stat];
+					if (outvals != null)
+						outvals[stat] = v2;
+					if (writeTo != null)
+						str = v2.ToString("0.#") + " (" + current[stat] + ")";
+					pts += v2;
 				}
-				else
-				{
-					double vv = current.ExtraValue(stat);
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (Sort.ExtraGet(stat) != 0)
-					{
-						outvals.ExtraSet(stat, ((Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat))) - Goal.ExtraGet(stat)) / Sort.ExtraGet(stat));
-						str = outvals[stat].ToString("0.#") + " (" + vv + ")";
-						pts += outvals[stat];
-					}
-					writeTo?.Invoke(str, i);
-					i++;
-				}
+				writeTo?.Invoke(str, i);
+				i++;
 			}
-			for (int j = 0; j < 4; j++)
-			{
-				if (current.SkillFunc[j] != null)
-				{
-					double vv = //current.SkillFunc[j](current);
-						current.GetSkillDamage(Attr.AverageDamage, j);
-					string str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (Sort.DamageSkillups[j] != 0)
-					{
-						outvals.DamageSkillups[j] = ((Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j])) - Goal.DamageSkillups[j]) / Sort.DamageSkillups[j];
-						str = outvals.DamageSkillups[j].ToString("0.#") + " (" + vv + ")";
-						pts += outvals.DamageSkillups[j];
+
+			foreach (Attr stat in Build.extraEnums) {
+				vv = current.ExtraValue(stat);
+				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+				if (Sort.ExtraGet(stat) != 0) {
+					v2 = ((Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat))) - Goal.ExtraGet(stat)) / Sort.ExtraGet(stat);
+					if (outvals != null)
+						outvals.ExtraSet(stat, v2);
+					if (writeTo != null)
+						str = v2.ToString("0.#") + " (" + vv + ")";
+					pts += v2;
+				}
+				writeTo?.Invoke(str, i);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (current.SkillFunc[j] != null) {
+					vv = current.GetSkillDamage(Attr.AverageDamage, j); //current.SkillFunc[j](current);
+					str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+					if (Sort.DamageSkillups[j] != 0) {
+						v2 = ((Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j])) - Goal.DamageSkillups[j]) / Sort.DamageSkillups[j];
+						if (outvals != null)
+							outvals.DamageSkillups[j] = v2;
+						if (writeTo != null)
+							str = v2.ToString("0.#") + " (" + vv + ")";
+						pts += v2;
 					}
 
 					writeTo?.Invoke(str, i);
@@ -790,7 +798,7 @@ namespace RuneOptim {
 				total *= runes[5].Length;
 				long complete = total;
 
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "..."));
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "cooking"));
 
 				if (total == 0)
 				{
@@ -829,12 +837,18 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 				SynchronizedCollection<string> outstrs = new SynchronizedCollection<string>();
 #endif
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "..."));
 
 				// Parallel the outer loop
 				SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
 				Parallel.ForEach(runes[0], (r0, loopState) =>
 				{
-					if (!IsRunning)
+					//var tempReq = RequiredSets.OrderBy(i => i).ToList();
+					var tempReq = RequiredSets.ToList();
+					var tempMax = Maximum == null ? null : new Stats(Maximum, true);
+					//bool[] tempCheck = new bool[3];
+					int tempCheck = 0;
+					if (!IsRunning_Unsafe)
 						loopState.Break();
 
 					// number of builds ruled out since last sync
@@ -863,7 +877,7 @@ namespace RuneOptim {
 
 					foreach (Rune r1 in runes[1])
 					{
-						if (!IsRunning) // Can't break to a label, don't want to goto
+						if (!IsRunning_Unsafe) // Can't break to a label, don't want to goto
 							break;
 #if BUILD_PRECHECK_BUILDS
 						if (!this.AllowBroken)
@@ -902,7 +916,7 @@ namespace RuneOptim {
 
 						foreach (Rune r2 in runes[2])
 						{
-							if (!IsRunning)
+							if (!IsRunning_Unsafe)
 								break;
 #if BUILD_PRECHECK_BUILDS
 							if (!this.AllowBroken)
@@ -945,11 +959,11 @@ namespace RuneOptim {
 								}
 							}
 #endif
-										test.ApplyRune(r2, 6);
+							test.ApplyRune(r2, 6);
 
 							foreach (Rune r3 in runes[3])
 							{
-								if (!IsRunning)
+								if (!IsRunning_Unsafe)
 									break;
 #if BUILD_PRECHECK_BUILDS
 								if (!this.AllowBroken)
@@ -996,7 +1010,7 @@ namespace RuneOptim {
 
 								foreach (Rune r4 in runes[4])
 								{
-									if (!IsRunning)
+									if (!IsRunning_Unsafe)
 									{
 										break;
 									}
@@ -1046,7 +1060,7 @@ namespace RuneOptim {
 
 									foreach (Rune r5 in runes[5])
 									{
-										if (!IsRunning)
+										if (!IsRunning_Unsafe)
 											break;
 
 										test.ApplyRune(r5, 6);
@@ -1059,13 +1073,35 @@ namespace RuneOptim {
 
 										// check if build meets minimum
 										isBad |= (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
-										isBad |= (Maximum != null && cstats.CheckMax(Maximum));
+										isBad |= (tempMax != null && cstats.CheckMax(tempMax));
 										// if no broken sets, check for broken sets
 										isBad |= (!AllowBroken && !test.Current.SetsFull);
 										// if there are required sets, ensure we have them
-										isBad |= (RequiredSets != null && RequiredSets.Count > 0
+										/*isBad |= (tempReq != null && tempReq.Count > 0
 											// this Linq adds no overhead compared to GetStats() and ApplyRune()
-											&& !RequiredSets.All(s => test.Current.Sets.Count(q => q == s) >= RequiredSets.Count(q => q == s)));
+											//&& !tempReq.All(s => test.Current.Sets.Count(q => q == s) >= tempReq.Count(q => q == s))
+											//&& !tempReq.GroupBy(s => s).All(s => test.Current.Sets.Count(q => q == s.Key) >= s.Count())
+											);*/
+
+										if (tempReq != null && tempReq.Count > 0) {
+											/*for (int i = 0; i < 3; i++) {
+												tempCheck[i] = false;
+											}*/
+											tempCheck = 0;
+											foreach (var r in tempReq) {
+												int i;
+												for (i = 0; i < 3; i++) {
+													if (test.Current.Sets[i] == r && (tempCheck & (1 << i)) != (1 << i)) {
+														tempCheck |= (1 << i);
+														break;
+													}
+												}
+												if (i >= 3) {
+													isBad |= true;
+													break;
+												}
+											}
+										}
 
 										if (isBad)
 										{
@@ -1183,7 +1219,9 @@ namespace RuneOptim {
 						}
 					}
 				});
-				
+
+				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "99%+"));
+
 #if BUILD_PRECHECK_BUILDS_DEBUG
 				System.IO.File.WriteAllLines("_into_the_bridge.txt", outstrs.ToArray());
 #endif

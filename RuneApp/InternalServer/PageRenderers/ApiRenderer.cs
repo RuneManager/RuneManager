@@ -327,8 +327,7 @@ function log() {
 					if (uri.Length > 0) {
 						ulong.TryParse(uri[0], out id);
 					}
-
-					rune = Program.data.GetRune(id);
+					rune = Program.data?.GetRune(id);
 					if (rune != null) {
 						Program.data.Runes.Remove(rune);
 						Program.data.isModified = true;

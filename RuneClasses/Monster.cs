@@ -110,7 +110,19 @@ namespace RuneOptim
 		public Element Element;
 
 		[JsonProperty("skills")]
-		public IList<Skill> _skilllist = new List<Skill>();
+		private IList<Skill> _skilllist = null;
+
+		[JsonIgnore]
+		public IList<Skill> _SkillList {
+			get {
+				if (_skilllist == null)
+					_skilllist = new List<Skill>();
+				return _skilllist;
+			}
+			set {
+				_skilllist = value;
+			}
+		}
 
 		[JsonIgnore]
 		public int SkillupsLevel { get { checkSkillups(); return SkillupLevel.Sum() - SkillupLevel.Count(i => i > 0); } }
@@ -190,7 +202,19 @@ namespace RuneOptim
 		}
 
 		// what is currently equiped for this instance of a monster
-		public Loadout Current = new Loadout();
+		private Loadout current = null;
+			
+		[JsonIgnore]
+		public Loadout Current {
+			get {
+				if (current == null)
+					current = new Loadout();
+				return current;
+			}
+			set {
+				current = value;
+			}
+		}
 
 		public Monster()
 		{
@@ -205,7 +229,13 @@ namespace RuneOptim
 			monsterTypeId = rhs.monsterTypeId;
 			Grade = rhs.Grade;
 			Element = rhs.Element;
-			_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
+			if (_skilllist != null) {
+				if (rhs._skilllist != null)
+					_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
+			}
+			else if (rhs._skilllist != null) {
+				_skilllist = rhs._skilllist.ToList();
+			}
 			priority = rhs.priority;
 			downloaded = rhs.downloaded;
 			inStorage = rhs.inStorage;
@@ -267,7 +297,7 @@ namespace RuneOptim
 			{
 				checkSkillups();
 
-				curStats = Current.GetStats(this);
+				Current.GetStats(this, ref curStats);
 				changeStats = false;
 			}
 
@@ -276,7 +306,7 @@ namespace RuneOptim
 
 		private void checkSkillups()
 		{
-			if (this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId))
+			if (this._skilllist != null && this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId))
 			{
 				MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
@@ -304,7 +334,7 @@ namespace RuneOptim
 						this.DamageSkillups[i] = (dmg.Any() ? dmg.Sum() : 0);
 						skdmg += (dmg.Any() ? dmg.Sum() : 0) / cooltime;
 
-						this._skillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(Stats.statType), Stats.statType).Compile();
+						this._SkillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(Stats.statType), Stats.statType).Compile();
 
 						if (i != 0)
 						{

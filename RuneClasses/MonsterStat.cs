@@ -128,7 +128,7 @@ namespace RuneOptim {
 				Name = name,
 				downloaded = true,
 				monsterTypeId = monsterTypeId,
-				_skilllist = mon._skilllist.ToList()
+				_SkillList = mon._SkillList.ToList()
 			};
 		}
 	}

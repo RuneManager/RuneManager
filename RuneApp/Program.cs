@@ -728,6 +728,7 @@ namespace RuneApp
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
 				b.BuildSaveStats = saveStats;
 				b.BuildGoodRunes = false;
+				BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
 				b.GenRunes(Program.data);
 				b.shrines = Program.data.shrines;
 
@@ -768,6 +769,7 @@ namespace RuneApp
 
 				if (b.Best != null)
 				{
+					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Best"));
 
 					b.Best.Current.BuildID = b.ID;
 
@@ -795,15 +797,16 @@ namespace RuneApp
 						b.Best = theBest;
 					}
 
-
 					#region Save Build stats
 
 					/* TODO: put Excel on Program */
 					if (saveStats)
 					{
+						BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Excel"));
 						runeSheet.StatsExcelBuild(b, b.mon, b.Best.Current, true);
 					}
 
+					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Clean"));
 					// clean up for GC
 					if (b.buildUsage != null)
 						b.buildUsage.loads.Clear();
@@ -1078,8 +1081,8 @@ namespace RuneApp
 				m[attr] = mon[attr];
 			}
 
-			for (int i = 0; i < mon._skilllist.Count; i++) {
-				m._skilllist[i].Level = mon._skilllist[i].Level;
+			for (int i = 0; i < mon._SkillList.Count; i++) {
+				m._SkillList[i].Level = mon._SkillList[i].Level;
 			}
 			m.damageFormula = null;
 			m.RefreshStats();

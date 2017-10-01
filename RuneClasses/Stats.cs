@@ -193,18 +193,53 @@ namespace RuneOptim
 		}
 
 		[JsonProperty("skill_cooltime")]
-		public int[] SkillTimes = new int[8];
+		private int[] skillTimes = null;
 
-		public bool ShouldSerializeSkillTimes()
+		public int[] SkillTimes {
+			get {
+				if (skillTimes == null)
+					skillTimes = new int[8];
+				return skillTimes;
+			}
+			set {
+				skillTimes = value;
+			}
+		}
+
+		public bool ShouldSerializeskillTimes()
 		{
-			return SkillTimes.Any(i => i > 0);
+			return skillTimes != null && skillTimes.Any(i => i != 0);
 		}
 
 		[JsonIgnore]
-		public int[] SkillupLevel = new int[8];
+		private int[] skillupLevel = null;
 
 		[JsonIgnore]
-		public int[] SkillupMax = new int[8];
+		public int[] SkillupLevel {
+			get {
+				if (skillTimes == null)
+					skillTimes = new int[8];
+				return skillTimes;
+			}
+			set {
+				skillTimes = value;
+			}
+		}
+
+		[JsonIgnore]
+		private int[] skillupMax = null;
+
+		[JsonIgnore]
+		public int[] SkillupMax {
+			get {
+				if (skillTimes == null)
+					skillTimes = new int[8];
+				return skillTimes;
+			}
+			set {
+				skillTimes = value;
+			}
+		}
 
 		[JsonIgnore]
 		private int extraCritRate = 0;
@@ -224,7 +259,11 @@ namespace RuneOptim
 		public Stats(double i) { SetTo(i); }
 
 		// copy constructor, amrite?
-		public Stats(Stats rhs, bool copyExtra = false)
+		public Stats(Stats rhs, bool copyExtra = false) {
+			CopyFrom(rhs);
+		}
+
+		public void CopyFrom(Stats rhs, bool copyExtra = false)
 		{
 			Health = rhs.Health;
 			attack = rhs.Attack;
@@ -261,7 +300,6 @@ namespace RuneOptim
 					OnStatChanged += (EventHandler<StatModEventArgs>)del;
 				}*/
 			}
-
 		}
 
 		// fake "stats", need to be stored for scoring
@@ -315,7 +353,16 @@ namespace RuneOptim
 		private Func<Stats, double> _damageFormula = null;
 
 		[JsonIgnore]
-		protected Func<Stats, double>[] _skillsFormula = new Func<Stats, double>[8];
+		private Func<Stats, double>[] _skillsFormula = null;
+
+		[JsonIgnore]
+		protected Func<Stats, double>[] _SkillsFormula {
+			get {
+				if (_skillsFormula == null)
+					_skillsFormula = new Func<Stats, double>[8];
+				return _skillsFormula;
+			}
+		}
 
 		[JsonIgnore]
 		private Expression __form = null;
@@ -339,17 +386,17 @@ namespace RuneOptim
 		{
 			get
 			{
-				return _skillsFormula;
+				return _SkillsFormula;
 			}
 		}
 
 		public double GetSkillMultiplier(int skillNum, Stats applyTo = null)
 		{
-			if (_skillsFormula.Length < skillNum || _skillsFormula[skillNum] == null)
+			if (_SkillsFormula.Length < skillNum || _SkillsFormula[skillNum] == null)
 				return 0;
 			if (applyTo == null)
 				applyTo = this;
-			return this._skillsFormula[skillNum](applyTo);
+			return this._SkillsFormula[skillNum](applyTo);
 		}
 
 		public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null)
@@ -726,7 +773,55 @@ namespace RuneOptim
 		/// <returns>If any values in this Stats are greater than rhs</returns>
 		public bool CheckMax(Stats rhs)
 		{
+			double v;
+
+			v = rhs[Attr.HealthPercent];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.AttackPercent];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.DefensePercent];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.Speed];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.CritRate];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.CritDamage];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.Resistance];
+			if (v != 0 && v > Health)
+				return true;
+
+			v = rhs[Attr.Accuracy];
+			if (v != 0 && v > Health)
+				return true;
+
+			return false;
+
+			// 17% instumentation preunroll?
+			foreach (var a in Build.statEnums) {
+				//if (rhs[a] != 0 && this[a] > rhs[a])
+				if (CheckMax(this[a], rhs[a]))
+					return true;
+			}
+			return false;
+					
 			return Build.statEnums.Any(s => rhs[s] != 0 && this[s] > rhs[s]);
+		}
+
+		public bool CheckMax(double lhs, double rhs) {
+			return rhs != 0 && lhs > rhs;
 		}
 
 		public bool GreaterEqual(Stats rhs, bool extraGet = false)
@@ -820,7 +915,9 @@ namespace RuneOptim
 			{
 				this[a] = rhs[a];
 			}
-
+			for (int i = 0; i < 4; i++) {
+				OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + i, this.GetSkillDamage(Attr.AverageDamage, i, this)));
+			}
 			return this;
 		}
 

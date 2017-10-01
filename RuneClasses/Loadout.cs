@@ -135,8 +135,9 @@ namespace RuneOptim
 				buildID = rhs.buildID;
 				foreach (var r in rhs.Runes)
 				{
-					AddRune(r);
+					AddRune(r, 7);
 				}
+				CheckSets();
 				// TODO: do we even need to?
 				manageStats = rhs.manageStats;
 			}
@@ -423,7 +424,8 @@ namespace RuneOptim
 			// what slot we are looking at
 			int slotInd = 0;
 			// if we have used this slot in a set yet
-			bool[] used = new bool[6];
+			//bool[] used = new bool[6];
+			int use = 0;
 
 			// how many runes are in sets
 			int setNums = 0;
@@ -440,7 +442,8 @@ namespace RuneOptim
 			{
 				//if there is a uncounted rune in this slot
 				rune = runes[slotInd];
-				if (rune != null && !used[slotInd])
+				// && !used[slotInd]
+				if (rune != null && (use & (1 << slotInd)) != (1 << slotInd))
 				{
 					// look for more in the set
 					set = rune.Set;
@@ -449,15 +452,18 @@ namespace RuneOptim
 					// how many we got
 					gotNum = 1;
 					// we have now used this slot
-					used[slotInd] = true;
+					//used[slotInd] = true;
+					use |= (1 << slotInd);
 
 					// for the runes after this rune
 					for (int ind = slotInd + 1; ind < 6; ind++)
 					{
 						// if there is a rune in this slot that is the type I want
-						if (runes[ind] != null && !used[ind] && runes[ind].Set == set)
+						// && !used[ind] 
+						if (runes[ind] != null && runes[ind].Set == set && (use & (1 << ind)) != (1 << ind))
 						{
-							used[ind] = true;
+							//used[ind] = true;
+							use |= (1 << ind);
 							gotNum++;
 						}
 
@@ -541,7 +547,11 @@ namespace RuneOptim
 		private static Func<Stats, Stats> _getStats = null;
 
 		// Using the given stats as a base, apply the modifiers
-		public Stats GetStats(Stats baseStats)
+		public Stats GetStats(Stats baseStats) {
+			var v = new Stats();
+			return GetStats(baseStats, ref v);
+		}
+		public Stats GetStats(Stats baseStats, ref Stats value)
 		{
 			/*if (_getStats == null)
 			{
@@ -549,8 +559,12 @@ namespace RuneOptim
 				var expr = ;
 				_getStats = Expression.Lambda<Func<Stats, Stats>>(expr, statType).Compile();
 			}*/
-			
-			Stats value = new Stats(baseStats);
+
+			if (value == null)
+				value = new Stats();
+
+			//Stats value = new Stats(baseStats);
+			value.CopyFrom(baseStats);
 
 			// Apply percent before flat
 			value.Health += (int)Math.Ceiling(baseStats.Health * HealthPercent * 0.01) + HealthFlat;

@@ -533,11 +533,26 @@ namespace RuneApp
 
 				row++;
 			}
+
 			var rstart = row;
 
-			// maximum column (may need to be after writing table)
+			col = 6;
+			foreach (var a in Build.statBoth) {
+				row = rstart;
+				ws.Cells[row, col].CreateArrayFormula($"({abc[col-1]}{row + 1}-{abc[col-1]}{row + 2})/{abc[col-1]}{row + 1}/MIN(ABS((F{row + 1}:P{row + 1}-F{row + 2}:P{row + 2})/F{row + 1}:P{row + 1}))");
+				row++;
+				ws.Cells[row, col].Formula = $"AVERAGEIF(runesFor{build.ID}[Good], \"{build.Best.score}\", runesFor{build.ID}[{a.ToString()}])";
+				row++;
+				ws.Cells[row, col].Formula = $"AVERAGEA(runesFor{build.ID}[{a.ToString()}])";
+				row++;
+
+				col++;
+			}
 
 			// table
+			rstart = row;
+
+			// maximum column (may need to be after writing table)
 			col = runeBoardHeader(ws, ref row, ref cmax);
 
 			// for each rune
@@ -606,10 +621,11 @@ namespace RuneApp
 
 					var rval = r[stat, fake, false];
 
-					if (rval > 0)
+					//if (rval > 0)
 					{
 						ws.Cells[row, col].Value = rval;
 					}
+					ws.Cells[row, col].Style.Numberformat.Format = "#";
 					col++;
 				}
 				if (col > cmax)
