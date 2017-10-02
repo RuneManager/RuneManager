@@ -137,7 +137,6 @@
     </Compile>
     <Compile Include="InternalServer\PageRenderers\ApiRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\CssRenderer.cs" />
-    <Compile Include="InternalServer\PageRenderers\GoalsRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\LoadsRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\MonstersRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\RiftRenderer.cs" />
@@ -3616,9 +3615,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="data\unit\unit_icon_0044_3_1.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="data\wizards.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="custom_templates.json">
