@@ -1710,9 +1710,9 @@ namespace RuneApp {
 
 			foreach (ListViewItem li in buildList.Items)
 			{
-				li.BackColor = Color.White;
 				if (Program.Settings.ColorTeams && b1 != null && b1.Teams.Count > 0)
 				{
+					li.BackColor = Color.White;
 					var b2 = li.Tag as Build;
 					if (b2 != null && b2.Teams.Count > 0)
 					{
@@ -1802,7 +1802,19 @@ namespace RuneApp {
 
 					// I get about 4mil/sec, and can be bothered to wait 10 - 25 seconds
 					li.SubItems[0].ForeColor = Color.Black;
-					if (c > 4000000 * 25)
+					if (c > 1000 * 1000 * (long)1000 * 100) {
+						li.SubItems[0].ForeColor = Color.DarkBlue;
+						li.SubItems[0].BackColor = Color.Red;
+					}
+					else if (c > 1000 * 1000 * (long)1000 * 10) {
+						li.SubItems[0].ForeColor = Color.DarkBlue;
+						li.SubItems[0].BackColor = Color.OrangeRed;
+					}
+					else if (c > 1000 * 1000 * (long)1000 * 1) {
+						li.SubItems[0].ForeColor = Color.DarkBlue;
+						li.SubItems[0].BackColor = Color.Orange;
+					}
+					else if (c > 4000000 * 25)
 						li.SubItems[0].ForeColor = Color.Red;
 					else if (c > 4000000 * 10)
 						li.SubItems[0].ForeColor = Color.Orange;

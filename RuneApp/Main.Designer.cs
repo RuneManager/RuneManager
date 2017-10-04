@@ -103,6 +103,7 @@
 			this.HealthLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
+			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
 			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -190,7 +191,6 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.runeDial = new RuneApp.RuneDial();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -944,6 +944,17 @@
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
 			// 
+			// runeDial
+			// 
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.Size = new System.Drawing.Size(225, 188);
+			this.runeDial.TabIndex = 51;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			// 
 			// tabControl1
 			// 
 			this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1398,7 +1409,7 @@
 			// tsBtnRuneStats
 			// 
 			this.tsBtnRuneStats.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnRuneStats.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnRuneStats.Image")));
+			this.tsBtnRuneStats.Image = global::RuneApp.App.save;
 			this.tsBtnRuneStats.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.tsBtnRuneStats.Name = "tsBtnRuneStats";
 			this.tsBtnRuneStats.Size = new System.Drawing.Size(23, 22);
@@ -1565,11 +1576,12 @@
 			// tsBtnFindSpeed
 			// 
 			this.tsBtnFindSpeed.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnFindSpeed.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnFindSpeed.Image")));
+			this.tsBtnFindSpeed.Image = global::RuneApp.App.runedial;
 			this.tsBtnFindSpeed.ImageTransparentColor = System.Drawing.Color.Magenta;
 			this.tsBtnFindSpeed.Name = "tsBtnFindSpeed";
 			this.tsBtnFindSpeed.Size = new System.Drawing.Size(23, 22);
 			this.tsBtnFindSpeed.Text = "toolStripButton3";
+			this.tsBtnFindSpeed.ToolTipText = "Identify large builds";
 			this.tsBtnFindSpeed.Click += new System.EventHandler(this.tsBtnFindSpeed_Click);
 			// 
 			// buildList
@@ -1829,17 +1841,6 @@
 			this.runeEquipped.TabStop = false;
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
-			// 
-			// runeDial
-			// 
-			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(8, 201);
-			this.runeDial.Name = "runeDial";
-			this.runeDial.Size = new System.Drawing.Size(225, 188);
-			this.runeDial.TabIndex = 51;
-			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
 			// 
 			// Main
 			// 
