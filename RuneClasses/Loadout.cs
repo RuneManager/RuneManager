@@ -12,6 +12,10 @@ namespace RuneOptim
 		Worse,
 		Better
 	}
+	
+	public struct Buffs {
+		public bool Attack;
+	}
 
 	public class Loadout
 	{
@@ -43,6 +47,8 @@ namespace RuneOptim
 		
 		[JsonIgnore]
 		public bool SetsFull { get { return setsFull; } }
+
+		public Buffs Buffs;
 		
 		public double Time;
 
@@ -133,6 +139,7 @@ namespace RuneOptim
 				fakeLevel = rhs.fakeLevel;
 				predictSubs = rhs.predictSubs;
 				buildID = rhs.buildID;
+				Buffs = rhs.Buffs;
 				foreach (var r in rhs.Runes)
 				{
 					AddRune(r, 7);
@@ -569,6 +576,9 @@ namespace RuneOptim
 			// Apply percent before flat
 			value.Health += (int)Math.Ceiling(baseStats.Health * HealthPercent * 0.01) + HealthFlat;
 			value.Attack += (int)Math.Ceiling(baseStats.Attack * AttackPercent * 0.01) + AttackFlat;
+			if (Buffs.Attack)
+				value.Attack *= 1.5;
+			
 			value.Defense += (int)Math.Ceiling(baseStats.Defense * DefensePercent * 0.01) + DefenseFlat;
 			value.Speed += (int)Math.Ceiling(baseStats.Speed * SpeedPercent * 0.01) + Speed;
 

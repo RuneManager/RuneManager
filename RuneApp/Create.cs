@@ -756,6 +756,9 @@ namespace RuneApp
 				if (tab.Value.Value != 0)
 					tb.Text = tab.Value.Value.ToString();
 			}
+
+			checkBuffAtk.Checked = build.Buffs.Attack;
+
 			// done loading!
 			loading = false;
 			// this build is no longer considered new
@@ -2187,6 +2190,13 @@ namespace RuneApp
 		private void extraCritBox_SelectedIndexChanged(object sender, EventArgs e) {
 			// TODO: uncheese
 			build.ExtraCritRate = extraCritBox.SelectedIndex * 15;
+		}
+
+		private void checkBuffAtk_CheckedChanged(object sender, EventArgs e) {
+			if (loading)
+				return;
+
+			build.Buffs.Attack = checkBuffAtk.Checked;
 		}
 	}
 }

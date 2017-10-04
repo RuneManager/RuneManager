@@ -143,6 +143,9 @@ namespace RuneOptim {
 		[JsonProperty("priority")]
 		public int priority;
 
+		[JsonProperty("buffs")]
+		public Buffs Buffs;
+
 		[JsonIgnore]
 		public Monster mon;
 
@@ -859,10 +862,11 @@ namespace RuneOptim {
 					int skip = 0;
 
 					bool isBad;
-					double bestScore = 0, curScore;
+					double bestScore = double.MinValue, curScore;
 					Stats cstats;
 
 					Monster test = new Monster(mon);
+					test.Current.Buffs = this.Buffs;
 					test.Current.Shrines = shrines;
 					test.Current.Leader = leader;
 
