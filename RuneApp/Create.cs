@@ -1342,7 +1342,7 @@ namespace RuneApp
 				double goal = 0;
 				if (double.TryParse(ctrlGoal.Text, out val))
 					goal = val;
-				build.Maximum[stat] = val;
+				build.Goal[stat] = val;
 
 				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 				double worth = 0;
@@ -1389,7 +1389,7 @@ namespace RuneApp
 				double goal = 0;
 				if (double.TryParse(ctrlGoal.Text, out val))
 					goal = val;
-				build.Sort.ExtraSet(extra, val);
+				build.Goal.ExtraSet(extra, val);
 
 				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
 				double worth = 0;
@@ -1446,7 +1446,7 @@ namespace RuneApp
 					double goal = 0;
 					if (double.TryParse(ctrlGoal.Text, out val))
 						goal = val;
-					build.Sort.ExtraSet(aaa, val);
+					build.Goal.ExtraSet(aaa, val);
 
 					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 					double worth = 0;

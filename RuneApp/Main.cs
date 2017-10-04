@@ -149,6 +149,24 @@ namespace RuneApp {
 					yy += 4;
 				if (s == "ACC")
 					yy += 8;
+				if (s == "MxD")
+					yy += 8;
+
+				yy += 16;
+				xx = 0;
+			}
+
+			for (int i = 0; i < 4; i++) {
+				groupBox1.Controls.MakeControl<Label>("Skill" + (i + 1), "compStat", 4 + xx, yStart + yy, 50, 14, "Skill" + (i + 1));
+				xx += 50;
+
+				groupBox1.Controls.MakeControl<Label>("Skill" + (i + 1), "compBefore", 4 + xx, yStart + yy, 50, 14, "");
+				xx += 50;
+
+				groupBox1.Controls.MakeControl<Label>("Skill" + (i + 1), "compAfter", 4 + xx, yStart + yy, 50, 14, "");
+				xx += 50;
+
+				groupBox1.Controls.MakeControl<Label>("Skill" + (i + 1), "compDiff", 4 + xx, yStart + yy, 150, 14, "");
 
 				yy += 16;
 				xx = 0;
@@ -1508,6 +1526,17 @@ namespace RuneApp {
 				
 				groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = pts;
 
+			}
+
+			for (int i = 0; i < 4;i++) {
+				var stat = "Skill" + (i+1);
+				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
+				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
+				string pts = (load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)).ToString("0.##");
+				if (build != null && !build.Sort.DamageSkillups[i].EqualTo(0)) {
+					pts += " (" + ((load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)) / build.Sort.DamageSkillups[i]).ToString("0.##") + ")";
+				}
+				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
 		}
 		
