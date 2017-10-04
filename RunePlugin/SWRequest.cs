@@ -36,7 +36,7 @@ namespace RunePlugin {
 					}
 				}
 				else {
-					Console.WriteLine("No request types found for " + com + ":");
+					Console.WriteLine("No request types found for " + com);
 				}
 			}
 			return obj.ToObject<SWRequest>();

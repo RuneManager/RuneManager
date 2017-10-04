@@ -23,13 +23,13 @@ namespace SwagLogger
 				{
 					var post = HttpWebRequest.CreateHttp(log_url);
 					post.Method = "POST";
-					post.ContentType = "application/x-www-form-urlencoded";
+					post.ContentType = "application/json";
 
 					using (var write = new StreamWriter(post.GetRequestStream()))
 					{
 						write.Write(args.ResponseRaw);
 					}
-					post.GetResponse();
+					var resp = post.GetResponse();
 					Console.WriteLine("Sent " + args.Request.Command + " to SWAG");
 				}
 				catch (Exception e)

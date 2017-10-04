@@ -49,7 +49,7 @@ namespace RunePlugin {
 					}
 				}
 				else {
-					Console.WriteLine("No response types found for " + com + ":");
+					Console.WriteLine("No response types found for " + com);
 				}
 			}
 			return obj.ToObject<SWResponse>();
