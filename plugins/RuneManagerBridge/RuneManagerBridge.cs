@@ -58,10 +58,10 @@ namespace RuneManagerBridge
 						Console.WriteLine(api.MonsterPost(args.ResponseAs<UnequipRuneResponse>().Monster));
 						break;
 					case SWCommand.LockUnit:
-						Console.WriteLine(api.MonsterAction(args.ResponseAs<LockUnitResponse>().UnitId, "lock"));
+						Console.WriteLine(api.MonsterAction(args.ResponseAs<GenericUnitResponse>().UnitId, "lock"));
 						break;
 					case SWCommand.UnlockUnit:
-						Console.WriteLine(api.MonsterAction(args.ResponseAs<UnlockUnitResponse>().UnitId, "unlock"));
+						Console.WriteLine(api.MonsterAction(args.ResponseAs<GenericUnitResponse>().UnitId, "unlock"));
 						break;
 					#endregion
 
@@ -87,7 +87,7 @@ namespace RuneManagerBridge
 						}
 						break;
 					case SWCommand.BattleScenarioResult: {
-							var resp = args.ResponseAs<BattleScenarioResultResponse>();
+							var resp = args.ResponseAs<GenericBattleResponse>();
 
 							var rune = resp.Reward?.Crate?.Rune;
 							if (rune != null) {
@@ -112,23 +112,32 @@ namespace RuneManagerBridge
 						break;
 					case SWCommand.SacrificeUnit:
 						Console.WriteLine(api.MonsterPost(args.ResponseAs<SacrificeUnitResponse>().Target));
-						foreach (var m in args.RequestAs<SacrificeUnitRequest>().Sources)
+						foreach (var m in args.RequestAs<SourceUnitRequest>().Sources)
 							Console.WriteLine(api.MonsterDelete(m.Id));
 						break;
 					case SWCommand.UpdateUnitExpGained:
-						foreach (var m in args.ResponseAs<UpdateUnitExpGainedResponse>().UpdatedMonsters)
+						foreach (var m in args.ResponseAs<GenericUnitListResponse>().Monsters)
 							Console.WriteLine(api.MonsterPost(m));
 						break;
 					case SWCommand.UpgradeUnit:
 						Console.WriteLine(api.MonsterPost(args.ResponseAs<UpgradeUnitResponse>().Target));
-						foreach (var m in args.RequestAs<UpgradeUnitRequest>().Sources)
+						foreach (var m in args.RequestAs<SourceUnitRequest>().Sources)
 							Console.WriteLine(api.MonsterDelete(m.Id));
 						break;
 					#endregion
 
+					case SWCommand.ConfirmRune: {
+							var req = args.RequestAs<ConfirmRuneRequest>();
+							var resp = args.ResponseAs<GenericRuneResponse>();
+							if (!req.Rollback) {
+								Console.WriteLine(api.RunePost(resp.Rune));
+							}
+						}
+						break;
+
 					case SWCommand.UpgradeRune: {
 							var req = args.RequestAs<UpgradeRuneRequest>();
-							var resp = args.ResponseAs<UpgradeRuneResponse>();
+							var resp = args.ResponseAs<GenericRuneResponse>();
 							if (req.CurrentLevel != resp.Rune.Level) {
 								Console.WriteLine(api.RunePost(resp.Rune));
 							}

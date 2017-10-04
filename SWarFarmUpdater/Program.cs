@@ -51,7 +51,7 @@ namespace SWFarmLoader {
 #if true
 			Console.Write("Press Y for new data: ");
 			GetData(Console.ReadKey().Key == ConsoleKey.Y);
-#else
+#elif false
 			var list = JsonConvert.DeserializeObject<Monster[]>(File.ReadAllText("skills.json"));
 			var mm = list.FirstOrDefault(l => l.Name == "Theomars");
 			var msk = mm.Skills;
@@ -64,6 +64,9 @@ namespace SWFarmLoader {
 				ss.Speed = 170;
 				var dam = qq.GetValue(ss);
 			}
+#else
+			var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary");
+			var newmons = list.Where(r => r.monsterTypeId > 21800 && r.monsterTypeId < 40000).GroupBy(r => r.name).Select(rg => rg.FirstOrDefault()).OrderBy(r => r.monsterTypeId).Select(r => new KeyValuePair<int, string>(r.monsterTypeId, r.name));
 #endif
 		}
 

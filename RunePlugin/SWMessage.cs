@@ -44,6 +44,16 @@ namespace RunePlugin
 		public int WizardId;
 	}
 
+	[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
+	sealed class SWCommandAttribute : Attribute {
+		public SWCommand Command { get; private set; }
+
+		// This is a positional argument
+		public SWCommandAttribute(SWCommand command) {
+			this.Command = command;
+		}
+	}
+
 	public class ClearRecord {
 		[JsonProperty("is_new_record")]
 		public bool NewRecord;
@@ -115,5 +125,8 @@ namespace RunePlugin
 		BattleRiftDungeonResult,
 		GetBestClearRiftDungeon,
 		UpgradeRune,
+		RevalueRune,
+		ConfirmRune,
+		UpgradeDeco,
 	}
 }

@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace RunePlugin.Response
-{
-	public class GetBestClearRiftDungeonResponse : SWResponse
-	{
+namespace RunePlugin.Response {
+	[SWCommand(SWCommand.GetBestClearRiftDungeon)]
+	public class GetBestClearRiftDungeonResponse : SWResponse {
 		[JsonProperty("best_clear_rift_dungeon_list")]
 		public RuneOptim.BestRiftDeck[] BestClearRiftDungeons;
 

@@ -9,6 +9,7 @@ using RuneOptim;
 
 namespace RunePlugin.Response
 {
+	[SWCommand(SWCommand.EquipRune)]
 	public class EquipRuneResponse : SWResponse
 	{
 		[JsonProperty("rune_id")]
@@ -18,6 +19,7 @@ namespace RunePlugin.Response
 		public RuneOptim.Monster Monster;
 	}
 
+	[SWCommand(SWCommand.UnequipRune)]
 	public class UnequipRuneResponse : SWResponse {
 		[JsonProperty("rune")]
 		public RuneOptim.Rune Rune;
@@ -26,6 +28,7 @@ namespace RunePlugin.Response
 		public RuneOptim.Monster Monster;
 	}
 
+	[SWCommand(SWCommand.EquipRuneList)]
 	public class EquipRuneListResponse : SWResponse {
 		[JsonProperty("unit_info")]
 		public Monster TargetMonster;

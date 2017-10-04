@@ -12,7 +12,8 @@ namespace RunePlugin.Response {
 		Lose = 2,
 	}
 
-	public class BattleDungeonResultResponse : SWResponse {
+	[SWCommand(SWCommand.BattleScenarioResult)]
+	public class GenericBattleResponse : SWResponse {
 		[JsonProperty("win_lose")]
 		public WinLose Win;
 
@@ -22,13 +23,17 @@ namespace RunePlugin.Response {
 		[JsonProperty("reward")]
 		public DungeonReward Reward;
 
-		[JsonProperty("clear_bonus")]
-		public DungeonReward ClearBonus;
-
 		[JsonProperty("unit_list")]
 		public RuneOptim.Monster[] Monsters;
 	}
 
+	[SWCommand(SWCommand.BattleDungeonResult)]
+	public class BattleDungeonResultResponse : GenericBattleResponse {
+		[JsonProperty("clear_bonus")]
+		public DungeonReward ClearBonus;
+	}
+
+	[SWCommand(SWCommand.BattleRiftDungeonResult)]
 	public class BattleRiftDungeonResultResponse : SWResponse {
 		[JsonProperty("rift_dungeon_box_id")]
 		public int RiftDungeonBoxId;
@@ -63,17 +68,4 @@ namespace RunePlugin.Response {
 		public bool Cleared;
 	}
 
-	public class BattleScenarioResultResponse : SWResponse {
-		[JsonProperty("win_lose")]
-		public WinLose Win;
-
-		[JsonProperty("clear_time")]
-		public ClearRecord Time;
-
-		[JsonProperty("reward")]
-		public DungeonReward Reward;
-
-		[JsonProperty("unit_list")]
-		public RuneOptim.Monster[] Monsters;
-	}
 }

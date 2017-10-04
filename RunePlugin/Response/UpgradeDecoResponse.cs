@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace RunePlugin.Response
-{
-	class UpgradeDecoResponse : SWResponse
-	{
+namespace RunePlugin.Response {
+	[SWCommand(SWCommand.UpgradeDeco)]
+	class UpgradeDecoResponse : SWResponse {
 		[JsonProperty("deco_info")]
 		RuneOptim.Deco Deco;
 	}

@@ -47,13 +47,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Request\SacrificeUnitRequest.cs" />
-    <Compile Include="Request\UpgradeRuneRequest.cs" />
+    <Compile Include="Request\UnitRequests.cs" />
+    <Compile Include="Request\RuneRequests.cs" />
     <Compile Include="Response\BattleResultResponse.cs" />
     <Compile Include="Response\EquipRuneResponse.cs" />
     <Compile Include="Response\GetBestClearRiftDungeonResponse.cs" />
-    <Compile Include="Response\LockUnitResponse.cs" />
-    <Compile Include="Response\UpgradeRuneResponse.cs" />
+    <Compile Include="Response\GenericUnitResponse.cs" />
+    <Compile Include="Response\RuneResponses.cs" />
     <Compile Include="Response\SacrificeUnitResponse.cs" />
     <Compile Include="Response\UpgradeDecoResponse.cs" />
     <Compile Include="SWEvent.cs" />

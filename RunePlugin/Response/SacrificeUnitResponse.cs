@@ -12,6 +12,14 @@ namespace RunePlugin.Response {
 		public int bonus;
 	}
 
+	[SWCommand(SWCommand.UpdateUnitExpGained)]
+	public class GenericUnitListResponse : SWResponse {
+		[JsonProperty("unit_list")]
+		public Monster[] Monsters;
+	}
+
+
+	[SWCommand(SWCommand.SacrificeUnit)]
 	public class SacrificeUnitResponse : SWResponse {
 		[JsonProperty("gauge")]
 		public Gauge Gauge;
@@ -20,21 +28,16 @@ namespace RunePlugin.Response {
 		public Monster Target;
 	}
 
-	public class SummonUnitResponse : SWResponse {
+	[SWCommand(SWCommand.SummonUnit)]
+	public class SummonUnitResponse : GenericUnitListResponse {
 		[JsonProperty("item_info")]
 		public InventoryItem RemainingItem;
-
-		[JsonProperty("unit_list")]
-		public Monster[] Monsters;
 	}
 	
+	[SWCommand(SWCommand.UpgradeUnit)]
 	public class UpgradeUnitResponse : SWResponse {
 		[JsonProperty("unit_info")]
 		public Monster Target;
 	}
 
-	public class UpdateUnitExpGainedResponse : SWResponse {
-		[JsonProperty("unit_list")]
-		public Monster[] UpdatedMonsters;
-	}
 }
