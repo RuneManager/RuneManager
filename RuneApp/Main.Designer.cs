@@ -1297,8 +1297,8 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.loadoutList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.buildIDCol,
             this.buildNameCol,
+            this.buildIDCol,
             this.buildMonIDCol,
             this.buildSwapCol,
             this.buildPowerCol,
@@ -1315,11 +1315,13 @@
 			// 
 			// buildIDCol
 			// 
+			this.buildIDCol.DisplayIndex = 0;
 			this.buildIDCol.Text = "ID";
 			this.buildIDCol.Width = 10;
 			// 
 			// buildNameCol
 			// 
+			this.buildNameCol.DisplayIndex = 1;
 			this.buildNameCol.Text = "Name";
 			this.buildNameCol.Width = 80;
 			// 
@@ -1591,9 +1593,9 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.buildList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.buildCHName,
             this.buildCHPriority,
             this.buildCHID,
-            this.buildCHName,
             this.buildCHProgress,
             this.buildCHMID,
             this.buildCHTeams});
@@ -1612,11 +1614,13 @@
 			// 
 			// buildCHPriority
 			// 
+			this.buildCHPriority.DisplayIndex = 0;
 			this.buildCHPriority.Text = "Priority";
 			this.buildCHPriority.Width = 40;
 			// 
 			// buildCHID
 			// 
+			this.buildCHID.DisplayIndex = 1;
 			this.buildCHID.Text = "ID";
 			this.buildCHID.Width = 0;
 			// 

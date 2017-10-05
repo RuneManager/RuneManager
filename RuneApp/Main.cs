@@ -73,7 +73,7 @@ namespace RuneApp {
 			dataCraftList.ListViewItemSorter = new ListViewSort();
 
 			sorter = new ListViewSort();
-			sorter.OnColumnClick(0);
+			sorter.OnColumnClick(1);
 			buildList.ListViewItemSorter = sorter;
 			#endregion
 
@@ -450,8 +450,8 @@ namespace RuneApp {
 			nli.UseItemStyleForSubItems = false;
 			while (nli.SubItems.Count < 6)
 				nli.SubItems.Add("");
-			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
-			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.MonName);
+			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.MonName);
+			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
 			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.mon.Id.ToString());
 
 			l.RecountDiff(b.mon.Id);
@@ -585,12 +585,13 @@ namespace RuneApp {
 			while (lvi.SubItems.Count < 6)
 				lvi.SubItems.Add("");
 
-			lvi.SubItems[0] = new ListViewItem.ListViewSubItem(lvi, b.priority.ToString());
-			lvi.SubItems[1] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
-			lvi.SubItems[2] = new ListViewItem.ListViewSubItem(lvi, b.mon?.FullName ?? b.MonName);
-			lvi.SubItems[3] = new ListViewItem.ListViewSubItem(lvi, "");
-			lvi.SubItems[4] = new ListViewItem.ListViewSubItem(lvi, (b.mon?.Id ?? b.MonId).ToString());
-			lvi.SubItems[5] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
+			int i = 0;
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.mon?.FullName ?? b.MonName);
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.priority.ToString());
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "");
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, (b.mon?.Id ?? b.MonId).ToString());
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
 
 			lvi.Tag = b;
 
@@ -861,7 +862,7 @@ namespace RuneApp {
 					Loadout load = (Loadout)item.Tag;
 
 					var monid = ulong.Parse(item.SubItems[2].Text);
-					var bid = int.Parse(item.SubItems[0].Text);
+					var bid = int.Parse(item.SubItems[1].Text);
 
 					var build = Program.builds.FirstOrDefault(b => b.ID == bid);
 
@@ -996,7 +997,7 @@ namespace RuneApp {
 						var res = ff.ShowDialog();
 						if (res == DialogResult.OK)
 						{
-							item.SubItems[2].Text = bb.mon.FullName;
+							item.SubItems[0].Text = bb.mon.FullName;
 							item.SubItems[4].Text = bb.mon.Id.ToString();
 							item.ForeColor = bb.runePrediction.Any(p => p.Value.Value) ? Color.Purple : Color.Black;
 							if (bb.mon != before)
@@ -1078,7 +1079,7 @@ namespace RuneApp {
 		public void ProgressToList(Build b, string str)
 		{
 			Program.log.Info("_" + str);
-			this.BeginInvoke((MethodInvoker)delegate
+			this.Invoke((MethodInvoker)delegate
 			{
 				if (!IsDisposed)
 				{
@@ -1177,7 +1178,7 @@ namespace RuneApp {
 				var b = lvi.Tag as Build;
 				if (b != null)
 				{
-					lvi.SubItems[0].Text = b.priority.ToString();
+					lvi.SubItems[1].Text = b.priority.ToString();
 				}
 			}
 		}
