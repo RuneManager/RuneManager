@@ -1,4 +1,5 @@
-0.5.1.1
+0.6
 https://github.com/Skibisky/RuneManager/releases/latest
-Build Wizard has the builds for monsters from the top 2000 players on EU.
-Can overwrite shrines and delete builds again.
+Added Unicorns and Paladins images and stats.
+Really really fast for some builds.
+More working numbers in more places.
