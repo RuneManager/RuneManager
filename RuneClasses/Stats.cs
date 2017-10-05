@@ -260,7 +260,7 @@ namespace RuneOptim
 
 		// copy constructor, amrite?
 		public Stats(Stats rhs, bool copyExtra = false) {
-			CopyFrom(rhs);
+			CopyFrom(rhs, copyExtra);
 		}
 
 		public void CopyFrom(Stats rhs, bool copyExtra = false)
@@ -776,36 +776,38 @@ namespace RuneOptim
 			double v;
 
 			v = rhs[Attr.HealthPercent];
-			if (v != 0 && v > Health)
+			if (v != 0 && Health > v)
 				return true;
 
 			v = rhs[Attr.AttackPercent];
-			if (v != 0 && v > Health)
+			if (v != 0 && Attack > v)
 				return true;
 
 			v = rhs[Attr.DefensePercent];
-			if (v != 0 && v > Health)
+			if (v != 0 && Defense > v)
 				return true;
 
 			v = rhs[Attr.Speed];
-			if (v != 0 && v > Health)
+			if (v != 0 && Speed > v)
 				return true;
 
 			v = rhs[Attr.CritRate];
-			if (v != 0 && v > Health)
+			if (v != 0 && CritRate > v)
 				return true;
 
 			v = rhs[Attr.CritDamage];
-			if (v != 0 && v > Health)
+			if (v != 0 && CritDamage > v)
 				return true;
 
 			v = rhs[Attr.Resistance];
-			if (v != 0 && v > Health)
+			if (v != 0 && Resistance > v)
 				return true;
 
 			v = rhs[Attr.Accuracy];
-			if (v != 0 && v > Health)
+			if (v != 0 && Accuracy > v)
 				return true;
+
+			// TODO: the rest
 
 			return false;
 
@@ -1036,7 +1038,21 @@ namespace RuneOptim
 			return ret;
 		}
 
-		public bool NonZero()
+		public Attr[] NonZero = null;
+
+		public void BakeNonZero() {
+			NonZero = GetNonZero().ToArray();
+		}
+
+		public System.Collections.Generic.IEnumerable<Attr> GetNonZero() {
+			foreach (var a in Build.statAll) {
+				if (!this[a].EqualTo(0))
+					yield return a;
+			}
+			yield return default(Attr);
+		}
+
+		public bool IsNonZero()
 		{
 			if (!Accuracy.EqualTo(0))
 				return true;

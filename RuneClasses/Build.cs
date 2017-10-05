@@ -299,7 +299,7 @@ namespace RuneOptim {
 
 		public bool ShouldSerializeSort()
 		{
-			return Sort.NonZero();
+			return Sort.IsNonZero();
 		}
 
 		// resulting build must have every set in this collection
@@ -329,22 +329,22 @@ namespace RuneOptim {
 
 		public bool ShouldSerializeMinimum()
 		{
-			return Minimum.NonZero();
+			return Minimum.IsNonZero();
 		}
 
 		public bool ShouldSerializeMaximum()
 		{
-			return Maximum.NonZero();
+			return Maximum.IsNonZero();
 		}
 
 		public bool ShouldSerializeThreshold()
 		{
-			return Threshold.NonZero();
+			return Threshold.IsNonZero();
 		}
 
 		public bool ShouldSerializeGoal()
 		{
-			return Goal.NonZero();
+			return Goal.IsNonZero();
 		}
 
 		[JsonProperty]
@@ -488,7 +488,7 @@ namespace RuneOptim {
 
 		public bool ShouldSerializeleader()
 		{
-			return leader.NonZero();
+			return leader.IsNonZero();
 		}
 
 		// Seems to out-of-mem if too many
@@ -810,7 +810,7 @@ namespace RuneOptim {
 					return BuildResult.NoPermutations;
 				}
 
-				bool hasSort = Sort.NonZero();
+				bool hasSort = Sort.IsNonZero();
 				if (BuildTake == 0 && !hasSort)
 				{
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "No sort"));
@@ -819,7 +819,7 @@ namespace RuneOptim {
 				}
 
 				DateTime begin = DateTime.Now;
-				DateTime timer = DateTime.Now;
+				//DateTime timerShared = DateTime.Now;
 
 				RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
@@ -846,9 +846,10 @@ namespace RuneOptim {
 				SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
 				Parallel.ForEach(runes[0], (r0, loopState) =>
 				{
+					var tempTimer = DateTime.Now;
 					//var tempReq = RequiredSets.OrderBy(i => i).ToList();
 					var tempReq = RequiredSets.ToList();
-					var tempMax = Maximum == null ? null : new Stats(Maximum, true);
+					var tempMax = Maximum == null || !Maximum.IsNonZero() ? null : new Stats(Maximum, true);
 					//bool[] tempCheck = new bool[3];
 					int tempCheck = 0;
 					if (!IsRunning_Unsafe)
@@ -1071,12 +1072,12 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
-										isBad = false;
+										//isBad = false;
 
 										cstats = test.GetStats();
 
 										// check if build meets minimum
-										isBad |= (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
+										isBad = (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
 										isBad |= (tempMax != null && cstats.CheckMax(tempMax));
 										// if no broken sets, check for broken sets
 										isBad |= (!AllowBroken && !test.Current.SetsFull);
@@ -1181,15 +1182,14 @@ namespace RuneOptim {
 										}
 
 										// every second, give a bit of feedback to those watching
-										if (DateTime.Now > timer.AddSeconds(1))
+										if (DateTime.Now > tempTimer.AddSeconds(1))
 										{
-											timer = DateTime.Now;
+											tempTimer = DateTime.Now;
 											RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 											BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + string.Format("{0:P2}", (count + complete - total) / (double)complete)));
 											BuildProgTo?.Invoke(this, new ProgToEventArgs(this, (count + complete - total) / (double)complete, tests.Count));
 
-											if (BuildTimeout <= 0) continue;
-											if (DateTime.Now > begin.AddSeconds(BuildTimeout))
+											if (BuildTimeout > 0 && DateTime.Now > begin.AddSeconds(BuildTimeout))
 											{
 												RuneLog.Info("Timeout");
 												BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Timeout"));

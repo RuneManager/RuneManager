@@ -301,7 +301,7 @@ namespace RuneApp {
 				build.AllowBroken = tb.AllowBroken;
 				build.Minimum.SetTo(tb.Minimum);
 				build.Maximum.SetTo(tb.Maximum);
-				if (tb.Threshold.NonZero())
+				if (tb.Threshold.IsNonZero())
 					build.Threshold.SetTo(tb.Threshold);
 				else
 					build.Threshold.SetTo(new Stats()

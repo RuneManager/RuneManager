@@ -614,7 +614,7 @@ namespace RuneApp
 
 			check_autoRunes.Checked = build.autoRuneSelect;
 
-			if (build.leader.NonZero())
+			if (build.leader.IsNonZero())
 			{
 				Attr t = build.leader.FirstNonZero();
 				if (t != Attr.Null)
@@ -1852,7 +1852,7 @@ namespace RuneApp
 				}
 			}
 
-			if (!build.Sort.NonZero())
+			if (!build.Sort.IsNonZero())
 			{
 				var ctrl = groupBox1.Controls.Find("SPDWorth", false).FirstOrDefault();
 				if (ctrl != null)

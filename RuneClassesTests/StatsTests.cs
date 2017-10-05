@@ -121,7 +121,7 @@ namespace RuneOptim.Tests
         public void NonZeroTest()
         {
             var stats = new Stats();
-            Assert.IsFalse(stats.NonZero());
+            Assert.IsFalse(stats.IsNonZero());
         }
 
         [TestMethod()]
