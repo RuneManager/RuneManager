@@ -548,7 +548,7 @@ namespace RuneApp {
 					{
 						ListViewItem li = new ListViewItem();
 						ListViewItemBuild(li, b);
-						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); });
+						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); buildList.Sort(); });
 						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null)
 						{
@@ -576,6 +576,7 @@ namespace RuneApp {
 				default:
 					throw new NotImplementedException();
 			}
+			buildList.Sort();
 		}
 
 		private void ListViewItemBuild(ListViewItem lvi, Build b)
@@ -591,7 +592,12 @@ namespace RuneApp {
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "");
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, (b.mon?.Id ?? b.MonId).ToString());
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
+			if (b.Type == BuildType.Lock) {
+				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Lock");
+				lvi.ForeColor = Color.Gray;
+			}
+			else
+				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
 
 			lvi.Tag = b;
 
@@ -940,7 +946,7 @@ namespace RuneApp {
 			if (Program.builds.Any())
 				nextId = Program.builds.Max(q => q.ID) + 1;
 
-			Build bb = new Build((Monster)dataMonsterList.SelectedItems[0].Tag)
+			Build bb = new Build(mon)
 			{
 				New = true,
 				ID = nextId,
@@ -972,8 +978,6 @@ namespace RuneApp {
 				else
 					bb.priority = 1;
 				
-				ListViewItem li = new ListViewItem(new string[] { bb.priority.ToString(), bb.ID.ToString(), bb.mon.FullName, "", bb.mon.Id.ToString(), "" });
-				li.Tag = bb;
 				Program.builds.Add(bb);
 
 				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
@@ -1351,6 +1355,8 @@ namespace RuneApp {
 					}
 				}
 			}
+
+			checkLocked();
 		}
 
 		private void runetab_savebutton_click(object sender, EventArgs e)
@@ -1838,6 +1844,49 @@ namespace RuneApp {
 						lvi.SubItems[buildCHTeams.Index].Text = getTeamStr(lvi.Tag as Build);
 				}
 			}
+		}
+
+		private void tsBtnLockMon_Click(object sender, EventArgs e) {
+			if (dataMonsterList.SelectedItems.Count <= 0) return;
+			var mon = dataMonsterList.SelectedItems[0].Tag as Monster;
+			if (mon == null)
+				return;
+
+			var existingLock = Program.builds.FirstOrDefault(b => b.mon == mon);
+			if (existingLock != null) {
+				Program.builds.Remove(existingLock);
+				return;
+			}
+
+
+			var nextId = 1;
+			if (Program.builds.Any())
+				nextId = Program.builds.Max(q => q.ID) + 1;
+
+			Build bb = new Build(mon)
+			{
+				New = true,
+				ID = nextId,
+				MonId = mon.Id,
+				MonName = mon.FullName,
+				Type = BuildType.Lock,
+				priority = 0,
+				AllowBroken = true,
+			};
+
+			while (Program.builds.Any(b => b.ID == bb.ID)) {
+				bb.ID++;
+			}
+
+			Program.builds.Add(bb);
+
+			var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
+			if (lv1li != null)
+				lv1li.ForeColor = Color.Green;
+		}
+
+		private void tsBtnLink_Click(object sender, EventArgs e) {
+
 		}
 	}
 

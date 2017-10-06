@@ -64,6 +64,12 @@ namespace RuneOptim {
 		SumN = 3
 	}
 
+	public enum BuildType {
+		Build = 0,
+		Lock,
+		Link,
+	}
+
 	// The heavy lifter
 	// Contains most of the data needed to outline build requirements
 	public class Build
@@ -127,6 +133,8 @@ namespace RuneOptim {
 		{
 			return ID + " " + MonName;
 		}
+
+		public BuildType Type = BuildType.Build;
 		
 		[JsonProperty("id")]
 		public int ID = 0;
@@ -735,6 +743,11 @@ namespace RuneOptim {
 		/// <param name="saveStats">If to write stats to rune stats</param>
 		public BuildResult GenBuilds(string prefix = "")
 		{
+			if (Type == BuildType.Lock) {
+				Best = new Monster(mon, true);
+				return BuildResult.Success;
+			}
+
 			if (runes.Any(r => r == null))
 			{
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Null rune"));
@@ -1674,6 +1687,14 @@ namespace RuneOptim {
 			if (save?.Runes == null)
 				return;
 
+			if (Type == BuildType.Lock) {
+				foreach (var r in mon.Current.Runes) {
+					if (r != null)
+						runes[r.Slot - 1] = new Rune[] { r };
+				}
+				return;
+			}
+
 			IEnumerable<Rune> rsGlobal = save.Runes;
 
 			// if not saving stats, cull unusable here
@@ -1741,7 +1762,7 @@ namespace RuneOptim {
 					if (!RunesUseEquipped)
 						runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped).ToArray();
 					if (!RunesUseLocked)
-						runes[i] = runes[i].Where(r => r.Locked == false).ToArray();
+						runes[i] = runes[i].Where(r => !r.Locked).ToArray();
 				}
 			}
 			CleanBroken();

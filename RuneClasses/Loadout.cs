@@ -171,7 +171,8 @@ namespace RuneOptim
 		{
 			foreach (Rune r in runes)
 			{
-				r.Locked = true;
+				if (r != null)
+					r.Locked = true;
 			}
 		}
 
@@ -664,7 +665,7 @@ namespace RuneOptim
 
 			foreach (Rune r in Runes)
 			{
-				r.Locked = true;
+				if (r == null) continue;
 				if (r.AssignedId != monId)
 				{
 					if (r.IsUnassigned)

@@ -413,7 +413,10 @@ namespace RuneApp
 						id++;
 					b.ID = id;
 				}
-				b.priority = current_pri++;
+				if (b.Type == BuildType.Lock)
+					b.priority = 0;
+				else
+					b.priority = current_pri++;
 
 				// make sure bad things are removed
 				foreach (var ftab in b.runeFilters)
@@ -605,7 +608,11 @@ namespace RuneApp
 			int i = 1;
 			foreach (var b in bpri)
 			{
-				b.priority = i++;
+				if (b.Type == BuildType.Lock) {
+					b.priority = 0;
+				}
+				else
+					b.priority = i++;
 			}
 		}
 
@@ -774,6 +781,7 @@ namespace RuneApp
 					b.Best.Current.BuildID = b.ID;
 
 					#region Get the rune diff
+					b.Best.Current.Lock();
 					b.Best.Current.RecountDiff(b.mon.Id);
 					#endregion
 
@@ -783,7 +791,7 @@ namespace RuneApp
 					loads.Add(b.Best.Current);
 
 					// if we are on the hunt of good runes.
-					if (goodRunes && saveStats)
+					if (goodRunes && saveStats && b.Type != BuildType.Lock)
 					{
 						var theBest = b.Best;
 						int count = 0;
