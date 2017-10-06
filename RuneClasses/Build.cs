@@ -501,7 +501,75 @@ namespace RuneOptim {
 
 		// Seems to out-of-mem if too many
 		private static readonly int MaxBuilds32 = 500000;
-		
+
+		public int LinkId;
+
+		[JsonIgnore]
+		public Build LinkBuild;
+
+		public void CopyFrom(Build rhs) {
+			if (rhs == null) return;
+
+			runePrediction.Clear();
+			runeFilters.Clear();
+			runeScoring.Clear();
+			BuildSets.Clear();
+			RequiredSets.Clear();
+
+			AllowBroken = rhs.AllowBroken;
+			autoAdjust = rhs.autoAdjust;
+			autoRuneAmount = rhs.autoRuneAmount;
+			autoRuneSelect = rhs.autoRuneSelect;
+			Buffs = rhs.Buffs;
+			//BuildDumpBads = rhs.BuildDumpBads;
+			//BuildGenerate = rhs.BuildGenerate;
+			//BuildGoodRunes = rhs.BuildGoodRunes;
+			//BuildSaveStats = rhs.BuildSaveStats;
+			//BuildTake = rhs.BuildTake;
+			//BuildTimeout = rhs.BuildTimeout;
+			DownloadAwake = rhs.DownloadAwake;
+			DownloadStats = rhs.DownloadStats;
+			extraCritRate = rhs.extraCritRate;
+			//RunesUseEquipped = rhs.RunesUseEquipped;
+			//RunesUseLocked = rhs.RunesUseLocked;
+
+			leader = rhs.leader;
+			shrines = rhs.shrines;
+
+			Goal.CopyFrom(rhs.Goal, true);
+			Maximum.CopyFrom(rhs.Maximum, true);
+			Minimum.CopyFrom(rhs.Minimum, true);
+			Sort.CopyFrom(rhs.Sort, true);
+			Threshold.CopyFrom(rhs.Threshold, true);
+
+			foreach (var kv in rhs.runeFilters) {
+				runeFilters[kv.Key] = new Dictionary<string, RuneFilter>();
+				foreach (var vp in kv.Value) {
+					runeFilters[kv.Key].Add(vp.Key, new RuneFilter(vp.Value));
+				}
+			}
+
+			foreach (var kv in rhs.runePrediction) {
+				runePrediction[kv.Key] = new KeyValuePair<int?, bool>(kv.Value.Key, kv.Value.Value);
+			}
+
+			foreach (var kv in rhs.runeScoring) {
+				runeScoring[kv.Key] = new KeyValuePair<FilterType, double?>(kv.Value.Key, kv.Value.Value);
+			}
+
+			for (int i = 0; i < slotStats.Length; i++) {
+				slotStats[i] = rhs.slotStats[i].ToList();
+			}
+
+			foreach (var bs in rhs.BuildSets) {
+				BuildSets.Add(bs);
+			}
+
+			foreach (var bs in rhs.RequiredSets) {
+				RequiredSets.Add(bs);
+			}
+		}
+
 		public void BanEmTemp(params ulong[] brunes)
 		{
 			bannedRunesTemp.Clear();
@@ -746,6 +814,16 @@ namespace RuneOptim {
 			if (Type == BuildType.Lock) {
 				Best = new Monster(mon, true);
 				return BuildResult.Success;
+			}
+			else if (Type == BuildType.Link) {
+				if (LinkBuild == null) {
+					for (int i = 0; i < 6; i++)
+						runes[i] = new Rune[0];
+					return BuildResult.Failure;
+				}
+				else {
+					CopyFrom(LinkBuild);
+				}
 			}
 
 			if (runes.Any(r => r == null))
@@ -1687,157 +1765,160 @@ namespace RuneOptim {
 			if (save?.Runes == null)
 				return;
 
-			if (Type == BuildType.Lock) {
-				foreach (var r in mon.Current.Runes) {
-					if (r != null)
-						runes[r.Slot - 1] = new Rune[] { r };
-				}
+			if (!GetRunningHandle())
 				return;
-			}
+			try {
 
-			IEnumerable<Rune> rsGlobal = save.Runes;
-
-			// if not saving stats, cull unusable here
-			if (!BuildSaveStats)
-			{
-				// Only using 'inventory' or runes on mon
-				// also, include runes which have been unequipped (should only look above)
-				if (!RunesUseEquipped)
-					rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped);
-				// only if the rune isn't currently locked for another purpose
-				if (!RunesUseLocked)
-					rsGlobal = rsGlobal.Where(r => !r.Locked);
-				rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !bannedRunesTemp.Any(b => b == r.Id));
-			}
-
-			if ((BuildSets.Any() || RequiredSets.Any()) && BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4))
-			{
-				// if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
-				rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
-			}
-			else if (BuildSets.Any() || RequiredSets.Any())
-			{
-				rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
-				// Only runes which we've included
-			}
-
-			if (BuildSaveStats)
-			{
-				foreach (Rune r in rsGlobal)
-				{
-					r.manageStats.AddOrUpdate("currentBuildPoints", 0, (k, v) => 0);
-					if (!BuildGoodRunes)
-						r.manageStats.AddOrUpdate("Set", 1, (s, d) => { return d + 1; });
-					else
-						r.manageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
-				}
-			}
-			
-			int?[] slotFakes = new int?[6];
-			bool[] slotPred = new bool[6];
-			GetPrediction(slotFakes, slotPred);
-
-			// Set up each runeslot
-			for (int i = 0; i < 6; i++)
-			{
-				// put the right ones in
-				runes[i] = rsGlobal.Where(r => r.Slot == i + 1).ToArray();
-
-				// makes sure that the primary stat type is in the selection
-				if (i % 2 == 1 && slotStats[i].Count > 0) // actually evens because off by 1
-				{
-					runes[i] = runes[i].Where(r => slotStats[i].Contains(r.Main.Type.ToForms())).ToArray();
-				}
-
-				if (BuildSaveStats)
-				{
-					foreach (Rune r in runes[i])
-					{
-						if (!BuildGoodRunes)
-							r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
-						else
-							r.manageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
+				if (Type == BuildType.Lock) {
+					foreach (var r in mon.Current.Runes) {
+						if (r != null)
+							runes[r.Slot - 1] = new Rune[] { r };
 					}
-					// cull here instead
+					return;
+				}
+
+				if (Type == BuildType.Link) {
+					if (LinkBuild == null) {
+						for (int i = 0; i < 6; i++)
+							runes[i] = new Rune[0];
+						return;
+					}
+					else {
+						//CopyFrom(LinkBuild);
+					}
+				}
+
+				IEnumerable<Rune> rsGlobal = save.Runes;
+
+				// if not saving stats, cull unusable here
+				if (!BuildSaveStats) {
+					// Only using 'inventory' or runes on mon
+					// also, include runes which have been unequipped (should only look above)
 					if (!RunesUseEquipped)
-						runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped).ToArray();
+						rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped);
+					// only if the rune isn't currently locked for another purpose
 					if (!RunesUseLocked)
-						runes[i] = runes[i].Where(r => !r.Locked).ToArray();
+						rsGlobal = rsGlobal.Where(r => !r.Locked);
+					rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !bannedRunesTemp.Any(b => b == r.Id));
 				}
-			}
-			CleanBroken();
 
-			if (autoRuneSelect)
-			{
-				// TODO: triple pass: start at needed for min, but each pass reduce the requirements by the average of the chosen runes for that pass, increase it by build scoring
+				if ((BuildSets.Any() || RequiredSets.Any()) && BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4)) {
+					// if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
+					rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
+				}
+				else if (BuildSets.Any() || RequiredSets.Any()) {
+					rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
+					// Only runes which we've included
+				}
 
-				var needed = NeededForMin(slotFakes, slotPred);
-				if (needed == null)
-					autoRuneSelect = false;
+				if (BuildSaveStats) {
+					foreach (Rune r in rsGlobal) {
+						r.manageStats.AddOrUpdate("currentBuildPoints", 0, (k, v) => 0);
+						if (!BuildGoodRunes)
+							r.manageStats.AddOrUpdate("Set", 1, (s, d) => { return d + 1; });
+						else
+							r.manageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
+					}
+				}
 
-				if (autoRuneSelect)
-				{
-					var needRune = new Stats(needed) / 6;
+				int?[] slotFakes = new int?[6];
+				bool[] slotPred = new bool[6];
+				GetPrediction(slotFakes, slotPred);
 
-					// Auto-Rune select picking N per RuneSet should be fine to pick more because early-out should keep times low.
-					// reduce number of runes to 10-15
+				// Set up each runeslot
+				for (int i = 0; i < 6; i++) {
+					// put the right ones in
+					runes[i] = rsGlobal.Where(r => r.Slot == i + 1).ToArray();
 
-					// odds first, then evens
-					foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 })
+					// makes sure that the primary stat type is in the selection
+					if (i % 2 == 1 && slotStats[i].Count > 0) // actually evens because off by 1
 					{
-						Rune[] rr = new Rune[0];
-						foreach (var rs in RequiredSets)
-						{
-							rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount / 2).ToArray()).ToArray();
-						}
-						if (rr.Length < autoRuneAmount)
-							rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount - rr.Length).ToArray()).Distinct().ToArray();
-
-						runes[i] = rr;
+						runes[i] = runes[i].Where(r => slotStats[i].Contains(r.Main.Type.ToForms())).ToArray();
 					}
 
-					CleanBroken();
+					if (BuildSaveStats) {
+						foreach (Rune r in runes[i]) {
+							if (!BuildGoodRunes)
+								r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
+							else
+								r.manageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
+						}
+						// cull here instead
+						if (!RunesUseEquipped)
+							runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped).ToArray();
+						if (!RunesUseLocked)
+							runes[i] = runes[i].Where(r => !r.Locked).ToArray();
+					}
 				}
-			}
-			if (!autoRuneSelect)
-			{
-				// TODO: Remove
-				//var tmp = RuneLog.logTo;
-				//using (var fs = new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create))
-				//using (var sw = new System.IO.StreamWriter(fs))
-				{
-					//RuneLog.logTo = sw;
-					// Filter each runeslot
-					for (int i = 0; i < 6; i++)
-					{
-						// default fail OR
-						Predicate<Rune> slotTest = RuneScoring(i + 1, (slotFakes[i] ?? 0), slotPred[i]);
+				CleanBroken();
 
-						runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
-						double? n;
-						if (LoadFilters(i + 1, out n) == FilterType.SumN) {
-							var nInc = Math.Max(runes[i].GroupBy(r => r.Set).Count(rs => !RequiredSets.Contains(rs.Key)),
-								runes[i].GroupBy(r => r.Set).Count(rs => RequiredSets.Contains(rs.Key)));
-							runes[i] = runes[i].Where(r => !RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(1, (int)(n ?? 30) / nInc)))
-								.Concat(runes[i].Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, 2 * (int)(n ?? 30) / nInc)))).Distinct().ToArray();
+				if (autoRuneSelect) {
+					// TODO: triple pass: start at needed for min, but each pass reduce the requirements by the average of the chosen runes for that pass, increase it by build scoring
 
-							//runes[i] = runes[i].GroupBy(r => r.Set).SelectMany(rg => rg.Take((int)(n ?? 30))).ToArray();
-							//runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
+					var needed = NeededForMin(slotFakes, slotPred);
+					if (needed == null)
+						autoRuneSelect = false;
+
+					if (autoRuneSelect) {
+						var needRune = new Stats(needed) / 6;
+
+						// Auto-Rune select picking N per RuneSet should be fine to pick more because early-out should keep times low.
+						// reduce number of runes to 10-15
+
+						// odds first, then evens
+						foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 }) {
+							Rune[] rr = new Rune[0];
+							foreach (var rs in RequiredSets) {
+								rr = rr.Concat(runes[i].Where(r => r.Set == rs).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount / 2).ToArray()).ToArray();
+							}
+							if (rr.Length < autoRuneAmount)
+								rr = rr.Concat(runes[i].Where(r => !rr.Contains(r)).OrderByDescending(r => RuneVsStats(r, needRune) * 10 + RuneVsStats(r, Sort)).Take(autoRuneAmount - rr.Length).ToArray()).Distinct().ToArray();
+
+							runes[i] = rr;
 						}
 
-						if (BuildSaveStats)
-						{
-							foreach (Rune r in runes[i])
-							{
-								if (!BuildGoodRunes)
-									r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
-								else
-									r.manageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
+						CleanBroken();
+					}
+				}
+				if (!autoRuneSelect) {
+					// TODO: Remove
+					//var tmp = RuneLog.logTo;
+					//using (var fs = new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create))
+					//using (var sw = new System.IO.StreamWriter(fs))
+					{
+						//RuneLog.logTo = sw;
+						// Filter each runeslot
+						for (int i = 0; i < 6; i++) {
+							// default fail OR
+							Predicate<Rune> slotTest = RuneScoring(i + 1, (slotFakes[i] ?? 0), slotPred[i]);
+
+							runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
+							double? n;
+							if (LoadFilters(i + 1, out n) == FilterType.SumN) {
+								var nInc = Math.Max(runes[i].GroupBy(r => r.Set).Count(rs => !RequiredSets.Contains(rs.Key)),
+								runes[i].GroupBy(r => r.Set).Count(rs => RequiredSets.Contains(rs.Key)));
+								runes[i] = runes[i].Where(r => !RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(1, (int)(n ?? 30) / nInc)))
+									.Concat(runes[i].Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, 2 * (int)(n ?? 30) / nInc)))).Distinct().ToArray();
+
+								//runes[i] = runes[i].GroupBy(r => r.Set).SelectMany(rg => rg.Take((int)(n ?? 30))).ToArray();
+								//runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
+							}
+
+							if (BuildSaveStats) {
+								foreach (Rune r in runes[i]) {
+									if (!BuildGoodRunes)
+										r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
+									else
+										r.manageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
+								}
 							}
 						}
+						//RuneLog.logTo = tmp;
 					}
-					//RuneLog.logTo = tmp;
 				}
+			}
+			finally {
+				IsRunning = false;
 			}
 		}
 

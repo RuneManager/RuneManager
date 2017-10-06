@@ -113,6 +113,7 @@
 			this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
 			this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
 			this.unequipMonsterButton = new System.Windows.Forms.ToolStripButton();
+			this.tsBtnLockMon = new System.Windows.Forms.ToolStripButton();
 			this.tabRunes = new System.Windows.Forms.TabPage();
 			this.toolStrip3 = new System.Windows.Forms.ToolStrip();
 			this.RuneTab_UnfilterButton = new System.Windows.Forms.ToolStripButton();
@@ -159,10 +160,15 @@
 			this.tsBtnBuildsMoveDown = new System.Windows.Forms.ToolStripButton();
 			this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsBtnBuildsRemove = new System.Windows.Forms.ToolStripButton();
+			this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
+			this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsBtnBuildsSave = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnBuildsUnlock = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnFindSpeed = new System.Windows.Forms.ToolStripButton();
+			this.tsBtnLink = new System.Windows.Forms.ToolStripButton();
 			this.buildList = new System.Windows.Forms.ListView();
 			this.buildCHName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.buildCHPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -187,12 +193,6 @@
 			this.label1 = new System.Windows.Forms.Label();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.tsBtnLockMon = new System.Windows.Forms.ToolStripButton();
-			this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
-			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-			this.tsBtnLink = new System.Windows.Forms.ToolStripButton();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -1062,6 +1062,17 @@
 			this.unequipMonsterButton.Text = "Unequip Selected";
 			this.unequipMonsterButton.Click += new System.EventHandler(this.unequipMonsterButton_Click);
 			// 
+			// tsBtnLockMon
+			// 
+			this.tsBtnLockMon.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnLockMon.Image = global::RuneApp.App.locked;
+			this.tsBtnLockMon.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnLockMon.Name = "tsBtnLockMon";
+			this.tsBtnLockMon.Size = new System.Drawing.Size(23, 22);
+			this.tsBtnLockMon.Text = "Lock this Monster";
+			this.tsBtnLockMon.ToolTipText = "Lock this Monster";
+			this.tsBtnLockMon.Click += new System.EventHandler(this.tsBtnLockMon_Click);
+			// 
 			// tabRunes
 			// 
 			this.tabRunes.Controls.Add(this.toolStrip3);
@@ -1511,6 +1522,44 @@
 			this.tsBtnBuildsRemove.Text = "Remove Build";
 			this.tsBtnBuildsRemove.Click += new System.EventHandler(this.tsBtnBuildsRemove_Click);
 			// 
+			// tsBtnBuildsRunOne
+			// 
+			this.tsBtnBuildsRunOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnBuildsRunOne.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.allToolStripMenuItem,
+            this.resumeToolStripMenuItem,
+            this.runToToolStripMenuItem});
+			this.tsBtnBuildsRunOne.Image = global::RuneApp.App.right;
+			this.tsBtnBuildsRunOne.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnBuildsRunOne.Name = "tsBtnBuildsRunOne";
+			this.tsBtnBuildsRunOne.Size = new System.Drawing.Size(32, 22);
+			this.tsBtnBuildsRunOne.Text = "Run Builds";
+			this.tsBtnBuildsRunOne.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
+			// 
+			// allToolStripMenuItem
+			// 
+			this.allToolStripMenuItem.Image = global::RuneApp.App.go;
+			this.allToolStripMenuItem.Name = "allToolStripMenuItem";
+			this.allToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.allToolStripMenuItem.Text = "All";
+			this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
+			// 
+			// resumeToolStripMenuItem
+			// 
+			this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
+			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.resumeToolStripMenuItem.Text = "Resume";
+			this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
+			// 
+			// runToToolStripMenuItem
+			// 
+			this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
+			this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
+			this.runToToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.runToToolStripMenuItem.Text = "Run to";
+			this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
+			// 
 			// toolStripSeparator1
 			// 
 			this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -1547,6 +1596,17 @@
 			this.tsBtnFindSpeed.ToolTipText = "Identify large builds";
 			this.tsBtnFindSpeed.Click += new System.EventHandler(this.tsBtnFindSpeed_Click);
 			// 
+			// tsBtnLink
+			// 
+			this.tsBtnLink.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnLink.Image = global::RuneApp.App.unlockedYes;
+			this.tsBtnLink.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnLink.Name = "tsBtnLink";
+			this.tsBtnLink.Size = new System.Drawing.Size(23, 22);
+			this.tsBtnLink.Text = "Make a linked build";
+			this.tsBtnLink.ToolTipText = "Make a linked build";
+			this.tsBtnLink.Click += new System.EventHandler(this.tsBtnLink_Click);
+			// 
 			// buildList
 			// 
 			this.buildList.AllowColumnReorder = true;
@@ -1570,7 +1630,7 @@
 			this.buildList.UseCompatibleStateImageBehavior = false;
 			this.buildList.View = System.Windows.Forms.View.Details;
 			this.buildList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.buildList_ColumnWidthChanging);
-			this.buildList.DoubleClick += new System.EventHandler(this.listView5_DoubleClick);
+			this.buildList.DoubleClick += new System.EventHandler(this.buildList_DoubleClick);
 			this.buildList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.buildList_MouseClick);
 			// 
 			// buildCHName
@@ -1806,66 +1866,6 @@
 			this.runeEquipped.TabStop = false;
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
-			// 
-			// tsBtnLockMon
-			// 
-			this.tsBtnLockMon.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnLockMon.Image = global::RuneApp.App.locked;
-			this.tsBtnLockMon.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tsBtnLockMon.Name = "tsBtnLockMon";
-			this.tsBtnLockMon.Size = new System.Drawing.Size(23, 22);
-			this.tsBtnLockMon.Text = "Lock this Monster";
-			this.tsBtnLockMon.ToolTipText = "Lock this Monster";
-			this.tsBtnLockMon.Click += new System.EventHandler(this.tsBtnLockMon_Click);
-			// 
-			// tsBtnBuildsRunOne
-			// 
-			this.tsBtnBuildsRunOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnBuildsRunOne.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.allToolStripMenuItem,
-            this.resumeToolStripMenuItem,
-            this.runToToolStripMenuItem});
-			this.tsBtnBuildsRunOne.Image = global::RuneApp.App.right;
-			this.tsBtnBuildsRunOne.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tsBtnBuildsRunOne.Name = "tsBtnBuildsRunOne";
-			this.tsBtnBuildsRunOne.Size = new System.Drawing.Size(32, 22);
-			this.tsBtnBuildsRunOne.Text = "Run All";
-			this.tsBtnBuildsRunOne.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
-			// 
-			// resumeToolStripMenuItem
-			// 
-			this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
-			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.resumeToolStripMenuItem.Text = "Resume";
-			this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
-			// 
-			// runToToolStripMenuItem
-			// 
-			this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
-			this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-			this.runToToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.runToToolStripMenuItem.Text = "Run to";
-			this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
-			// 
-			// allToolStripMenuItem
-			// 
-			this.allToolStripMenuItem.Image = global::RuneApp.App.go;
-			this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-			this.allToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-			this.allToolStripMenuItem.Text = "All";
-			this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
-			// 
-			// tsBtnLink
-			// 
-			this.tsBtnLink.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnLink.Image = global::RuneApp.App.unlockedYes;
-			this.tsBtnLink.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tsBtnLink.Name = "tsBtnLink";
-			this.tsBtnLink.Size = new System.Drawing.Size(23, 22);
-			this.tsBtnLink.Text = "Make a linked build";
-			this.tsBtnLink.ToolTipText = "Make a linked build";
-			this.tsBtnLink.Click += new System.EventHandler(this.tsBtnLink_Click);
 			// 
 			// Main
 			// 

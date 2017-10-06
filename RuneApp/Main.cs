@@ -593,8 +593,12 @@ namespace RuneApp {
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "");
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, (b.mon?.Id ?? b.MonId).ToString());
 			if (b.Type == BuildType.Lock) {
-				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Lock");
+				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Locked");
 				lvi.ForeColor = Color.Gray;
+			}
+			else if (b.Type == BuildType.Link) {
+				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Linked");
+				lvi.ForeColor = Color.Teal;
 			}
 			else
 				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
@@ -986,7 +990,7 @@ namespace RuneApp {
 			}
 		}
 
-		private void listView5_DoubleClick(object sender, EventArgs e)
+		private void buildList_DoubleClick(object sender, EventArgs e)
 		{
 			var items = buildList.SelectedItems;
 			if (items.Count > 0)
@@ -996,6 +1000,9 @@ namespace RuneApp {
 				{
 					Build bb = (Build)item.Tag;
 					Monster before = bb.mon;
+					if (bb.Type == BuildType.Link) {
+						bb.CopyFrom(Program.builds.FirstOrDefault(b => b.ID == bb.LinkId));
+					}
 					using (var ff = new Create(bb))
 					{
 						var res = ff.ShowDialog();
@@ -1016,6 +1023,9 @@ namespace RuneApp {
 									lv1li.ForeColor = Color.Green;
 
 							}
+							if (bb.Type == BuildType.Link) {
+								Program.builds.FirstOrDefault(b => b.ID == bb.LinkId).CopyFrom(bb);
+							}
 						}
 					}
 				}
@@ -1030,6 +1040,9 @@ namespace RuneApp {
 			{
 				var li = lis[0];
 				RunBuild(li, Program.Settings.MakeStats);
+			}
+			else {
+				Program.StopBuild();
 			}
 		}
 
@@ -1051,6 +1064,9 @@ namespace RuneApp {
 					Build b = (Build)li.Tag;
 					if (b != null)
 					{
+						foreach (var bb in Program.builds.Where(bu => bu.Type == BuildType.Link && bu.LinkId == b.ID)) {
+							bb.Type = BuildType.Build;
+						}
 						Program.builds.Remove(b);
 					}
 				}
@@ -1717,9 +1733,9 @@ namespace RuneApp {
 
 			foreach (ListViewItem li in buildList.Items)
 			{
+				li.BackColor = Color.White;
 				if (Program.Settings.ColorTeams && b1 != null && b1.Teams.Count > 0)
 				{
-					li.BackColor = Color.White;
 					var b2 = li.Tag as Build;
 					if (b2 != null && b2.Teams.Count > 0)
 					{
@@ -1746,6 +1762,19 @@ namespace RuneApp {
 						else if (close == 3)
 							li.BackColor = Color.LightGray;
 					}
+				}
+			}
+
+			if (b1 != null && b1.Type == BuildType.Link) {
+				var li = buildList.Items.Cast<ListViewItem>().FirstOrDefault(l => l.Tag == b1.LinkBuild);
+				li.BackColor = Color.Fuchsia;
+				foreach (var lvi in buildList.Items.Cast<ListViewItem>().Where(l => {
+					var b = l.Tag as Build;
+					if (b != null && b.Type == BuildType.Link && b.LinkId == b1.LinkId)
+						return true;
+					return false;
+				})) {
+					lvi.BackColor = Color.Purple;
 				}
 			}
 		}
@@ -1800,6 +1829,8 @@ namespace RuneApp {
 					b.RunesUseEquipped = Program.Settings.UseEquipped;
 					b.BuildSaveStats = false;
 					b.GenRunes(Program.data);
+					if (b.runes.Any(rr => rr == null))
+						continue;
 					long c = b.runes[0].Length;
 					c *= b.runes[1].Length;
 					c *= b.runes[2].Length;
@@ -1886,7 +1917,57 @@ namespace RuneApp {
 		}
 
 		private void tsBtnLink_Click(object sender, EventArgs e) {
+			if (buildList.SelectedItems.Count <= 0) return;
+			
+			var build = buildList.SelectedItems[0].Tag as Build;
 
+			if (build == null)
+				return;
+
+			if (build.Type == BuildType.Lock)
+				return;
+			else if (build.Type == BuildType.Link) {
+				build.Type = BuildType.Build;
+				ListViewItemBuild(buildList.SelectedItems[0], build);
+				return;
+			}
+
+			if (buildList.SelectedItems.Count > 1) {
+				if (MessageBox.Show($"Link {buildList.SelectedItems.Count - 1} builds to [{build.ID} - {build.MonName}]?", "Link Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+					foreach (var lvi in buildList.SelectedItems.Cast<ListViewItem>().Skip(1)) {
+						var b = lvi.Tag as Build;
+						if (b != null && b != build) {
+							b.Type = BuildType.Link;
+							b.LinkId = build.ID;
+							b.LinkBuild = build;
+							ListViewItemBuild(lvi, b);
+						}
+					}
+				}
+				return;
+			}
+			var nextId = 1;
+			if (Program.builds.Any())
+				nextId = Program.builds.Max(q => q.ID) + 1;
+
+			Build bb = new Build(build.mon)
+			{
+				New = true,
+				ID = nextId,
+				MonId = build.mon.Id,
+				MonName = build.mon.FullName,
+				Type = BuildType.Link,
+				priority = build.priority,
+				LinkId = build.ID,
+			};
+
+			while (Program.builds.Any(b => b.ID == bb.ID)) {
+				bb.ID++;
+			}
+
+			Program.builds.Add(bb);
+
+			Program.BuildPriority(bb, 1);
 		}
 	}
 

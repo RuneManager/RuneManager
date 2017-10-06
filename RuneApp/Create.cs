@@ -782,6 +782,7 @@ namespace RuneApp
 						if (num > 1)
 							lvi.Text = $"{set.ToString()} x{num}";
 					}
+					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 					foreach (var set in e.OldItems.Cast<RuneSet>())
@@ -795,10 +796,13 @@ namespace RuneApp
 						if (num > 1)
 							lvi.Text = $"{set.ToString()} x{num}";
 					}
+					RegenSetList();
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 				default:
 					throw new NotImplementedException();
 			}
@@ -809,22 +813,26 @@ namespace RuneApp
 			switch (e.Action)
 			{
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var set in e.NewItems.Cast<RuneSet>())
+					/*foreach (var set in e.NewItems.Cast<RuneSet>())
 					{
 						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsInc;
-					}
+					}*/
+					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var set in e.OldItems.Cast<RuneSet>())
+					/*foreach (var set in e.OldItems.Cast<RuneSet>())
 					{
 						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsExc;
-					}
+					}*/
+					RegenSetList();
+					break;
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 				default:
 					throw new NotImplementedException();
 			}
@@ -1119,7 +1127,7 @@ namespace RuneApp
 					sl.ForeColor = Color.Black;
 				}
 			}
-			CalcPerms();
+			//CalcPerms();
 		}
 
 		// shuffle runesets between: included <-> excluded
@@ -2010,6 +2018,9 @@ namespace RuneApp
 			Label ctrl;
 			for (int i = 0; i < 6; i++)
 			{
+				if (build.runes[i] == null)
+					continue;
+
 				int num = build.runes[i].Length;
 
 				if (i == 0)

@@ -370,6 +370,9 @@ namespace RuneApp
 				{
 					builds.Add(b);
 				}
+				foreach (var b in builds.Where(b => b.Type == BuildType.Link)) {
+					b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
+				}
 #if !DEBUG
 			}
 			catch (Exception e)
@@ -411,6 +414,11 @@ namespace RuneApp
 					id = 1;
 					while (Program.builds.Any(bu => bu.ID == id))
 						id++;
+
+					foreach (var lb in Program.builds.Where(bu => bu.LinkId == b.ID)) {
+						lb.LinkId = id;
+					}
+
 					b.ID = id;
 				}
 				if (b.Type == BuildType.Lock)
@@ -736,6 +744,9 @@ namespace RuneApp
 				b.BuildSaveStats = saveStats;
 				b.BuildGoodRunes = false;
 				BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
+				if (b.Type == BuildType.Link) {
+					b.CopyFrom(b.LinkBuild);
+				}
 				b.GenRunes(Program.data);
 				b.shrines = Program.data.shrines;
 

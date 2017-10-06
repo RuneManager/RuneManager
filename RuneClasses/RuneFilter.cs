@@ -11,12 +11,22 @@ namespace RuneOptim
 		public double? Percent = null; // div percent by
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
 		public double? Test = null; // sum both >= test
+
+		public RuneFilter() {
+
+		}
 		
 		public RuneFilter(double? f = null, double? p = null, double? t = null)
 		{
 			Flat = f;
 			Percent = p;
 			Test = t;
+		}
+
+		public RuneFilter(RuneFilter rhs) {
+			Flat = rhs.Flat;
+			Percent = rhs.Percent;
+			Test = rhs.Test;
 		}
 
 		// for debugging niceness
