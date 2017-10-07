@@ -536,14 +536,15 @@ namespace RuneApp
 
 				foreach (var load in lloads)
 				{
-					for (int i = 0; i < 6; i++)
-					{
-						load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == load.RuneIDs[i]);
-						if (load.Runes[i] != null)
-						{
-							load.Runes[i].Locked = true;
-							foreach (var ms in load.manageStats[i])
-								load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+					if (load.RuneIDs != null) {
+						for (int i = 0; i < 6; i++) {
+							var ids = load.RuneIDs[i];
+							load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == ids);
+							if (load.Runes[i] != null) {
+								load.Runes[i].Locked = true;
+								foreach (var ms in load.manageStats[i])
+									load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+							}
 						}
 					}
 					load.Shrines = data.shrines;

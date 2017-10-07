@@ -4,8 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	public enum EquipCompare
 	{
 		Unknown,
@@ -73,12 +72,20 @@ namespace RuneOptim
 
 		private ulong[] runeIDs;
 
+		//[JsonIgnore]
 		public ulong[] RuneIDs
 		{
 			get
 			{
-				if (runes.All(r => r != null))
-					runeIDs = runes.Select(r => r.Id).ToArray();
+				if (runeIDs == null)
+					runeIDs = new ulong[6];
+
+				for (int i = 0; i < 6; i++) {
+					var ru = runes.FirstOrDefault(r => r != null && r.Slot == i + 1);
+					if (ru != null && ru.Id != runeIDs[i])
+						runeIDs[i] = ru.Id;
+				}
+				
 				return runeIDs;
 			}
 			set

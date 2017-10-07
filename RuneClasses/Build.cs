@@ -1562,7 +1562,7 @@ namespace RuneOptim {
 			{
 				var kv = runeScoring[SlotIndex.Global];
 				if (kv.Key != FilterType.None) {
-					if (runeFilters.ContainsKey(SlotIndex.Global))
+					if (runeFilters.ContainsKey(SlotIndex.Global) || kv.Key == FilterType.SumN)
 						and = kv.Key;
 					if (kv.Value != null) {
 						testVal = kv.Value;
@@ -1575,7 +1575,7 @@ namespace RuneOptim {
 			{
 				var kv = runeScoring[tmk];
 				if (kv.Key != FilterType.None) {
-					if (runeFilters.ContainsKey(tmk))
+					if (runeFilters.ContainsKey(tmk) || kv.Key == FilterType.SumN)
 						and = kv.Key;
 					if (kv.Value != null) {
 						testVal = kv.Value;
@@ -1588,7 +1588,7 @@ namespace RuneOptim {
 			{
 				var kv = runeScoring[tmk];
 				if (kv.Key != FilterType.None) {
-					if (runeFilters.ContainsKey(tmk))
+					if (runeFilters.ContainsKey(tmk) || kv.Key == FilterType.SumN)
 						and = kv.Key;
 					if (kv.Value != null) {
 						testVal = kv.Value;
