@@ -130,6 +130,11 @@
     <Compile Include="Help.Designer.cs">
       <DependentUpon>Help.cs</DependentUpon>
     </Compile>
+    <Compile Include="Icon.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Icon.resx</DependentUpon>
+    </Compile>
     <Compile Include="InternalServer\InternalServer.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -248,6 +253,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Help.resx">
       <DependentUpon>Help.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Icon.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Icon.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="InternalServer\InternalServer.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -3864,6 +3873,39 @@
     <None Include="Resources\building_store.png" />
     <None Include="Resources\building_store_small.png" />
     <Content Include="Resources\fromMon.png" />
+    <None Include="Resources\icon_duration_attack_down.png" />
+    <None Include="Resources\icon_duration_attack_up.png" />
+    <None Include="Resources\icon_duration_boom.png" />
+    <None Include="Resources\icon_duration_brand.png" />
+    <None Include="Resources\icon_duration_counter.png" />
+    <None Include="Resources\icon_duration_cridown.png" />
+    <None Include="Resources\icon_duration_critical.png" />
+    <None Include="Resources\icon_duration_defence_down.png" />
+    <None Include="Resources\icon_duration_defence_up.png" />
+    <None Include="Resources\icon_duration_dot.png" />
+    <None Include="Resources\icon_duration_endure.png" />
+    <None Include="Resources\icon_duration_forgetfulness.png" />
+    <None Include="Resources\icon_duration_freezing.png" />
+    <None Include="Resources\icon_duration_heal.png" />
+    <None Include="Resources\icon_duration_immue.png" />
+    <None Include="Resources\icon_duration_impossible.png" />
+    <None Include="Resources\icon_duration_invinciblity.png" />
+    <None Include="Resources\icon_duration_manafury.png" />
+    <None Include="Resources\icon_duration_miss.png" />
+    <None Include="Resources\icon_duration_notbuff.png" />
+    <None Include="Resources\icon_duration_notshield.png" />
+    <None Include="Resources\icon_duration_protect.png" />
+    <None Include="Resources\icon_duration_provocative.png" />
+    <None Include="Resources\icon_duration_reflect.png" />
+    <None Include="Resources\icon_duration_revange.png" />
+    <None Include="Resources\icon_duration_runeshield.png" />
+    <None Include="Resources\icon_duration_shield.png" />
+    <None Include="Resources\icon_duration_silence.png" />
+    <None Include="Resources\icon_duration_sleep.png" />
+    <None Include="Resources\icon_duration_soulprotect.png" />
+    <None Include="Resources\icon_duration_speed_down.png" />
+    <None Include="Resources\icon_duration_speed_up.png" />
+    <None Include="Resources\icon_duration_stun.png" />
     <Content Include="Resources\locked.png" />
     <Content Include="Resources\lockedNo.png" />
     <Content Include="Resources\mon.png" />
