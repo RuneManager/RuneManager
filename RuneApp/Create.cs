@@ -758,7 +758,19 @@ namespace RuneApp
 			}
 
 			checkBuffAtk.Checked = build.Buffs.Attack;
-
+			
+			tcATK.Gamma = build.Buffs.Attack ? 1.0f : 0.2f;
+			tcDEF.Gamma = build.Buffs.Defense ? 1.0f : 0.2f;
+			tcSPD.Gamma = build.Buffs.Speed ? 1.0f : 0.2f;
+			new System.Threading.Thread(() => {
+				System.Threading.Thread.Sleep(200);
+				this.Invoke((MethodInvoker)delegate {
+					tcATK.Invalidate();
+					tcDEF.Invalidate();
+					tcSPD.Invalidate();
+				});
+			}).Start();
+			
 			// done loading!
 			loading = false;
 			// this build is no longer considered new
@@ -1906,7 +1918,7 @@ namespace RuneApp
 						if (ctrlWorth == null)
 							continue;
 
-						ctrlWorth.Text = build.Sort[stat] > 0 ? build.Sort[stat].ToString() : "";
+						ctrlWorth.Text = build.Sort[stat] != 0 ? build.Sort[stat].ToString() : "";
 					}
 					foreach (var extra in Build.extraNames)
 					{
@@ -1914,7 +1926,7 @@ namespace RuneApp
 						if (ctrlWorth == null)
 							continue;
 
-						ctrlWorth.Text = build.Sort.ExtraGet(extra) > 0 ? build.Sort.ExtraGet(extra).ToString() : "";
+						ctrlWorth.Text = build.Sort.ExtraGet(extra) != 0 ? build.Sort.ExtraGet(extra).ToString() : "";
 					}
 					for (int i = 0; i < 4; i++) {
 						var ctrlWorth = groupBox1.Controls.Find("Skill" + i + "Worth", true).FirstOrDefault();
@@ -2208,6 +2220,40 @@ namespace RuneApp
 				return;
 
 			build.Buffs.Attack = checkBuffAtk.Checked;
+		}
+
+		private void tcATK_Click(object sender, EventArgs e) {
+			build.Buffs.Attack = !build.Buffs.Attack;
+			checkBuffAtk.Checked = build.Buffs.Attack;
+			tcATK.Gamma = build.Buffs.Attack ? 1.0f : 0.2f;
+			tcATK.Invalidate();
+
+			Monster mon = build.mon;
+			mon.Current.Buffs = build.Buffs;
+			Stats cur = mon.GetStats(true);
+			refreshStats(mon, cur);
+		}
+
+		private void tcDEF_Click(object sender, EventArgs e) {
+			build.Buffs.Defense = !build.Buffs.Defense;
+			tcDEF.Gamma = build.Buffs.Defense ? 1.0f : 0.2f;
+			tcDEF.Invalidate();
+
+			Monster mon = build.mon;
+			mon.Current.Buffs = build.Buffs;
+			Stats cur = mon.GetStats(true);
+			refreshStats(mon, cur);
+		}
+
+		private void tcSPD_Click(object sender, EventArgs e) {
+			build.Buffs.Speed = !build.Buffs.Speed;
+			tcSPD.Gamma = build.Buffs.Speed ? 1.0f : 0.2f;
+			tcSPD.Invalidate();
+
+			Monster mon = build.mon;
+			mon.Current.Buffs = build.Buffs;
+			Stats cur = mon.GetStats(true);
+			refreshStats(mon, cur);
 		}
 	}
 }

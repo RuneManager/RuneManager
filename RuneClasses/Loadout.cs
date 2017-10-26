@@ -14,6 +14,8 @@ namespace RuneOptim {
 	
 	public struct Buffs {
 		public bool Attack;
+		public bool Defense;
+		public bool Speed;
 	}
 
 	public class Loadout
@@ -592,7 +594,11 @@ namespace RuneOptim {
 				value.Attack *= 1.5;
 			
 			value.Defense += (int)Math.Ceiling(baseStats.Defense * DefensePercent * 0.01) + DefenseFlat;
+			if (Buffs.Defense)
+				value.Defense *= 1.7;
 			value.Speed += (int)Math.Ceiling(baseStats.Speed * SpeedPercent * 0.01) + Speed;
+			if (Buffs.Speed)
+				value.Speed *= 1.3;
 
 			value.CritDamage += CritDamage;
 			value.CritRate += CritRate;
