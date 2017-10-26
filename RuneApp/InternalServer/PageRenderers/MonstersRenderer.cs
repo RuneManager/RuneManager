@@ -152,6 +152,10 @@ http.send(params);
 
 			var bdic = bb.ToDictionary(b => b.MonId);
 
+			var remids = Program.goals.ReservedIds.Where(i => Program.data.GetMonster(i) == null).ToList();
+			foreach (var i in remids) {
+				Program.goals.ReservedIds.Remove(i);
+			}
 			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null);
 			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
@@ -455,23 +459,26 @@ http.send(params);
 			};
 			foreach (var r in l.Runes)
 			{
+				if (r == null) continue;
 				var rd = RuneRenderer.renderRune(r);
 				var hide = rd.contentList.FirstOrDefault(ele => ele.contentDic.Any(pr => pr.Value.ToString().Contains(r.Id.ToString() + "_")));
 				hide.contentDic["style"] = (r.AssignedId == m.Id) ? "\"display:none;\"" : "";
 				div.contentList.Add(rd);
 			}
-			if (l.Runes.All(r => r.AssignedId == m.Id))
+			if (l.Runes.All(r => r == null || r.AssignedId == m.Id))
 				div.contentDic.Add("style", "\"display:none;\"");
-
-			// list skillups
-			var nl = new ServedResult("ul");
-			nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
-			if (nl.contentList.Count == 0)
-				nl.name = "br";
 
 			li.contentList.Add(span);
 			li.contentList.Add(div);
-			li.contentList.Add(nl);
+
+			// list skillups
+			if (pairs.ContainsKey(m)) {
+				var nl = new ServedResult("ul");
+				nl.contentList.AddRange(pairs?[m]?.Select(mo => new ServedResult("li") { contentList = { renderMonLink(mo, "- ", LinkRenderOptions.Grade | LinkRenderOptions.Level) } }));
+				if (nl.contentList.Count == 0)
+					nl.name = "br";
+				li.contentList.Add(nl);
+			}
 
 			return li;
 		}
