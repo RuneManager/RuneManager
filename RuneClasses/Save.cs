@@ -172,6 +172,12 @@ namespace RuneOptim
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+					foreach (var i in e.OldItems.Cast<ulong>()) {
+						var mon = GetMonster(i);
+						if (mon != null)
+							mon.Locked = false;
+					}
+					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
@@ -188,7 +194,12 @@ namespace RuneOptim
 					foreach (var shr in e.NewItems.Cast<Deco>().Where(d => d.Shrine != Shrine.Unknown))
 					{
 						var i = Deco.ShrineStats.ToList().IndexOf(shr.Shrine.ToString());
-						shrines[shr.Shrine.ToString()] = Math.Ceiling(shr.Level * Deco.ShrineLevel[i]);
+						int v = (int)Math.Floor(shr.Level * Deco.ShrineLevel[i]);
+						if (i < 4)
+							v = (int)Math.Ceiling(shr.Level * Deco.ShrineLevel[i]);
+						else if (i < 9)
+							v = (int)Math.Ceiling(1 + shr.Level * Deco.ShrineLevel[i]);
+						shrines[shr.Shrine.ToString()] = v;
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
@@ -274,7 +285,7 @@ namespace RuneOptim
 							if (ru != r) {
 								Runes.Remove(ru);
 								var mon = ru.Assigned ?? r.Assigned;
-								if (mon.Id == r.AssignedId && mon.Current.Runes[r.Slot - 1] != r) {
+								if (mon != null && mon.Current.Runes[r.Slot - 1] != r) {
 									mon.ApplyRune(r);
 									r.Assigned = mon;
 								}

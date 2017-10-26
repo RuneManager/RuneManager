@@ -47,9 +47,13 @@ namespace RuneOptim {
 		[JsonIgnore]
 		public bool SetsFull { get { return setsFull; } }
 
+		public Element Element = Element.Pure;
+
 		public Buffs Buffs;
 		
 		public double Time;
+
+		public double DeltaPoints;
 
 		public long ActualTests = 0;
 		
@@ -245,7 +249,7 @@ namespace RuneOptim {
 					(runes[3]?.AttackPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Attack + 
+					(int)shrines.Attack + (int)shrines[Element + "ATK"] +
 					(int)leader.Attack + 
 					SetStat(Attr.AttackPercent);
 			}

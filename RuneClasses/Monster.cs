@@ -291,12 +291,12 @@ namespace RuneOptim
 
 		// get the stats of the current build.
 		// NOTE: the monster will contain it's base stats
-		public Stats GetStats()
+		public Stats GetStats(bool force = false)
 		{
-			if (changeStats || Current.Changed)
+			if (changeStats || Current.Changed || force)
 			{
 				checkSkillups();
-
+				Current.Element = this.Element;
 				Current.GetStats(this, ref curStats);
 				changeStats = false;
 			}
@@ -317,7 +317,8 @@ namespace RuneOptim
 				{
 					i++;
 					this.SkillupLevel[i] = _skilllist[i].Level ?? 0;
-					this.SkillupMax[i] = this.SkillupLevel[i];
+					if (this.SkillupMax[i] == 0)
+						this.SkillupMax[i] = this.SkillupLevel[i];
 					if (!SkillDefs.ContainsKey(si.SkillId ?? 0))
 						continue;
 					var ss = SkillDefs[si.SkillId ?? 0];

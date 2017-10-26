@@ -221,6 +221,7 @@ namespace RuneApp
 								var bnum = builds.Count(bu => bu.MonName == b.MonName);
 								b.mon = Program.data.GetMonster(b.MonName, bnum + 1);
 							}
+							b.shrines = Program.data.shrines;
 						}
 						else
 						{
@@ -799,6 +800,24 @@ namespace RuneApp
 
 					//currentBuild = null;
 					b.Best.Current.Time = b.Time;
+
+					var dmon = Program.data.GetMonster(b.Best.Id);
+
+					var dmonld = dmon.Current.Leader;
+					var dmonsh = dmon.Current.Shrines;
+					dmon.Current.Leader = b.Best.Current.Leader;
+					dmon.Current.Shrines = b.Best.Current.Shrines;
+					var dmonfl = dmon.Current.FakeLevel;
+					var dmonps = dmon.Current.PredictSubs;
+					dmon.Current.FakeLevel = b.Best.Current.FakeLevel;
+					dmon.Current.PredictSubs = b.Best.Current.PredictSubs;
+
+					b.Best.Current.DeltaPoints = b.CalcScore(b.Best.Current.GetStats(b.Best)) - b.CalcScore(dmon.GetStats());
+
+					dmon.Current.Leader = dmonld;
+					dmon.Current.Shrines = dmonsh;
+					dmon.Current.FakeLevel = dmonfl;
+					dmon.Current.PredictSubs = dmonps;
 
 					loads.Add(b.Best.Current);
 

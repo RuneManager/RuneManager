@@ -217,12 +217,12 @@ namespace RuneOptim
 		[JsonIgnore]
 		public int[] SkillupLevel {
 			get {
-				if (skillTimes == null)
-					skillTimes = new int[8];
-				return skillTimes;
+				if (skillupLevel == null)
+					skillupLevel = new int[8];
+				return skillupLevel;
 			}
 			set {
-				skillTimes = value;
+				skillupLevel = value;
 			}
 		}
 
@@ -232,12 +232,12 @@ namespace RuneOptim
 		[JsonIgnore]
 		public int[] SkillupMax {
 			get {
-				if (skillTimes == null)
-					skillTimes = new int[8];
-				return skillTimes;
+				if (skillupMax == null)
+					skillupMax = new int[8];
+				return skillupMax;
 			}
 			set {
-				skillTimes = value;
+				skillupMax = value;
 			}
 		}
 
@@ -606,6 +606,16 @@ namespace RuneOptim
 						return Accuracy;
 					case "RES":
 						return Resistance;
+					case "WaterATK":
+						return this.DamageSkillups[0];
+					case "FireATK":
+						return this.DamageSkillups[1];
+					case "WindATK":
+						return this.DamageSkillups[2];
+					case "LightATK":
+						return this.DamageSkillups[3];
+					case "DarkATK":
+						return this.DamageSkillups[4];
 					default:
 						return 0;
 						//throw new NotImplementedException();
@@ -650,6 +660,21 @@ namespace RuneOptim
 					case "RES":
 						Resistance = value;
 						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Resistance, value));
+						break;
+					case "WaterATK":
+						this.DamageSkillups[0] = value;
+						break;
+					case "FireATK":
+						this.DamageSkillups[1] = value;
+						break;
+					case "WindATK":
+						this.DamageSkillups[2] = value;
+						break;
+					case "LightATK":
+						this.DamageSkillups[3] = value;
+						break;
+					case "DarkATK":
+						this.DamageSkillups[4] = value;
 						break;
 					default:
 						break;
@@ -919,6 +944,9 @@ namespace RuneOptim
 			}
 			for (int i = 0; i < 4; i++) {
 				OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + i, this.GetSkillDamage(Attr.AverageDamage, i, this)));
+			}
+			for (int i = 0; i < 8; i++) {
+				this.DamageSkillups[i] = rhs.DamageSkillups[i];
 			}
 			return this;
 		}
