@@ -543,8 +543,9 @@ namespace RuneApp
 							load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == ids);
 							if (load.Runes[i] != null) {
 								load.Runes[i].Locked = true;
-								foreach (var ms in load.manageStats[i])
-									load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+								if (load.manageStats != null)
+									foreach (var ms in load.manageStats[i])
+										load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
 							}
 						}
 					}
@@ -839,7 +840,7 @@ namespace RuneApp
 					#region Save Build stats
 
 					/* TODO: put Excel on Program */
-					if (saveStats)
+					if (saveStats && b.Type != BuildType.Lock)
 					{
 						BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Excel"));
 						runeSheet.StatsExcelBuild(b, b.mon, b.Best.Current, true);

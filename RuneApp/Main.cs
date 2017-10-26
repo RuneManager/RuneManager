@@ -457,8 +457,12 @@ namespace RuneApp {
 			l.RecountDiff(b.mon.Id);
 
 			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.runesNew + l.runesChanged).ToString());
-			if (l.runesNew > 0 && b.mon.Current.RuneCount < 6)
+			if (l.Runes.Where(r => r != null && r.IsUnassigned).Any(r => b.mon.Runes.FirstOrDefault(ru => ru != null && ru.Slot == r.Slot) == null))
 				nli.SubItems[3].ForeColor = Color.Green;
+			if (b.Type == BuildType.Lock)
+				nli.SubItems[0].ForeColor = Color.Gray;
+			else if (b.Type == BuildType.Link)
+				nli.SubItems[0].ForeColor = Color.Teal;
 			if (Program.Settings.SplitAssign)
 				nli.SubItems[3].Text = l.runesNew.ToString() + "/" + l.runesChanged.ToString();
 			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
@@ -906,7 +910,10 @@ namespace RuneApp {
 							var afterScore = build.CalcScore(load.GetStats(mon));
 							groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
 							groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
-							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = (afterScore - beforeScore).ToString("0.##");
+							var dScore = load.DeltaPoints;
+							if (dScore == 0)
+								dScore = afterScore - beforeScore;
+							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = dScore.ToString("0.##");
 						}
 						ShowDiff(dmon.GetStats(), load.GetStats(mon), build);
 

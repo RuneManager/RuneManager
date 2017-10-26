@@ -910,7 +910,7 @@ namespace RuneOptim {
 				}
 
 				DateTime begin = DateTime.Now;
-				//DateTime timerShared = DateTime.Now;
+				DateTime timerShared = DateTime.Now;
 
 				RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
@@ -933,8 +933,32 @@ namespace RuneOptim {
 #endif
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "..."));
 
-				// Parallel the outer loop
 				SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
+
+				var timeThread = new Thread(()=> {
+					while (IsRunning) {
+						Thread.Sleep(400);
+						// every second, give a bit of feedback to those watching
+						//if (DateTime.Now > timerShared.AddSeconds(0.5)) {
+						//	timerShared = DateTime.Now;
+							RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
+							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + string.Format("{0:P2}", (count + complete - total) / (double)complete)));
+						if (tests != null)
+							BuildProgTo?.Invoke(this, new ProgToEventArgs(this, (count + complete - total) / (double)complete, tests.Count));
+
+						if (BuildTimeout > 0 && DateTime.Now > begin.AddSeconds(BuildTimeout)) {
+							RuneLog.Info("Timeout");
+							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Timeout"));
+							BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
+
+							IsRunning = false;
+						}
+						//}
+					}
+				});
+				timeThread.Start();
+
+				// Parallel the outer loop
 				Parallel.ForEach(runes[0], (r0, loopState) =>
 				{
 					var tempTimer = DateTime.Now;
@@ -1164,7 +1188,6 @@ namespace RuneOptim {
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
 										//isBad = false;
-
 										cstats = test.GetStats();
 
 										// check if build meets minimum
@@ -1272,24 +1295,6 @@ namespace RuneOptim {
 											}
 										}
 
-										// every second, give a bit of feedback to those watching
-										if (DateTime.Now > tempTimer.AddSeconds(1))
-										{
-											tempTimer = DateTime.Now;
-											RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
-											BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + string.Format("{0:P2}", (count + complete - total) / (double)complete)));
-											BuildProgTo?.Invoke(this, new ProgToEventArgs(this, (count + complete - total) / (double)complete, tests.Count));
-
-											if (BuildTimeout > 0 && DateTime.Now > begin.AddSeconds(BuildTimeout))
-											{
-												RuneLog.Info("Timeout");
-												BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Timeout"));
-												BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
-
-												IsRunning = false;
-												break;
-											}
-										}
 									}
 									// sum up what work we've done
 									Interlocked.Add(ref total, -kill);
@@ -1314,6 +1319,8 @@ namespace RuneOptim {
 						}
 					}
 				});
+
+				
 
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "99%+"));
 
@@ -1895,13 +1902,23 @@ namespace RuneOptim {
 							runes[i] = runes[i].Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
 							double? n;
 							if (LoadFilters(i + 1, out n) == FilterType.SumN) {
+								/*
 								var nInc = Math.Max(runes[i].GroupBy(r => r.Set).Count(rs => !RequiredSets.Contains(rs.Key)),
 								runes[i].GroupBy(r => r.Set).Count(rs => RequiredSets.Contains(rs.Key)));
 								runes[i] = runes[i].Where(r => !RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(1, (int)(n ?? 30) / nInc)))
 									.Concat(runes[i].Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, 2 * (int)(n ?? 30) / nInc)))).Distinct().ToArray();
-
+								*/
 								//runes[i] = runes[i].GroupBy(r => r.Set).SelectMany(rg => rg.Take((int)(n ?? 30))).ToArray();
 								//runes[i] = runes[i].Take((int)(n ?? 30)).ToArray();
+
+								var rr = runes[i].Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, (int)((n ?? 30) * 0.25))));
+								runes[i] = rr.Concat(runes[i].Where(r => !RequiredSets.Contains(r.Set)).Take((int)(n ?? 30) - rr.Count())).ToArray();
+
+								// TODO: pick 20% per required set
+								// Then fill remaining with the best from included
+								// Go around checking if there are enough runes from each set to complete it (if NonBroken)
+								// Check if removing N other runes of SCORE will permit finishing set
+								// Remove rune add next best in slot
 							}
 
 							if (BuildSaveStats) {

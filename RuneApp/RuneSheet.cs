@@ -801,11 +801,11 @@ namespace RuneApp
 					{
 						case "Id":
 							if (r._extra > 0) {
-								Color color = Color.FromArgb(255, 146, 208, 80);
-								if (r._extra == 4) color = Color.FromArgb(255, 255, 153, 0);
-								else if (r._extra == 3) color = Color.FromArgb(255, 204, 0, 153);
-								else if (r._extra == 2) color = Color.FromArgb(255, 102, 205, 255);
-
+								Color color = Color.FromArgb(255, 190, 190, 190);
+								if (r._extra == 5) color = Color.FromArgb(255, 255, 153, 0);
+								else if (r._extra == 4) color = Color.FromArgb(255, 204, 0, 153);
+								else if (r._extra == 3) color = Color.FromArgb(255, 102, 205, 255);
+								else if (r._extra == 2) color = Color.FromArgb(255, 146, 208, 80);
 								ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
 								ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(color);
 							}
