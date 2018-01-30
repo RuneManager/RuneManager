@@ -156,6 +156,9 @@ namespace RuneManagerBridge
 			catch (WebException we) when (we.Status == WebExceptionStatus.ConnectFailure) {
 				Console.WriteLine("RuneManager bridge connection failure.");
 			}
+			catch (WebException we) when (we.Status == WebExceptionStatus.ProtocolError) {
+				Console.WriteLine("RuneManager bridge protocol error. " + we.Message);
+			}
 			catch (WebException we) {
 
 				Console.WriteLine("RuneManager bridge WebException " + we.Message + Environment.NewLine + we.Status);
