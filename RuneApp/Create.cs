@@ -1924,6 +1924,9 @@ namespace RuneApp {
 				case Attr.AttackPercent:
 					build.leader.Attack = lv.value;
 					break;
+				default:
+					build.leader[lv.type] = lv.value;
+					break;
 			}
 			var mon = build.mon;
 			mon.Current.Leader = build.leader;

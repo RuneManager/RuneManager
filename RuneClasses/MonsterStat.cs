@@ -254,6 +254,9 @@ namespace RuneOptim {
 			}
 			if (File.Exists(fpath) && new FileInfo(fpath).CreationTime < DateTime.Now.AddDays(-30)) {
 				File.Delete(fpath);
+				// wait a second for the filesystem to actual refresh the new files Creation Time
+				// recreating too fast doesn't reset it >:|
+				System.Threading.Thread.Sleep(1000);
 			}
 			if (!File.Exists(fpath) || refetch) {
 				Directory.CreateDirectory(new FileInfo(fpath).Directory.FullName);
