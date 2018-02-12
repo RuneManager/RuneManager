@@ -974,15 +974,13 @@ namespace RuneApp {
 				return string.Format(ifError, finalCut);
 			};
 
-			foreach (var rs in Enum.GetNames(typeof(RuneSet)))
-			{
+			foreach (var rs in Enum.GetNames(typeof(RuneSet))) {
 				cmax = Math.Max(cmax, col);
 				col = 2;
-				if (rs[0] != '_' && rs != "Null" && rs != "Broken" && rs != "Unknown")
-				{
+				if (rs[0] != '_' && rs != "Null" && rs != "Broken" && rs != "Unknown") {
 					ws.Cells[row, col].Value = rs.ToString(); col++;
-					ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[Used],\"Best\")"; col++;
-					ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[Used],\"<>Best\")"; col++;
+					ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[CurMon],\"<>\")+COUNTIFS(RuneTable[Set],B{row},RuneTable[Mon],\"<>\")-COUNTIFS(RuneTable[Set],B{row},RuneTable[CurMon],\"<>\",RuneTable[Mon],\"<>\")"; col++;
+					ws.Cells[row, col].Formula = $"COUNTIFS(RuneTable[Set],B{row},RuneTable[CurMon],\"\",RuneTable[Mon],\"\")"; col++;
 					ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
 					ws.Cells[row, col].Formula = $"C{row}/C$1"; col++;
 					ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
@@ -991,7 +989,7 @@ namespace RuneApp {
 					ws.Cells[row, col].Formula = $"(C{row}+D{row})/B$1"; col++;
 					// =IF(D3=0,"",AVERAGEIFS(RuneTable[Eff],RuneTable[Set],C3,RuneTable[Used],"Best"))
 					ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
-					ws.Cells[row, col].Formula = $"IF(C{row}=0,\"\",AVERAGEIFS(RuneTable[Eff],RuneTable[Set],B{row},RuneTable[Used],\"Best\"))"; col++;
+					ws.Cells[row, col].Formula = $"IF(C{row}=0,\"\",(SUMIFS(RuneTable[Eff],RuneTable[Set],B{row},RuneTable[CurMon],\"<>\")+SUMIFS(RuneTable[Eff],RuneTable[Set],B{row},RuneTable[Mon],\"<>\")-SUMIFS(RuneTable[Eff],RuneTable[Set],B{row},RuneTable[CurMon],\"<>\",RuneTable[Mon],\"<>\"))/DetailedRunes[[#This Row],[Used]])"; col++;
 
 					ws.Cells[row, col].CreateArrayFormula(makeHardcore("Main", 2)); col++;
 					ws.Cells[row, col].CreateArrayFormula(makeHardcore("Main", 4)); col++;
