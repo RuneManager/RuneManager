@@ -67,7 +67,8 @@ namespace RuneApp {
 			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
 
-		public static event EventHandler<PrintToEventArgs> BuildsProgressTo;
+		public static event EventHandler<PrintToEventArgs> BuildsPrintTo;
+		public static event EventHandler<ProgToEventArgs> BuildsProgressTo;
 
 		/// <summary>
 		/// The list of build definitions
@@ -113,7 +114,7 @@ namespace RuneApp {
 
 			builds.CollectionChanged += Builds_CollectionChanged;
 			loads.CollectionChanged += Loads_CollectionChanged;
-			BuildsProgressTo += Program_BuildsProgressTo;
+			BuildsPrintTo += Program_BuildsProgressTo;
 
 			if (Program.Settings.InternalServer) {
 				try {
@@ -655,7 +656,7 @@ namespace RuneApp {
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
 				b.BuildSaveStats = saveStats;
 				b.BuildGoodRunes = false;
-				BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
+				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
 				if (b.Type == BuildType.Link) {
 					b.CopyFrom(b.LinkBuild);
 				}
@@ -669,9 +670,8 @@ namespace RuneApp {
 						nR += (i + 1) + " ";
 				}
 
-				if (nR != "")
-				{
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, ":( " + nR + "Runes"));
+				if (nR != "") {
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, ":( " + nR + "Runes"));
 					return;
 				}
 				#endregion
@@ -683,12 +683,14 @@ namespace RuneApp {
 				b.BuildTimeout = 0;
 				b.BuildDumpBads = true;
 
-				b.BuildPrintTo += BuildsProgressTo;
+				b.BuildPrintTo += BuildsPrintTo;
+				b.BuildProgTo += BuildsProgressTo;
 
-				b.BuildPrintTo += (bq, s) => {
+				EventHandler<PrintToEventArgs> qw = (bq, s) => {
 					if (runToken.IsCancellationRequested)
 						b.Cancel();
 				};
+				b.BuildPrintTo += qw;
 
 				var result = b.GenBuilds();
 
@@ -696,9 +698,8 @@ namespace RuneApp {
 				b.Time = buildTime.ElapsedMilliseconds;
 				log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
 
-				if (b.Best != null)
-				{
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Best"));
+				if (b.Best != null) {
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Best"));
 
 					b.Best.Current.BuildID = b.ID;
 
@@ -747,13 +748,12 @@ namespace RuneApp {
 					#region Save Build stats
 
 					/* TODO: put Excel on Program */
-					if (saveStats && b.Type != BuildType.Lock)
-					{
-						BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Excel"));
+					if (saveStats && b.Type != BuildType.Lock) {
+						BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Excel"));
 						runeSheet.StatsExcelBuild(b, b.mon, b.Best.Current, true);
 					}
 
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Clean"));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Clean"));
 					// clean up for GC
 					if (b.buildUsage != null)
 						b.buildUsage.loads.Clear();
@@ -767,15 +767,17 @@ namespace RuneApp {
 					#endregion
 				}
 
-				b.BuildPrintTo -= BuildsProgressTo;
+				b.BuildPrintTo -= BuildsPrintTo;
+				b.BuildPrintTo -= qw;
+				b.BuildProgTo -= BuildsProgressTo;
 
 				//if (plsDie)
 				//    printTo?.Invoke("Canned");
 				//else 
 				if (b.Best != null)
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, "Done"));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Done"));
 				else
-					BuildsProgressTo?.Invoke(null, new PrintToEventArgs(b, result + " :("));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, result + " :("));
 
 				log.Info("Cleaning up");
 				//b.isRun = false;

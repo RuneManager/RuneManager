@@ -208,6 +208,7 @@ namespace RuneApp {
 			Program.OnRuneUpdate += Program_OnRuneUpdate;
 			Program.OnMonsterUpdate += Program_OnMonsterUpdate;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
+			Program.BuildsPrintTo += Program_BuildsPrintTo;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
 
 #if !DEBUG
@@ -320,6 +321,9 @@ namespace RuneApp {
 				irene.Show(this);
 		}
 
+		private void Program_BuildsProgressTo(object sender, ProgToEventArgs e) {
+			toolStripBuildStatus.Text = "Build Status: " + e.Progress;
+		}
 		private void Program_saveFileTouched(object sender, EventArgs e) {
 			this.fileBox.Visible = true;
 		}
@@ -441,7 +445,6 @@ namespace RuneApp {
 			if (nli == null)
 				nli = new ListViewItem();
 			nli.Tag = mon;
-			nli.ForeColor = mon.inStorage ? Color.Gray : Color.Black;
 			nli.Text = mon.FullName;
 
 			while (nli.SubItems.Count < 6)
@@ -453,6 +456,7 @@ namespace RuneApp {
 			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
 			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
 			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
+			nli.ForeColor = mon.inStorage ? Color.Gray : Color.Black;
 			return nli;
 		}
 
@@ -1022,7 +1026,7 @@ namespace RuneApp {
 				e.Cancel = true;
 				return;
 			}
-			Program.BuildsProgressTo -= Program_BuildsProgressTo;
+			Program.BuildsPrintTo -= Program_BuildsPrintTo;
 			Program.SaveBuilds();
 		}
 
