@@ -1,7 +1,7 @@
-0.6.1
+0.6.2
 https://github.com/Skibisky/RuneManager/releases/latest
-Build Locks and Links.
-Shrine elemental damages.
-Buffs!
-SumN tweaked a little.
+*Faster* by mashing shared lists less.
+Resist lead, better integration.
+0.6.1: Build Locks and Links.
+Shrine ele damage, buffs!
 0.6: Really really fast for some builds.
