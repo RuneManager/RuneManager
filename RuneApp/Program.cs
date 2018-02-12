@@ -90,6 +90,8 @@ namespace RuneApp {
 
 		public static readonly InternalServer.Master master = new InternalServer.Master();
 		public static bool goodRunes;
+		public static bool goFast;
+		public static bool fillRunes;
 
 		static FileSystemWatcher saveFileWatcher = null;
 		static System.Timers.Timer saveFileDebouncer = null;
@@ -564,6 +566,8 @@ namespace RuneApp {
 				build.shrines = Program.data.shrines;
 				build.BuildDumpBads = false;
 				build.BuildGoodRunes = false;
+				build.RunesOnlyFillEmpty = Program.fillRunes;
+				build.RunesDropHalfSetStat = Program.goFast;
 
 				build.GenRunes(Program.data);
 				var result = build.GenBuilds();
@@ -656,6 +660,8 @@ namespace RuneApp {
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
 				b.BuildSaveStats = saveStats;
 				b.BuildGoodRunes = false;
+				b.RunesOnlyFillEmpty = Program.fillRunes;
+				b.RunesDropHalfSetStat = Program.goFast;
 				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
 				if (b.Type == BuildType.Link) {
 					b.CopyFrom(b.LinkBuild);
@@ -800,7 +806,9 @@ namespace RuneApp {
 				b.RunesUseLocked = false;
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
 				b.BuildSaveStats = true;
+				b.RunesOnlyFillEmpty = Program.fillRunes;
 				b.BuildGoodRunes = goodRunes;
+				b.RunesDropHalfSetStat = Program.goFast;
 				b.GenRunes(Program.data);
 
 				b.BuildTimeout = 0;

@@ -103,7 +103,6 @@
 			this.HealthLabel = new System.Windows.Forms.Label();
 			this.label3 = new System.Windows.Forms.Label();
 			this.label2 = new System.Windows.Forms.Label();
-			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
 			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
@@ -191,8 +190,12 @@
 			this.fileBox = new System.Windows.Forms.GroupBox();
 			this.btnRefreshSave = new System.Windows.Forms.Button();
 			this.label1 = new System.Windows.Forms.Label();
+			this.cbGoFast = new System.Windows.Forms.CheckBox();
+			this.cbFillRunes = new System.Windows.Forms.CheckBox();
+			this.toolStripBuildStatus = new System.Windows.Forms.ToolStripStatusLabel();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
+			this.runeDial = new RuneApp.RuneDial();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -288,6 +291,7 @@
 			this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2,
+            this.toolStripBuildStatus,
             this.toolStripCopyright,
             this.toolStripSpacer});
 			this.statusStrip1.Location = new System.Drawing.Point(0, 708);
@@ -313,7 +317,7 @@
 			// 
 			this.toolStripCopyright.ForeColor = System.Drawing.SystemColors.ControlDarkDark;
 			this.toolStripCopyright.Name = "toolStripCopyright";
-			this.toolStripCopyright.Size = new System.Drawing.Size(1206, 17);
+			this.toolStripCopyright.Size = new System.Drawing.Size(556, 17);
 			this.toolStripCopyright.Spring = true;
 			this.toolStripCopyright.Text = "Images belong to Com2Us";
 			this.toolStripCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -321,7 +325,7 @@
 			// toolStripSpacer
 			// 
 			this.toolStripSpacer.Name = "toolStripSpacer";
-			this.toolStripSpacer.Size = new System.Drawing.Size(12, 17);
+			this.toolStripSpacer.Size = new System.Drawing.Size(556, 17);
 			this.toolStripSpacer.Spring = true;
 			this.toolStripSpacer.Text = "_";
 			// 
@@ -946,17 +950,6 @@
 			this.label2.TabIndex = 0;
 			this.label2.Text = "Name";
 			// 
-			// runeDial
-			// 
-			this.runeDial.Loadout = null;
-			this.runeDial.Location = new System.Drawing.Point(8, 201);
-			this.runeDial.Name = "runeDial";
-			this.runeDial.Size = new System.Drawing.Size(225, 188);
-			this.runeDial.TabIndex = 51;
-			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			// 
 			// tabControl1
 			// 
 			this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -1540,7 +1533,7 @@
 			// 
 			this.allToolStripMenuItem.Image = global::RuneApp.App.go;
 			this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-			this.allToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.allToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.allToolStripMenuItem.Text = "All";
 			this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
 			// 
@@ -1548,7 +1541,7 @@
 			// 
 			this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
 			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.resumeToolStripMenuItem.Text = "Resume";
 			this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
 			// 
@@ -1556,7 +1549,7 @@
 			// 
 			this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
 			this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-			this.runToToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+			this.runToToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.runToToolStripMenuItem.Text = "Run to";
 			this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
 			// 
@@ -1710,7 +1703,7 @@
 			// 
 			this.useRunesCheck.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.useRunesCheck.AutoSize = true;
-			this.useRunesCheck.Location = new System.Drawing.Point(894, 66);
+			this.useRunesCheck.Location = new System.Drawing.Point(894, 52);
 			this.useRunesCheck.Name = "useRunesCheck";
 			this.useRunesCheck.Size = new System.Drawing.Size(127, 17);
 			this.useRunesCheck.TabIndex = 18;
@@ -1803,7 +1796,7 @@
 			this.findGoodRunes.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.findGoodRunes.AutoSize = true;
 			this.findGoodRunes.Enabled = false;
-			this.findGoodRunes.Location = new System.Drawing.Point(894, 89);
+			this.findGoodRunes.Location = new System.Drawing.Point(894, 75);
 			this.findGoodRunes.Name = "findGoodRunes";
 			this.findGoodRunes.Size = new System.Drawing.Size(109, 17);
 			this.findGoodRunes.TabIndex = 18;
@@ -1843,6 +1836,34 @@
 			this.label1.TabIndex = 0;
 			this.label1.Text = "A change has been made to your save.";
 			// 
+			// cbGoFast
+			// 
+			this.cbGoFast.AutoSize = true;
+			this.cbGoFast.Location = new System.Drawing.Point(894, 99);
+			this.cbGoFast.Name = "cbGoFast";
+			this.cbGoFast.Size = new System.Drawing.Size(142, 17);
+			this.cbGoFast.TabIndex = 22;
+			this.cbGoFast.Text = "Go fast and break things";
+			this.cbGoFast.UseVisualStyleBackColor = true;
+			this.cbGoFast.CheckedChanged += new System.EventHandler(this.cbGoFast_CheckedChanged);
+			// 
+			// cbFillRunes
+			// 
+			this.cbFillRunes.AutoSize = true;
+			this.cbFillRunes.Location = new System.Drawing.Point(894, 123);
+			this.cbFillRunes.Name = "cbFillRunes";
+			this.cbFillRunes.Size = new System.Drawing.Size(62, 17);
+			this.cbFillRunes.TabIndex = 23;
+			this.cbFillRunes.Text = "Fill Only";
+			this.cbFillRunes.UseVisualStyleBackColor = true;
+			this.cbFillRunes.CheckedChanged += new System.EventHandler(this.cbFillRunes_CheckedChanged);
+			// 
+			// toolStripBuildStatus
+			// 
+			this.toolStripBuildStatus.Name = "toolStripBuildStatus";
+			this.toolStripBuildStatus.Size = new System.Drawing.Size(75, 17);
+			this.toolStripBuildStatus.Text = "Build Status: ";
+			// 
 			// runeInventory
 			// 
 			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -1867,11 +1888,24 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
+			// runeDial
+			// 
+			this.runeDial.Loadout = null;
+			this.runeDial.Location = new System.Drawing.Point(8, 201);
+			this.runeDial.Name = "runeDial";
+			this.runeDial.Size = new System.Drawing.Size(225, 188);
+			this.runeDial.TabIndex = 51;
+			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(1350, 730);
+			this.Controls.Add(this.cbFillRunes);
+			this.Controls.Add(this.cbGoFast);
 			this.Controls.Add(this.fileBox);
 			this.Controls.Add(this.runeInventory);
 			this.Controls.Add(this.runeEquipped);
@@ -2104,6 +2138,9 @@
 		private System.Windows.Forms.ToolStripMenuItem runToToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
 		private System.Windows.Forms.ToolStripButton tsBtnLink;
+		private System.Windows.Forms.CheckBox cbGoFast;
+		private System.Windows.Forms.CheckBox cbFillRunes;
+		private System.Windows.Forms.ToolStripStatusLabel toolStripBuildStatus;
 	}
 }
 

@@ -30,6 +30,8 @@ namespace RuneApp {
 		public static Irene irene = null;
 
 		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
+		public static bool goFast { get { return Program.goFast; } set { Program.goFast = value; } }
+		public static bool fillRunes { get { return Program.fillRunes; } set { Program.fillRunes = value; } }
 
 		public static Main currentMain = null;
 		public static RuneDisplay runeDisplay = null;
@@ -1624,6 +1626,8 @@ namespace RuneApp {
 					b.RunesUseLocked = false;
 					b.RunesUseEquipped = Program.Settings.UseEquipped;
 					b.BuildSaveStats = false;
+					b.RunesDropHalfSetStat = Program.goFast;
+					b.RunesOnlyFillEmpty = Program.fillRunes;
 					b.GenRunes(Program.data);
 					if (b.runes.Any(rr => rr == null))
 						continue;
@@ -1760,6 +1764,14 @@ namespace RuneApp {
 			Program.builds.Add(bb);
 
 			Program.BuildPriority(bb, 1);
+		}
+
+		private void cbGoFast_CheckedChanged(object sender, EventArgs e) {
+			goFast = cbGoFast.Checked;
+		}
+
+		private void cbFillRunes_CheckedChanged(object sender, EventArgs e) {
+			fillRunes = cbFillRunes.Checked;
 		}
 	}
 

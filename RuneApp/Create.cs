@@ -1171,6 +1171,8 @@ namespace RuneApp {
 		private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {
 			build.RunesUseEquipped = Program.Settings.UseEquipped;
 			build.RunesUseLocked = false;
+			build.RunesDropHalfSetStat = Program.goFast;
+			build.RunesOnlyFillEmpty = Program.fillRunes;
 			// good idea, generate right now whenever the user clicks a... whatever
 			build.GenRunes(Program.data);
 
@@ -1588,6 +1590,8 @@ namespace RuneApp {
 		void button1_Click(object sender, EventArgs e) {
 			build.RunesUseLocked = false;
 			build.RunesUseEquipped = true;
+			build.RunesDropHalfSetStat = Program.goFast;
+			build.RunesOnlyFillEmpty = Program.fillRunes;
 			build.GenRunes(Program.data);
 			using (var ff = new RuneSelect()) {
 				ff.returnedRune = runeTest;
@@ -1840,6 +1844,8 @@ namespace RuneApp {
 			// good idea, generate right now whenever the user clicks a... whatever
 			build.RunesUseLocked = false;
 			build.RunesUseEquipped = Program.Settings.UseEquipped;
+			build.RunesDropHalfSetStat = Program.goFast;
+			build.RunesOnlyFillEmpty = Program.fillRunes;
 			build.BuildSaveStats = false;
 			build.GenRunes(Program.data);
 

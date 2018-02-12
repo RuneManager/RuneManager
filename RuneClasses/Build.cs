@@ -166,6 +166,12 @@ namespace RuneOptim {
 		[JsonIgnore]
 		public bool RunesUseEquipped = false;
 
+		[JsonIgnore]
+		public bool RunesDropHalfSetStat = false;
+
+		[JsonIgnore]
+		public bool RunesOnlyFillEmpty = false;
+
 		public event EventHandler<PrintToEventArgs> BuildPrintTo;
 
 		public event EventHandler<ProgToEventArgs> BuildProgTo;
@@ -882,6 +888,8 @@ namespace RuneOptim {
 				});
 				timeThread.Start();
 
+				double bestScore = double.MinValue;
+
 				// Parallel the outer loop
 				Parallel.ForEach(runes[0], (r0, loopState) => {
 					var tempTimer = DateTime.Now;
@@ -890,8 +898,39 @@ namespace RuneOptim {
 					var tempMax = Maximum == null || !Maximum.IsNonZero() ? null : new Stats(Maximum, true);
 					//bool[] tempCheck = new bool[3];
 					int tempCheck = 0;
-					if (!IsRunning_Unsafe)
+
+					Monster myBest = null;
+					List<Monster> syncList = new List<Monster>();
+
+					Action syncMyList = () => {
+						lock (BestLock) {
+							foreach (var s in syncList) {
+								if (s.Current.Runes.All(r => r.Assigned == mon)) {
+									Console.WriteLine("!");
+								}
+								tests.Add(s);
+							}
+							syncList.Clear();
+							if (tests.Count > Math.Max(BuildGenerate, 200000)) {
+								var rems = tests.OrderBy(b => b.score).Take(tests.Count / 2);
+								var q = rems.Select(r => r.score);
+								foreach (var bbb in rems) {
+									if (bbb.Current.Runes.All(r => r.Assigned == mon)) {
+										Console.WriteLine("!");
+									}
+									tests.Remove(bbb);
+								}
+							}
+
+							if (tests.Count > MaxBuilds32)
+								IsRunning = false;
+						}
+					};
+
+					if (!IsRunning_Unsafe) {
+						syncMyList();
 						loopState.Break();
+					}
 
 					// number of builds ruled out since last sync
 					int kill = 0;
@@ -900,9 +939,10 @@ namespace RuneOptim {
 					// number of builds skipped
 					int skip = 0;
 
+
 					bool isBad;
-					double bestScore = double.MinValue, curScore;
-					Stats cstats;
+					double myBestScore = double.MinValue, curScore, lastBest = double.MinValue;
+					Stats cstats, myStats;
 
 					Monster test = new Monster(mon);
 					test.Current.Buffs = this.Buffs;
@@ -1077,14 +1117,17 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
-										//isBad = false;
+										isBad = false;
+
 										cstats = test.GetStats();
 
 										// check if build meets minimum
-										isBad = (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
+										if (!RunesOnlyFillEmpty) {
+											isBad |= (!AllowBroken && !test.Current.SetsFull);
+											isBad |= (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
+										}
 										isBad |= (tempMax != null && cstats.CheckMax(tempMax));
 										// if no broken sets, check for broken sets
-										isBad |= (!AllowBroken && !test.Current.SetsFull);
 										// if there are required sets, ensure we have them
 										/*isBad |= (tempReq != null && tempReq.Count > 0
 											// this Linq adds no overhead compared to GetStats() and ApplyRune()
@@ -1120,6 +1163,7 @@ namespace RuneOptim {
 											// we found an okay build!
 											plus++;
 											curScore = CalcScore(cstats);
+											test.score = curScore;
 
 											if (BuildSaveStats) {
 												foreach (Rune r in test.Current.Runes) {
@@ -1137,51 +1181,78 @@ namespace RuneOptim {
 												}
 											}
 
-											// if we are to track all good builds, keep it
-											if (!BuildDumpBads)
-											{
-												if (tests.Count < MaxBuilds32)
-													tests.Add(new Monster(test, true));
+											if (syncList.Count >= 500) {
+												syncMyList();
+											}
 
-												bestScore = CalcScore(bstats);
-												lock (BestLock)
-												{
-													if (Best == null || bestScore < curScore)
-													{
-														Best = new Monster(test, true);
-														bstats = Best.GetStats();
+											// if we are to track all good builds, keep it
+											if (!BuildDumpBads) {
+
+												syncList.Add(new Monster(test, true));
+
+												// locally track my best
+												if (myBest == null || curScore > myBestScore) {
+													myBest = new Monster(test, true);
+													myStats = myBest.GetStats();
+													myBestScore = CalcScore(myStats);
+													myBest.score = myBestScore;
+												}
+
+												// if mine is better than what I last saw
+												if (myBestScore > lastBest) {
+													lock (BestLock) {
+														if (Best == null) {
+															Best = new Monster(myBest, true);
+															bstats = Best.GetStats();
+															bestScore = CalcScore(bstats);
+															Best.score = bestScore;
+														}
+														else {
+															// sync best score
+															lastBest = bestScore;
+															// double check
+															if (myBestScore > lastBest) {
+																Best = new Monster(myBest, true);
+																bestScore = CalcScore(bstats);
+																Best.score = bestScore;
+																bstats = Best.GetStats();
+															}
+														}
 													}
 												}
+
 											}
 											// if we only want to track really good builds
 											else {
 												// if there are currently no good builds, keep it
 												// or if this build is better than the best, keep it
 
-												curScore = CalcScore(cstats);
+												//how about not do this twice? curScore = CalcScore(cstats);
 
-												lock (BestLock)
-												{
-													if (Best == null || bestScore < curScore)
-													{
-														Best = new Monster(test, true);
-														bestScore = CalcScore(bstats);
-														bstats = Best.GetStats();
-														tests.Add(Best);
-													}
+												// locally track my best
+												if (myBest == null || curScore > myBestScore) {
+													myBest = new Monster(test, true);
+													myStats = myBest.GetStats();
+													myBestScore = CalcScore(myStats);
+													myBest.score = myBestScore;
+													syncList.Add(myBest);
 												}
-												if (tests.Count < MaxBuilds32 && BuildSaveStats)
-												{
+												else if (BuildSaveStats) {
 													// keep it for spreadsheeting
-													tests.Add(new Monster(test, true));
+													var m = new Monster(test, true);
+													m.score = curScore;
+													syncList.Add(m);
 												}
 											}
+
 										}
 
 									}
 									// sum up what work we've done
-									Interlocked.Add(ref total, -kill);
-									Interlocked.Add(ref total, -skip);
+									Interlocked.Add(ref count, kill);
+									Interlocked.Add(ref count, skip);
+									//Interlocked.Add(ref total, -kill);
+									//Interlocked.Add(ref total, -skip);
 									Interlocked.Add(ref actual, kill);
 									Interlocked.Add(ref buildUsage.failed, kill);
 									kill = 0;
@@ -1200,6 +1271,8 @@ namespace RuneOptim {
 							}
 						}
 					}
+					// just before dying
+					syncMyList();
 				});
 
 
@@ -1309,6 +1382,8 @@ namespace RuneOptim {
 			}
 			finally {
 				IsRunning = false;
+				if (timeThread != null)
+					timeThread.Join();
 			}
 		}
 
@@ -1635,7 +1710,7 @@ namespace RuneOptim {
 				if (!BuildSaveStats) {
 					// Only using 'inventory' or runes on mon
 					// also, include runes which have been unequipped (should only look above)
-					if (!RunesUseEquipped)
+					if (!RunesUseEquipped || RunesOnlyFillEmpty)
 						rsGlobal = rsGlobal.Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped);
 					// only if the rune isn't currently locked for another purpose
 					if (!RunesUseLocked)
@@ -1685,10 +1760,11 @@ namespace RuneOptim {
 								r.manageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
 						}
 						// cull here instead
-						if (!RunesUseEquipped)
+						if (!RunesUseEquipped || RunesOnlyFillEmpty)
 							runes[i] = runes[i].Where(r => (r.IsUnassigned || r.AssignedId == mon.Id) || r.Swapped).ToArray();
 						if (!RunesUseLocked)
 							runes[i] = runes[i].Where(r => !r.Locked).ToArray();
+
 					}
 				}
 				CleanBroken();
@@ -1765,6 +1841,41 @@ namespace RuneOptim {
 							}
 						}
 						//RuneLog.logTo = tmp;
+					}
+				}
+				if (RunesDropHalfSetStat) {
+					for (int i = 0; i < 6; i++) {
+						double rmm =0;
+						var runesForSlot = runes[i];
+						var outRunes = new List<Rune>();
+						var runesBySet = runesForSlot.GroupBy(r => r.Set);
+						foreach (var rsg in runesBySet) {
+							var runesByMain = rsg.GroupBy(r => r.Main.Type);
+							foreach (var rmg in runesByMain) {
+								rmm = rmg.Max(r => r.manageStats.GetOrAdd("testScore", 0)) * 0.6;
+								if (rmm > 0) {
+									outRunes.AddRange(rmg.Where(r => r.manageStats.GetOrAdd("testScore", 0) > rmm));
+								}
+							}
+						}
+						if (rmm > 0)
+							runes[i] = outRunes.ToArray();
+					}
+				}
+				// if we are only to fill empty slots
+				if (RunesOnlyFillEmpty) {
+					for (int i = 0; i < 6; i++) {
+						if (mon.Current.Runes[i] != null && (!mon.Current.Runes[i]?.Locked ?? false)) {
+							runes[i] = new Rune[0];
+						}
+					}
+				}
+				// always try to put the current rune back in
+				for (int i = 0; i < 6; i++) {
+					if (!runes[i].Contains(mon.Current.Runes[i]) && (!mon.Current.Runes[i]?.Locked ?? false)) {
+						var tl = runes[i].ToList();
+						tl.Add(mon.Current.Runes[i]);
+						runes[i] = tl.ToArray();
 					}
 				}
 			}
