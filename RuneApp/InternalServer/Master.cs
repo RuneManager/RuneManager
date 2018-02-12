@@ -177,6 +177,25 @@ namespace RuneApp.InternalServer {
 
 						resp.ContentLength64 = outBytes.Length;
 						try {
+							output.Write(outBytes, 0, outBytes.Length);
+						}
+						catch (Exception ex) {
+							Program.log.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
+						}
+					}
+				}
+				else {
+					resp.OutputStream.Close();
+				}
+			}
+			catch (Exception e) {
+				Log.Error("Something went wrong.", e);
+				var resp = context.Response;
+				resp.StatusCode = 500;
+				using (var output = resp.OutputStream) {
+					byte[] outBytes = Encoding.UTF8.GetBytes(e.GetType() + ": " + e.Message);
+					resp.ContentLength64 = outBytes.Length;
+					try {
 						output.Write(outBytes, 0, outBytes.Length);
 					}
 					catch (Exception ex) {

@@ -58,6 +58,29 @@ namespace RuneOptim {
 		public long ActualTests = 0;
 
 		[JsonIgnore]
+		public bool tempLoad;
+
+		[JsonIgnore]
+		public bool TempLoad {
+			get {
+				return tempLoad;
+			}
+			set {
+				tempLoad = value;
+				if (!tempLoad) {
+					foreach (var r in Runes.Where(ru => ru != null)) {
+						r.OnUpdate += Rune_OnUpdate;
+					}
+				}
+				else {
+					foreach (var r in Runes.Where(ru => ru != null)) {
+						r.OnUpdate -= Rune_OnUpdate;
+					}
+				}
+			}
+		}
+
+		[JsonIgnore]
 		public ConcurrentDictionary<string, double>[] manageStats;
 
 		public ConcurrentDictionary<string, double>[] ManageStats {
@@ -356,7 +379,10 @@ namespace RuneOptim {
 
 			runes[rune.Slot - 1] = rune;
 			runeCount++;
-			
+
+			if (!tempLoad)
+				rune.OnUpdate += Rune_OnUpdate;
+
 			if (runeCount % checkOn == 0)
 				CheckSets();
 			return old;
@@ -371,13 +397,20 @@ namespace RuneOptim {
 			changed = true;
 
 			var r = runes[slot - 1];
-			
+
+			if (!tempLoad)
+				r.OnUpdate -= Rune_OnUpdate;
+
 			runes[slot - 1] = null;
 			runeCount--;
 			CheckSets();
 			return r;
 		}
-		
+
+		private void Rune_OnUpdate(object sender, EventArgs e) {
+			changed = true;
+		}
+
 		// Check what sets are completed in this build
 		public void CheckSets() {
 			setsFull = false;

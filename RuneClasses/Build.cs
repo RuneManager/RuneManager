@@ -945,6 +945,7 @@ namespace RuneOptim {
 					Stats cstats, myStats;
 
 					Monster test = new Monster(mon);
+					test.Current.TempLoad = true;
 					test.Current.Buffs = this.Buffs;
 					test.Current.Shrines = shrines;
 					test.Current.Leader = leader;
@@ -1334,6 +1335,7 @@ namespace RuneOptim {
 				else {
 					// remember the good one
 					Best = loads.First();
+					Best.Current.TempLoad = false;
 					Best.score = CalcScore(Best.GetStats());
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "best " + (Best?.score ?? -1)));
 					//Best.Current.runeUsage = usage.runeUsage;

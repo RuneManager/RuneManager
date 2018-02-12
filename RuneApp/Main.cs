@@ -815,8 +815,10 @@ namespace RuneApp {
 					if (dmon != null) {
 						var dmonld = dmon.Current.Leader;
 						var dmonsh = dmon.Current.Shrines;
+						var dmonbu = dmon.Current.Buffs;
 						dmon.Current.Leader = load.Leader;
 						dmon.Current.Shrines = load.Shrines;
+						dmon.Current.Buffs = load.Buffs;
 						var dmonfl = dmon.Current.FakeLevel;
 						var dmonps = dmon.Current.PredictSubs;
 						dmon.Current.FakeLevel = load.FakeLevel;
@@ -836,6 +838,7 @@ namespace RuneApp {
 
 						dmon.Current.Leader = dmonld;
 						dmon.Current.Shrines = dmonsh;
+						dmon.Current.Buffs = dmonbu;
 						dmon.Current.FakeLevel = dmonfl;
 						dmon.Current.PredictSubs = dmonps;
 

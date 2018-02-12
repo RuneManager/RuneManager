@@ -1015,30 +1015,44 @@ namespace RuneApp {
 			m.RefreshStats();
 
 			for (int i = 0; i < 6; i++) {
+				// find the changes per slot
 				var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
 				if (rl != null) {
 					var rune = data.GetRune(rl.Id);
-					if (rune.AssignedId != m.Id && rune.AssignedId > 0) {
-						var om = data.GetMonster(rune.AssignedId);
-						var rm = om.RemoveRune(rune.Slot);
-						rm.Assigned = null;
-						rm.AssignedId = 0;
-						rm.AssignedName = "Unassigned";
-					}
-					rune.AssignedId = m.Id;
-					rune.Assigned = m;
-					rune.AssignedName = m.FullName;
-					if (rune != m.Current.Runes[i]) {
-						var rm = m.ApplyRune(rune);
-						if (rm != null) {
-							rm.Assigned = null;
-							rm.AssignedId = 0;
-							rm.AssignedName = "Unassigned";
+					if (rune != null) {
+						// if the new rune is assigned to someone else
+						if (rune.AssignedId != m.Id && rune.AssignedId > 0) {
+							var om = data.GetMonster(rune.AssignedId);
+							var rm = om?.RemoveRune(rune.Slot);
+							if (rm != null) {
+								rm.Assigned = null;
+								rm.AssignedId = 0;
+								rm.AssignedName = "Unassigned";
+							}
+						}
+						// unassign any runes that point to this slot (just to be safe)
+						/*foreach (var r in data.Runes.Where(r => r.AssignedId == m.Id && r.Slot - 1 == i)) {
+							r.Assigned = null;
+							r.AssignedId = 0;
+							r.AssignedName = "Unassigned";
+						}*/
+						// assign the new rune to the current monster
+						rune.AssignedId = m.Id;
+						rune.Assigned = m;
+						rune.AssignedName = m.FullName;
+						if (rune != m.Current.Runes[i]) {
+							var rm = m.ApplyRune(rune);
+							if (rm != null) {
+								rm.Assigned = null;
+								rm.AssignedId = 0;
+								rm.AssignedName = "Unassigned";
+							}
 						}
 					}
 				}
-				else if (m != null) {
-					var rm = m.RemoveRune(i + 1);
+				else {
+					// pull a rune off, if that don't work find anyrune who was pointing at my slot
+					var rm = m.RemoveRune(i + 1) ?? data.Runes.FirstOrDefault(r => r.AssignedId == m.Id && r.Slot - 1 == i);
 					if (rm != null) {
 						rm.Assigned = null;
 						rm.AssignedId = 0;
@@ -1057,6 +1071,8 @@ namespace RuneApp {
 				return;
 			// TODO: modify stats and trigger callbacks
 			rune.CopyTo(r, keepLocked, newAssigned);
+
+			//r.Assigned?.Current.AddRune(r);
 
 			data.isModified = true;
 			OnRuneUpdate?.Invoke(r, false);
