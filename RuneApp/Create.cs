@@ -33,6 +33,7 @@ namespace RuneApp
 			new LeaderType(Attr.SpeedPercent).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 }),
 			new LeaderType(Attr.HealthPercent).AddRange(new int[] { 0, 15, 17, 18, 21, 25, 30, 33, 44, 50 }),
 			new LeaderType(Attr.AttackPercent).AddRange(new int[] { 0, 15, 18, 20, 21, 22, 25, 30, 33, 35, 38, 40, 44, 50 }),
+			new LeaderType(Attr.Resistance).AddRange(new int[] { 0, 20, 26, 28, 30, 33, 38, 40, 41, 48, 50, 55 }),
 		};
 
 		static readonly string[] tabNames = { "g", "o", "e", "2", "4", "6", "1", "3", "5" };
