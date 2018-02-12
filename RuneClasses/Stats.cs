@@ -607,15 +607,15 @@ namespace RuneOptim
 					case "RES":
 						return Resistance;
 					case "WaterATK":
-						return this.DamageSkillups[0];
+						return this.DamageSkillups[(int)Element.Water - 1];
 					case "FireATK":
-						return this.DamageSkillups[1];
+						return this.DamageSkillups[(int)Element.Fire - 1];
 					case "WindATK":
-						return this.DamageSkillups[2];
+						return this.DamageSkillups[(int)Element.Wind - 1];
 					case "LightATK":
-						return this.DamageSkillups[3];
+						return this.DamageSkillups[(int)Element.Light - 1];
 					case "DarkATK":
-						return this.DamageSkillups[4];
+						return this.DamageSkillups[(int)Element.Dark - 1];
 					default:
 						return 0;
 						//throw new NotImplementedException();

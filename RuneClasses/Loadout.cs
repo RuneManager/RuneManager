@@ -251,8 +251,8 @@ namespace RuneOptim {
 					(runes[3]?.AttackPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Attack + (int)shrines[Element + "ATK"] +
 					(int)leader.Attack + 
+					(int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] + //(int)shrines[Element + "ATK"] +
 					SetStat(Attr.AttackPercent);
 			}
 		}
