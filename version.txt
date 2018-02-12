@@ -1,5 +1,7 @@
-0.6
+0.6.1
 https://github.com/Skibisky/RuneManager/releases/latest
-Added Unicorns and Paladins images and stats.
-Really really fast for some builds.
-More working numbers in more places.
+Build Locks and Links.
+Shrine elemental damages.
+Buffs!
+SumN tweaked a little.
+0.6: Really really fast for some builds.
