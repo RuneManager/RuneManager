@@ -5,15 +5,13 @@ using Newtonsoft.Json.Converters;
 
 namespace RuneOptim {
 	[JsonConverter(typeof(StringEnumConverter))]
-	public enum CraftType
-	{
+	public enum CraftType {
 		Null = 0,
 		Enchant = 1,
 		Grind = 2,
 	}
 
-	public class Craft
-	{
+	public class Craft {
 		[JsonProperty("wizard_id")]
 		public ulong wizardId;
 
@@ -29,26 +27,20 @@ namespace RuneOptim {
 		[JsonProperty("sell_value")]
 		public int SellValue;
 
-		public Attr Stat
-		{
-			get
-			{
+		public Attr Stat {
+			get {
 				return (Attr)((TypeId / 100) % 100);
 			}
 		}
 
-		public RuneSet Set
-		{
-			get
-			{
+		public RuneSet Set {
+			get {
 				return (RuneSet)(TypeId / 10000);
 			}
 		}
 
-		public int Rarity
-		{
-			get
-			{
+		public int Rarity {
+			get {
 				return (int)TypeId % 10;
 			}
 		}
@@ -160,21 +152,17 @@ namespace RuneOptim {
 		#endregion
 	}
 
-	public class ValueRange
-	{
+	public class ValueRange {
 		public int Min;
 		public int Max;
 
-		public ValueRange(int i, int a)
-		{
+		public ValueRange(int i, int a) {
 			Min = i;
 			Max = a;
 		}
 
-		public double Average
-		{
-			get
-			{
+		public double Average {
+			get {
 				return (Max - Min) / (double)2 + Min;
 			}
 		}

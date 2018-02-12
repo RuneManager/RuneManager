@@ -5,20 +5,16 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Linq.Expressions;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
-	sealed class AttrFieldAttribute : Attribute
-	{
+	sealed class AttrFieldAttribute : Attribute {
 		readonly Attr attrName;
 
-		public AttrFieldAttribute(Attr attr)
-		{
+		public AttrFieldAttribute(Attr attr) {
 			this.attrName = attr;
 		}
 
-		public Attr attr
-		{
+		public Attr attr {
 			get { return attrName; }
 		}
 
@@ -26,10 +22,9 @@ namespace RuneOptim
 
 	// Allows me to steal the JSON values into Enum
 	[JsonConverter(typeof(StringEnumConverter))]
-	public enum Attr
-	{
+	public enum Attr {
 		[EnumMember(Value = "-")]
-		Neg = -1, 
+		Neg = -1,
 
 		[EnumMember(Value = "")]
 		// TODO: FIXME:
@@ -102,28 +97,24 @@ namespace RuneOptim
 		Skill4 = 9 | ExtraStat,
 	}
 
-	public enum AttributeCategory
-	{
+	public enum AttributeCategory {
 		Neutral,
 		Offensive,
 		Defensive,
 		Support
 	}
 
-	public class StatModEventArgs : EventArgs
-	{
+	public class StatModEventArgs : EventArgs {
 		public Attr Attr { get; private set; }
 		public double Value { get; private set; }
 
-		public StatModEventArgs(Attr a, double v)
-		{
+		public StatModEventArgs(Attr a, double v) {
 			Attr = a;
 			Value = v;
 		}
 	}
 
-	public class Stats
-	{
+	public class Stats {
 		// allows mapping save.json into the program via Monster
 		[JsonProperty("con")]
 		public double _con = 0;
@@ -133,14 +124,13 @@ namespace RuneOptim
 
 		// TODO: should I set con?
 		[JsonIgnore]
-		public double Health { get { return _health ??  _con * 15; } set { _con = value / 15.0; _health = value; } }
+		public double Health { get { return _health ?? _con * 15; } set { _con = value / 15.0; _health = value; } }
 
 		[JsonProperty("atk")]
 		private double attack = 0;
 
 		[JsonIgnore]
-		public double Attack
-		{
+		public double Attack {
 			get { return attack; }
 			set { attack = value; OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackFlat, value)); OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackPercent, value)); }
 		}
@@ -180,15 +170,14 @@ namespace RuneOptim
 				damageSkillups = value;
 			}
 		}
-		
+
 
 		public void DamageSkillupsSet(int ind, double val) {
 			DamageSkillups[ind] = val;
 			OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + ind, val));
 		}
-		
-		public bool ShouldSerializedamageSkillups()
-		{
+
+		public bool ShouldSerializedamageSkillups() {
 			return damageSkillups != null && damageSkillups.Any(d => d != 0);
 		}
 
@@ -206,8 +195,7 @@ namespace RuneOptim
 			}
 		}
 
-		public bool ShouldSerializeskillTimes()
-		{
+		public bool ShouldSerializeskillTimes() {
 			return skillTimes != null && skillTimes.Any(i => i != 0);
 		}
 
@@ -263,8 +251,7 @@ namespace RuneOptim
 			CopyFrom(rhs, copyExtra);
 		}
 
-		public void CopyFrom(Stats rhs, bool copyExtra = false)
-		{
+		public void CopyFrom(Stats rhs, bool copyExtra = false) {
 			Health = rhs.Health;
 			attack = rhs.Attack;
 			Defense = rhs.Defense;
@@ -283,8 +270,7 @@ namespace RuneOptim
 			DamageSkillups = rhs.DamageSkillups;
 			ExtraCritRate = rhs.ExtraCritRate;
 
-			if (copyExtra)
-			{
+			if (copyExtra) {
 				EffectiveHP = rhs.EffectiveHP;
 				EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
 				DamagePerSpeed = rhs.DamagePerSpeed;
@@ -306,40 +292,35 @@ namespace RuneOptim
 		[JsonProperty("fake_ehp")]
 		public double EffectiveHP = 0;
 
-		public bool ShouldSerializeEffectiveHP()
-		{
+		public bool ShouldSerializeEffectiveHP() {
 			return EffectiveHP != 0;
 		}
 
 		[JsonProperty("fake_ehpdb")]
 		public double EffectiveHPDefenseBreak = 0;
 
-		public bool ShouldSerializeEffectiveHPDefenseBreak()
-		{
+		public bool ShouldSerializeEffectiveHPDefenseBreak() {
 			return EffectiveHPDefenseBreak != 0;
 		}
 
 		[JsonProperty("fake_dps")]
 		public double DamagePerSpeed = 0;
 
-		public bool ShouldSerializeDamagePerSpeed()
-		{
+		public bool ShouldSerializeDamagePerSpeed() {
 			return DamagePerSpeed != 0;
 		}
 
 		[JsonProperty("fake_avd")]
 		public double AverageDamage = 0;
 
-		public bool ShouldSerializeAverageDamage()
-		{
+		public bool ShouldSerializeAverageDamage() {
 			return AverageDamage != 0;
 		}
 
 		[JsonProperty("fake_mxd")]
 		public double MaxDamage = 0;
 
-		public bool ShouldSerializeMaxDamage()
-		{
+		public bool ShouldSerializeMaxDamage() {
 			return MaxDamage != 0;
 		}
 
@@ -368,12 +349,9 @@ namespace RuneOptim
 		private Expression __form = null;
 
 		[JsonIgnore]
-		public Func<Stats, double> DamageFormula
-		{
-			get
-			{
-				if (_damageFormula == null && damageFormula != null)
-				{
+		public Func<Stats, double> DamageFormula {
+			get {
+				if (_damageFormula == null && damageFormula != null) {
 					__form = damageFormula.AsExpression(statType);
 					_damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
 				}
@@ -382,16 +360,13 @@ namespace RuneOptim
 		}
 
 		[JsonIgnore]
-		public Func<Stats, double>[] SkillFunc
-		{
-			get
-			{
+		public Func<Stats, double>[] SkillFunc {
+			get {
 				return _SkillsFormula;
 			}
 		}
 
-		public double GetSkillMultiplier(int skillNum, Stats applyTo = null)
-		{
+		public double GetSkillMultiplier(int skillNum, Stats applyTo = null) {
 			if (_SkillsFormula.Length < skillNum || _SkillsFormula[skillNum] == null)
 				return 0;
 			if (applyTo == null)
@@ -399,20 +374,16 @@ namespace RuneOptim
 			return this._SkillsFormula[skillNum](applyTo);
 		}
 
-		public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null)
-		{
+		public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null) {
 			var mult = GetSkillMultiplier(skillNum, applyTo);
 
-			if (type == Attr.MaxDamage)
-			{
+			if (type == Attr.MaxDamage) {
 				return mult * (1 + CritDamage * 0.01 + DamageSkillups[skillNum] * 0.01);
 			}
-			else if (type == Attr.AverageDamage)
-			{
+			else if (type == Attr.AverageDamage) {
 				return mult * (1 + CritDamage * 0.01 * Math.Min(100, CritRate + ExtraCritRate) * 0.01 + DamageSkillups[skillNum] * 0.01);
 			}
-			else if (type == Attr.DamagePerSpeed)
-			{
+			else if (type == Attr.DamagePerSpeed) {
 				return mult * (1 + CritDamage * 0.01 * Math.Min(100, CritRate + ExtraCritRate) * 0.01 + DamageSkillups[skillNum] * 0.01) * Speed / SkillTimes[skillNum];
 			}
 
@@ -420,10 +391,8 @@ namespace RuneOptim
 		}
 
 		// Gets the Extra stat manually stored (for scoring)
-		public double ExtraGet(string extra)
-		{
-			switch (extra)
-			{
+		public double ExtraGet(string extra) {
+			switch (extra) {
 				case "EHP":
 					return EffectiveHP;
 				case "EHPDB":
@@ -439,10 +408,8 @@ namespace RuneOptim
 			}
 		}
 
-		public double ExtraGet(Attr extra)
-		{
-			switch (extra)
-			{
+		public double ExtraGet(Attr extra) {
+			switch (extra) {
 				case Attr.EffectiveHP:
 					return EffectiveHP;
 				case Attr.EffectiveHPDefenseBreak:
@@ -464,10 +431,8 @@ namespace RuneOptim
 		}
 
 		// Computes and returns the Extra stat
-		public double ExtraValue(string extra)
-		{
-			switch (extra)
-			{
+		public double ExtraValue(string extra) {
+			switch (extra) {
 				case "EHP":
 					return ExtraValue(Attr.EffectiveHP);
 				case "EHPDB":
@@ -483,10 +448,8 @@ namespace RuneOptim
 			}
 		}
 
-		public double ExtraValue(Attr extra)
-		{
-			switch (extra)
-			{
+		public double ExtraValue(Attr extra) {
+			switch (extra) {
 				case Attr.EffectiveHP:
 					return Health * (1140 + Defense * 3.5) * 0.001;
 				case Attr.EffectiveHPDefenseBreak:
@@ -503,10 +466,8 @@ namespace RuneOptim
 		}
 
 		// manually sets the Extra stat (used for scoring)
-		public void ExtraSet(string extra, double value)
-		{
-			switch (extra)
-			{
+		public void ExtraSet(string extra, double value) {
+			switch (extra) {
 				case "EHP":
 					EffectiveHP = value;
 					OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.EffectiveHP, value));
@@ -533,10 +494,8 @@ namespace RuneOptim
 		}
 
 		// manually sets the Extra stat (used for scoring)
-		public void ExtraSet(Attr extra, double value)
-		{
-			switch (extra)
-			{
+		public void ExtraSet(Attr extra, double value) {
+			switch (extra) {
 				case Attr.EffectiveHP:
 					EffectiveHP = value;
 					break;
@@ -564,8 +523,7 @@ namespace RuneOptim
 			OnStatChanged?.Invoke(this, new StatModEventArgs(extra, value));
 		}
 
-		public double Sum()
-		{
+		public double Sum() {
 			return Accuracy
 				+ Attack
 				+ CritDamage
@@ -583,13 +541,10 @@ namespace RuneOptim
 		}
 
 		// Allows speedy iteration through the entity
-		public double this[string stat]
-		{
-			get
-			{
+		public double this[string stat] {
+			get {
 				// TODO: switch from using [string] to [Attr]
-				switch (stat)
-				{
+				switch (stat) {
 					case "HP":
 						return Health;
 					case "ATK":
@@ -622,10 +577,8 @@ namespace RuneOptim
 				}
 			}
 
-			set
-			{
-				switch (stat)
-				{
+			set {
+				switch (stat) {
 					case "HP":
 						Health = value;
 						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.HealthFlat, value));
@@ -684,12 +637,9 @@ namespace RuneOptim
 
 		}
 
-		public double this[Attr stat]
-		{
-			get
-			{
-				switch (stat)
-				{
+		public double this[Attr stat] {
+			get {
+				switch (stat) {
 					case Attr.HealthFlat:
 					case Attr.HealthPercent:
 						return Health;
@@ -725,10 +675,8 @@ namespace RuneOptim
 				throw new NotImplementedException();
 			}
 
-			set
-			{
-				switch (stat)
-				{
+			set {
+				switch (stat) {
 					case Attr.HealthFlat:
 					case Attr.HealthPercent:
 						Health = value;
@@ -781,13 +729,11 @@ namespace RuneOptim
 		}
 
 		// Perfectly legit operator overloading to compare builds/minimum
-		public static bool operator <(Stats lhs, Stats rhs)
-		{
+		public static bool operator <(Stats lhs, Stats rhs) {
 			return rhs.GreaterEqual(lhs);
 		}
 
-		public static bool operator >(Stats lhs, Stats rhs)
-		{
+		public static bool operator >(Stats lhs, Stats rhs) {
 			return lhs.GreaterEqual(rhs);
 		}
 
@@ -796,8 +742,7 @@ namespace RuneOptim
 		/// </summary>
 		/// <param name="rhs">Stats to compare to</param>
 		/// <returns>If any values in this Stats are greater than rhs</returns>
-		public bool CheckMax(Stats rhs)
-		{
+		public bool CheckMax(Stats rhs) {
 			double v;
 
 			v = rhs[Attr.HealthPercent];
@@ -843,7 +788,7 @@ namespace RuneOptim
 					return true;
 			}
 			return false;
-					
+
 			return Build.statEnums.Any(s => rhs[s] != 0 && this[s] > rhs[s]);
 		}
 
@@ -851,8 +796,7 @@ namespace RuneOptim
 			return rhs != 0 && lhs > rhs;
 		}
 
-		public bool GreaterEqual(Stats rhs, bool extraGet = false)
-		{
+		public bool GreaterEqual(Stats rhs, bool extraGet = false) {
 			if (Accuracy < rhs.Accuracy)
 				return false;
 			if (Attack < rhs.Attack)
@@ -895,8 +839,7 @@ namespace RuneOptim
 			return true;
 		}
 
-		public void SetTo(double v)
-		{
+		public void SetTo(double v) {
 			/* // TODO: put this back when SetTo is good
 			Accuracy = 0;
 			Attack = 0;
@@ -913,16 +856,14 @@ namespace RuneOptim
 			AverageDamage = 0;
 			MaxDamage = 0;*/
 
-			foreach (var a in Build.statAll)
-			{
+			foreach (var a in Build.statAll) {
 				this[a] = v;
 			}
 
 			DamageSkillups = new double[8];
 		}
 
-		public Stats SetTo(Stats rhs)
-		{
+		public Stats SetTo(Stats rhs) {
 			/* // TODO: put back when Properties are done
 			Health = rhs.Health;
 			Attack = rhs.Attack;
@@ -938,8 +879,7 @@ namespace RuneOptim
 			AverageDamage = rhs.AverageDamage;
 			MaxDamage = rhs.MaxDamage;*/
 
-			foreach (var a in Build.statAll)
-			{
+			foreach (var a in Build.statAll) {
 				this[a] = rhs[a];
 			}
 			for (int i = 0; i < 4; i++) {
@@ -951,8 +891,7 @@ namespace RuneOptim
 			return this;
 		}
 
-		public static Stats operator +(Stats lhs, Stats rhs)
-		{
+		public static Stats operator +(Stats lhs, Stats rhs) {
 			Stats ret = new Stats(lhs, true);
 			ret.Health += rhs.Health;
 			ret.Attack += rhs.Attack;
@@ -970,8 +909,7 @@ namespace RuneOptim
 			return ret;
 		}
 
-		public static Stats operator -(Stats lhs, Stats rhs)
-		{
+		public static Stats operator -(Stats lhs, Stats rhs) {
 			Stats ret = new Stats(lhs, true);
 			ret.Health -= rhs.Health;
 			ret.Attack -= rhs.Attack;
@@ -989,8 +927,7 @@ namespace RuneOptim
 			return ret;
 		}
 
-		public static Stats operator /(Stats lhs, double rhs)
-		{
+		public static Stats operator /(Stats lhs, double rhs) {
 			Stats ret = new Stats(lhs, true);
 			ret.Health /= rhs;
 			ret.Attack /= rhs;
@@ -1008,20 +945,17 @@ namespace RuneOptim
 			return ret;
 		}
 
-		public static Stats operator /(Stats lhs, Stats rhs)
-		{
+		public static Stats operator /(Stats lhs, Stats rhs) {
 			Stats ret = new Stats(lhs, true);
-			
-			foreach (var a in Build.statEnums)
-			{
+
+			foreach (var a in Build.statEnums) {
 				if (rhs[a].EqualTo(0))
 					ret[a] = 0;
 				else
 					ret[a] /= rhs[a];
 			}
 
-			foreach (var a in Build.extraEnums)
-			{
+			foreach (var a in Build.extraEnums) {
 				if (rhs[a].EqualTo(0))
 					ret[a] = 0;
 				else
@@ -1032,8 +966,7 @@ namespace RuneOptim
 		}
 
 		// how much % of the 3 pris RHS needs to get to this
-		public Stats Of(Stats rhs)
-		{
+		public Stats Of(Stats rhs) {
 			Stats ret = new Stats(this);
 
 			if (rhs.Health > 0)
@@ -1049,8 +982,7 @@ namespace RuneOptim
 
 		// boots this by RHS
 		// assumes A/D/H/S are 100.00 instead of 1.00 (leader/shrine)
-		public Stats Boost(Stats rhs)
-		{
+		public Stats Boost(Stats rhs) {
 			Stats ret = new Stats(this);
 
 			ret.Attack *= 1 + rhs.Attack / 100;
@@ -1080,8 +1012,7 @@ namespace RuneOptim
 			yield return default(Attr);
 		}
 
-		public bool IsNonZero()
-		{
+		public bool IsNonZero() {
 			if (!Accuracy.EqualTo(0))
 				return true;
 			if (!Attack.EqualTo(0))
@@ -1122,8 +1053,7 @@ namespace RuneOptim
 			return false;
 		}
 
-		public Attr FirstNonZero()
-		{
+		public Attr FirstNonZero() {
 			if (!Accuracy.EqualTo(0))
 				return Attr.Accuracy;
 			if (!Attack.EqualTo(0))

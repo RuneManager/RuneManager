@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	// Per-stat filter
-	public class RuneFilter
-	{
+	public class RuneFilter {
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
 		public double? Flat = null; // div flat by
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -15,9 +13,8 @@ namespace RuneOptim
 		public RuneFilter() {
 
 		}
-		
-		public RuneFilter(double? f = null, double? p = null, double? t = null)
-		{
+
+		public RuneFilter(double? f = null, double? p = null, double? t = null) {
 			Flat = f;
 			Percent = p;
 			Test = t;
@@ -30,13 +27,11 @@ namespace RuneOptim
 		}
 
 		// for debugging niceness
-		public override string ToString()
-		{
+		public override string ToString() {
 			return "/" + Flat + " + /" + Percent + "% >= " + Test;
 		}
-		
-		public static RuneFilter Dominant(RuneFilter child, RuneFilter parent)
-		{
+
+		public static RuneFilter Dominant(RuneFilter child, RuneFilter parent) {
 			RuneFilter m = new RuneFilter();
 
 			m.Flat = child.Flat ?? parent.Flat;
@@ -45,10 +40,9 @@ namespace RuneOptim
 
 			return m;
 		}
-		
+
 		// Gets the minimum divisor from A and B per type
-		public static RuneFilter Min(RuneFilter a, RuneFilter b)
-		{
+		public static RuneFilter Min(RuneFilter a, RuneFilter b) {
 			RuneFilter m = new RuneFilter();
 
 			m.Flat = MinNZero(a.Flat, b.Flat);
@@ -59,10 +53,8 @@ namespace RuneOptim
 		}
 
 		// Returns the smaller int that's not zero
-		public static double? MinNZero(double? a, double? b)
-		{
-			if (a != null)
-			{
+		public static double? MinNZero(double? a, double? b) {
+			if (a != null) {
 				if (b == null)
 					return a;
 				return (a < b ? a : b);
@@ -74,12 +66,9 @@ namespace RuneOptim
 		}
 
 		// speedy iterating
-		public double? this[string stat]
-		{
-			get
-			{
-				switch (stat)
-				{
+		public double? this[string stat] {
+			get {
+				switch (stat) {
 					case "flat":
 						return Flat;
 					case "perc":
@@ -88,10 +77,8 @@ namespace RuneOptim
 						return Test;
 				}
 			}
-			set
-			{
-				switch (stat)
-				{
+			set {
+				switch (stat) {
 					case "flat":
 						Flat = value;
 						break;
@@ -109,10 +96,8 @@ namespace RuneOptim
 
 		// returns if this instance is non-zero
 		[JsonIgnore]
-		public bool NonZero
-		{
-			get
-			{
+		public bool NonZero {
+			get {
 				if (Flat != null)
 					return true;
 				if (Percent != null)

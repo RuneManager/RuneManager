@@ -9,37 +9,29 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	// The monster stores its base stats in its base class
-	public class Monster : Stats, IComparable<Monster>
-	{
+	public class Monster : Stats, IComparable<Monster> {
 		[JsonProperty("name")]
 		private string name = "Missingno";
 
-		public string Name
-		{
-			get
-			{
+		public string Name {
+			get {
 				return name;
 			}
-			set
-			{
+			set {
 				name = value;
 			}
 		}
 
 		[JsonIgnore]
-		public string FullName
-		{
-			get
-			{
+		public string FullName {
+			get {
 				if (IsHomunculus)
 					return HomunculusName;
 				return (awakened == 1 ? "" : Element.ToString() + " ") + name;
 			}
-			set
-			{
+			set {
 				name = value;
 			}
 		}
@@ -63,21 +55,17 @@ namespace RuneOptim
 
 		[JsonProperty("building_id")]
 		public ulong BuildingId;
-		
+
 		[JsonProperty("create_time")]
 		public DateTime? createdOn = null;
 
 		private static Dictionary<int, MonsterStat> monDefs = null;
 
-		private static Dictionary<int, MonsterStat> MonDefs
-		{
-			get
-			{
-				if (monDefs == null)
-				{
+		private static Dictionary<int, MonsterStat> MonDefs {
+			get {
+				if (monDefs == null) {
 					monDefs = new Dictionary<int, MonsterStat>();
-					foreach (var item in SkillList)
-					{
+					foreach (var item in SkillList) {
 						if (!monDefs.ContainsKey(item.monsterTypeId))
 							monDefs.Add(item.monsterTypeId, item);
 					}
@@ -181,19 +169,15 @@ namespace RuneOptim
 
 		public event EventHandler<EventArgs> OnRunesChanged;
 
-		public int SwapCost(Loadout l)
-		{
+		public int SwapCost(Loadout l) {
 			int cost = 0;
-			for (int i = 0; i < 6; i++)
-			{
-				if (l.Runes[i] != null && l.Runes[i].AssignedName != FullName)
-				{
+			for (int i = 0; i < 6; i++) {
+				if (l.Runes[i] != null && l.Runes[i].AssignedName != FullName) {
 					// unequip current rune
 					if (Current.Runes[i] != null)
 						cost += Current.Runes[i].UnequipCost;
 					// unequip new rune from host
-					if ((l.Runes[i].IsUnassigned) && l.Runes[i].Swapped != true)
-					{
+					if ((l.Runes[i].IsUnassigned) && l.Runes[i].Swapped != true) {
 						cost += l.Runes[i].UnequipCost;
 					}
 				}
@@ -203,7 +187,7 @@ namespace RuneOptim
 
 		// what is currently equiped for this instance of a monster
 		private Loadout current = null;
-			
+
 		[JsonIgnore]
 		public Loadout Current {
 			get {
@@ -216,13 +200,11 @@ namespace RuneOptim
 			}
 		}
 
-		public Monster()
-		{
+		public Monster() {
 		}
 
 		// copy down!
-		public Monster(Monster rhs, bool loadout = false) : base(rhs)
-		{
+		public Monster(Monster rhs, bool loadout = false) : base(rhs) {
 			FullName = rhs.FullName;
 			Id = rhs.Id;
 			level = rhs.level;
@@ -239,16 +221,14 @@ namespace RuneOptim
 			priority = rhs.priority;
 			downloaded = rhs.downloaded;
 			inStorage = rhs.inStorage;
-		
-			if (loadout)
-			{
-				Current = new Loadout(rhs.Current); 
+
+			if (loadout) {
+				Current = new Loadout(rhs.Current);
 			}
 		}
 
 		// put this rune on the current build
-		public Rune ApplyRune(Rune rune, int checkOn = 2)
-		{
+		public Rune ApplyRune(Rune rune, int checkOn = 2) {
 			var old = Current.AddRune(rune, checkOn);
 			changeStats = true;
 			OnRunesChanged?.Invoke(this, null);
@@ -270,10 +250,8 @@ namespace RuneOptim
 
 		private static MonsterStat[] skillList = null;
 
-		private static MonsterStat[] SkillList
-		{
-			get
-			{
+		private static MonsterStat[] SkillList {
+			get {
 				if (skillList == null)
 					Monster.skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(global::RuneOptim.Properties.Resources.SkillsJSON));
 
@@ -281,20 +259,16 @@ namespace RuneOptim
 			}
 		}
 
-		public int awakened
-		{
-			get
-			{
+		public int awakened {
+			get {
 				return (this.monsterTypeId / 10) - (this.monsterTypeId / 100) * 10;
 			}
 		}
 
 		// get the stats of the current build.
 		// NOTE: the monster will contain it's base stats
-		public Stats GetStats(bool force = false)
-		{
-			if (changeStats || Current.Changed || force)
-			{
+		public Stats GetStats(bool force = false) {
+			if (changeStats || Current.Changed || force) {
 				checkSkillups();
 				Current.Element = this.Element;
 				Current.GetStats(this, ref curStats);
@@ -304,17 +278,14 @@ namespace RuneOptim
 			return curStats;
 		}
 
-		private void checkSkillups()
-		{
-			if (this._skilllist != null && this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId))
-			{
+		private void checkSkillups() {
+			if (this._skilllist != null && this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId)) {
 				MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
 				int skdmg = 0;
 				int i = -1;
 
-				foreach (var si in _skilllist)
-				{
+				foreach (var si in _skilllist) {
 					i++;
 					this.SkillupLevel[i] = _skilllist[i].Level ?? 0;
 					if (this.SkillupMax[i] == 0)
@@ -323,8 +294,7 @@ namespace RuneOptim
 						continue;
 					var ss = SkillDefs[si.SkillId ?? 0];
 					var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
-					if (df.props.Count > 0)
-					{
+					if (df.props.Count > 0) {
 						var levels = ss.LevelProgressDescription.Split('\n').Take((_skilllist[i].Level - 1) ?? 0);
 						this.SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
 						var ct = levels.Count(s => s == "Cooltime Turn -1");
@@ -337,8 +307,7 @@ namespace RuneOptim
 
 						this._SkillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(Stats.statType), Stats.statType).Compile();
 
-						if (i != 0)
-						{
+						if (i != 0) {
 							df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
 							df.props.Add(new MonsterDefinitions.MultiplierValue(cooltime));
 							if (average.props.Any())
@@ -353,8 +322,7 @@ namespace RuneOptim
 		}
 
 		// NYI comparison
-		public EquipCompare CompareTo(Monster rhs)
-		{
+		public EquipCompare CompareTo(Monster rhs) {
 			if (Loadout.CompareSets(Current.Sets, rhs.Current.Sets) == 0)
 				return EquipCompare.Unknown;
 
@@ -381,13 +349,11 @@ namespace RuneOptim
 			return EquipCompare.Better;
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return Id + " " + FullName + " lvl. " + level;
 		}
 
-		int IComparable<Monster>.CompareTo(Monster rhs)
-		{
+		int IComparable<Monster>.CompareTo(Monster rhs) {
 			var comp = rhs.Grade - Grade;
 			if (comp != 0) return comp;
 			comp = rhs.level - level;
@@ -401,18 +367,15 @@ namespace RuneOptim
 		}
 	}
 
-	public class Skill : ListProp<int?>
-	{
+	public class Skill : ListProp<int?> {
 		// TODO: name
 		[ListProperty(0)]
 		public int? SkillId = null;
 		[ListProperty(1)]
 		public int? Level = null;
 
-		protected override int maxInd
-		{
-			get
-			{
+		protected override int maxInd {
+			get {
 				return 2;
 			}
 		}
@@ -420,39 +383,30 @@ namespace RuneOptim
 
 
 
-	public class RuneLoadConverter : JsonConverter
-	{
-		public override bool CanConvert(Type objectType)
-		{
+	public class RuneLoadConverter : JsonConverter {
+		public override bool CanConvert(Type objectType) {
 			return typeof(IList<RuneOptim.Rune>).IsAssignableFrom(objectType);
 		}
 
-		public override bool CanRead
-		{
-			get
-			{
+		public override bool CanRead {
+			get {
 				return base.CanRead;
 			}
 		}
 
-		public override bool CanWrite
-		{
-			get
-			{
+		public override bool CanWrite {
+			get {
 				return base.CanWrite;
 			}
 		}
 
 		public override object ReadJson(JsonReader reader,
-			Type objectType, object existingValue, JsonSerializer serializer)
-		{
+			Type objectType, object existingValue, JsonSerializer serializer) {
 			JToken tok = JToken.Load(reader);
-			if (tok is JArray)
-			{
+			if (tok is JArray) {
 				return tok.ToObject<RuneOptim.Rune[]>();
 			}
-			else if (tok is JObject)
-			{
+			else if (tok is JObject) {
 				var jo = tok as JObject;
 				return jo.Children().Select(o => o.First.ToObject<RuneOptim.Rune>()).ToArray();
 			}
@@ -460,10 +414,8 @@ namespace RuneOptim
 		}
 
 		public override void WriteJson(JsonWriter writer,
-			object value, JsonSerializer serializer)
-		{
-			if (value is Array)
-			{
+			object value, JsonSerializer serializer) {
+			if (value is Array) {
 				// TODO: not having 6 runes is a mess
 				var a = value as Array;
 				//if (a.Length == 6)

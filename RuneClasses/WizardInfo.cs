@@ -2,8 +2,7 @@
 using Newtonsoft.Json;
 
 namespace RuneOptim {
-	public class WizardInfo
-	{
+	public class WizardInfo {
 		[JsonProperty("wizard_id")]
 		public ulong Id;
 
@@ -95,8 +94,7 @@ namespace RuneOptim {
 		public int GainExp;
 	}
 
-	public class UnitSlots
-	{
+	public class UnitSlots {
 		[JsonProperty("number")]
 		public int Number;
 
@@ -104,8 +102,7 @@ namespace RuneOptim {
 		public SlotsUpgrade Upgrade;
 	}
 
-	public class SlotsUpgrade
-	{
+	public class SlotsUpgrade {
 		[JsonProperty("number")]
 		public int Number;
 
@@ -116,8 +113,7 @@ namespace RuneOptim {
 		public int Crystal;
 	}
 
-	public class DefensePlacement
-	{
+	public class DefensePlacement {
 		[JsonProperty("pos_id")]
 		public int Position;
 

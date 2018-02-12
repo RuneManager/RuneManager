@@ -293,7 +293,7 @@ namespace RuneOptim {
 
 		[JsonProperty("fusion_food")]
 		public bool isFusion;
-		
+
 		[JsonProperty("com2us_id")]
 		public int monsterTypeId;
 	}

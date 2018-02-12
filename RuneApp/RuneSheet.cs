@@ -9,49 +9,39 @@ using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RuneOptim;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	/// <summary>
 	/// Manages all the stuff for the spreadsheet
 	/// </summary>
-	public class RuneSheet
-	{
+	public class RuneSheet {
 		readonly FileInfo excelFile = new FileInfo(@"runestats.xlsx");
 		private ExcelPackage excelPack = null;
 		private bool gotExcelPack = false;
 		ExcelWorksheets excelSheets = null;
 		private int linkCol = 1;
 
-		public void Save()
-		{
-			if (StatsExcelBind(true))
-			{
+		public void Save() {
+			if (StatsExcelBind(true)) {
 				StatsExcelRunes();
 				StatsExcelSave();
 			}
 			StatsExcelBind(true);
 		}
 
-		void StatsExcelClear()
-		{
+		void StatsExcelClear() {
 			if (Program.data?.Runes == null)
 				return;
 
 			FileInfo newFile = new FileInfo(@"runestats.xlsx");
 			int status = 0;
-			while (status != 1)
-			{
-				try
-				{
+			while (status != 1) {
+				try {
 					newFile.Delete();
 					status = 1;
 				}
-				catch (Exception e)
-				{
-					if (status == 0)
-					{
-						if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
-						{
+				catch (Exception e) {
+					if (status == 0) {
+						if (MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel) {
 							status = 1;
 						}
 					}
@@ -62,8 +52,7 @@ namespace RuneApp
 
 		}
 
-		bool StatsExcelBind(bool passive = false)
-		{
+		bool StatsExcelBind(bool passive = false) {
 			if (Program.data?.Runes == null)
 				return false;
 
@@ -71,20 +60,16 @@ namespace RuneApp
 				return true;
 
 			int status = 0;
-			do
-			{
-				try
-				{
+			do {
+				try {
 					excelPack = new ExcelPackage(excelFile);
 					status = 1;
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					// don't care if no bind
 					if (passive)
 						return false;
-					if (status == 0 && MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel)
-					{
+					if (status == 0 && MessageBox.Show("Please close runestats.xlsx\r\nOr ensure you can overwrite it.", "RuneStats", MessageBoxButtons.RetryCancel) == DialogResult.Cancel) {
 						status = 1;
 						return false;
 					}
@@ -105,47 +90,38 @@ namespace RuneApp
 			return true;
 		}
 
-		private void makeHome()
-		{
+		private void makeHome() {
 			var hws = excelSheets.FirstOrDefault(w => w.Name == "Home");
 			if (hws == null)
 				hws = excelSheets.Add("Home");
 			excelSheets.MoveBefore(hws.Index, 1);
 		}
 
-		public void StatsExcelSave(bool passiveBind)
-		{
-			if (StatsExcelBind(passiveBind))
-			{
+		public void StatsExcelSave(bool passiveBind) {
+			if (StatsExcelBind(passiveBind)) {
 				StatsExcelSave();
 			}
 			StatsExcelBind(true);
 		}
 
-		void StatsExcelSave()
-		{
-			try
-			{
+		void StatsExcelSave() {
+			try {
 				excelPack.Save();
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Console.WriteLine(e);
 			}
 		}
 
-		public void StatsExcelBuild(Build build, Monster mon, Loadout load, bool passiveBind)
-		{
-			if (StatsExcelBind(passiveBind))
-			{
+		public void StatsExcelBuild(Build build, Monster mon, Loadout load, bool passiveBind) {
+			if (StatsExcelBind(passiveBind)) {
 				StatsExcelBuild(build, mon, load);
 				StatsExcelSave();
 			}
 			StatsExcelBind(true);
 		}
 
-		void StatsExcelBuild(Build build, Monster mon, Loadout load)
-		{
+		void StatsExcelBuild(Build build, Monster mon, Loadout load) {
 			// TODO
 			Console.WriteLine("Writing build");
 			ExcelWorksheet ws = getSheet(mon);
@@ -175,12 +151,11 @@ namespace RuneApp
 			ws.Cells[row, 8].Hyperlink = new ExcelHyperLink("Home!A1", "Home");
 			ws.Cells[row, 8].Style.Font.UnderLine = true;
 			ws.Cells[row, 8].Style.Font.Color.SetColor(Color.Blue);
-			
+
 			ws.Cells[1, 9].Value = mon.Id;
 
 			var runeSheet = excelSheets.FirstOrDefault(w => w.Name == "Home");
-			if (runeSheet != null)
-			{
+			if (runeSheet != null) {
 				string hl = ws.Name + "!A1";
 				if (hl.IndexOf(' ') != -1)
 					hl = "'" + ws.Name + "'!A1";
@@ -190,23 +165,19 @@ namespace RuneApp
 
 				runeSheet.Cells[build.priority + 1, linkCol + 1].Value = build.Time / (double)1000;
 				runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Numberformat.Format = "0.00";
-				if (build.Time / 1000 < 2)
-				{
+				if (build.Time / 1000 < 2) {
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
 				}
-				else if (build.Time / 1000 < 15)
-				{
+				else if (build.Time / 1000 < 15) {
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
 				}
-				else if (build.Time / 1000 < 60)
-				{
+				else if (build.Time / 1000 < 60) {
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Orange);
 				}
-				else
-				{
+				else {
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.PatternType = ExcelFillStyle.Solid;
 					runeSheet.Cells[build.priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
 				}
@@ -222,8 +193,7 @@ namespace RuneApp
 				runeSheet.Cells[build.priority + 1, linkCol + 3].Value = combinations;
 
 			}
-			else
-			{
+			else {
 				Console.WriteLine("No Home sheet");
 			}
 
@@ -238,14 +208,12 @@ namespace RuneApp
 			double scoreav = 0;
 			int c = 0;
 			Stats minav = new Stats();
-			foreach (var b in build.buildUsage.loads)
-			{
+			foreach (var b in build.buildUsage.loads) {
 				double sc = build.CalcScore(b.GetStats());
 				b.score = sc;
 				scoreav += sc;
 				minav += b.GetStats();
-				foreach (var s in Build.extraNames)
-				{
+				foreach (var s in Build.extraNames) {
 					minav.ExtraSet(s, minav.ExtraGet(s) + b.GetStats().ExtraValue(s));
 				}
 				c++;
@@ -256,26 +224,20 @@ namespace RuneApp
 			ws.Cells[row - 1, 4].Value = scoreav;
 
 			Stats lowQ = new Stats();
-			foreach (var s in Build.statEnums)
-			{
+			foreach (var s in Build.statEnums) {
 				c = 0;
-				foreach (var b in build.buildUsage.loads)
-				{
-					if (minav[s] > b.GetStats()[s])
-					{
+				foreach (var b in build.buildUsage.loads) {
+					if (minav[s] > b.GetStats()[s]) {
 						lowQ[s] += b.GetStats()[s];
 						c++;
 					}
 				}
 				lowQ[s] /= c;
 			}
-			foreach (var s in Build.extraNames)
-			{
+			foreach (var s in Build.extraNames) {
 				c = 0;
-				foreach (var b in build.buildUsage.loads)
-				{
-					if (minav.ExtraGet(s) > b.GetStats().ExtraValue(s))
-					{
+				foreach (var b in build.buildUsage.loads) {
+					if (minav.ExtraGet(s) > b.GetStats().ExtraValue(s)) {
 						lowQ.ExtraSet(s, b.GetStats().ExtraValue(s));
 						c++;
 					}
@@ -286,27 +248,20 @@ namespace RuneApp
 			Stats versus = new Stats();
 			bool enough = false;
 
-			foreach (Attr s in Build.statAll)
-			{
-				if (!s.HasFlag(Attr.ExtraStat))
-				{
-					if (!build.Minimum[s].EqualTo(0))
-					{
+			foreach (Attr s in Build.statAll) {
+				if (!s.HasFlag(Attr.ExtraStat)) {
+					if (!build.Minimum[s].EqualTo(0)) {
 						versus[s] = lowQ[s];
-						if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
-						{
+						if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed) {
 							enough = true;
 							break;
 						}
 					}
 				}
-				else
-				{
-					if (!build.Minimum.ExtraGet(s).EqualTo(0))
-					{
+				else {
+					if (!build.Minimum.ExtraGet(s).EqualTo(0)) {
 						versus.ExtraSet(s, lowQ.ExtraGet(s));
-						if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
-						{
+						if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed) {
 							enough = true;
 							break;
 						}
@@ -314,28 +269,20 @@ namespace RuneApp
 				}
 			}
 
-			if (!enough)
-			{
-				foreach (Attr s in Build.statAll)
-				{
-					if (!s.HasFlag(Attr.ExtraStat))
-					{
-						if (!build.Sort[s].EqualTo(0))
-						{
+			if (!enough) {
+				foreach (Attr s in Build.statAll) {
+					if (!s.HasFlag(Attr.ExtraStat)) {
+						if (!build.Sort[s].EqualTo(0)) {
 							versus[s] = lowQ[s];
-							if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
-							{
+							if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed) {
 								break;
 							}
 						}
 					}
-					else
-					{
-						if (!build.Sort.ExtraGet(s).EqualTo(0))
-						{
+					else {
+						if (!build.Sort.ExtraGet(s).EqualTo(0)) {
 							versus.ExtraSet(s, lowQ.ExtraGet(s));
-							if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed)
-							{
+							if (build.buildUsage.loads.Count(m => m.GetStats().GreaterEqual(versus, true)) < 0.25 * build.buildUsage.passed) {
 								break;
 							}
 						}
@@ -349,22 +296,17 @@ namespace RuneApp
 			var trow = row;
 			row++;
 
-			foreach (Attr stat in Build.statAll)
-			{
+			foreach (Attr stat in Build.statAll) {
 				ws.Cells[row, 1].Value = stat;
-				if (!stat.HasFlag(Attr.ExtraStat))
-				{
-					if (build.Minimum[stat] > 0 || !build.Sort[stat].EqualTo(0))
-					{
+				if (!stat.HasFlag(Attr.ExtraStat)) {
+					if (build.Minimum[stat] > 0 || !build.Sort[stat].EqualTo(0)) {
 						ws.Cells[row, 2].Value = build.Minimum[stat];
 						ws.Cells[row, 3].Value = build.Sort[stat];
 						ws.Cells[row, 4].Value = versus[stat];
 					}
 				}
-				else
-				{
-					if (build.Minimum.ExtraGet(stat) > 0 || !build.Sort.ExtraGet(stat).EqualTo(0))
-					{
+				else {
+					if (build.Minimum.ExtraGet(stat) > 0 || !build.Sort.ExtraGet(stat).EqualTo(0)) {
 						ws.Cells[row, 2].Value = build.Minimum.ExtraGet(stat);
 						ws.Cells[row, 3].Value = build.Sort.ExtraGet(stat);
 						ws.Cells[row, 4].Value = versus.ExtraGet(stat);
@@ -376,24 +318,19 @@ namespace RuneApp
 			col = 5;
 			row = trow;
 
-			foreach (var b in build.buildUsage.loads.Take(20))
-			{
+			foreach (var b in build.buildUsage.loads.Take(20)) {
 				row = trow;
 				ws.Cells[row, col].Value = b.score;
-				if (b.score < scoreav)
-				{
+				if (b.score < scoreav) {
 					ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
 					ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightPink);
 				}
 				row++;
-				foreach (Attr stat in Build.statAll)
-				{
-					if (!stat.HasFlag(Attr.ExtraStat))
-					{
+				foreach (Attr stat in Build.statAll) {
+					if (!stat.HasFlag(Attr.ExtraStat)) {
 						ws.Cells[row, col].Value = b.GetStats()[stat];
 					}
-					else
-					{
+					else {
 						ws.Cells[row, col].Value = b.GetStats().ExtraValue(stat);
 					}
 					row++;
@@ -408,24 +345,20 @@ namespace RuneApp
 			Program.log.Info("Finished Writing statsheet");
 		}
 
-		private ExcelWorksheet getSheet(Monster mon)
-		{
+		private ExcelWorksheet getSheet(Monster mon) {
 			ExcelWorksheet ws;
 			string wsname;
 			int ptries = 0;
 			int ind = -1;
 
-			do
-			{
+			do {
 				wsname = mon.FullName + (ptries == 0 ? "" : ptries.ToString());
 				ws = excelSheets.FirstOrDefault(w => w.Name == wsname);
 
-				if (ws != null)
-				{
+				if (ws != null) {
 					ulong pid;
 					string pids = ws.Cells[1, 9].Value.ToString();
-					if ((!string.IsNullOrWhiteSpace(pids) && ulong.TryParse(pids, out pid) && pid == mon.Id))
-					{
+					if ((!string.IsNullOrWhiteSpace(pids) && ulong.TryParse(pids, out pid) && pid == mon.Id)) {
 						ind = ws.Index;
 						excelSheets.Delete(mon.FullName + (ptries == 0 ? "" : ptries.ToString()));
 						ws = null;
@@ -442,16 +375,14 @@ namespace RuneApp
 			return ws;
 		}
 
-		void StatsExcelRuneBoard(ExcelWorksheet ws, ref int row, ref int col, Build build, Loadout load)
-		{
+		void StatsExcelRuneBoard(ExcelWorksheet ws, ref int row, ref int col, Build build, Loadout load) {
 			// write each slots scoring weights
 			// reference and gray out things which inherit
 			var cmax = 1;
 			var rowstat = row + 2;
 			var abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-			foreach (int i in new int[] { -1, -2, -3, 0, 1, 2, 3, 4, 5 })
-			{
+			foreach (int i in new int[] { -1, -2, -3, 0, 1, 2, 3, 4, 5 }) {
 				col = 5;
 				var slot = i + 1;
 				string sslot = "g";
@@ -473,16 +404,13 @@ namespace RuneApp
 				bool isTestInherited = false;
 				string testForm = null;
 
-				if (test == null)
-				{
-					if (slot > 0)
-					{
+				if (test == null) {
+					if (slot > 0) {
 						isTestInherited = true;
 						testForm = "=A" + (rowstat - (slot) % 2);
 
 					}
-					else if (slot < 0)
-					{
+					else if (slot < 0) {
 						isTestInherited = true;
 						testForm = "=A" + (rowstat - 2);
 					}
@@ -492,25 +420,21 @@ namespace RuneApp
 				else
 					ws.Cells[row, 1].Formula = testForm;
 
-				if (isTestInherited)
-				{
+				if (isTestInherited) {
 					ws.Cells[row, 1].Style.Font.Color.SetColor(Color.Gray);
 				}
 				ws.Cells[row, 1].Style.Numberformat.Format = "#";
 
-				for (int j = 0; j < Build.statNames.Length; j++)
-				{
+				for (int j = 0; j < Build.statNames.Length; j++) {
 					var stat = Build.statNames[j];
 
-					foreach (var sstr in new string[] { "flat", "perc" })
-					{
+					foreach (var sstr in new string[] { "flat", "perc" }) {
 						if (!((sstr == "flat" && j < 4) || (sstr == "perc" && j != 3)))
 							continue;
 
 						double? vvv = rf?.ContainsKey(stat) ?? false ? rf[stat][sstr] : null;
 						string sssForm = null;
-						if (vvv == null)
-						{
+						if (vvv == null) {
 							if (slot > 0)
 								sssForm = "=" + abc[col - 1] + (rowstat - (slot) % 2);
 							else if (slot < 0)
@@ -518,8 +442,7 @@ namespace RuneApp
 						}
 						if (sssForm == null)
 							ws.Cells[row, col].Value = vvv;
-						else
-						{
+						else {
 							ws.Cells[row, col].Formula = sssForm;
 							ws.Cells[row, col].Style.Font.Color.SetColor(Color.Gray);
 						}
@@ -539,7 +462,7 @@ namespace RuneApp
 			col = 6;
 			foreach (var a in Build.statBoth) {
 				row = rstart;
-				ws.Cells[row, col].CreateArrayFormula($"({abc[col-1]}{row + 1}-{abc[col-1]}{row + 2})/{abc[col-1]}{row + 1}/MIN(ABS((F{row + 1}:P{row + 1}-F{row + 2}:P{row + 2})/F{row + 1}:P{row + 1}))");
+				ws.Cells[row, col].CreateArrayFormula($"({abc[col - 1]}{row + 1}-{abc[col - 1]}{row + 2})/{abc[col - 1]}{row + 1}/MIN(ABS((F{row + 1}:P{row + 1}-F{row + 2}:P{row + 2})/F{row + 1}:P{row + 1}))");
 				row++;
 				ws.Cells[row, col].Formula = $"AVERAGEIF(runesFor{build.ID}[Good], \"{build.Best.score}\", runesFor{build.ID}[{a.ToString()}])";
 				row++;
@@ -566,12 +489,10 @@ namespace RuneApp
 
 			Console.WriteLine("Used runes: " + used.Count());
 
-			foreach (var r in used.OrderByDescending(r => good.Contains(r)).ThenByDescending(r => build.ScoreRune(r, build.GetFakeLevel(r), false)))
-			{
+			foreach (var r in used.OrderByDescending(r => good.Contains(r)).ThenByDescending(r => build.ScoreRune(r, build.GetFakeLevel(r), false))) {
 				col = 1;
 				StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < Build.statBoth.Length; i++)
-				{
+				for (int i = 0; i < Build.statBoth.Length; i++) {
 					var attr = Build.statBoth[i];
 					if (i != 0) sb.Append("+");
 					var statCell = "$" + abc[i + 5] + "$" + (rowstat + r.Slot);
@@ -587,36 +508,30 @@ namespace RuneApp
 				ws.Cells[row, col].Value = r.Main.Type;
 				col++;
 				ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
-				if (load?.Runes != null)
-				{
+				if (load?.Runes != null) {
 					double d;
 					r.manageStats.TryGetValue("cbp" + build.ID, out d);
 					ws.Cells[row, col].Value = d;
-					if (load.Runes.Contains(r))
-					{
+					if (load.Runes.Contains(r)) {
 						//ws.Cells[row, col].Value = "Best";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.MediumTurquoise);
 					}
-					else if (second.Contains(r))
-					{
+					else if (second.Contains(r)) {
 						//ws.Cells[row, col].Value = "Second";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Teal);
 					}
-					else if (good.Contains(r))
-					{
+					else if (good.Contains(r)) {
 						//ws.Cells[row, col].Value = "Good";
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LimeGreen);
 					}
-					else
-					{
+					else {
 						ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.Red);
 					}
 				}
 
 				col++;
 
-				foreach (Attr stat in Build.statBoth)
-				{
+				foreach (Attr stat in Build.statBoth) {
 					var fake = build.GetFakeLevel(r);
 
 					var rval = r[stat, fake, false];
@@ -632,22 +547,19 @@ namespace RuneApp
 					cmax = col;
 				row++;
 			}
-			
+
 			OfficeOpenXml.Table.ExcelTable table = null;
-			try
-			{
+			try {
 				table = ws.Tables.FirstOrDefault(t => t.Name == "runesFor" + build.ID);
 				if (table == null)
 					table = ws.Tables.Add(ws.Cells[rstart, 1, row - 1, cmax - 1], "runesFor" + build.ID);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				MessageBox.Show(e.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 				return;
 			}
 
-			if (table.Address.Columns != cmax - 1 || table.Address.Rows != row - 1)
-			{
+			if (table.Address.Columns != cmax - 1 || table.Address.Rows != row - 1) {
 				var newRange = new ExcelAddress(rstart, 1, row - 1, cmax - 1).ToString();
 
 				var tableElement = table.TableXml.DocumentElement;
@@ -670,8 +582,7 @@ namespace RuneApp
 			cond.Style.Fill.BackgroundColor.Color = Color.Red;
 		}
 
-		private static int runeBoardHeader(ExcelWorksheet ws, ref int row, ref int cmax)
-		{
+		private static int runeBoardHeader(ExcelWorksheet ws, ref int row, ref int cmax) {
 			// PTS, set, slot, primary, HP, %, ATK, %, DEF, %, SPD, CR, CD, RES, ACC
 			int col = 1;
 			ws.Cells[row, col].Value = "Pts";
@@ -684,8 +595,7 @@ namespace RuneApp
 			col++;
 			ws.Cells[row, col].Value = "Good";
 			col++;
-			foreach (Attr stat in Build.statBoth)
-			{
+			foreach (Attr stat in Build.statBoth) {
 				ws.Cells[row, col].Value = stat.ToString();
 				col++;
 				if (col > cmax)
@@ -695,29 +605,24 @@ namespace RuneApp
 			return col;
 		}
 
-		public void StatsExcelRunes(bool passiveBind)
-		{
-			if (StatsExcelBind(passiveBind))
-			{
+		public void StatsExcelRunes(bool passiveBind) {
+			if (StatsExcelBind(passiveBind)) {
 				StatsExcelRunes();
 				StatsExcelSave();
 			}
 			StatsExcelBind(true);
 		}
 
-		void StatsExcelRunes()
-		{
+		void StatsExcelRunes() {
 			if (Program.data?.Runes == null || excelPack == null)
 				return;
 
 			var ws = excelSheets.FirstOrDefault(w => w.Name == "Runes");
-			if (ws == null)
-			{
+			if (ws == null) {
 				ws = excelSheets.Add("Runes");
 				excelSheets.MoveAfter(ws.Index, 1);
 			}
-			else
-			{
+			else {
 				var ind = ws.Index;
 				excelSheets.Delete("Runes");
 				ws = excelPack.Workbook.Worksheets.Add("Runes");
@@ -733,8 +638,7 @@ namespace RuneApp
 			List<string> colHead = new List<string>();
 
 			// ,MType,Points,FlatPts
-			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,VPM,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(','))
-			{
+			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,VPM,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(',')) {
 				colHead.Add(th);
 				ws.Cells[row, col].Value = th; col++;
 			}
@@ -743,34 +647,28 @@ namespace RuneApp
 
 
 			// calculate the stats
-			foreach (Rune r in Program.data.Runes)
-			{
+			foreach (Rune r in Program.data.Runes) {
 				double keep = StatsKeepRune(r, colHead);
 				r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 			}
 
 			int rr = 0;
 			// from keepscore 1 to 100
-			foreach (Rune r in Program.data.Runes.Where(r => r.manageStats["In"].EqualTo(0)).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
-			{
+			foreach (Rune r in Program.data.Runes.Where(r => r.manageStats["In"].EqualTo(0)).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
 				rr++;
-				if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.25)
-				{
+				if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.25) {
 					if (!r.manageStats.ContainsKey("Action"))
 						r.manageStats["Action"] = -2;
 				}
-				else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.5)
-				{
+				else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.5) {
 					if (r.manageStats["Action"].EqualTo(0))
 						r.manageStats["Action"] = -3;
 				}
-				else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.75)
-				{
+				else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.75) {
 					if (r.manageStats["Action"].EqualTo(0))
 						r.manageStats["Action"] = -1;
 				}
-				else
-				{
+				else {
 					r.manageStats["Action"] = -1;
 					if (r.Level < 6)
 						r.manageStats["Action"] = 6;
@@ -781,24 +679,19 @@ namespace RuneApp
 				}
 			}
 
-			foreach (Rune r in Program.data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0)))
-			{
+			foreach (Rune r in Program.data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
 				Monster m = null;
-				if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0))
-				{
+				if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
 					m = Program.data.GetMonster((ulong)r.manageStats["Mon"]);
 				}
 
 				Build b = null;
-				if (m != null)
-				{
+				if (m != null) {
 					b = Program.builds.FirstOrDefault(bu => bu.mon == m);
 				}
 
-				for (col = 1; col <= colHead.Count; col++)
-				{
-					switch (colHead[col - 1])
-					{
+				for (col = 1; col <= colHead.Count; col++) {
+					switch (colHead[col - 1]) {
 						case "Id":
 							if (r._extra > 0) {
 								Color color = Color.FromArgb(255, 190, 190, 190);
@@ -818,8 +711,7 @@ namespace RuneApp
 							ws.Cells[row, col].Value = r.Rarity;
 							break;
 						case "Set":
-							if (r.Rarity > 0)
-							{
+							if (r.Rarity > 0) {
 								Color color = Color.FromArgb(255, 146, 208, 80);
 								if (r.Rarity == 4) color = Color.FromArgb(255, 255, 153, 0);
 								else if (r.Rarity == 3) color = Color.FromArgb(255, 204, 0, 153);
@@ -875,8 +767,7 @@ namespace RuneApp
 							ws.Cells[row, col].Value = r.VivoPrestoModel;
 							break;
 						case "Used":
-							switch ((int)r.manageStats.GetOrAdd("In", 0))
-							{
+							switch ((int)r.manageStats.GetOrAdd("In", 0)) {
 								case 1:
 									ws.Cells[row, col].Value = "Best";
 									break;
@@ -915,14 +806,12 @@ namespace RuneApp
 							ws.Cells[row, col].Formula = fstr;
 							break;
 						case "Action":
-							if (r.manageStats.GetOrAdd("Action", 0).EqualTo(0))
-							{
+							if (r.manageStats.GetOrAdd("Action", 0).EqualTo(0)) {
 								if (r.ScoreATK() < 0.5
 									&& r.ScoreHP() < 0.5
 									&& r.ScoreRune() < 0.5
 									&& r.BarionEfficiency < 0.5
-									&& r.manageStats.GetOrAdd("Keep", 0) < 40)
-								{
+									&& r.manageStats.GetOrAdd("Keep", 0) < 40) {
 									ws.Cells[row, col].Value = "Sell";
 								}
 							}
@@ -1015,8 +904,7 @@ namespace RuneApp
 			if (table == null)
 				table = ws.Tables.Add(ws.Cells[tTop, tLeft, row - 1, cmax - 1], "RuneTable");
 
-			if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop)
-			{
+			if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop) {
 				var start = table.Address.Start;
 				var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(tTop, tLeft, row - 1, cmax - 1));
 
@@ -1059,8 +947,7 @@ namespace RuneApp
 			ws.Cells[row, col].Value = "S3"; col++;
 			ws.Cells[row, col].Value = "S4"; col++;
 
-			foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(','))
-			{
+			foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(',')) {
 				ws.Cells[row, col].Value = attr; col++;
 			}
 
@@ -1114,8 +1001,7 @@ namespace RuneApp
 					ws.Cells[row, col].CreateArrayFormula(makeHardcore("3", 0)); col++;
 					ws.Cells[row, col].CreateArrayFormula(makeHardcore("4", 0)); col++;
 
-					foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(','))
-					{
+					foreach (var attr in "HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC".Split(',')) {
 						ws.Cells[row, col].Formula = $"IFERROR(AVERAGEIFS(RuneTable[{attr}], RuneTable[Set], B{row},RuneTable[{attr}],\"<>0\", RuneTable[Used], \"Best\"),\"\")"; col++;
 					}
 
@@ -1127,8 +1013,7 @@ namespace RuneApp
 			if (table == null)
 				table = ws.Tables.Add(ws.Cells[tTop, tLeft, row - 1, cmax - 1], "DetailedRunes");
 
-			if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop)
-			{
+			if (table.Address.Columns != cmax - tLeft || table.Address.Rows != row - tTop) {
 				var start = table.Address.Start;
 				var newRange = string.Format("{0}:{1}", start.Address, new ExcelAddress(tTop, tLeft, row - 1, cmax - 1));
 
@@ -1142,14 +1027,12 @@ namespace RuneApp
 
 		}
 
-		double StatsKeepRune(Rune r, List<string> heads)
-		{
+		double StatsKeepRune(Rune r, List<string> heads) {
 			string t;
 			return StatsKeepRune(r, heads, out t);
 		}
 
-		double StatsKeepRune(Rune r, List<string> heads, out string formula)
-		{
+		double StatsKeepRune(Rune r, List<string> heads, out string formula) {
 			double keep = 0;
 			formula = "";
 
@@ -1164,22 +1047,19 @@ namespace RuneApp
 			r.manageStats["Action"] = 0;
 			if (!r.manageStats.ContainsKey("In"))
 				r.manageStats["In"] = 0;
-			
+
 			r.manageStats.GetOrAdd("Mon", 0);
-			if (r.manageStats["In"] > 0)
-			{
+			if (r.manageStats["In"] > 0) {
 				var b = Program.builds.FirstOrDefault(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r));
 				r.manageStats["Action"] = -1;
-				if (b == null)
-				{
+				if (b == null) {
 					r.manageStats["Priority"] = 2;
 					if (r.Slot % 2 == 0 && r.Level < 15)
 						r.manageStats["Action"] = 15;
 					if (r.Slot % 2 == 1 && r.Level < 12)
 						r.manageStats["Action"] = 12;
 				}
-				else
-				{
+				else {
 					r.manageStats["Mon"] = b.mon.Id;
 					r.manageStats["Priority"] = b.priority / (double)Program.builds.Max(bu => bu.priority);
 					int p = b.GetFakeLevel(r);
@@ -1192,8 +1072,7 @@ namespace RuneApp
 
 			// TODO: skip upgrading if rune is trash
 
-			if (r.Rarity > Math.Floor(r.Level / (double)3))
-			{
+			if (r.Rarity > Math.Floor(r.Level / (double)3)) {
 				keep += Math.Pow(r.Rarity - Math.Min(4, Math.Floor(r.Level / (double)3)), 1.1) * 6;
 				if (r.Rarity > Math.Floor(r.Level / (double)3) + 1)
 					r.manageStats["Action"] = r.Rarity * 3;
@@ -1230,8 +1109,7 @@ namespace RuneApp
 			keep += (Math.Pow(1.01, r.manageStats.GetOrAdd("TypeFilt", 0)) - 1) * 10;
 			formula += "+(power(1.01, " + (heads.Contains("Type") ? "RuneTable[[#This Row],[Type]]" : r.manageStats.GetOrAdd("TypeFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
 
-			if (r.manageStats.GetOrAdd("LoadGen", 0) > 0)
-			{
+			if (r.manageStats.GetOrAdd("LoadGen", 0) > 0) {
 				keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt", 0) / r.manageStats["LoadGen"], 1.1) * 10;
 			}
 			/**/
@@ -1242,6 +1120,6 @@ namespace RuneApp
 			r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
 			return keep;
 		}
-		
+
 	}
 }

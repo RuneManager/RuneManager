@@ -161,7 +161,7 @@ namespace RuneOptim {
 	}
 
 	public class AcquireMonsterGoalDef : GoalDef {
-		public AcquireMonsterGoalDef(MonsterTypeMap monsterType) : base (monsterType, GoalType.Own) {
+		public AcquireMonsterGoalDef(MonsterTypeMap monsterType) : base(monsterType, GoalType.Own) {
 		}
 		public Monster FindMonster(Goals goals, GoalState state) {
 			/*var mm = data.Monsters.FirstOrDefault(m => !goals.goals.Where(g => g.def is AcquireMonsterGoalDef).Any(g => g.reservedMonsters.Contains(m)));

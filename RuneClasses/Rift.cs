@@ -2,8 +2,7 @@
 using Newtonsoft.Json;
 
 namespace RuneOptim {
-	public enum RiftRating
-	{
+	public enum RiftRating {
 		F,
 		E,
 		D,
@@ -19,8 +18,7 @@ namespace RuneOptim {
 		SSS,
 	}
 
-	public enum RiftDungeon
-	{
+	public enum RiftDungeon {
 		Ice = 1001,
 		Fire = 2001,
 		Wind = 3001,
@@ -28,8 +26,7 @@ namespace RuneOptim {
 		Dark = 5001
 	}
 
-	public class RiftPosition : ListProp<long?>
-	{
+	public class RiftPosition : ListProp<long?> {
 		[ListProperty(0)]
 		[JsonProperty("position")]
 		public long? Position = null;
@@ -53,8 +50,7 @@ namespace RuneOptim {
 		public override bool IsReadOnly { get { return false; } }
 		protected override int maxInd { get { return 4; } }
 
-		public override void Add(long? item)
-		{
+		public override void Add(long? item) {
 			if (Position == null)
 				Position = item;
 			else if (MonsterId == null)
@@ -70,16 +66,14 @@ namespace RuneOptim {
 		}
 	}
 
-	public class RiftRun
-	{
+	public class RiftRun {
 		[JsonProperty("wizard_id")]
 		public ulong WizardId;
 		[JsonProperty("rift_dungeon_id")]
 		public RiftDungeon RiftDungeonId;
 	}
 
-	public class RiftDeck : RiftRun
-	{
+	public class RiftDeck : RiftRun {
 		[JsonProperty("clear_rating")]
 		public RiftRating ClearRating;
 		[JsonProperty("clear_damage")]
@@ -90,8 +84,7 @@ namespace RuneOptim {
 		public RiftPosition[] Monsters;
 	}
 
-	public class BestRiftDeck : RiftRun
-	{
+	public class BestRiftDeck : RiftRun {
 		[JsonProperty("best_rating")]
 		public RiftRating BestRating;
 		[JsonProperty("best_damage")]

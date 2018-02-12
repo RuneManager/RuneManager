@@ -1,8 +1,7 @@
 ﻿using Newtonsoft.Json;
 
 namespace RuneOptim {
-	public class Building
-	{
+	public class Building {
 		[JsonProperty("building_id")]
 		public ulong Id;
 
@@ -17,7 +16,7 @@ namespace RuneOptim {
 
 		[JsonProperty("pos_x")]
 		public int X;
-		
+
 		[JsonProperty("pos_y")]
 		public int Y;
 
@@ -37,13 +36,12 @@ namespace RuneOptim {
 		public int NextHarvest;
 	}
 
-	public enum BuildingType
-	{
+	public enum BuildingType {
 		PondOfMana = 3,
 		CrystalMine,
 		AncientStone = 12,
 		CrystalTitan = 15,
-		
+
 		CrystalLake = 21,
 		TranquilForest,
 		GustyCliffs,

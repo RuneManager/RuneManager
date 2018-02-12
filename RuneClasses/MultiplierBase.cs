@@ -277,7 +277,7 @@ namespace MonsterDefinitions {
 			if (inner != null)
 				return inner.GetValue(vals);
 			else if (key != MultiAttr.Null) {
-				
+
 			}
 			else if (value != null)
 				return value ?? 0;

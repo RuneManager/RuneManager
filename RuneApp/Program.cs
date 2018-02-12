@@ -14,34 +14,27 @@ using System.Windows.Forms;
 using Newtonsoft.Json;
 using RuneOptim;
 
-namespace RuneApp
-{
-	public enum LoadSaveResult
-	{
+namespace RuneApp {
+	public enum LoadSaveResult {
 		Failure = -2,
 		FileNotFound = -1,
 		EmptyFile = 0,
 		Success = 1,
 	}
 
-	class progLogger : TextWriter
-	{
-		public override Encoding Encoding
-		{
-			get
-			{
+	class progLogger : TextWriter {
+		public override Encoding Encoding {
+			get {
 				return Encoding.Default;
 			}
 		}
 
-		public override void WriteLine(string value)
-		{
+		public override void WriteLine(string value) {
 			Program.log.Debug(value);
 		}
 	}
 
-	public static class Program
-	{
+	public static class Program {
 		public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 		public static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
 
@@ -52,10 +45,8 @@ namespace RuneApp
 
 		public static Goals goals;
 
-		public static Properties.Settings Settings
-		{
-			get
-			{
+		public static Properties.Settings Settings {
+			get {
 				//var qwete = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
 				//Console.WriteLine(qwete);
 				//Properties.Settings.Default.Upgrade();
@@ -63,19 +54,16 @@ namespace RuneApp
 			}
 		}
 
-		public static bool WatchSave
-		{
+		public static bool WatchSave {
 			get { return Settings.WatchSave; }
-			set
-			{
+			set {
 				// TODO: start/stop Directory watcher
 				Settings.WatchSave = value;
 				Settings.Save();
 			}
 		}
 
-		private static bool DoesSettingExist(string settingName)
-		{
+		private static bool DoesSettingExist(string settingName) {
 			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
 
@@ -110,8 +98,7 @@ namespace RuneApp
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
-		{
+		static void Main() {
 			ReadConfig();
 			try {
 				if (Settings.UpgradeRequired) {
@@ -128,14 +115,11 @@ namespace RuneApp
 			loads.CollectionChanged += Loads_CollectionChanged;
 			BuildsProgressTo += Program_BuildsProgressTo;
 
-			if (Program.Settings.InternalServer)
-			{
-				try
-				{
+			if (Program.Settings.InternalServer) {
+				try {
 					master.Start();
 				}
-				catch
-				{
+				catch {
 					Program.Settings.InternalServer = false;
 					Program.Settings.Save();
 				}
@@ -154,15 +138,12 @@ namespace RuneApp
 			Application.Run(new Main());
 		}
 
-		private static void Program_BuildsProgressTo(object sender, PrintToEventArgs e)
-		{
+		private static void Program_BuildsProgressTo(object sender, PrintToEventArgs e) {
 			log.Info("@" + e.Message);
 		}
 
-		public static void ReadConfig()
-		{
-			if (config != null)
-			{
+		public static void ReadConfig() {
+			if (config != null) {
 				// it's stored as string, what is fasted yescompare?
 				// this?
 				/*
@@ -175,18 +156,14 @@ namespace RuneApp
 			}
 		}
 
-		private static void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private static void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var l in e.OldItems.Cast<Loadout>())
-					{
-						foreach (Rune r in l.Runes.Where(r => r != null))
-						{
+					foreach (var l in e.OldItems.Cast<Loadout>()) {
+						foreach (Rune r in l.Runes.Where(r => r != null)) {
 							r.Locked = false;
 						}
 					}
@@ -198,33 +175,26 @@ namespace RuneApp
 			}
 		}
 
-		private static void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private static void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var b in e.NewItems.Cast<Build>())
-					{
-						if (Program.data != null)
-						{
+					foreach (var b in e.NewItems.Cast<Build>()) {
+						if (Program.data != null) {
 							// for each build, find the build in the buildlist with the same mon name?
 							//var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
 							// if there is a build with this monname, maybe I have 2 mons with that name?!
 							if (!System.Diagnostics.Debugger.IsAttached)
 								Program.log.Debug("finding " + b.MonId);
-							if (Program.data.GetMonster(b.MonId) != null)
-							{
+							if (Program.data.GetMonster(b.MonId) != null) {
 								b.mon = Program.data.GetMonster(b.MonId);
 							}
-							else
-							{
+							else {
 								var bnum = builds.Count(bu => bu.MonName == b.MonName);
 								b.mon = Program.data.GetMonster(b.MonName, bnum + 1);
 							}
 							b.shrines = Program.data.shrines;
 						}
-						else
-						{
+						else {
 							b.mon = new Monster();
 							b.mon.FullName = b.MonName;
 						}
@@ -243,35 +213,28 @@ namespace RuneApp
 		/// <summary>
 		/// Checks the Working directory for a supported save file
 		/// </summary>
-		public static LoadSaveResult FindSave()
-		{
+		public static LoadSaveResult FindSave() {
 			string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
-			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
-			{
+			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation)) {
 				return LoadSave(Program.Settings.SaveLocation);
 			}
-			else if (files.Any())
-			{
+			else if (files.Any()) {
 				if (files.Count() > 1)
 					return LoadSaveResult.FileNotFound;
 				return LoadSave(files.First());
 			}
-			else if (File.Exists("save.json"))
-			{
+			else if (File.Exists("save.json")) {
 				return LoadSave("save.json");
 			}
 			return LoadSaveResult.FileNotFound;
 		}
 
-		public static LoadSaveResult LoadSave(string filename)
-		{
-			if (string.IsNullOrWhiteSpace(filename))
-			{
+		public static LoadSaveResult LoadSave(string filename) {
+			if (string.IsNullOrWhiteSpace(filename)) {
 				log.Error("Filename for save is null");
 				return LoadSaveResult.FileNotFound;
 			}
-			if (!File.Exists(filename))
-			{
+			if (!File.Exists(filename)) {
 				log.Error($"File {filename} doesn't exist");
 				return LoadSaveResult.FileNotFound;
 			}
@@ -288,14 +251,13 @@ namespace RuneApp
 					Console.WriteLine("Loaded data has been touched, untouching...");
 					data.isModified = false;
 				}
-				
+
 				if (File.Exists("shrine_overwrite.json")) {
 					Program.data.shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
 				}
 			}
 #if !DEBUG
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				File.WriteAllText("error_save.txt", e.ToString());
 				throw new Exception("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 			}
@@ -303,10 +265,8 @@ namespace RuneApp
 			return LoadSaveResult.Success;
 		}
 
-		private static void watchSave()
-		{
-			if (saveFileWatcher == null)
-			{
+		private static void watchSave() {
+			if (saveFileWatcher == null) {
 				saveFileWatcher = new FileSystemWatcher();
 				saveFileWatcher.Changed += SaveFileWatcher_Changed;
 			}
@@ -316,10 +276,8 @@ namespace RuneApp
 
 		}
 
-		private static void SaveFileWatcher_Changed(object sender, FileSystemEventArgs e)
-		{
-			if (saveFileDebouncer == null)
-			{
+		private static void SaveFileWatcher_Changed(object sender, FileSystemEventArgs e) {
+			if (saveFileDebouncer == null) {
 				saveFileDebouncer = new System.Timers.Timer();
 				saveFileDebouncer.Elapsed += SaveFileDebouncer_Elapsed;
 				saveFileDebouncer.AutoReset = false;
@@ -329,30 +287,24 @@ namespace RuneApp
 			saveFileDebouncer.Start();
 		}
 
-		private static void SaveFileDebouncer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-		{
-			if (saveFileTouched != null && saveFileTouched.GetInvocationList().Length > 0)
-			{
+		private static void SaveFileDebouncer_Elapsed(object sender, System.Timers.ElapsedEventArgs e) {
+			if (saveFileTouched != null && saveFileTouched.GetInvocationList().Length > 0) {
 				saveFileTouched.Invoke(Program.Settings.SaveLocation, new EventArgs());
 			}
-			else
-			{
+			else {
 				LoadSave(Program.Settings.SaveLocation);
 			}
 		}
 
-		public static LoadSaveResult LoadBuilds(string filename = "builds.json")
-		{
-			if (!File.Exists(filename))
-			{
+		public static LoadSaveResult LoadBuilds(string filename = "builds.json") {
+			if (!File.Exists(filename)) {
 				log.Error($"{filename} wasn't found.");
 				return LoadSaveResult.FileNotFound;
 			}
 			log.Info($"Loading {filename} as builds.");
 
 #if !DEBUG
-			try
-			{
+			try {
 #endif
 				var bstr = File.ReadAllText(filename);
 
@@ -367,8 +319,7 @@ namespace RuneApp
 				bstr = bstr.Replace("\"b_res\"", "\"res\"");
 
 				var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
-				foreach (var b in bs.OrderBy(b => b.priority))
-				{
+				foreach (var b in bs.OrderBy(b => b.priority)) {
 					builds.Add(b);
 				}
 				foreach (var b in builds.Where(b => b.Type == BuildType.Link)) {
@@ -376,20 +327,17 @@ namespace RuneApp
 				}
 #if !DEBUG
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				File.WriteAllText("error_build.txt", e.ToString());
 				throw new InvalidOperationException("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
 			}
 #endif
 
-			if (Program.builds.Count > 0 && (Program.data?.Monsters == null))
-			{
+			if (Program.builds.Count > 0 && (Program.data?.Monsters == null)) {
 				// backup, just in case
 				string destFile = Path.Combine("", string.Format("{0}.backup{1}", "builds", ".json"));
 				int num = 2;
-				while (File.Exists(destFile))
-				{
+				while (File.Exists(destFile)) {
 					destFile = Path.Combine("", string.Format("{0}.backup{1}{2}", "builds", num, ".json"));
 					num++;
 				}
@@ -403,14 +351,11 @@ namespace RuneApp
 			return LoadSaveResult.Success;
 		}
 
-		public static void SanitizeBuilds()
-		{
+		public static void SanitizeBuilds() {
 			int current_pri = 1;
-			foreach (Build b in Program.builds.OrderBy(bu => bu.priority))
-			{
+			foreach (Build b in Program.builds.OrderBy(bu => bu.priority)) {
 				int id = b.ID;
-				if (b.ID == 0 || Program.builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID))
-				{
+				if (b.ID == 0 || Program.builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID)) {
 					//id = buildList.Items.Count + 1;
 					id = 1;
 					while (Program.builds.Any(bu => bu.ID == id))
@@ -428,10 +373,8 @@ namespace RuneApp
 					b.priority = current_pri++;
 
 				// make sure bad things are removed
-				foreach (var ftab in b.runeFilters)
-				{
-					foreach (var filter in ftab.Value)
-					{
+				foreach (var ftab in b.runeFilters) {
+					foreach (var filter in ftab.Value) {
 						if (filter.Key == "SPD")
 							filter.Value.Percent = null;
 						if (filter.Key == "ACC" || filter.Key == "RES" || filter.Key == "CR" || filter.Key == "CD")
@@ -440,10 +383,8 @@ namespace RuneApp
 				}
 
 				// upgrade builds, hopefully
-				while (b.VERSIONNUM < Create.VERSIONNUM)
-				{
-					switch (b.VERSIONNUM)
-					{
+				while (b.VERSIONNUM < Create.VERSIONNUM) {
+					switch (b.VERSIONNUM) {
 						case 0: // unversioned to 1
 							b.Threshold = b.Maximum;
 							b.Maximum = new Stats();
@@ -455,23 +396,17 @@ namespace RuneApp
 			}
 		}
 
-		public static LoadSaveResult SaveBuilds(string filename = "builds.json")
-		{
+		public static LoadSaveResult SaveBuilds(string filename = "builds.json") {
 			log.Info($"Saving builds to {filename}");
 			// TODO: fix this mess
-			foreach (Build bb in builds)
-			{
-				if (bb.mon != null && bb.mon.FullName != "Missingno")
-				{
-					if (!bb.DownloadAwake || (Program.data.GetMonster(bb.mon.FullName) != null && Program.data.GetMonster(bb.mon.FullName).FullName != "Missingno"))
-					{
+			foreach (Build bb in builds) {
+				if (bb.mon != null && bb.mon.FullName != "Missingno") {
+					if (!bb.DownloadAwake || (Program.data.GetMonster(bb.mon.FullName) != null && Program.data.GetMonster(bb.mon.FullName).FullName != "Missingno")) {
 						bb.MonName = bb.mon.FullName;
 						bb.MonId = bb.mon.Id;
 					}
-					else
-					{
-						if (Program.data.GetMonster(bb.mon.Id).FullName != "Missingno")
-						{
+					else {
+						if (Program.data.GetMonster(bb.mon.Id).FullName != "Missingno") {
 							bb.MonId = bb.mon.Id;
 							bb.MonName = Program.data.GetMonster(bb.mon.Id).FullName;
 						}
@@ -480,10 +415,8 @@ namespace RuneApp
 			}
 
 			// only write if there are builds, may save some files
-			if (Program.builds.Count > 0)
-			{
-				try
-				{
+			if (Program.builds.Count > 0) {
+				try {
 					// keep a single recent backup
 					if (File.Exists(filename))
 						File.Copy(filename, filename + ".backup", true);
@@ -491,8 +424,7 @@ namespace RuneApp
 					File.WriteAllText(filename, str);
 					return LoadSaveResult.Success;
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					log.Error($"Error while saving builds {e.GetType()}", e);
 					throw;
 					//MessageBox.Show(e.ToString());
@@ -501,14 +433,11 @@ namespace RuneApp
 			return LoadSaveResult.Failure;
 		}
 
-		public static LoadSaveResult SaveLoadouts(string filename = "loads.json")
-		{
+		public static LoadSaveResult SaveLoadouts(string filename = "loads.json") {
 			log.Info($"Saving loads to {filename}");
 
-			if (loads.Count > 0)
-			{
-				try
-				{
+			if (loads.Count > 0) {
+				try {
 					// keep a single recent backup
 					if (File.Exists(filename))
 						File.Copy(filename, filename + ".backup", true);
@@ -516,8 +445,7 @@ namespace RuneApp
 					File.WriteAllText(filename, str);
 					return LoadSaveResult.Success;
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					log.Error($"Error while saving loads {e.GetType()}", e);
 					throw;
 					//MessageBox.Show(e.ToString());
@@ -527,16 +455,13 @@ namespace RuneApp
 			return LoadSaveResult.EmptyFile;
 		}
 
-		public static LoadSaveResult LoadLoadouts(string filename = "loads.json")
-		{
-			try
-			{
+		public static LoadSaveResult LoadLoadouts(string filename = "loads.json") {
+			try {
 				string text = File.ReadAllText(filename);
 				var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
 				loads.Clear();
 
-				foreach (var load in lloads)
-				{
+				foreach (var load in lloads) {
 					if (load.RuneIDs != null) {
 						for (int i = 0; i < 6; i++) {
 							var ids = load.RuneIDs[i];
@@ -554,8 +479,7 @@ namespace RuneApp
 				}
 				return LoadSaveResult.Success;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.Error($"Error while loading loads {e.GetType()}", e);
 				//MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 				File.WriteAllText("error_loads.txt", e.ToString());
@@ -564,12 +488,9 @@ namespace RuneApp
 			return LoadSaveResult.Failure;
 		}
 
-		internal static void ClearLoadouts()
-		{
-			foreach (Loadout l in loads)
-			{
-				foreach (Rune r in l.Runes)
-				{
+		internal static void ClearLoadouts() {
+			foreach (Loadout l in loads) {
+				foreach (Rune r in l.Runes) {
 					if (r != null)
 						r.Locked = false;
 				}
@@ -612,13 +533,11 @@ namespace RuneApp
 			return LoadSaveResult.Failure;
 		}
 
-		public static void BuildPriority(Build build, int deltaPriority)
-		{
+		public static void BuildPriority(Build build, int deltaPriority) {
 			build.priority += deltaPriority;
 			var bpri = builds.OrderBy(b => b.priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
 			int i = 1;
-			foreach (var b in bpri)
-			{
+			foreach (var b in bpri) {
 				if (b.Type == BuildType.Lock) {
 					b.priority = 0;
 				}
@@ -627,13 +546,11 @@ namespace RuneApp
 			}
 		}
 
-		public static void RunTest(Build build, Action<Build, BuildResult> onFinish = null)
-		{
+		public static void RunTest(Build build, Action<Build, BuildResult> onFinish = null) {
 			if (build.IsRunning)
 				throw new InvalidOperationException("This build is already running");
 
-			Task.Factory.StartNew(() =>
-			{
+			Task.Factory.StartNew(() => {
 				// Allow the window to draw before destroying the CPU
 				Thread.Sleep(100);
 
@@ -654,22 +571,18 @@ namespace RuneApp
 			});
 		}
 
-		public static void StopBuild()
-		{
+		public static void StopBuild() {
 			runSource?.Cancel();
 		}
 
-		public static void RunBuild(Build b, bool saveStats = false)
-		{
+		public static void RunBuild(Build b, bool saveStats = false) {
 			if (Program.data == null)
 				return;
 
-			if (currentBuild != null)
-			{
+			if (currentBuild != null) {
 				if (runTask != null && runTask.Status != TaskStatus.Running)
 					throw new Exception("Already running builds!");
-				else
-				{
+				else {
 					runSource.Cancel();
 					return;
 				}
@@ -678,18 +591,14 @@ namespace RuneApp
 
 			runSource = new CancellationTokenSource();
 			runToken = runSource.Token;
-			runTask = Task.Factory.StartNew(() =>
-			{
+			runTask = Task.Factory.StartNew(() => {
 				runBuild(b, saveStats);
 			});
 		}
 
-		private static void runBuild(Build b, bool saveStats = false)
-		{
-			try
-			{
-				if (b == null)
-				{
+		private static void runBuild(Build b, bool saveStats = false) {
+			try {
+				if (b == null) {
 					log.Info("Build is null");
 					return;
 				}
@@ -755,8 +664,7 @@ namespace RuneApp
 
 				#region Check enough runes
 				string nR = "";
-				for (int i = 0; i < b.runes.Length; i++)
-				{
+				for (int i = 0; i < b.runes.Length; i++) {
 					if (b.runes[i] != null && b.runes[i].Length == 0)
 						nR += (i + 1) + " ";
 				}
@@ -823,8 +731,7 @@ namespace RuneApp
 					loads.Add(b.Best.Current);
 
 					// if we are on the hunt of good runes.
-					if (goodRunes && saveStats && b.Type != BuildType.Lock)
-					{
+					if (goodRunes && saveStats && b.Type != BuildType.Lock) {
 						var theBest = b.Best;
 						int count = 0;
 						// we must progressively ban more runes from the build to find second-place runes.
@@ -850,8 +757,7 @@ namespace RuneApp
 					// clean up for GC
 					if (b.buildUsage != null)
 						b.buildUsage.loads.Clear();
-					if (b.runeUsage != null)
-					{
+					if (b.runeUsage != null) {
 						b.runeUsage.runesGood.Clear();
 						b.runeUsage.runesUsed.Clear();
 					}
@@ -875,22 +781,18 @@ namespace RuneApp
 				//b.isRun = false;
 				//currentBuild = null;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
 			}
-			finally
-			{
+			finally {
 				currentBuild = null;
 				log.Info("Cleaned");
 			}
 		}
 
-		private static void RunBanned(Build b, int c, params ulong[] doneIds)
-		{
+		private static void RunBanned(Build b, int c, params ulong[] doneIds) {
 			log.Info("Running ban");
-			try
-			{
+			try {
 				b.BanEmTemp(doneIds);
 
 				b.RunesUseLocked = false;
@@ -907,12 +809,10 @@ namespace RuneApp
 				b.BuildGoodRunes = false;
 				log.Info("ran ban with result: " + result);
 			}
-			catch (Exception ex)
-			{
+			catch (Exception ex) {
 				log.Error("Running ban failed ", ex);
 			}
-			finally
-			{
+			finally {
 				b.BanEmTemp(new ulong[] { });
 				b.BuildSaveStats = false;
 				b.GenRunes(Program.data);
@@ -920,27 +820,22 @@ namespace RuneApp
 			}
 		}
 
-		public static void RunBuilds(bool skipLoaded, int runTo = -1)
-		{
+		public static void RunBuilds(bool skipLoaded, int runTo = -1) {
 			if (Program.data == null)
 				return;
 
-			if (isRunning)
-			{
+			if (isRunning) {
 				if (runTask != null && runTask.Status != TaskStatus.Running)
 					throw new Exception("Already running builds!");
-				else
-				{
+				else {
 					runSource.Cancel();
 					return;
 				}
 			}
 			isRunning = true;
 
-			try
-			{
-				if (runTask != null && runTask.Status == TaskStatus.Running)
-				{
+			try {
+				if (runTask != null && runTask.Status == TaskStatus.Running) {
 					runSource.Cancel();
 					//if (currentBuild != null)
 					//   currentBuild.isRun = false;
@@ -952,19 +847,16 @@ namespace RuneApp
 
 				List<int> loady = new List<int>();
 
-				if (!skipLoaded)
-				{
+				if (!skipLoaded) {
 					ClearLoadouts();
-					foreach (var r in Program.data.Runes)
-					{
+					foreach (var r in Program.data.Runes) {
 						r.manageStats.AddOrUpdate("buildScoreIn", 0, (k, v) => 0);
 						r.manageStats.AddOrUpdate("buildScoreTotal", 0, (k, v) => 0);
 					}
 				}
 
 				List<Build> toRun = new List<Build>();
-				foreach (var build in builds.OrderBy(b => b.priority))
-				{
+				foreach (var build in builds.OrderBy(b => b.priority)) {
 					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.priority < runTo))
 						toRun.Add(build);
 				}
@@ -994,56 +886,46 @@ namespace RuneApp
 
 				runSource = new CancellationTokenSource();
 				runToken = runSource.Token;
-				runTask = Task.Factory.StartNew(() =>
-				{
-					if (Program.data.Runes != null && !skipLoaded)
-					{
-						foreach (Rune r in Program.data.Runes)
-						{
+				runTask = Task.Factory.StartNew(() => {
+					if (Program.data.Runes != null && !skipLoaded) {
+						foreach (Rune r in Program.data.Runes) {
 							r.Swapped = false;
 							r.ResetStats();
 						}
 					}
 
-					foreach (Build bbb in toRun)
-					{
+					foreach (Build bbb in toRun) {
 						runBuild(bbb, Program.Settings.MakeStats);
 						if (runToken.IsCancellationRequested || bbb.Best == null)
 							break;
 					}
 
-					if (!runToken.IsCancellationRequested && Program.Settings.MakeStats)
-					{
+					if (!runToken.IsCancellationRequested && Program.Settings.MakeStats) {
 						if (!skipLoaded)
 							Program.runeSheet.StatsExcelRunes(true);
-						try
-						{
+						try {
 							Program.runeSheet.StatsExcelSave(true);
 						}
-						catch (Exception ex)
-						{
+						catch (Exception ex) {
 							Console.WriteLine(ex);
 						}
 					}
 					isRunning = false;
 				}, runSource.Token);
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				MessageBox.Show(e.Message + Environment.NewLine + e.StackTrace, e.GetType().ToString());
 			}
 		}
 
-		public static void SaveData()
-		{
+		public static void SaveData() {
 			// tag the save as a modified save
 			Program.data.isModified = true;
 			var l = Program.data.Runes.Where(r => r.Locked);
 			foreach (var r in l)
 				r.Locked = false;
 
-			if (File.Exists(Program.Settings.SaveLocation))
-			{
+			if (File.Exists(Program.Settings.SaveLocation)) {
 				// backup, just in case
 				string fname = Path.ChangeExtension(Program.Settings.SaveLocation, ".backup.json");
 				int i = 2;
@@ -1058,8 +940,7 @@ namespace RuneApp
 				r.Locked = true;
 		}
 
-		public static void AddMonster(Monster mon)
-		{
+		public static void AddMonster(Monster mon) {
 			if (data.Monsters.Any(m => m.Id == mon.Id)) {
 				UpdateMonster(mon);
 				return;
@@ -1072,8 +953,7 @@ namespace RuneApp
 			}
 		}
 
-		public static void AddRune(Rune rune)
-		{
+		public static void AddRune(Rune rune) {
 			if (data.Runes.Any(r => r.Id == rune.Id)) {
 				UpdateRune(rune);
 				return;
@@ -1086,8 +966,7 @@ namespace RuneApp
 			}
 		}
 
-		public static void DeleteMonster(Monster mon)
-		{
+		public static void DeleteMonster(Monster mon) {
 			var m = data.GetMonster(mon.Id);
 			data.Monsters.Remove(m);
 
@@ -1095,8 +974,7 @@ namespace RuneApp
 			OnMonsterUpdate?.Invoke(mon, true);
 		}
 
-		public static void DeleteRune(Rune rune)
-		{
+		public static void DeleteRune(Rune rune) {
 			var r = data.GetRune(rune.Id);
 			data.Runes.Remove(r);
 
@@ -1104,8 +982,7 @@ namespace RuneApp
 			OnRuneUpdate?.Invoke(rune, true);
 		}
 
-		public static void UpdateMonster(Monster mon)
-		{
+		public static void UpdateMonster(Monster mon) {
 			var m = data.GetMonster(mon.Id);
 			if (m == null) {
 				AddMonster(mon);
@@ -1129,8 +1006,7 @@ namespace RuneApp
 
 			for (int i = 0; i < 6; i++) {
 				var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
-				if (rl != null)
-				{
+				if (rl != null) {
 					var rune = data.GetRune(rl.Id);
 					if (rune.AssignedId != m.Id && rune.AssignedId > 0) {
 						var om = data.GetMonster(rune.AssignedId);
@@ -1165,8 +1041,7 @@ namespace RuneApp
 			OnMonsterUpdate?.Invoke(m, false);
 		}
 
-		public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null)
-		{
+		public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null) {
 			var r = data.GetRune(rune.Id);
 			if (r == null)
 				return;
@@ -1219,21 +1094,17 @@ namespace RuneApp
 
 
 		#region Extension Methods
-		public static bool IsConnected(this Socket socket)
-		{
-			try
-			{
+		public static bool IsConnected(this Socket socket) {
+			try {
 				return !(socket.Poll(1, SelectMode.SelectRead) && socket.Available == 0);
 			}
 			catch (SocketException) { return false; }
 		}
 
-		public static double StandardDeviation<T>(this IEnumerable<T> src, Func<T, double> selector)
-		{
+		public static double StandardDeviation<T>(this IEnumerable<T> src, Func<T, double> selector) {
 			double av = src.Where(p => Math.Abs(selector(p)) > 0.00000001).Average(selector);
 			List<double> nls = new List<double>();
-			foreach (var o in src.Where(p => Math.Abs(selector(p)) > 0.00000001))
-			{
+			foreach (var o in src.Where(p => Math.Abs(selector(p)) > 0.00000001)) {
 				nls.Add((selector(o) - av) * (selector(o) - av));
 			}
 			double avs = nls.Average();
@@ -1241,8 +1112,7 @@ namespace RuneApp
 		}
 
 		public static T MakeControl<T>(this Control.ControlCollection ctrlC, string name, string suff, int x, int y, int w = 40, int h = 20, string text = null)
-			where T : Control, new()
-		{
+			where T : Control, new() {
 			T ctrl = new T()
 			{
 				Name = name + suff,
@@ -1256,8 +1126,7 @@ namespace RuneApp
 		}
 
 		//http://stackoverflow.com/a/77233
-		public static void SetDoubleBuffered(this System.Windows.Forms.Control c)
-		{
+		public static void SetDoubleBuffered(this System.Windows.Forms.Control c) {
 			//Taxes: Remote Desktop Connection and painting
 			//http://blogs.msdn.com/oldnewthing/archive/2006/01/03/508694.aspx
 			if (System.Windows.Forms.SystemInformation.TerminalServerSession)

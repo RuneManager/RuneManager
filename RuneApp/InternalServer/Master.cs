@@ -13,8 +13,7 @@ namespace RuneApp.InternalServer {
 	/// Connects and manages slaves.
 	/// Also acts as the server for the remote management app.
 	/// </summary>
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 #if !TEST_SLAVE
 		public static log4net.ILog Log { get { return Program.log; } }
 #else
@@ -38,18 +37,14 @@ namespace RuneApp.InternalServer {
 		/// <summary>
 		/// Dispatches a thread to listen for the incoming Remote App connection
 		/// </summary>
-		public void Start()
-		{
-			try
-			{
-				try
-				{
+		public void Start() {
+			try {
+				try {
 					listener = new HttpListener();
 					listener.Prefixes.Add("http://*:7676/");
 					listener.Start();
 				}
-				catch
-				{
+				catch {
 					Log.Error("Failed to bind to *, binding to localhost");
 					listener = new HttpListener();
 					listener.Prefixes.Add("http://localhost:7676/");
@@ -59,39 +54,32 @@ namespace RuneApp.InternalServer {
 				Log.Info("Server is listening on " + listener.Prefixes.First());
 				isRunning = true;
 			}
-			catch (Exception e)
-			{
+			catch (Exception e) {
 				Log.Error("Failed to start server", e);
 				throw;
 			}
 
-			Task.Factory.StartNew(() =>
-			{
-				try
-				{
-					while (isRunning)
-					{
+			Task.Factory.StartNew(() => {
+				try {
+					while (isRunning) {
 						Log.Info("Waiting for a connection...");
 						var context = listener.GetContext();
 						new Thread(() => RemoteManageLoop(context)).Start();
 					}
 				}
-				catch (Exception e)
-				{
+				catch (Exception e) {
 					Log.Error("Failed while running server", e);
 				}
 				isRunning = false;
 			}, TaskCreationOptions.LongRunning);
 		}
 
-		public void Stop()
-		{
+		public void Stop() {
 			listener.Stop();
 			listener.Close();
 
 			DateTime start = DateTime.Now;
-			while (DateTime.Now - start < new TimeSpan(0,0,5))
-			{
+			while (DateTime.Now - start < new TimeSpan(0, 0, 5)) {
 				Thread.Sleep(100);
 				if (!isRunning)
 					return;
@@ -99,125 +87,107 @@ namespace RuneApp.InternalServer {
 			throw new TaskCanceledException("Failed to stop server!");
 		}
 
-		public async void RemoteManageLoop(HttpListenerContext context)
-		{
-			Log.Debug("serving: " + context.Request.RawUrl);
-			var req = context.Request;
-			var resp = context.Response;
+		public async void RemoteManageLoop(HttpListenerContext context) {
+			try {
+				Log.Debug("serving: " + context.Request.RawUrl);
+				var req = context.Request;
+				var resp = context.Response;
 
-			var msg = getResponse(req);
-			resp.StatusCode = (int)msg.StatusCode;
-			Log.Debug("returning: " + resp.StatusCode);
-			foreach (var h in msg.Headers)
-			{
-				foreach (var v in h.Value)
-				{
-					resp.Headers.Add(h.Key, v);
+				var msg = getResponse(req);
+				resp.StatusCode = (int)msg.StatusCode;
+				Log.Debug("returning: " + resp.StatusCode);
+				foreach (var h in msg.Headers) {
+					foreach (var v in h.Value) {
+						resp.Headers.Add(h.Key, v);
+					}
 				}
-			}
 
-			if (resp.StatusCode != 303)
-			{
-				using (var output = resp.OutputStream)
-				{
-					byte[] outBytes = Encoding.UTF8.GetBytes("Critical Failure");
-					bool expires = false;
-					if (msg.Content is StringContent)
-					{
-						var qw = msg.Content as StringContent;
-						string qq = await qw.ReadAsStringAsync();
-						resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
-						if (resp.ContentType == null)
-							resp.ContentType = "text/html";					// Default to HTML
-						outBytes = Encoding.UTF8.GetBytes(qq);
-					}
-					else if (msg.Content is FileContent)
-					{
-						var qw = msg.Content as FileContent;
-						resp.ContentType = qw.Type;
-						if (resp.ContentType == null)
-							resp.ContentType = "application/octet-stream";	// Should always be set, but bin just incase
-						//resp.Headers.Add("Content-Disposition", $"attachment; filename=\"{qw.FileName}\"");
-						outBytes = await qw.ReadAsByteArrayAsync();
-					}
-					else if (msg.Content is ByteArrayContent)
-					{
-						var qw = msg.Content as ByteArrayContent;
-						resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
-						if (resp.ContentType == null)
-							resp.ContentType = "application/octet-stream";	// Default to binary
-						outBytes = await qw.ReadAsByteArrayAsync();
-					}
-					else if (msg.Content is StreamContent)
-					{
-						var qw = msg.Content as StreamContent;
-						using (var ms = new MemoryStream())
-						{
-							var stream = await qw.ReadAsStreamAsync();
-							stream.CopyTo(ms);
-							//resp.ContentType = "application/octet-stream"
-							outBytes = ms.ToArray();
+				if (resp.StatusCode != 303) {
+					using (var output = resp.OutputStream) {
+						byte[] outBytes = Encoding.UTF8.GetBytes("Critical Failure");
+						bool expires = false;
+						if (msg.Content is StringContent) {
+							var qw = msg.Content as StringContent;
+							string qq = await qw.ReadAsStringAsync();
+							resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
+							if (resp.ContentType == null)
+								resp.ContentType = "text/html";                 // Default to HTML
+							outBytes = Encoding.UTF8.GetBytes(qq);
 						}
-					}
-					//resp.Headers.Add("Content-language", "en-au");
-					resp.Headers.Add("Access-Control-Allow-Origin: *");
-					resp.Headers.Add("Access-Control-Allow-Methods: *");
-
-					if (expires)
-					{
-						resp.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
-						resp.Headers.Add("Pragma", "no-cache");
-						resp.Headers.Add("Expires", "Wed, 16 Jul 1969 13:32:00 UTC");
-					}
-
-					if ((outBytes.Length > 0) && (resp.ContentType != "image/png")) {	// Don't compress empty responses or compressed file types
-						var enc = req.Headers.GetValues("Accept-Encoding");
-
-						if (enc?.Contains("gzip") ?? false) {
-							using (MemoryStream ms = new MemoryStream())
-							using (System.IO.Compression.GZipStream gs = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress)) {
-								gs.Write(outBytes, 0, outBytes.Length);
-								gs.Flush();
-								gs.Close();     // https://stackoverflow.com/questions/3722192/how-do-i-use-gzipstream-with-system-io-memorystream#comment3929538_3722263
-								ms.Flush();
+						else if (msg.Content is FileContent) {
+							var qw = msg.Content as FileContent;
+							resp.ContentType = qw.Type;
+							if (resp.ContentType == null)
+								resp.ContentType = "application/octet-stream";  // Should always be set, but bin just incase
+																				//resp.Headers.Add("Content-Disposition", $"attachment; filename=\"{qw.FileName}\"");
+							outBytes = await qw.ReadAsByteArrayAsync();
+						}
+						else if (msg.Content is ByteArrayContent) {
+							var qw = msg.Content as ByteArrayContent;
+							resp.ContentType = mimeTypes.Where(t => req.Url.AbsolutePath.EndsWith(t.Key)).FirstOrDefault().Value;
+							if (resp.ContentType == null)
+								resp.ContentType = "application/octet-stream";  // Default to binary
+							outBytes = await qw.ReadAsByteArrayAsync();
+						}
+						else if (msg.Content is StreamContent) {
+							var qw = msg.Content as StreamContent;
+							using (var ms = new MemoryStream()) {
+								var stream = await qw.ReadAsStreamAsync();
+								stream.CopyTo(ms);
+								//resp.ContentType = "application/octet-stream"
 								outBytes = ms.ToArray();
 							}
-							resp.Headers.Add("Content-Encoding", "gzip");
 						}
-						else if (enc?.Any(a => a.ToLowerInvariant() == "deflate") ?? false) {
-							using (MemoryStream ms = new MemoryStream()) {
-								using (System.IO.Compression.DeflateStream ds = new System.IO.Compression.DeflateStream(ms, System.IO.Compression.CompressionMode.Compress)) {
-									ds.Write(outBytes, 0, outBytes.Length);
-									ds.Flush();
+						//resp.Headers.Add("Content-language", "en-au");
+						resp.Headers.Add("Access-Control-Allow-Origin: *");
+						resp.Headers.Add("Access-Control-Allow-Methods: *");
+
+						if (expires) {
+							resp.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate");
+							resp.Headers.Add("Pragma", "no-cache");
+							resp.Headers.Add("Expires", "Wed, 16 Jul 1969 13:32:00 UTC");
+						}
+
+						if ((outBytes.Length > 0) && (resp.ContentType != "image/png")) {   // Don't compress empty responses or compressed file types
+							var enc = req.Headers.GetValues("Accept-Encoding");
+
+							if (enc?.Contains("gzip") ?? false) {
+								using (MemoryStream ms = new MemoryStream())
+								using (System.IO.Compression.GZipStream gs = new System.IO.Compression.GZipStream(ms, System.IO.Compression.CompressionMode.Compress)) {
+									gs.Write(outBytes, 0, outBytes.Length);
+									gs.Flush();
+									gs.Close();     // https://stackoverflow.com/questions/3722192/how-do-i-use-gzipstream-with-system-io-memorystream#comment3929538_3722263
+									ms.Flush();
+									outBytes = ms.ToArray();
 								}
-								ms.Flush();
-								outBytes = ms.ToArray();
+								resp.Headers.Add("Content-Encoding", "gzip");
 							}
-							resp.Headers.Add("Content-Encoding", "deflate");
+							else if (enc?.Any(a => a.ToLowerInvariant() == "deflate") ?? false) {
+								using (MemoryStream ms = new MemoryStream()) {
+									using (System.IO.Compression.DeflateStream ds = new System.IO.Compression.DeflateStream(ms, System.IO.Compression.CompressionMode.Compress)) {
+										ds.Write(outBytes, 0, outBytes.Length);
+										ds.Flush();
+									}
+									ms.Flush();
+									outBytes = ms.ToArray();
+								}
+								resp.Headers.Add("Content-Encoding", "deflate");
+							}
 						}
-					}
 
-					resp.ContentLength64 = outBytes.Length;
-					try
-					{
+						resp.ContentLength64 = outBytes.Length;
+						try {
 						output.Write(outBytes, 0, outBytes.Length);
 					}
-					catch (Exception ex)
-					{
+					catch (Exception ex) {
 						Program.log.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
 					}
 				}
 			}
-			else
-			{
-				resp.OutputStream.Close();
-			}
 		}
 
-		public HttpResponseMessage getResponse(HttpListenerRequest req)
-		{
-			if (req.AcceptTypes == null)
-			{
+		public HttpResponseMessage getResponse(HttpListenerRequest req) {
+			if (req.AcceptTypes == null) {
 				//TODO: topkek return new HttpResponseMessage(HttpStatusCode.NotAcceptable);
 			}
 
@@ -234,26 +204,23 @@ namespace RuneApp.InternalServer {
 			return this.Render(req, locList.ToArray());
 
 			//<html><head><script src='/script.js'></script></head><body><button id='button1' style='width:50px' onclick='javascript:startProgress();'>Start</button></body></html>
-			
+
 		}
 
-		private string getUrlComp(string url, int comp)
-		{
+		private string getUrlComp(string url, int comp) {
 			if (url.Contains("?"))
 				url = url.Remove(url.IndexOf("?"));
 			var array = url.Split('/');
 			if (array.Length > comp && !string.IsNullOrWhiteSpace(array[comp]))
 				return array[comp];
-			
+
 			return null;
 		}
 
 		#region Address Rendering
 
-		public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-		{
-			if (uri == null || uri.Length == 0 || uri[0] == "/")
-			{
+		public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+			if (uri == null || uri.Length == 0 || uri[0] == "/") {
 				return returnHtml(null, "Check my thingo!<br/>",
 					new ServedResult("a") { contentDic = { { "href", "api" } }, contentList = { "Api docs" } }, "<br/>",
 					new ServedResult("a") { contentDic = { { "href", "runes" } }, contentList = { "Rune list" } }, "<br/>",
@@ -265,20 +232,17 @@ namespace RuneApp.InternalServer {
 					new ServedResult("a") { contentDic = { { "href", "css" } }, contentList = { "Choose a theme!" } }, "<br/>",
 					"<br/>");
 			}
-			else
-			{
+			else {
 				return Recurse(req, uri);
 			}
 		}
 
-		protected static HttpResponseMessage return404()
-		{
+		protected static HttpResponseMessage return404() {
 			// TODO:
 			return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("404 lol") };
 		}
 
-		protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body)
-		{
+		protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body) {
 			var bb = new StringBuilder();
 			if (body != null)
 				foreach (var b in body)
@@ -298,40 +262,34 @@ namespace RuneApp.InternalServer {
 
 			return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(html) };
 		}
-		
+
 		[System.AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
-		public class PageAddressRenderAttribute : Attribute
-		{
+		public class PageAddressRenderAttribute : Attribute {
 			readonly string pageAddress;
 
-			public PageAddressRenderAttribute(string pageAddress)
-			{
+			public PageAddressRenderAttribute(string pageAddress) {
 				this.pageAddress = pageAddress;
 			}
 
-			public string PageAddress
-			{
+			public string PageAddress {
 				get { return pageAddress; }
 			}
 		}
 
 		[System.AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
-		sealed class HttpMethodAttribute : Attribute
-		{
+		sealed class HttpMethodAttribute : Attribute {
 			readonly string method;
 
-			public HttpMethodAttribute(string method)
-			{
+			public HttpMethodAttribute(string method) {
 				this.method = method;
 			}
 
-			public string Method
-			{
+			public string Method {
 				get { return method; }
 			}
 		}
 
 		#endregion
 	}
-	
+
 }

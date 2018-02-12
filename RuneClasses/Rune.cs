@@ -5,8 +5,7 @@ using Newtonsoft.Json;
 using System.Collections.Concurrent;
 
 namespace RuneOptim {
-	public partial class Rune : RuneLink
-	{
+	public partial class Rune : RuneLink {
 		#region JSON Props
 
 		[JsonProperty("set_id")]
@@ -87,7 +86,7 @@ namespace RuneOptim {
 
 		[JsonIgnore]
 		public int[] Accuracy = new int[32];
-		
+
 		[JsonIgnore]
 		public int[] Resistance = new int[32];
 
@@ -95,7 +94,7 @@ namespace RuneOptim {
 
 		[JsonIgnore]
 		public Monster Assigned;
-		
+
 		[JsonIgnore]
 		public bool Swapped = false;
 
@@ -109,10 +108,8 @@ namespace RuneOptim {
 		private bool? setIs4;
 
 		[JsonIgnore]
-		public bool SetIs4
-		{
-			get
-			{
+		public bool SetIs4 {
+			get {
 				return setIs4 ?? (setIs4 = (Rune.SetRequired(this.Set) == 4)).Value;
 			}
 		}
@@ -121,28 +118,24 @@ namespace RuneOptim {
 		public int UnequipCost { get { return UnequipCosts[Grade - 1]; } }
 
 		[JsonIgnore]
-		public int Rarity
-		{
-			get
-			{
+		public int Rarity {
+			get {
 				// TODO: base-rarity is a thing now, consider this
 				return Subs.Count;
 			}
 		}
 
-		public event EventHandler<EventArgs> OnUpdate; 
+		public event EventHandler<EventArgs> OnUpdate;
 
-		public Rune()
-		{
+		public Rune() {
 			Main = new RuneAttr();
 			Innate = new RuneAttr();
 			Main.OnChanged += (a, b) => { PrebuildAttributes(); };
 			Innate.OnChanged += (a, b) => { PrebuildAttributes(); };
 			Subs = new List<RuneAttr>();
 		}
-		
-		public void CopyTo(Rune rhs, bool keepLocked, Monster newAssigned)
-		{
+
+		public void CopyTo(Rune rhs, bool keepLocked, Monster newAssigned) {
 			// TODO
 			rhs.Freeze();
 
@@ -168,8 +161,7 @@ namespace RuneOptim {
 			rhs.Unfreeze();
 			rhs.PrebuildAttributes();
 
-			if (rhs.AssignedId != AssignedId)
-			{
+			if (rhs.AssignedId != AssignedId) {
 				if (AssignedId == 0) {
 					rhs.AssignedName = "Inventory";
 					rhs.Assigned = null;
@@ -187,34 +179,27 @@ namespace RuneOptim {
 			}
 		}
 
-		protected void Freeze()
-		{
+		protected void Freeze() {
 			Main.PreventOnChange = true;
 			Innate.PreventOnChange = true;
-			foreach (var s in Subs)
-			{
+			foreach (var s in Subs) {
 				s.PreventOnChange = true;
 			}
 		}
 
-		protected void Unfreeze()
-		{
+		protected void Unfreeze() {
 			Main.PreventOnChange = false;
 			Innate.PreventOnChange = false;
-			foreach (var s in Subs)
-			{
+			foreach (var s in Subs) {
 				s.PreventOnChange = false;
 			}
 		}
 
 		// fast iterate over rune stat types
-		public int this[string stat, int fake, bool pred]
-		{
-			get
-			{
+		public int this[string stat, int fake, bool pred] {
+			get {
 				int ind = pred ? fake + 16 : fake;
-				switch (stat)
-				{
+				switch (stat) {
 					case "HPflat":
 						return HealthFlat[ind];
 					case "HPperc":
@@ -244,13 +229,10 @@ namespace RuneOptim {
 		}
 
 		// fast iterate over rune stat types
-		public int this[Attr stat, int fake, bool pred]
-		{
-			get
-			{
+		public int this[Attr stat, int fake, bool pred] {
+			get {
 				int ind = pred ? fake + 16 : fake;
-				switch (stat)
-				{
+				switch (stat) {
 					case Attr.HealthFlat:
 						return HealthFlat[ind];
 					case Attr.HealthPercent:
@@ -280,26 +262,22 @@ namespace RuneOptim {
 		}
 
 		[JsonIgnore]
-		public bool IsUnassigned
-		{
-			get
-			{
+		public bool IsUnassigned {
+			get {
 				if (this.AssignedId == 0) return true;
 				return new string[] { "Unknown name", "Inventory", "Unknown name (???[0])" }.Any(s => s.Equals(this.AssignedName));
 			}
 		}
-		
-		public void ResetStats()
-		{
+
+		public void ResetStats() {
 			manageStats.Clear();
 		}
 
 		// Number of sets
 		public static readonly int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
-		
+
 		// Number of runes required for set to be complete
-		public static int SetRequired(RuneSet set)
-		{
+		public static int SetRequired(RuneSet set) {
 			if (set == RuneSet.Swift || set == RuneSet.Fatal || set == RuneSet.Violent || set == RuneSet.Vampire || set == RuneSet.Despair || set == RuneSet.Rage)
 				return 4;
 			// Not a 4 set => is a 2 set
@@ -307,20 +285,17 @@ namespace RuneOptim {
 		}
 
 		// Format rune values okayish
-		public string StringIt()
-		{
+		public string StringIt() {
 			return StringIt(Main.Type, Main.Value);
 		}
 
-		public static string StringIt(Attr type, int? val)
-		{
+		public static string StringIt(Attr type, int? val) {
 			if (type <= Attr.Null || !val.HasValue)
 				return "";
 			return StringIt(type, val.Value);
 		}
 
-		public static string StringIt(Attr type, int val)
-		{
+		public static string StringIt(Attr type, int val) {
 			if (type <= Attr.Null)
 				return "";
 
@@ -328,28 +303,24 @@ namespace RuneOptim {
 
 			ret += " +" + val;
 
-			if (type.ToString().Contains("Percent") || type == Attr.CritRate || type == Attr.CritDamage || type == Attr.Accuracy || type == Attr.Resistance)
-			{
+			if (type.ToString().Contains("Percent") || type == Attr.CritRate || type == Attr.CritDamage || type == Attr.Accuracy || type == Attr.Resistance) {
 				ret += "%";
 			}
 
 			return ret;
 		}
-		
-		public static string StringIt(List<RuneAttr> subs, int v)
-		{
+
+		public static string StringIt(List<RuneAttr> subs, int v) {
 			if (subs.Count > v)
 				return StringIt(subs[v].Type, subs[v].Value);
 			return "";
 		}
-		
+
 		// Ask the rune for the value of the Attribute type as a string
-		public static string StringIt(Attr type, bool suffix = false)
-		{
+		public static string StringIt(Attr type, bool suffix = false) {
 			string ret = "";
 
-			switch (type)
-			{
+			switch (type) {
 				case Attr.HealthFlat:
 				case Attr.HealthPercent:
 					ret += "HP";
@@ -385,14 +356,12 @@ namespace RuneOptim {
 		}
 
 		// Debugger niceness
-		public override string ToString()
-		{
+		public override string ToString() {
 			return Grade + "* " + Set + " " + StringIt();
 		}
 
 		// Gets the value of that Attribute on this rune
-		public int GetValue(Attr stat, int FakeLevel = -1, bool PredictSubs = false)
-		{
+		public int GetValue(Attr stat, int FakeLevel = -1, bool PredictSubs = false) {
 			if (Main == null) return -1;
 			// the stat can only be present once per rune, early exit
 			if (Main.Type == stat && FakeLevel <= 15 && FakeLevel > Level)
@@ -403,15 +372,13 @@ namespace RuneOptim {
 			// Need to be able to load in null values (requiring int?) but xType shouldn't be a Type if xValue is null
 			if (Innate.Type == stat) return Innate.Value;
 			// Here, if a subs type is null, there is not further subs (it's how runes work), so we quit early.
-			if (!PredictSubs)
-			{
+			if (!PredictSubs) {
 				if (Subs.Count > 0 && (Subs[0].Type == stat || Subs[0].Type <= Attr.Null)) return Subs[0].Value;
 				else if (Subs.Count > 1 && (Subs[1].Type == stat || Subs[1].Type <= Attr.Null)) return Subs[1].Value;
 				else if (Subs.Count > 2 && (Subs[2].Type == stat || Subs[2].Type <= Attr.Null)) return Subs[2].Value;
 				else if (Subs.Count > 3 && (Subs[3].Type == stat || Subs[3].Type <= Attr.Null)) return Subs[3].Value;
 			}
-			else
-			{
+			else {
 				// count how many upgrades have gone into the rune
 				int maxUpgrades = Math.Min(Rarity, Math.Max(Level, FakeLevel) / 3);
 				int upgradesGone = Math.Min(4, Level / 3);
@@ -420,7 +387,7 @@ namespace RuneOptim {
 				// how many subs will go into existing stats (0 legend will be 4 - 0 - 0 = 4, 6 rare will be 4 - 1 - 2 = 1, 6 magic will be 4 - 2 - 2 = 0)
 				int subEx = maxUpgrades - upgradesGone;// - subNew;
 				int subVal = subNew * RuneProperties.MainValues[stat][this.Grade - 1][0] / 8;
-				
+
 				// TODO: sub prediction
 				if (Subs.Count == 0) return subVal;
 				if (Subs[0].Type == stat) return Subs[0].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
@@ -432,68 +399,56 @@ namespace RuneOptim {
 				if (Subs[3].Type == stat) return Subs[3].Value + subEx * (RuneProperties.MainValues[stat][this.Grade - 1][0] / Subs.Count);
 				return subVal;
 			}
-		
+
 			return 0;
 		}
 
 		// Does it have this stat at all?
 		// TODO: should I listen to fake/pred?
-		public bool HasStat(Attr stat, int fake = -1, bool pred = false)
-		{
+		public bool HasStat(Attr stat, int fake = -1, bool pred = false) {
 			if (GetValue(stat, fake, pred) > 0)
 				return true;
 			return false;
 		}
 
 		// For each non-zero stat in flat and percent, divide the runes value and see if any >= test
-		public bool Or(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false)
-		{
-			foreach (Attr attr in Build.statEnums)
-			{
+		public bool Or(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false) {
+			foreach (Attr attr in Build.statEnums) {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] >= rTest[attr])
-						return true;
+					return true;
 			}
-			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
-			{
+			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat }) {
 				if (!rFlat[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rFlat[attr] >= rTest[attr])
-						return true;
+					return true;
 			}
 			return false;
 		}
 
 		// For each non-zero stat in flat and percent, divide the runes value and see if *ALL* >= test
-		public bool And(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false)
-		{
-			foreach (Attr attr in Build.statEnums)
-			{
+		public bool And(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false) {
+			foreach (Attr attr in Build.statEnums) {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] < rTest[attr])
-						return false;
+					return false;
 			}
-			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
-			{
+			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat }) {
 				if (!rFlat[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rFlat[attr] < rTest[attr])
-						return false;
+					return false;
 			}
 			return true;
 		}
 
 		// sum the result of dividing the runes value by flat/percent per stat
-		public double Test(Stats rFlat, Stats rPerc, int fake = -1, bool pred = false)
-		{
+		public double Test(Stats rFlat, Stats rPerc, int fake = -1, bool pred = false) {
 			double val = 0;
-			foreach (Attr attr in Build.statEnums)
-			{
-				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0))
-				{
+			foreach (Attr attr in Build.statEnums) {
+				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0)) {
 					if (!System.Diagnostics.Debugger.IsAttached)
 						RuneLog.Debug(attr + ": " + this[attr, fake, pred] + "/" + rPerc[attr] + (this[attr, fake, pred] / rPerc[attr]));
 					val += this[attr, fake, pred] / rPerc[attr];
 				}
 			}
-			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat })
-			{
-				if (!rFlat[attr].EqualTo(0))
-				{
+			foreach (Attr attr in new Attr[] { Attr.Speed, Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat }) {
+				if (!rFlat[attr].EqualTo(0)) {
 					if (!System.Diagnostics.Debugger.IsAttached)
 						RuneLog.Debug(attr + ": " + this[attr, fake, pred] + "/" + rFlat[attr] + (this[attr, fake, pred] / rFlat[attr]));
 					val += this[attr, fake, pred] / rFlat[attr];
@@ -503,8 +458,7 @@ namespace RuneOptim {
 			return val;
 		}
 
-		public void PrebuildAttributes()
-		{
+		public void PrebuildAttributes() {
 			Accuracy = PrebuildAttribute(Attr.Accuracy);
 			AttackFlat = PrebuildAttribute(Attr.AttackFlat);
 			AttackPercent = PrebuildAttribute(Attr.AttackPercent);
@@ -519,21 +473,17 @@ namespace RuneOptim {
 			OnUpdate?.Invoke(this, null);
 		}
 
-		private int[] PrebuildAttribute(Attr a)
-		{
+		private int[] PrebuildAttribute(Attr a) {
 			int[] vs = new int[32];
-			for (int i = 0; i < 16; i++)
-			{
+			for (int i = 0; i < 16; i++) {
 				vs[i] = GetValue(a, i, false);
 				vs[i + 16] = GetValue(a, i, true);
 			}
 			return vs;
 		}
 
-		public void SetValue(int p, Attr a, int v)
-		{
-			switch (p)
-			{
+		public void SetValue(int p, Attr a, int v) {
+			switch (p) {
 				case -1:
 					Innate.Type = a;
 					Innate.Value = v;

@@ -8,17 +8,15 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Collections.Concurrent;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	// Generates a bunch of builds to preview the stats
-	public partial class GenerateLive : Form
-	{
+	public partial class GenerateLive : Form {
 		// the build to use
 		public Build build;
 
 		// if making builds
 		bool building;
-		
+
 		bool changedSpec = true;
 
 		bool listGenCancelled = false;
@@ -38,16 +36,13 @@ namespace RuneApp
 
 		List<Monster> currentList = new List<Monster>();
 
-		class RuneKey : IEquatable<RuneKey>
-		{
+		class RuneKey : IEquatable<RuneKey> {
 			public Rune[] rs;
-			public RuneKey(params Rune[] ii)
-			{
+			public RuneKey(params Rune[] ii) {
 				rs = ii;
 			}
-			
-			public bool Equals(RuneKey other)
-			{
+
+			public bool Equals(RuneKey other) {
 				return !(other.rs[0].Id != rs[0].Id ||
 					other.rs[1].Id != rs[1].Id ||
 					other.rs[2].Id != rs[2].Id ||
@@ -56,8 +51,7 @@ namespace RuneApp
 					other.rs[5].Id != rs[5].Id);
 			}
 
-			public override bool Equals(object obj)
-			{
+			public override bool Equals(object obj) {
 				RuneKey rk;
 				if ((rk = obj as RuneKey) != null)
 					return !(rk.rs[0].Id != rs[0].Id ||
@@ -70,8 +64,7 @@ namespace RuneApp
 				return (GetHashCode() == obj.GetHashCode());
 			}
 
-			public override int GetHashCode()
-			{
+			public override int GetHashCode() {
 				var res = 0;
 				res = (res * 397) ^ (int)rs[0].Id;
 				res = (res * 397) ^ (int)rs[1].Id;
@@ -82,14 +75,12 @@ namespace RuneApp
 				return res;
 			}
 
-			public override string ToString()
-			{
+			public override string ToString() {
 				return rs[0].Id + "," + rs[1].Id + "," + rs[2].Id + "," + rs[3].Id + "," + rs[4].Id + "," + rs[5].Id;
 			}
 		}
 
-		public bool IsOkayBuild(Monster test)
-		{
+		public bool IsOkayBuild(Monster test) {
 
 			bool isBad = false;
 
@@ -107,10 +98,9 @@ namespace RuneApp
 			return !isBad;
 		}
 
-		public GenerateLive(Build bb)
-		{
+		public GenerateLive(Build bb) {
 			InitializeComponent();
-			
+
 			// master has given Gener a Build?
 			build = bb;
 
@@ -119,9 +109,8 @@ namespace RuneApp
 			// sort decending on POINTS
 			sorter.OnColumnClick(0, false);
 			loadoutList.ListViewItemSorter = sorter;
-			
-			foreach (Attr stat in Build.statAll)
-			{
+
+			foreach (Attr stat in Build.statAll) {
 				loadoutList.Columns.Add(stat.ToShortForm()).Width = 80;
 			}
 
@@ -131,15 +120,12 @@ namespace RuneApp
 
 			//for (int i = 0; i < 20; i++)
 			{
-				Task.Factory.StartNew(() =>
-				{
+				Task.Factory.StartNew(() => {
 					DateTime start = DateTime.Now;
-					while (true)
-					{
+					while (true) {
 						long total = getTotal();
 						var partitioner = Partitioner.Create(buildsToGen.GetConsumingEnumerable(), EnumerablePartitionerOptions.NoBuffering);
-						Parallel.ForEach(partitioner, (batch, state) =>
-						{
+						Parallel.ForEach(partitioner, (batch, state) => {
 							//string compKey = batch;// buildsToGen.Take();
 							if (batch.rs[0].Id == 638 &&
 								batch.rs[1].Id == 465 &&
@@ -150,20 +136,16 @@ namespace RuneApp
 								total -= 1;
 
 
-								var tb = build.GenBuild(batch.rs);
-							if (tb != null)
-							{
+							var tb = build.GenBuild(batch.rs);
+							if (tb != null) {
 								//Console.WriteLine("Created build " + compKey);
 								freshMons.Add(tb);
 								monsList.AddOrUpdate(batch, tb, (k, v) => tb);
 							}
 
-							if (buildsToGen.Count == 0 || DateTime.Now > start.AddSeconds(1))
-							{
-								if (!IsDisposed && progState == 1)
-								{
-									Invoke((MethodInvoker)delegate
-									{
+							if (buildsToGen.Count == 0 || DateTime.Now > start.AddSeconds(1)) {
+								if (!IsDisposed && progState == 1) {
+									Invoke((MethodInvoker)delegate {
 										int num = buildsToGen.Count;
 										// put the thing in on the main thread and bump the progress bar
 										int v = (int)(toolStripProgressBar1.Maximum * num / (double)total);
@@ -176,8 +158,7 @@ namespace RuneApp
 								start = DateTime.Now;
 							}
 						});
-						Invoke((MethodInvoker)delegate
-						{
+						Invoke((MethodInvoker)delegate {
 							int num = buildsToGen.Count;
 							// put the thing in on the main thread and bump the progress bar
 							int v = (int)(toolStripProgressBar1.Maximum * num / (double)total);
@@ -189,66 +170,55 @@ namespace RuneApp
 				});
 			}
 
-			Task.Factory.StartNew(() =>
-			{
-				while (true)
-				{
+			Task.Factory.StartNew(() => {
+				while (true) {
 					bool hasChanged = false;
 					Monster fresh;
-					if (freshMons.TryTake(out fresh))
-					{
+					if (freshMons.TryTake(out fresh)) {
 						if (fresh.score == 0)
 							fresh.score = build.CalcScore(fresh);
 						//Console.WriteLine("Checking build " + string.Join(",", fresh.Current.Runes.Select(r => r.ID.ToString())));
-						if (currentList.Count < Program.Settings.TestShow || fresh.score > currentList.Min(qq => qq.score))
-						{
+						if (currentList.Count < Program.Settings.TestShow || fresh.score > currentList.Min(qq => qq.score)) {
 							currentList.Add(fresh); //.Where(IsOkayBuild)
 							currentList = currentList.OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
 							hasChanged = true;
 						}
 					}
 
-					if (changedSpec && monsList.Count > 0)
-					{
+					if (changedSpec && monsList.Count > 0) {
 						// todo: recheck min/max //  && IsOkayBuild(m.Value)
 						currentList = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
 						if (currentList.Count > 0)
 							hasChanged = true;
 					}
 
-					if (!hasChanged)
-					{
+					if (!hasChanged) {
 						//Thread.Sleep(50);
 						continue;
 					}
 
 					IEnumerable<Monster> llist = currentList.ToList();
 					List<ListViewItem> ilist = null;
-					Invoke((MethodInvoker)delegate
-					{
+					Invoke((MethodInvoker)delegate {
 						ilist = loadoutList.Items.Cast<ListViewItem>().ToList();
-					}); 
+					});
 
-					foreach (var li in ilist)
-					{
+					foreach (var li in ilist) {
 						if (listGenCancelled)
 							break;
 
 						var mon = li.Tag as Monster;
 						if (mon == null)
 							continue;
-						
+
 						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.Id.ToString()));
-						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey))
-						{
+						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey)) {
 							// new list doen't contain old build
-							Invoke((MethodInvoker) delegate 
-							{
+							Invoke((MethodInvoker)delegate {
 								li.Remove();
 							});
 						}
-						else
-						{
+						else {
 							currentList.Add(mon);
 							// new list does contain old build
 							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey));
@@ -258,8 +228,7 @@ namespace RuneApp
 					if (listGenCancelled)
 						return;
 
-					foreach (var b in llist)
-					{
+					foreach (var b in llist) {
 						if (listGenCancelled)
 							break;
 
@@ -270,8 +239,7 @@ namespace RuneApp
 
 						int underSpec = 0;
 						int under12 = 0;
-						foreach (var r in b.Current.Runes)
-						{
+						foreach (var r in b.Current.Runes) {
 							if (r.Level < 12)
 								under12 += 12 - r.Level;
 							if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
@@ -288,34 +256,28 @@ namespace RuneApp
 						li.Tag = b;
 						if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.Locked))
 							li.ForeColor = Color.Gray;
-						else
-						{
+						else {
 							if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-							{
+								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
 								li.ForeColor = Color.Green;
 							}
-							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
-							{
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2)) {
 								li.ForeColor = Color.Goldenrod;
 							}
-							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-							{
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
 								li.ForeColor = Color.DarkBlue;
 							}
 						}
 
-						if (!IsDisposed && IsHandleCreated)
-						{
-							Invoke((MethodInvoker)delegate
-							{
+						if (!IsDisposed && IsHandleCreated) {
+							Invoke((MethodInvoker)delegate {
 								// put the thing in on the main thread and bump the progress bar
 								loadoutList.Items.Add(li);
 							});
 						}
 					}
 					changedSpec = false;
-					
+
 				}
 			});
 
@@ -324,14 +286,12 @@ namespace RuneApp
 
 		}
 
-		public void textBox_TextChanged(object sender, EventArgs e)
-		{
+		public void textBox_TextChanged(object sender, EventArgs e) {
 			// if we are generating builds, don't recalculate all the builds
 			//if (building) return;
-			
+
 			// "sort" as in, recalculate the whole number
-			foreach (ListViewItem li in loadoutList.Items)
-			{
+			foreach (ListViewItem li in loadoutList.Items) {
 				ListItemSort(li);
 			}
 			var lv = loadoutList;
@@ -341,18 +301,14 @@ namespace RuneApp
 			lv.Sort();
 		}
 
-		private double GetPoints(Stats Cur, Action<string, int> w = null)
-		{
+		private double GetPoints(Stats Cur, Action<string, int> w = null) {
 			double pts = 0;
 			double p;
 			int i = 2;
-			foreach (Attr stat in Build.statAll)
-			{
-				if (!stat.HasFlag(Attr.ExtraStat))
-				{
+			foreach (Attr stat in Build.statAll) {
+				if (!stat.HasFlag(Attr.ExtraStat)) {
 					string str = Cur[stat].ToString();
-					if (build.Sort[stat] != 0)
-					{
+					if (build.Sort[stat] != 0) {
 						p = Cur[stat] / build.Sort[stat];
 						if (build.Threshold[stat] != 0)
 							p -= Math.Max(0, Cur[stat] - build.Threshold[stat]) / build.Sort[stat];
@@ -362,11 +318,9 @@ namespace RuneApp
 					w?.Invoke(str, i);
 					i++;
 				}
-				else
-				{
+				else {
 					string str = Cur.ExtraValue(stat).ToString();
-					if (build.Sort.ExtraGet(stat) != 0)
-					{
+					if (build.Sort.ExtraGet(stat) != 0) {
 						p = Cur.ExtraValue(stat) / build.Sort.ExtraGet(stat);
 						if (build.Threshold.ExtraGet(stat) != 0)
 							p -= Math.Max(0, Cur.ExtraValue(stat) - build.Threshold.ExtraGet(stat)) /
@@ -384,45 +338,39 @@ namespace RuneApp
 		// recalculate all the points for this monster
 		// TODO: consider hiding point values in the subitem tags and only recalcing the changed column
 		// TODO: pull the scoring algorithm into a neater function
-		public void ListItemSort(ListViewItem li)
-		{
+		public void ListItemSort(ListViewItem li) {
 			Monster load = (Monster)li.Tag;
 			var Cur = load.GetStats();
 
 			double pts = GetPoints(Cur, (str, num) => { li.SubItems[num].Text = str; });
-			
+
 			li.SubItems[0].Text = pts.ToString("0.##");
 
 		}
 
-		private void listView1_ColumnClick(object sender, ColumnClickEventArgs e)
-		{
+		private void listView1_ColumnClick(object sender, ColumnClickEventArgs e) {
 			if (building) return;
 
 			var sorter = (ListViewSort)((ListView)sender).ListViewItemSorter;
 			sorter.OnColumnClick(e.Column, false, true);
 			((ListView)sender).Sort();
 		}
-		
-		private void button1_Click(object sender, EventArgs e)
-		{
+
+		private void button1_Click(object sender, EventArgs e) {
 			// Things went okay
 			DialogResult = DialogResult.OK;
 			Close();
 		}
 
-		private void button2_Click(object sender, EventArgs e)
-		{
+		private void button2_Click(object sender, EventArgs e) {
 			// things were :(
 			DialogResult = DialogResult.Cancel;
 			Close();
 		}
 
 		// TODO: update, fix, make work forrealz
-		public void TryMakeTheBest()
-		{
-			if (loadoutList.SelectedItems.Count > 0)
-			{
+		public void TryMakeTheBest() {
+			if (loadoutList.SelectedItems.Count > 0) {
 				ListViewItem lit = loadoutList.Items[0];
 				ListViewItem lis = loadoutList.SelectedItems[0];
 
@@ -436,42 +384,35 @@ namespace RuneApp
 
 				building = true;
 
-				foreach (Attr stat in Build.statAll)
-				{
+				foreach (Attr stat in Build.statAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && mY.GetStats()[stat] > mN.GetStats()[stat])
 						better.Add(stat);
 				}
 				double totalsort = 0;
-				foreach (var stat in Build.statAll)
-				{
+				foreach (var stat in Build.statAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && build.Sort[stat] != 0)
 						totalsort += Math.Abs(build.Sort[stat]);
 
 					if (stat.HasFlag(Attr.ExtraStat) && build.Sort.ExtraGet(stat) != 0)
 						totalsort += Math.Abs(build.Sort.ExtraGet(stat));
 				}
-				if (totalsort == 0)
-				{
+				if (totalsort == 0) {
 					double totalstats = 0;
-					foreach (var stat in better)
-					{
+					foreach (var stat in better) {
 						if (!stat.HasFlag(Attr.ExtraStat))
 							totalstats += mY.GetStats()[stat];
 						else
 							totalstats += mY.GetStats().ExtraValue(stat);
 					}
 					int amount = (int)Math.Max(30, Math.Sqrt(Math.Max(100, totalstats)));
-					foreach (var stat in better)
-					{
-						if (!stat.HasFlag(Attr.ExtraStat))
-						{
+					foreach (var stat in better) {
+						if (!stat.HasFlag(Attr.ExtraStat)) {
 							build.Sort[stat] = (int)(amount * (mY.GetStats()[stat] / totalstats));
 							TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
 							if (tb != null)
 								tb.Text = build.Sort[stat].ToString();
 						}
-						else
-						{
+						else {
 							build.Sort.ExtraSet(stat, (int)(amount * (mY.GetStats().ExtraValue(stat) / totalstats)));
 							TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
 							if (tb != null)
@@ -479,8 +420,7 @@ namespace RuneApp
 						}
 					}
 				}
-				else
-				{
+				else {
 					// todo
 				}
 
@@ -489,8 +429,7 @@ namespace RuneApp
 			}
 		}
 
-		private int getTotal()
-		{
+		private int getTotal() {
 			return build.runes[0].Length
 				* build.runes[1].Length
 				* build.runes[2].Length
@@ -499,8 +438,7 @@ namespace RuneApp
 				* build.runes[5].Length;
 		}
 
-		public void RegenSets()
-		{
+		public void RegenSets() {
 			progState = 0;
 			// delegate
 			Task.Factory.StartNew(() => {
@@ -509,8 +447,7 @@ namespace RuneApp
 				// cancel anyone making builds
 				buildGenCancelled = true;
 				// wait for anyone to stop
-				lock (monSetsLock)
-				{
+				lock (monSetsLock) {
 					// stop cancelling
 					monSetsCancelled = false;
 					build.RunesUseLocked = Program.Settings.LockTest;
@@ -563,7 +500,7 @@ namespace RuneApp
 
 									if (!build.AllowBroken && r3.SetIs4)
 									{
-									   if (c4set != r3.Set)
+										if (c4set != r3.Set)
 											continue;
 									}
 
@@ -627,10 +564,8 @@ namespace RuneApp
 							}
 						}
 					});
-					if (!IsDisposed)
-					{
-						Invoke((MethodInvoker)delegate
-						{
+					if (!IsDisposed) {
+						Invoke((MethodInvoker)delegate {
 							toolStripProgressBar1.Value = (int)(toolStripProgressBar1.Maximum * num / (double)total);
 							toolStripStatusLabel1.Text = "Generating Sets " + num.ToString("#,##0") + "/" + total.ToString("#,##0");
 						});
@@ -640,21 +575,18 @@ namespace RuneApp
 			});
 		}
 
-		public void RegenBuilds()
-		{
-			Task.Factory.StartNew(() =>
-			{
+		public void RegenBuilds() {
+			Task.Factory.StartNew(() => {
 				// cancel the current worker
 				buildGenCancelled = true;
 				// wait for anyone to stop
-				lock (buildGenLock)
-					{
-						// stop cancelling
-						buildGenCancelled = false;
-						int num = 0;
-						int total = monsList.Count;
-						DateTime start = DateTime.Now;
-						var pfer = Parallel.ForEach(monsList, (kv, loop) =>
+				lock (buildGenLock) {
+					// stop cancelling
+					buildGenCancelled = false;
+					int num = 0;
+					int total = monsList.Count;
+					DateTime start = DateTime.Now;
+					var pfer = Parallel.ForEach(monsList, (kv, loop) =>
 						{
 							if (buildGenCancelled)
 								loop.Break();
@@ -679,29 +611,24 @@ namespace RuneApp
 								}
 							}
 						});
-					}
+				}
 				RegenList();
 			});
 		}
 
-		private void AddBuild(Monster mon)
-		{
+		private void AddBuild(Monster mon) {
 			//string compKey = string.Join(",", mon.Current.Runes.Select(r => r.ID.ToString()));
 			var key = new RuneKey(mon.Current.Runes);
-			if (!monsList.ContainsKey(key))
-			{
-				monsList.AddOrUpdate(key, mon, (k,v)=> mon);
+			if (!monsList.ContainsKey(key)) {
+				monsList.AddOrUpdate(key, mon, (k, v) => mon);
 				RegenList();
 			}
 		}
 
-		private void RegenList()
-		{
-			Task.Factory.StartNew(() =>
-			{
+		private void RegenList() {
+			Task.Factory.StartNew(() => {
 				listGenCancelled = true;
-				lock (listGenLock)
-				{
+				lock (listGenLock) {
 					listGenCancelled = false;
 					var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow);
 					var ilist = loadoutList.Items.Cast<ListViewItem>();
@@ -709,8 +636,7 @@ namespace RuneApp
 					int num = 0;
 					int total = ilist.Count() + llist.Count();
 
-					foreach (var li in ilist)
-					{
+					foreach (var li in ilist) {
 						if (listGenCancelled)
 							break;
 
@@ -718,19 +644,16 @@ namespace RuneApp
 						if (mon == null)
 							continue;
 						var compKey = string.Join(",", mon.Current.Runes.Select(r => r.Id.ToString()));
-						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey))
-						{
+						if (!llist.Any(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey)) {
 							// new list doen't contain old build
 							li.Remove();
 						}
-						else
-						{
+						else {
 							// new list does contain old build
 							llist = llist.Except(llist.Where(m => string.Join(",", m.Current.Runes.Select(r => r.Id.ToString())) == compKey));
 							total--;
 						}
-						Invoke((MethodInvoker)delegate
-						{
+						Invoke((MethodInvoker)delegate {
 							// put the thing in on the main thread and bump the progress bar
 							Interlocked.Increment(ref num);
 							toolStripProgressBar1.Value = (int)(toolStripProgressBar1.Maximum * num / (double)total);
@@ -741,8 +664,7 @@ namespace RuneApp
 					if (listGenCancelled)
 						return;
 
-					foreach (var b in llist)
-					{
+					foreach (var b in llist) {
 						if (listGenCancelled)
 							break;
 
@@ -752,8 +674,7 @@ namespace RuneApp
 
 						int underSpec = 0;
 						int under12 = 0;
-						foreach (var r in b.Current.Runes)
-						{
+						foreach (var r in b.Current.Runes) {
 							if (r.Level < 12)
 								under12 += 12 - r.Level;
 							if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
@@ -770,27 +691,21 @@ namespace RuneApp
 						li.Tag = b;
 						if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.Locked))
 							li.ForeColor = Color.Gray;
-						else
-						{
+						else {
 							if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-							{
+								b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
 								li.ForeColor = Color.Green;
 							}
-							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2))
-							{
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2)) {
 								li.ForeColor = Color.Goldenrod;
 							}
-							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4))
-							{
+							else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
 								li.ForeColor = Color.DarkBlue;
 							}
 						}
 
-						if (!IsDisposed && IsHandleCreated)
-						{
-							Invoke((MethodInvoker)delegate
-							{
+						if (!IsDisposed && IsHandleCreated) {
+							Invoke((MethodInvoker)delegate {
 								// put the thing in on the main thread and bump the progress bar
 								loadoutList.Items.Add(li);
 								Interlocked.Increment(ref num);
@@ -803,13 +718,11 @@ namespace RuneApp
 			});
 		}
 
-		private void listView1_DoubleClick(object sender, EventArgs e)
-		{
-			
+		private void listView1_DoubleClick(object sender, EventArgs e) {
+
 		}
 
-		private void btnHelp_Click(object sender, EventArgs e)
-		{
+		private void btnHelp_Click(object sender, EventArgs e) {
 			if (Main.help != null)
 				Main.help.Close();
 
@@ -817,21 +730,16 @@ namespace RuneApp
 			Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
 			Main.help.Show();
 		}
-		
-		private void loadoutList_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (loadoutList.FocusedItem != null)
-			{
+
+		private void loadoutList_SelectedIndexChanged(object sender, EventArgs e) {
+			if (loadoutList.FocusedItem != null) {
 				var item = loadoutList.FocusedItem;
-				if (item.Tag != null)
-				{
+				if (item.Tag != null) {
 					Monster mon = item.Tag as Monster;
-					if (mon != null)
-					{
+					if (mon != null) {
 						if (Main.runeDisplay == null || Main.runeDisplay.IsDisposed)
 							Main.runeDisplay = new RuneDisplay();
-						if (!Main.runeDisplay.Visible)
-						{
+						if (!Main.runeDisplay.Visible) {
 							Main.runeDisplay.Show(this);
 						}
 						Main.runeDisplay.Owner = this;
@@ -841,17 +749,13 @@ namespace RuneApp
 				}
 			}
 		}
-		
-		private void btn_powerrunes_Click(object sender, EventArgs e)
-		{
-			if (!building)
-			{
+
+		private void btn_powerrunes_Click(object sender, EventArgs e) {
+			if (!building) {
 				var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
 				List<Rune> lrunes = new List<Rune>();
-				foreach (var g in mons)
-				{
-					foreach (var r in g.Current.Runes)
-					{
+				foreach (var g in mons) {
+					foreach (var r in g.Current.Runes) {
 						r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
 
 						if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
@@ -859,8 +763,7 @@ namespace RuneApp
 					}
 				}
 
-				using (var qq = new RuneSelect())
-				{
+				using (var qq = new RuneSelect()) {
 					qq.runes = lrunes;
 					qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
 					qq.runeStatKey = "besttestscore";
@@ -869,10 +772,8 @@ namespace RuneApp
 			}
 		}
 
-		private void Generate_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			if (Main.runeDisplay != null && !Main.runeDisplay.IsDisposed && Main.runeDisplay.Owner == this)
-			{
+		private void Generate_FormClosing(object sender, FormClosingEventArgs e) {
+			if (Main.runeDisplay != null && !Main.runeDisplay.IsDisposed && Main.runeDisplay.Owner == this) {
 				Main.runeDisplay.Owner = Main.currentMain;
 				Main.runeDisplay.Location = new Point(Main.currentMain.Location.X + Main.currentMain.Width, Main.currentMain.Location.Y);
 			}

@@ -7,35 +7,29 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	// WON'T COMPILE
-	class AttrComparer : IEqualityComparer<Attr>
-	{
-		public bool Equals(Attr x, Attr y)
-		{
+	class AttrComparer : IEqualityComparer<Attr> {
+		public bool Equals(Attr x, Attr y) {
 			return (x == y);
 		}
-		public int GetHashCode(Attr obj)
-		{
+		public int GetHashCode(Attr obj) {
 			return (int)obj;
 		}
 	}
 
 	[Flags]
-	public enum LogSeverity
-	{
-		None =	0x00000000,
+	public enum LogSeverity {
+		None = 0x00000000,
 
 
 		Verbose = 0x10000000,
-		Debug	= 0x01000000,
-		Info	= 0x00100000,
-		Error	= 0x00010000,
+		Debug = 0x01000000,
+		Info = 0x00100000,
+		Error = 0x00010000,
 	}
 
-	public static class RuneLog
-	{
+	public static class RuneLog {
 		public static System.IO.TextWriter logTo = Console.Out;
 		public static LogSeverity CurrentSeverity =
 #if DEBUG
@@ -47,10 +41,8 @@ namespace RuneOptim
 		public static void Log(LogSeverity sev, string str,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null)
-		{
-			if (CurrentSeverity >= sev)
-			{
+			[CallerFilePath] string filepath = null) {
+			if (CurrentSeverity >= sev) {
 				logTo.WriteLine(System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str);
 			}
 		}
@@ -58,43 +50,36 @@ namespace RuneOptim
 		public static void Info(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null)
-		{
+			[CallerFilePath] string filepath = null) {
 			Log(sev | LogSeverity.Info, str, lineNumber, caller, filepath);
 		}
 
 		public static void Debug(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null)
-		{
+			[CallerFilePath] string filepath = null) {
 			Log(sev | LogSeverity.Debug, str, lineNumber, caller, filepath);
 		}
 
 		public static void Error(string str, LogSeverity sev = LogSeverity.None,
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null)
-		{
+			[CallerFilePath] string filepath = null) {
 			Log(sev | LogSeverity.Error, str, lineNumber, caller, filepath);
 		}
 	}
 
-	public static class ExtensionMethods
-	{
-		public static void AddRange<T>(this Collection<T> lhs, IEnumerable<T> rhs)
-		{
+	public static class ExtensionMethods {
+		public static void AddRange<T>(this Collection<T> lhs, IEnumerable<T> rhs) {
 			foreach (var t in rhs)
 				lhs.Add(t);
 		}
 
-		public static bool EqualTo(this double a, double b, double within = double.Epsilon)
-		{
+		public static bool EqualTo(this double a, double b, double within = double.Epsilon) {
 			return (Math.Abs(a - b) < within);
 		}
 
-		public static bool IsA(this Type type, Type typeToBe)
-		{
+		public static bool IsA(this Type type, Type typeToBe) {
 			if (!typeToBe.IsGenericTypeDefinition)
 				return typeToBe.IsAssignableFrom(type);
 
@@ -103,8 +88,7 @@ namespace RuneOptim
 				toCheckTypes.AddRange(type.GetInterfaces());
 
 			var basedOn = type;
-			while (basedOn.BaseType != null)
-			{
+			while (basedOn.BaseType != null) {
 				toCheckTypes.Add(basedOn.BaseType);
 				basedOn = basedOn.BaseType;
 			}
@@ -112,16 +96,14 @@ namespace RuneOptim
 			return toCheckTypes.Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeToBe);
 		}
 
-		public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute
-		{
+		public static T GetAttributeOfType<T>(this Enum enumVal) where T : System.Attribute {
 			var type = enumVal.GetType();
 			var memInfo = type.GetMember(enumVal.ToString());
 			var attributes = memInfo[0].GetCustomAttributes(typeof(T), false);
 			return (attributes.Length > 0) ? (T)attributes[0] : null;
 		}
 
-		public static SlotIndex GetIndex(string str)
-		{
+		public static SlotIndex GetIndex(string str) {
 			int v;
 			if (int.TryParse(str, out v))
 				return (SlotIndex)v;
@@ -137,10 +119,8 @@ namespace RuneOptim
 		}
 
 		// Enable casting Attr enums to a string
-		public static string ToForms(this Attr attr)
-		{
-			switch (attr)
-			{
+		public static string ToForms(this Attr attr) {
+			switch (attr) {
 				case Attr.Neg:
 					return "neg";
 				case Attr.Null:
@@ -187,10 +167,8 @@ namespace RuneOptim
 
 		}
 		// Enable casting Attr enums to a string
-		public static string ToShortForm(this Attr attr)
-		{
-			switch (attr)
-			{
+		public static string ToShortForm(this Attr attr) {
+			switch (attr) {
 				case Attr.Null:
 					return "-";
 				case Attr.Accuracy:
@@ -231,10 +209,8 @@ namespace RuneOptim
 		}
 
 		// Enable casting Attr enums to a string
-		public static string ToGameString(this Attr attr)
-		{
-			switch (attr)
-			{
+		public static string ToGameString(this Attr attr) {
+			switch (attr) {
 				case Attr.Neg:
 				case Attr.Null:
 				case Attr.ExtraStat:
@@ -274,21 +250,17 @@ namespace RuneOptim
 		}
 	}
 
-	
-	public class DictionaryWithSpecialEnumKeyConverter : JsonConverter
-	{
-		public override bool CanWrite
-		{
+
+	public class DictionaryWithSpecialEnumKeyConverter : JsonConverter {
+		public override bool CanWrite {
 			get { return false; }
 		}
 
-		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-		{
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
 			throw new NotSupportedException();
 		}
 
-		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-		{
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
 			if (reader.TokenType == JsonToken.Null)
 				return null;
 
@@ -298,16 +270,12 @@ namespace RuneOptim
 			serializer.Populate(reader, intermediateDictionary);
 
 			var finalDictionary = (IDictionary)Activator.CreateInstance(objectType);
-			foreach (DictionaryEntry pair in intermediateDictionary)
-			{
+			foreach (DictionaryEntry pair in intermediateDictionary) {
 				SlotIndex ind;
-				if (!Enum.TryParse(pair.Key.ToString(), true, out ind))
-				{
-					foreach (var q in Enum.GetValues(typeof(SlotIndex)))
-					{
+				if (!Enum.TryParse(pair.Key.ToString(), true, out ind)) {
+					foreach (var q in Enum.GetValues(typeof(SlotIndex))) {
 						var qw = (SlotIndex)q;
-						if (qw.GetAttributeOfType<EnumMemberAttribute>().Value == pair.Key.ToString())
-						{
+						if (qw.GetAttributeOfType<EnumMemberAttribute>().Value == pair.Key.ToString()) {
 							ind = qw;
 							break;
 						}
@@ -320,8 +288,7 @@ namespace RuneOptim
 			return finalDictionary;
 		}
 
-		public override bool CanConvert(Type objectType)
-		{
+		public override bool CanConvert(Type objectType) {
 			return objectType.IsA(typeof(IDictionary<,>)) &&
 				   objectType.GetGenericArguments()[0].IsA(typeof(SlotIndex));
 		}

@@ -5,8 +5,7 @@ using System.Linq.Expressions;
 using Newtonsoft.Json;
 
 namespace RuneOptim {
-	public enum EquipCompare
-	{
+	public enum EquipCompare {
 		Unknown,
 		Worse,
 		Better
@@ -18,8 +17,7 @@ namespace RuneOptim {
 		public bool Speed;
 	}
 
-	public class Loadout
-	{
+	public class Loadout {
 		private readonly Rune[] runes = new Rune[6];
 
 		private int runeCount = 0;
@@ -45,33 +43,30 @@ namespace RuneOptim {
 
 		[JsonIgnore]
 		public RuneSet[] Sets { get { return sets; } }
-		
+
 		[JsonIgnore]
 		public bool SetsFull { get { return setsFull; } }
 
 		public Element Element = Element.Pure;
 
 		public Buffs Buffs;
-		
+
 		public double Time;
 
 		public double DeltaPoints;
 
 		public long ActualTests = 0;
-		
+
 		[JsonIgnore]
 		public ConcurrentDictionary<string, double>[] manageStats;
-		
-		public ConcurrentDictionary<string, double>[] ManageStats
-		{
-			get
-			{
+
+		public ConcurrentDictionary<string, double>[] ManageStats {
+			get {
 				if (runes.All(r => r != null))
 					return runes.Select(r => r.manageStats).ToArray();
 				return null;
 			}
-			set
-			{
+			set {
 				manageStats = value;
 			}
 		}
@@ -79,10 +74,8 @@ namespace RuneOptim {
 		private ulong[] runeIDs;
 
 		//[JsonIgnore]
-		public ulong[] RuneIDs
-		{
-			get
-			{
+		public ulong[] RuneIDs {
+			get {
 				if (runeIDs == null)
 					runeIDs = new ulong[6];
 
@@ -91,11 +84,10 @@ namespace RuneOptim {
 					if (ru != null && ru.Id != runeIDs[i])
 						runeIDs[i] = ru.Id;
 				}
-				
+
 				return runeIDs;
 			}
-			set
-			{
+			set {
 				runeIDs = value;
 			}
 		}
@@ -116,45 +108,36 @@ namespace RuneOptim {
 		public bool Changed { get { return changed; } }
 
 		[JsonIgnore]
-		public Stats Shrines
-		{
-			get
-			{
+		public Stats Shrines {
+			get {
 				return shrines;
 			}
-			set
-			{
+			set {
 				shrines = value;
 				if (shrines == null)
 					shrines = new Stats();
 				changed = true;
 			}
 		}
-		public Stats Leader
-		{
-			get
-			{
+		public Stats Leader {
+			get {
 				return leader;
 			}
-			set
-			{
+			set {
 				leader = value;
 				changed = true;
 			}
 		}
-		
-		public Loadout(Loadout rhs = null)
-		{
-			if (rhs != null)
-			{
+
+		public Loadout(Loadout rhs = null) {
+			if (rhs != null) {
 				shrines = rhs.shrines;
 				leader = rhs.leader;
 				fakeLevel = rhs.fakeLevel;
 				predictSubs = rhs.predictSubs;
 				buildID = rhs.buildID;
 				Buffs = rhs.Buffs;
-				foreach (var r in rhs.Runes)
-				{
+				foreach (var r in rhs.Runes) {
 					AddRune(r, 7);
 				}
 				CheckSets();
@@ -164,26 +147,21 @@ namespace RuneOptim {
 		}
 
 		// Debugging niceness
-		public override string ToString()
-		{
+		public override string ToString() {
 			System.Text.StringBuilder str = new System.Text.StringBuilder("");
-			foreach (Rune r in runes)
-			{
+			foreach (Rune r in runes) {
 				str.Append(r.Id).Append("  ");
 			}
 			str.Append("|  ");
-			foreach (RuneSet s in sets)
-			{
+			foreach (RuneSet s in sets) {
 				str.Append(s).Append(" ");
 			}
 			return str.ToString();
 		}
 
 		// Lock all the runes on the build
-		public void Lock()
-		{
-			foreach (Rune r in runes)
-			{
+		public void Lock() {
+			foreach (Rune r in runes) {
 				if (r != null)
 					r.Locked = true;
 			}
@@ -192,11 +170,9 @@ namespace RuneOptim {
 		#region AttrGetters
 
 		[JsonIgnore]
-		public int HealthFlat
-		{
-			get
-			{
-				return 
+		public int HealthFlat {
+			get {
+				return
 					(runes[0]?.HealthFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.HealthFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
 					(runes[2]?.HealthFlat[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
@@ -207,10 +183,8 @@ namespace RuneOptim {
 			}
 		}
 		[JsonIgnore]
-		public int HealthPercent
-		{
-			get
-			{
+		public int HealthPercent {
+			get {
 				return
 					(runes[0]?.HealthPercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.HealthPercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -218,17 +192,15 @@ namespace RuneOptim {
 					(runes[3]?.HealthPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.HealthPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.HealthPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Health + 
-					(int)leader.Health + 
+					(int)shrines.Health +
+					(int)leader.Health +
 					SetStat(Attr.HealthPercent);
 			}
 		}
 
 		[JsonIgnore]
-		public int AttackFlat
-		{
-			get
-			{
+		public int AttackFlat {
+			get {
 				return
 					(runes[0]?.AttackFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.AttackFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -240,10 +212,8 @@ namespace RuneOptim {
 			}
 		}
 		[JsonIgnore]
-		public int AttackPercent
-		{
-			get
-			{
+		public int AttackPercent {
+			get {
 				return
 					(runes[0]?.AttackPercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.AttackPercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -251,17 +221,15 @@ namespace RuneOptim {
 					(runes[3]?.AttackPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)leader.Attack + 
 					(int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] + //(int)shrines[Element + "ATK"] +
+					(int)leader.Attack +
 					SetStat(Attr.AttackPercent);
 			}
 		}
 
 		[JsonIgnore]
-		public int DefenseFlat
-		{
-			get
-			{
+		public int DefenseFlat {
+			get {
 				return
 					(runes[0]?.DefenseFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.DefenseFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -273,10 +241,8 @@ namespace RuneOptim {
 			}
 		}
 		[JsonIgnore]
-		public int DefensePercent
-		{
-			get
-			{
+		public int DefensePercent {
+			get {
 				return
 					(runes[0]?.DefensePercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.DefensePercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -284,17 +250,15 @@ namespace RuneOptim {
 					(runes[3]?.DefensePercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.DefensePercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.DefensePercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Defense + 
-					(int)leader.Defense + 
+					(int)shrines.Defense +
+					(int)leader.Defense +
 					SetStat(Attr.DefensePercent);
 			}
 		}
 
 		[JsonIgnore]
-		public int Speed
-		{
-			get
-			{
+		public int Speed {
+			get {
 				return
 					(runes[0]?.Speed[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.Speed[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -308,19 +272,15 @@ namespace RuneOptim {
 
 		// Runes don't get SPD%
 		[JsonIgnore]
-		public int SpeedPercent
-		{
-			get
-			{
+		public int SpeedPercent {
+			get {
 				return SetStat(Attr.SpeedPercent) + (int)shrines.Speed + (int)leader.Speed;
 			}
 		}
 
 		[JsonIgnore]
-		public int CritRate
-		{
-			get
-			{
+		public int CritRate {
+			get {
 				return
 					(runes[0]?.CritRate[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.CritRate[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -328,17 +288,15 @@ namespace RuneOptim {
 					(runes[3]?.CritRate[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.CritRate[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.CritRate[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.CritRate + 
-					(int)leader.CritRate + 
+					(int)shrines.CritRate +
+					(int)leader.CritRate +
 					SetStat(Attr.CritRate);
 			}
 		}
 
 		[JsonIgnore]
-		public int CritDamage
-		{
-			get
-			{
+		public int CritDamage {
+			get {
 				return
 					(runes[0]?.CritDamage[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.CritDamage[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -346,17 +304,15 @@ namespace RuneOptim {
 					(runes[3]?.CritDamage[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.CritDamage[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.CritDamage[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.CritDamage + 
-					(int)leader.CritDamage + 
+					(int)shrines.CritDamage +
+					(int)leader.CritDamage +
 					SetStat(Attr.CritDamage);
 			}
 		}
 
 		[JsonIgnore]
-		public int Accuracy
-		{
-			get
-			{
+		public int Accuracy {
+			get {
 				return
 					(runes[0]?.Accuracy[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.Accuracy[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -364,17 +320,15 @@ namespace RuneOptim {
 					(runes[3]?.Accuracy[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.Accuracy[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.Accuracy[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Accuracy + 
-					(int)leader.Accuracy + 
+					(int)shrines.Accuracy +
+					(int)leader.Accuracy +
 					SetStat(Attr.Accuracy);
 			}
 		}
 
 		[JsonIgnore]
-		public int Resistance
-		{
-			get
-			{
+		public int Resistance {
+			get {
 				return
 					(runes[0]?.Resistance[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
 					(runes[1]?.Resistance[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
@@ -382,8 +336,8 @@ namespace RuneOptim {
 					(runes[3]?.Resistance[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
 					(runes[4]?.Resistance[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
 					(runes[5]?.Resistance[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-					(int)shrines.Resistance + 
-					(int)leader.Resistance + 
+					(int)shrines.Resistance +
+					(int)leader.Resistance +
 					SetStat(Attr.Resistance);
 			}
 		}
@@ -391,8 +345,7 @@ namespace RuneOptim {
 		#endregion
 
 		// Put the rune on the build
-		public Rune AddRune(Rune rune, int checkOn = 2)
-		{
+		public Rune AddRune(Rune rune, int checkOn = 2) {
 			// don't bother if not a rune
 			if (rune == null)
 				return null;
@@ -410,8 +363,7 @@ namespace RuneOptim {
 		}
 
 		// Removes the rune from slot
-		public Rune RemoveRune(int slot)
-		{
+		public Rune RemoveRune(int slot) {
 			// don't bother if there was none
 			if (runes[slot - 1] == null)
 				return null;
@@ -427,10 +379,9 @@ namespace RuneOptim {
 		}
 		
 		// Check what sets are completed in this build
-		public void CheckSets()
-		{
+		public void CheckSets() {
 			setsFull = false;
-			
+
 			// If there are an odd number of runes, don't bother (maybe even check < 6?)
 			if (runeCount % 2 == 1)
 				return;
@@ -459,13 +410,11 @@ namespace RuneOptim {
 			// Check slots 1 - 5, minimum set size is 2.
 			// Because it will search forward for sets, can't find more from 6
 			// Eg. starting from 6, working around, find 2 runes?
-			for (; slotInd < 5; slotInd++)
-			{
+			for (; slotInd < 5; slotInd++) {
 				//if there is a uncounted rune in this slot
 				rune = runes[slotInd];
 				// && !used[slotInd]
-				if (rune != null && (use & (1 << slotInd)) != (1 << slotInd))
-				{
+				if (rune != null && (use & (1 << slotInd)) != (1 << slotInd)) {
 					// look for more in the set
 					set = rune.Set;
 					// how many runes we need to get
@@ -477,20 +426,17 @@ namespace RuneOptim {
 					use |= (1 << slotInd);
 
 					// for the runes after this rune
-					for (int ind = slotInd + 1; ind < 6; ind++)
-					{
+					for (int ind = slotInd + 1; ind < 6; ind++) {
 						// if there is a rune in this slot that is the type I want
 						// && !used[ind] 
-						if (runes[ind] != null && runes[ind].Set == set && (use & (1 << ind)) != (1 << ind))
-						{
+						if (runes[ind] != null && runes[ind].Set == set && (use & (1 << ind)) != (1 << ind)) {
 							//used[ind] = true;
 							use |= (1 << ind);
 							gotNum++;
 						}
 
 						// if we have more than 1 rune and we have enough runes for a set
-						if (gotNum == getNum)
-						{
+						if (gotNum == getNum) {
 							// log this set
 							sets[setInd] = set;
 							// increase the number of runes in sets
@@ -514,10 +460,8 @@ namespace RuneOptim {
 		}
 
 		// pull how much Attr is in the equipped sets
-		public int SetStat(Attr attr)
-		{
-			switch (attr)
-			{
+		public int SetStat(Attr attr) {
+			switch (attr) {
 				case Attr.Null:
 				case Attr.HealthFlat:
 				case Attr.AttackFlat:
@@ -538,8 +482,8 @@ namespace RuneOptim {
 						(sets[2] == RuneSet.Energy ? 15 : sets[2] == RuneSet.Enhance ? 8 : 0);
 				// 4 slot sets aren't going to be in [2]
 				case Attr.AttackPercent:
-					return (sets[0] == RuneSet.Fatal ? 35 : sets[0] == RuneSet.Fight ? 8 : 0) + 
-						(sets[1] == RuneSet.Fatal ? 35 : sets[1] == RuneSet.Fight ? 8 : 0) + 
+					return (sets[0] == RuneSet.Fatal ? 35 : sets[0] == RuneSet.Fight ? 8 : 0) +
+						(sets[1] == RuneSet.Fatal ? 35 : sets[1] == RuneSet.Fight ? 8 : 0) +
 						(sets[2] == RuneSet.Fight ? 8 : 0);
 				case Attr.CritRate:
 					return (sets[0] == RuneSet.Blade ? 12 : 0) + (sets[1] == RuneSet.Blade ? 12 : 0) + (sets[2] == RuneSet.Blade ? 12 : 0);
@@ -572,8 +516,7 @@ namespace RuneOptim {
 			var v = new Stats();
 			return GetStats(baseStats, ref v);
 		}
-		public Stats GetStats(Stats baseStats, ref Stats value)
-		{
+		public Stats GetStats(Stats baseStats, ref Stats value) {
 			/*if (_getStats == null)
 			{
 				Expression.
@@ -592,7 +535,7 @@ namespace RuneOptim {
 			value.Attack += (int)Math.Ceiling(baseStats.Attack * AttackPercent * 0.01) + AttackFlat;
 			if (Buffs.Attack)
 				value.Attack *= 1.5;
-			
+
 			value.Defense += (int)Math.Ceiling(baseStats.Defense * DefensePercent * 0.01) + DefenseFlat;
 			if (Buffs.Defense)
 				value.Defense *= 1.7;
@@ -645,16 +588,13 @@ namespace RuneOptim {
 		// 0 = differing magical sets
 		// 1 = exact match
 		// 2 = none or no differing magic sets
-		public static int CompareSets(RuneSet[] a, RuneSet[] b)
-		{
+		public static int CompareSets(RuneSet[] a, RuneSet[] b) {
 			if (a == b)
 				return 1;
 
-			if (a.Length == b.Length)
-			{
+			if (a.Length == b.Length) {
 				int same = 0;
-				for (int i = 0; i < a.Length; i++)
-				{
+				for (int i = 0; i < a.Length; i++) {
 					if (a[i] == b[i])
 						same++;
 				}
@@ -664,8 +604,7 @@ namespace RuneOptim {
 			// different lengths, or not the same sets
 
 			// count the number of magical sets, and make sure both loadout have the same number of sets
-			foreach (RuneSet s in RuneProperties.MagicalSets)
-			{
+			foreach (RuneSet s in RuneProperties.MagicalSets) {
 				if (a.Count(x => x == s) != b.Count(x => x == s))
 					return 0;
 			}
@@ -673,26 +612,22 @@ namespace RuneOptim {
 			return 1;
 		}
 
-		public void RecountDiff(ulong monId)
-		{
+		public void RecountDiff(ulong monId) {
 			powerup = 0;
 			upgrades = 0;
 			runesNew = 0;
 			runesChanged = 0;
 
-			foreach (Rune r in Runes)
-			{
+			foreach (Rune r in Runes) {
 				if (r == null) continue;
-				if (r.AssignedId != monId)
-				{
+				if (r.AssignedId != monId) {
 					if (r.IsUnassigned)
 						runesNew++;
 					else
 						runesChanged++;
 				}
 				powerup += Math.Max(0, (FakeLevel[r.Slot - 1]) - r.Level);
-				if (FakeLevel[r.Slot - 1] != 0)
-				{
+				if (FakeLevel[r.Slot - 1] != 0) {
 					int tup = (int)Math.Floor(Math.Min(12, (FakeLevel[r.Slot - 1])) / (double)3);
 					int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
 					upgrades += Math.Max(0, tup - cup);

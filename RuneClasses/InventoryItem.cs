@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim
-{
-	public enum ItemType
-	{
+namespace RuneOptim {
+	public enum ItemType {
 		WizardInfo = 0,
 		Scrolls = 9,
 		Essence = 11,
@@ -24,8 +22,7 @@ namespace RuneOptim
 		CostumePoint
 	}
 
-	public enum ScrollType
-	{
+	public enum ScrollType {
 		Unknown = 1,
 		Mystical,
 		LightDark,
@@ -38,8 +35,7 @@ namespace RuneOptim
 		LightDarkPieces,
 	}
 
-	public enum EssenceType
-	{
+	public enum EssenceType {
 		WaterLow = 11001,
 		FireLow,
 		WindLow,
@@ -60,9 +56,8 @@ namespace RuneOptim
 		MagicHigh
 	}
 
-	public enum MaterialType
-	{
-		HardWood =1001,
+	public enum MaterialType {
+		HardWood = 1001,
 		ToughLeather,
 		SolidRock,
 		SolidIronOre,
@@ -81,9 +76,8 @@ namespace RuneOptim
 		CondensedMagicCrystal = 6001,
 		PureMagicCrystal = 7001,
 	}
-	
-	public class InventoryItem
-	{
+
+	public class InventoryItem {
 		[JsonProperty("wizard_id")]
 		public ulong WizardId;
 
@@ -96,10 +90,8 @@ namespace RuneOptim
 		[JsonProperty("item_quantity")]
 		public long Quantity;
 
-		public static int PiecesRequired(int stars)
-		{
-			switch (stars)
-			{
+		public static int PiecesRequired(int stars) {
+			switch (stars) {
 				case 1:
 					return 10;
 				case 2:
@@ -114,12 +106,9 @@ namespace RuneOptim
 			return 50;
 		}
 
-		public string Name
-		{
-			get
-			{
-				switch (Type)
-				{
+		public string Name {
+			get {
+				switch (Type) {
 					case ItemType.WizardInfo:
 						return ((WizardType)Id).ToString();
 					case ItemType.Scrolls:
@@ -127,8 +116,7 @@ namespace RuneOptim
 					case ItemType.Essence:
 						return ((EssenceType)Id).ToString();
 					case ItemType.SummoningPieces:
-						if (Id > 10000)
-						{
+						if (Id > 10000) {
 							if (Save.MonIdNames.ContainsKey(Id / 100))
 								return Save.MonIdNames[Id / 100] + " ";
 							return "Missingno " + Id;
@@ -149,8 +137,7 @@ namespace RuneOptim
 			}
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return Name;
 		}
 	}

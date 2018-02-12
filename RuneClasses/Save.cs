@@ -5,17 +5,15 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	// Deserializes the .json into this
-	public class Save
-	{
+	public class Save {
 		[JsonProperty("unit_list")]
 		public readonly ObservableCollection<Monster> Monsters = new ObservableCollection<Monster>();
 
 		[JsonProperty("deco_list")]
 		public readonly ObservableCollection<Deco> Decorations = new ObservableCollection<Deco>();
-		
+
 		[JsonProperty("rune_craft_item_list")]
 		public readonly ObservableCollection<Craft> Crafts = new ObservableCollection<Craft>();
 
@@ -39,7 +37,7 @@ namespace RuneOptim
 
 		[JsonProperty("wizard_info")]
 		public WizardInfo WizardInfo;
-		
+
 		// builds from rune optimizer don't match mine.
 		// Don't care right now, perhaps a fuzzy-import later?
 		[JsonProperty("savedBuilds")]
@@ -54,10 +52,8 @@ namespace RuneOptim
 		[JsonIgnore]
 		static Dictionary<int, string> monIdNames = null;
 
-		public static Dictionary<int, string> MonIdNames
-		{
-			get
-			{
+		public static Dictionary<int, string> MonIdNames {
+			get {
 				if (monIdNames == null)
 					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(global::RuneOptim.Properties.Resources.MonstersJSON));
 				return monIdNames;
@@ -70,8 +66,7 @@ namespace RuneOptim
 		[JsonIgnore]
 		private int monLoaded = 0;
 
-		public Save()
-		{
+		public Save() {
 			Runes.CollectionChanged += Runes_CollectionChanged;
 			Monsters.CollectionChanged += Monsters_CollectionChanged;
 			Decorations.CollectionChanged += Decorations_CollectionChanged;
@@ -89,15 +84,11 @@ namespace RuneOptim
 			return d;
 		}
 
-		private void GuildDefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void GuildDefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var d in e.NewItems.Cast<DefensePlacement[]>())
-					{
-						foreach (var dd in d)
-						{
+					foreach (var d in e.NewItems.Cast<DefensePlacement[]>()) {
+						foreach (var dd in d) {
 							var m = GetMonster(dd.UnitId);
 							if (m != null)
 								m.OnDefense = true;
@@ -113,13 +104,10 @@ namespace RuneOptim
 			}
 		}
 
-		private void DefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void DefenseUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var d in e.NewItems.Cast<DefensePlacement>())
-					{
+					foreach (var d in e.NewItems.Cast<DefensePlacement>()) {
 						var m = GetMonster(d.UnitId);
 						if (m != null)
 							m.OnDefense = true;
@@ -134,17 +122,12 @@ namespace RuneOptim
 			}
 		}
 
-		private void Buildings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void Buildings_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var b in e.NewItems.Cast<Building>())
-					{
-						if (b.BuildingType == BuildingType.MonsterStorage)
-						{
-							foreach (var m in Monsters.Where(mo => mo.BuildingId == b.Id))
-							{
+					foreach (var b in e.NewItems.Cast<Building>()) {
+						if (b.BuildingType == BuildingType.MonsterStorage) {
+							foreach (var m in Monsters.Where(mo => mo.BuildingId == b.Id)) {
 								m.inStorage = true;
 							}
 						}
@@ -159,13 +142,10 @@ namespace RuneOptim
 			}
 		}
 
-		private void LockedUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void LockedUnits_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var i in e.NewItems.Cast<ulong>())
-					{
+					foreach (var i in e.NewItems.Cast<ulong>()) {
 						var mon = GetMonster(i);
 						if (mon != null)
 							mon.Locked = true;
@@ -186,13 +166,10 @@ namespace RuneOptim
 			}
 		}
 
-		private void Decorations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void Decorations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var shr in e.NewItems.Cast<Deco>().Where(d => d.Shrine != Shrine.Unknown))
-					{
+					foreach (var shr in e.NewItems.Cast<Deco>().Where(d => d.Shrine != Shrine.Unknown)) {
 						var i = Deco.ShrineStats.ToList().IndexOf(shr.Shrine.ToString());
 						int v = (int)Math.Floor(shr.Level * Deco.ShrineLevel[i]);
 						if (i < 4)
@@ -211,22 +188,17 @@ namespace RuneOptim
 			}
 		}
 
-		private void Monsters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void Monsters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (Monster mon in e.NewItems.Cast<Monster>())
-					{
+					foreach (Monster mon in e.NewItems.Cast<Monster>()) {
 						mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
 						mon.loadOrder = monLoaded++;
-						if (mon.Name == null)
-						{
+						if (mon.Name == null) {
 							mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
 						}
 						// Add the runes contained in the Monsters JSON definition to the Rune pool
-						foreach (var r in mon.Runes)
-						{
+						foreach (var r in mon.Runes) {
 							if (!Runes.Any(ru => ru.Id == r.Id))
 								Runes.Add(r);
 						}
@@ -236,8 +208,7 @@ namespace RuneOptim
 							mon.inStorage = true;
 
 						// Add all the Runes in the pool assigned to the monster to it's current loadout
-						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id))
-						{
+						foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id)) {
 							mon.ApplyRune(rune);
 							rune.AssignedName = mon.FullName;
 							rune.Assigned = mon;
@@ -272,14 +243,11 @@ namespace RuneOptim
 			}
 		}
 
-		private void Runes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-		{
-			switch (e.Action)
-			{
+		private void Runes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 
-					foreach (var r in e.NewItems.Cast<Rune>())
-					{
+					foreach (var r in e.NewItems.Cast<Rune>()) {
 						var rems = Runes.Where(ru => ru.Id == r.Id).ToList();
 						foreach (var ru in rems) {
 							if (ru != r) {
@@ -307,22 +275,19 @@ namespace RuneOptim
 				default:
 					throw new NotImplementedException();
 			}
-			
+
 		}
 
 		// Ask for monsters nicely
-		public Monster GetMonster(string name)
-		{
+		public Monster GetMonster(string name) {
 			return getMonster(name, 1);
 		}
 
-		public Monster GetMonster(string name, int num)
-		{
+		public Monster GetMonster(string name, int num) {
 			return getMonster(name, num);
 		}
 
-		private Monster getMonster(string name, int num)
-		{
+		private Monster getMonster(string name, int num) {
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetMonster " + num + "th " + name + " from " + Monsters.Count);
 			Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.FullName == name);
@@ -333,15 +298,13 @@ namespace RuneOptim
 			return null;
 		}
 
-		public Monster GetMonster(ulong id)
-		{
+		public Monster GetMonster(ulong id) {
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetMonster " + id + " from " + Monsters.Count);
 			return Monsters.FirstOrDefault(m => m.Id == id);
 		}
 
-		public Rune GetRune(ulong id)
-		{
+		public Rune GetRune(ulong id) {
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetRune " + id + " from " + Runes.Count);
 			return Runes.FirstOrDefault(r => r.Id == id);
