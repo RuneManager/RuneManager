@@ -7,18 +7,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace RunePlugin
-{
-	public class SWMessage
-	{
+namespace RunePlugin {
+	public class SWMessage {
 		[JsonProperty("command")]
 		public string CommandStr;
 
 		[JsonIgnore]
-		public SWCommand Command
-		{
-			get
-			{
+		public SWCommand Command {
+			get {
 				SWCommand c = SWCommand.Unhandled;
 				Enum.TryParse<SWCommand>(CommandStr, out c);
 				return c;
@@ -64,7 +60,7 @@ namespace RunePlugin
 		[JsonProperty("best_time")]
 		public long Best;
 	}
-	
+
 	public class DungeonReward {
 		[JsonProperty("mana")]
 		public int Mana;
@@ -103,8 +99,7 @@ namespace RunePlugin
 	}
 
 	[JsonConverter(typeof(StringEnumConverter))]
-	public enum SWCommand
-	{
+	public enum SWCommand {
 		Unhandled,
 		EquipRune,
 		EquipRuneList,
@@ -128,5 +123,8 @@ namespace RunePlugin
 		RevalueRune,
 		ConfirmRune,
 		UpgradeDeco,
+		GetGuildWarMatchupInfo,
+		GetGuildWarParticipationInfo,
+		GetGuildInfo,
 	}
 }

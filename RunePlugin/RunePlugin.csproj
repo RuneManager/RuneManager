@@ -53,6 +53,7 @@
     <Compile Include="Response\EquipRuneResponse.cs" />
     <Compile Include="Response\GetBestClearRiftDungeonResponse.cs" />
     <Compile Include="Response\GenericUnitResponse.cs" />
+    <Compile Include="Response\GuildResponse.cs" />
     <Compile Include="Response\RuneResponses.cs" />
     <Compile Include="Response\SacrificeUnitResponse.cs" />
     <Compile Include="Response\UpgradeDecoResponse.cs" />
