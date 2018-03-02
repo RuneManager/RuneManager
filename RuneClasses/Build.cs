@@ -863,7 +863,8 @@ namespace RuneOptim {
 #endif
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "..."));
 
-				SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
+				//SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
+				List<Monster> tests = new List<Monster>();
 
 				timeThread = new Thread(() => {
 					while (IsRunning) {
@@ -904,22 +905,25 @@ namespace RuneOptim {
 
 					Action syncMyList = () => {
 						lock (BestLock) {
-							foreach (var s in syncList) {
-								if (s.Current.Runes.All(r => r.Assigned == mon)) {
+							/*foreach (var s in syncList) {
+								/*if (s.Current.Runes.All(r => r.Assigned == mon)) {
 									Console.WriteLine("!");
-								}
+								}*
 								tests.Add(s);
-							}
+							}*/
+							tests.AddRange(syncList);
 							syncList.Clear();
-							if (tests.Count > Math.Max(BuildGenerate, 200000)) {
-								var rems = tests.OrderBy(b => b.score).Take(tests.Count / 2);
-								var q = rems.Select(r => r.score);
-								foreach (var bbb in rems) {
-									if (bbb.Current.Runes.All(r => r.Assigned == mon)) {
+							if (tests.Count > Math.Max(BuildGenerate, 250000)) {
+								tests = tests.OrderByDescending(b => b.score).Take(75000).ToList();
+								//var rems = tests.OrderBy(b => b.score).Take(tests.Count / 2).ToList();
+								//var q = rems.Select(r => r.score);
+								/*foreach (var bbb in rems) {
+									/*if (bbb.Current.Runes.All(r => r.Assigned == mon)) {
 										Console.WriteLine("!");
-									}
+									}*
 									tests.Remove(bbb);
-								}
+								}*/
+								//tests.RemoveAll(r => rems.Contains(r));
 							}
 
 							if (tests.Count > MaxBuilds32)

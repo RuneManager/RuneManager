@@ -79,6 +79,25 @@ namespace RuneOptim {
 			return (Math.Abs(a - b) < within);
 		}
 
+		public static void AddRange<T>(this SynchronizedCollection<T> lhs, IEnumerable<T> rhs) {
+			lock (lhs.SyncRoot) {
+				var l = (List<T>)lhs.GetType().GetField("items", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).GetValue(lhs);
+				l.AddRange(rhs);
+			}
+		}
+		public static void RemoveAll<T>(this SynchronizedCollection<T> lhs, Predicate<T> match) {
+			lock (lhs.SyncRoot) {
+				try {
+					var mt = lhs.GetType().GetField("items", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+					var l = (List<T>)mt.GetValue(lhs);
+					l.RemoveAll(match);
+				}
+				catch (Exception e) {
+					Console.WriteLine(e.GetType() + ": " + e.Message);
+				}
+			}
+		}
+
 		public static bool IsA(this Type type, Type typeToBe) {
 			if (!typeToBe.IsGenericTypeDefinition)
 				return typeToBe.IsAssignableFrom(type);
