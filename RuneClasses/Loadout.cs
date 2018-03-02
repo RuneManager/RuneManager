@@ -160,6 +160,7 @@ namespace RuneOptim {
 				predictSubs = rhs.predictSubs;
 				buildID = rhs.buildID;
 				Buffs = rhs.Buffs;
+				tempLoad = rhs.tempLoad;
 				foreach (var r in rhs.Runes) {
 					AddRune(r, 7);
 				}
