@@ -565,6 +565,7 @@ namespace RuneApp {
 				build.BuildTimeout = Program.Settings.TestTime;
 				build.shrines = Program.data.shrines;
 				build.BuildDumpBads = false;
+				build.BuildSaveStats = false;
 				build.BuildGoodRunes = false;
 				build.RunesOnlyFillEmpty = Program.fillRunes;
 				build.RunesDropHalfSetStat = Program.goFast;
@@ -612,62 +613,28 @@ namespace RuneApp {
 				if (b.IsRunning)
 					throw new InvalidOperationException("This build is already running");
 				currentBuild = b;
-				/*
-				if (plsDie)
-				{
-					log.Info("Cancelling build " + b.ID + " " + b.MonName);
-					//plsDie = false;
-					return;
-				}*/
-				/*
-				if (currentBuild != null)
-				{
-					log.Info("Force stopping " + currentBuild.ID + " " + currentBuild.MonName);
-					currentBuild.isRun = false;
-				}
-
-				if (isRunning)
-					log.Info("Looping...");
-
-				while (isRunning)
-				{
-					plsDie = true;
-					b.isRun = false;
-					Thread.Sleep(100);
-				}
-				*/
-
+				
 				log.Info("Starting watch " + b.ID + " " + b.MonName);
 
 				Stopwatch buildTime = Stopwatch.StartNew();
-				//currentBuild = b;
-
-				// TODO: what is this? Maybe it unlocks runes used if this build was already run?
-				//ListViewItem[] olvs = null;
-				//Invoke((MethodInvoker)delegate { olvs = loadoutList.Items.Find(b.ID.ToString(), false); });
-				/*
-				if (olvs.Length > 0)
-				{
-					var olv = olvs.First();
-					Loadout ob = (Loadout)olv.Tag;
-					foreach (Rune r in ob.Runes)
-					{
-						r.Locked = false;
-					}
-				}*/
-
-				b.RunesUseLocked = false;
+				
 				b.RunesUseEquipped = Program.Settings.UseEquipped;
+				b.RunesUseLocked = false;
+				b.BuildGenerate = 0;
+				b.BuildTake = 0;
+				b.BuildTimeout = 0;
+				b.shrines = Program.data.shrines;
+				b.BuildDumpBads = true;
 				b.BuildSaveStats = saveStats;
 				b.BuildGoodRunes = false;
 				b.RunesOnlyFillEmpty = Program.fillRunes;
 				b.RunesDropHalfSetStat = Program.goFast;
+
 				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
 				if (b.Type == BuildType.Link) {
 					b.CopyFrom(b.LinkBuild);
 				}
 				b.GenRunes(Program.data);
-				b.shrines = Program.data.shrines;
 
 				#region Check enough runes
 				string nR = "";
@@ -681,14 +648,7 @@ namespace RuneApp {
 					return;
 				}
 				#endregion
-
-				//isRunning = true;
-
-				b.BuildGenerate = 0;
-				b.BuildTake = 0;
-				b.BuildTimeout = 0;
-				b.BuildDumpBads = true;
-
+				
 				b.BuildPrintTo += BuildsPrintTo;
 				b.BuildProgTo += BuildsProgressTo;
 

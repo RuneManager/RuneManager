@@ -827,14 +827,16 @@ namespace RuneOptim {
 			if (ExtraValue(Attr.MaxDamage) < rhs.MaxDamage)
 				return false;
 
-			if (_skillsFormula[0] != null && GetSkillDamage(Attr.AverageDamage, 0) < rhs.DamageSkillups[0])
-				return false;
-			if (_skillsFormula[1] != null && GetSkillDamage(Attr.AverageDamage, 1) < rhs.DamageSkillups[1])
-				return false;
-			if (_skillsFormula[2] != null && GetSkillDamage(Attr.AverageDamage, 2) < rhs.DamageSkillups[2])
-				return false;
-			if (_skillsFormula[3] != null && GetSkillDamage(Attr.AverageDamage, 3) < rhs.DamageSkillups[3])
-				return false;
+			if (_skillsFormula != null) {
+				if (_skillsFormula[0] != null && GetSkillDamage(Attr.AverageDamage, 0) < rhs.DamageSkillups[0])
+					return false;
+				if (_skillsFormula[1] != null && GetSkillDamage(Attr.AverageDamage, 1) < rhs.DamageSkillups[1])
+					return false;
+				if (_skillsFormula[2] != null && GetSkillDamage(Attr.AverageDamage, 2) < rhs.DamageSkillups[2])
+					return false;
+				if (_skillsFormula[3] != null && GetSkillDamage(Attr.AverageDamage, 3) < rhs.DamageSkillups[3])
+					return false;
+			}
 
 			return true;
 		}

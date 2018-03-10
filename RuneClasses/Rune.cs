@@ -166,7 +166,7 @@ namespace RuneOptim {
 					rhs.AssignedName = "Inventory";
 					rhs.Assigned = null;
 				}
-				else {
+				else if (rhs.Assigned != null && newAssigned != null) {
 					if (rhs.Assigned.Current.Runes[rhs.Slot - 1] == rhs)
 						rhs.Assigned.Current.RemoveRune(rhs.Slot - 1);
 					newAssigned.Current.AddRune(rhs);

@@ -1878,9 +1878,17 @@ namespace RuneOptim {
 				}
 				// always try to put the current rune back in
 				for (int i = 0; i < 6; i++) {
-					if (!runes[i].Contains(mon.Current.Runes[i]) && (!mon.Current.Runes[i]?.Locked ?? false)) {
+					var r = mon.Current.Runes[i];
+					if (r == null)
+						continue;
+
+					bool isGoodType = true;
+					if (i % 2 == 1 && slotStats[i].Count > 0) {
+						isGoodType = slotStats[i].Contains(r.Main.Type.ToForms());
+					}
+					if (!runes[i].Contains(r) && (!r.Locked) && isGoodType) {
 						var tl = runes[i].ToList();
-						tl.Add(mon.Current.Runes[i]);
+						tl.Add(r);
 						runes[i] = tl.ToArray();
 					}
 				}
