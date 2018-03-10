@@ -6,18 +6,13 @@ using System.Net.Http;
 using RuneOptim;
 
 namespace RuneApp.InternalServer {
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 		[PageAddressRender("runes")]
-		public class RuneRenderer : PageRenderer
-		{
+		public class RuneRenderer : PageRenderer {
 			private static global::System.Resources.ResourceManager resourceMan;
-			internal static global::System.Resources.ResourceManager ResourceManager
-			{
-				get
-				{
-					if (object.ReferenceEquals(resourceMan, null))
-					{
+			internal static global::System.Resources.ResourceManager ResourceManager {
+				get {
+					if (object.ReferenceEquals(resourceMan, null)) {
 						global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.Runes", typeof(Runes).Assembly);
 						resourceMan = temp;
 					}
@@ -25,15 +20,11 @@ namespace RuneApp.InternalServer {
 				}
 			}
 
-			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-			{
-				if (uri.Length > 0 && uri[0].Contains(".png"))
-				{
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+				if (uri.Length > 0 && uri[0].Contains(".png")) {
 					var res = uri[0].Replace(".png", "").ToLower();
-					try
-					{
-						using (var stream = new MemoryStream())
-						{
+					try {
+						using (var stream = new MemoryStream()) {
 							var mgr = ResourceManager;
 							var obj = mgr.GetObject(res, null);
 							var img = (System.Drawing.Bitmap)obj;
@@ -43,8 +34,7 @@ namespace RuneApp.InternalServer {
 							return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png") };
 						}
 					}
-					catch (Exception e)
-					{
+					catch (Exception e) {
 						Program.log.Error(e.GetType() + " " + e.Message);
 					}
 				}
@@ -95,19 +85,16 @@ function hackLots(prop, num, on) {
 					);
 			}
 
-			private double calcSort(RuneOptim.Rune r)
-			{
+			private double calcSort(RuneOptim.Rune r) {
 				if (r == null)
 					return 0;
 				Monster m = null;
-				if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0))
-				{
+				if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
 					m = Program.data.GetMonster((ulong)r.manageStats["Mon"]);
 				}
 
 				Build b = null;
-				if (m != null)
-				{
+				if (m != null) {
 					b = Program.builds.FirstOrDefault(bu => bu.mon == m);
 				}
 				double ret = r.manageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
@@ -122,8 +109,7 @@ function hackLots(prop, num, on) {
 
 			public static Random rand = new Random();
 
-			public static ServedResult renderRune(RuneOptim.Rune r, bool forceExpand = false)
-			{
+			public static ServedResult renderRune(RuneOptim.Rune r, bool forceExpand = false) {
 				if (r == null)
 					return "";
 				var ret = new ServedResult("div") { contentDic = { { "class", "\"rune-box\"" } } };
@@ -142,8 +128,7 @@ function hackLots(prop, num, on) {
 					}
 				};
 				// colour name base on level
-				switch (r.Level / 3)
-				{
+				switch (r.Level / 3) {
 					case 5:
 					case 4:
 						mainspan.contentDic.Add("style", "\"color: darkorange\"");
@@ -160,8 +145,7 @@ function hackLots(prop, num, on) {
 				}
 				// show the proper background
 				var runebackName = "normal";
-				switch (r.Rarity)
-				{
+				switch (r.Rarity) {
 					case 4:
 						runebackName = "legend";
 						break;
@@ -186,8 +170,7 @@ function hackLots(prop, num, on) {
 
 
 				hidediv.contentList.Add(
-					new ServedResult("div")
-					{
+					new ServedResult("div") {
 						contentDic = { { "class", "\"rune-icon rune-icon-back rune-back " + runebackName + "\"" }, },
 						contentList = {
 						new ServedResult("div") { contentDic = { { "class", "\"rune-icon rune-icon-body rune-body rune-slot" + r.Slot + "\""},  }, contentList = {
@@ -198,29 +181,24 @@ function hackLots(prop, num, on) {
 					});
 
 				var propdiv = new ServedResult("div") { contentDic = { { "class", "\"rune-box-right\"" } } };
-				if (r.Innate != null && r.Innate.Type > RuneOptim.Attr.Null)
-				{
-					propdiv.contentList.Add(new ServedResult("div")
-					{
+				if (r.Innate != null && r.Innate.Type > RuneOptim.Attr.Null) {
+					propdiv.contentList.Add(new ServedResult("div") {
 						contentDic = { { "class", "\"rune-prop rune-sub rune-innate\"" } },
 						contentList = { "+" + r.Innate.Type + " " + r.Innate.Value }
 					});
 				}
-				propdiv.contentList.Add(new ServedResult("div")
-				{
+				propdiv.contentList.Add(new ServedResult("div") {
 					contentDic = { { "class", "\"monster-name rune-prop rune-monster-name\"" } },
 					contentList = { new ServedResult("a") { contentDic = { { "href", "\"monsters/" + r.AssignedName + "\"" } }, contentList = { r.AssignedName } }
 								}
 				});
 				hidediv.contentList.Add(propdiv);
 				hidediv.contentList.Add("<br/>");
-				for (int i = 0; i < 4; i++)
-				{
+				for (int i = 0; i < 4; i++) {
 					if (r.Subs == null || r.Subs.Count <= i || r.Subs[i].Type <= Attr.Null)
 						continue;
 					var s = r.Subs[i];
-					hidediv.contentList.Add(new ServedResult("span")
-					{
+					hidediv.contentList.Add(new ServedResult("span") {
 						contentDic = { { "class", "\"rune-prop rune-sub rune-sub" + i + "\"" } },
 						contentList = { "+" + s.Value + " " + s.Type }
 					});

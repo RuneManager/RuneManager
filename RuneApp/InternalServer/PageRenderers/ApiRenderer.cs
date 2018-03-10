@@ -9,19 +9,15 @@ using Newtonsoft.Json;
 using RuneOptim;
 
 namespace RuneApp.InternalServer {
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 		[PageAddressRender("api")]
-		public class ApiRenderer : PageRenderer
-		{
-			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-			{
+		public class ApiRenderer : PageRenderer {
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 				var resp = this.Recurse(req, uri);
 				if (resp != null)
 					return resp;
 
-				if (req.AcceptTypes?.Contains("application/json") ?? false)
-				{
+				if (req.AcceptTypes?.Contains("application/json") ?? false) {
 					return new SwaggerJsRenderer().Render(req, uri);
 				}
 				// yaml?
@@ -105,14 +101,10 @@ function log() {
 			}
 
 			[PageAddressRender("swagger.json")]
-			public class SwaggerJsRenderer : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					return new HttpResponseMessage(HttpStatusCode.OK)
-					{
-						Content = new StringContent(new ServedResult()
-						{
+			public class SwaggerJsRenderer : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+					return new HttpResponseMessage(HttpStatusCode.OK) {
+						Content = new StringContent(new ServedResult() {
 							contentDic =
 						{
 							{ "swagger", "2.0" },
@@ -165,11 +157,9 @@ function log() {
 
 
 			[PageAddressRender("monsters")]
-			public class MonstersRenderer : PageRenderer
-			{
+			public class MonstersRenderer : PageRenderer {
 				[HttpMethod("POST")]
-				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri)
-				{
+				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri) {
 					Monster mon = null;
 					ulong id = 0;
 					if (uri.Length > 0) {
@@ -224,8 +214,7 @@ function log() {
 				}
 
 				[HttpMethod("PUT")]
-				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri)
-				{
+				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri) {
 					Monster mon = null;
 					ulong id = 0;
 					if (uri.Length > 0) {
@@ -260,10 +249,8 @@ function log() {
 					return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
 				}
 
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					switch (req.HttpMethod)
-					{
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+					switch (req.HttpMethod) {
 						case "PUT":
 							return PutMethod(req, uri);
 
@@ -281,11 +268,9 @@ function log() {
 			}
 
 			[PageAddressRender("runes")]
-			public class RunesRenderer : PageRenderer
-			{
+			public class RunesRenderer : PageRenderer {
 				[HttpMethod("POST")]
-				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri)
-				{
+				public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri) {
 					if (Program.data == null) {
 						return return404();
 					}
@@ -315,8 +300,7 @@ function log() {
 				}
 
 				[HttpMethod("PUT")]
-				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri)
-				{
+				public HttpResponseMessage PutMethod(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent("{PUT}") };
 				}
 
@@ -336,10 +320,8 @@ function log() {
 					return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
 				}
 
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
-					switch (req.HttpMethod)
-					{
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
+					switch (req.HttpMethod) {
 						case "PUT":
 							return PutMethod(req, uri);
 						case "POST":

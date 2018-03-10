@@ -3,25 +3,20 @@ using System.Net;
 using System.Net.Http;
 
 namespace RuneApp.InternalServer {
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 		[PageAddressRender("scripts")]
-		public class ScriptRenderer : PageRenderer
-		{
-			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-			{
+		public class ScriptRenderer : PageRenderer {
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 				var resp = this.Recurse(req, uri);
 				if (resp != null)// && resp.StatusCode != HttpStatusCode.NotFound)
 					return resp;
 
 				// allows downloading files
-				if (uri.Length > 0 && File.Exists(uri[0]))
-				{
+				if (uri.Length > 0 && File.Exists(uri[0])) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(File.ReadAllText(uri[0])) };
 				}
 
-				return new HttpResponseMessage(HttpStatusCode.OK)
-				{
+				return new HttpResponseMessage(HttpStatusCode.OK) {
 					Content = new StringContent(@"function nextProgress() {
 	var xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function() {
@@ -40,28 +35,22 @@ namespace RuneApp.InternalServer {
 			}
 
 			[PageAddressRender("swagger.js")]
-			public class SwaggerRenderer : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class SwaggerRenderer : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_js) };
 				}
 			}
 
 			[PageAddressRender("swagger-ui.js")]
-			public class SwaggerUiRenderer : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class SwaggerUiRenderer : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_ui) };
 				}
 			}
 
 			[PageAddressRender("swagger-client.js")]
-			public class SwaggerClientRenderer : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class SwaggerClientRenderer : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_client) }; ;
 				}
 			}

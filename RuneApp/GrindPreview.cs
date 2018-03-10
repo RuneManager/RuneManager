@@ -49,8 +49,8 @@ namespace RuneApp {
 		void Craftify() {
 			if (selCraft != null) {
 				this.runeBox2.SetCraft(selCraft);
-			var r = Rune.Grind(selCraft, grindInd);
-			this.runeBox3.SetRune(r);
+				var r = Rune.Grind(selCraft, grindInd);
+				this.runeBox3.SetRune(r);
 			}
 		}
 

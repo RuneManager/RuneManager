@@ -10,7 +10,7 @@ namespace RuneOptim {
 		Worse,
 		Better
 	}
-	
+
 	public struct Buffs {
 		public bool Attack;
 		public bool Defense;
@@ -32,7 +32,7 @@ namespace RuneOptim {
 		private bool[] predictSubs = new bool[6];
 
 		private int buildID;
-		
+
 		public int BuildID { get { return buildID; } set { buildID = value; } }
 
 		[JsonIgnore]

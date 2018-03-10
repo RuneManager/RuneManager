@@ -5,17 +5,14 @@ using System.Windows.Forms;
 using RuneOptim;
 using System.Linq;
 
-namespace RuneApp
-{
-	public partial class RuneBox : GroupBox
-	{
+namespace RuneApp {
+	public partial class RuneBox : GroupBox {
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
 		public event EventHandler OnClickHide;
 
 		Rune rune = null;
 
-		public RuneBox()
-		{
+		public RuneBox() {
 			InitializeComponent();
 			subs = new[] { lb1, lb2, lb3, lb4 };
 		}
@@ -32,12 +29,11 @@ namespace RuneApp
 
 		Label[] subs = null;
 
-		public void SetRune(Rune rune)
-		{
+		public void SetRune(Rune rune) {
 			lbMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
 			lbInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
 
-			for (int i = 0; i < 4; i ++) {
+			for (int i = 0; i < 4; i++) {
 				subs[i].Text = Rune.StringIt(rune.Subs, i);
 				if (i < rune.Subs.Count)
 					subs[i].ForeColor = (rune.Subs[i].GrindBonus > 0) ? Color.OrangeRed : Color.Black;
@@ -50,8 +46,7 @@ namespace RuneApp
 			this.rune = rune;
 		}
 
-		public void SetCraft(Craft craft)
-		{
+		public void SetCraft(Craft craft) {
 			lbMain.Text = craft.Set.ToString();
 			RuneId = craft.ItemId;
 			runeControl.SetCraft(craft);
@@ -70,8 +65,7 @@ namespace RuneApp
 			btnGrind.Visible = false;
 		}
 
-		private void lbClose_Click(object sender, System.EventArgs e)
-		{
+		private void lbClose_Click(object sender, System.EventArgs e) {
 			this.Hide();
 			OnClickHide?.Invoke(sender, e);
 		}

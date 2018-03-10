@@ -3,12 +3,10 @@ using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace RuneApp
-{
+namespace RuneApp {
 	// A really overloaded control to display runes cool-like with a million options
 	// Mostly stolen from TransparentControl
-	public sealed class RuneControl : Control
-	{
+	public sealed class RuneControl : Control {
 		private readonly Timer refresher;
 
 		// yeah, pictures
@@ -30,74 +28,57 @@ namespace RuneApp
 		// Normal, Magic, Rare, Hero, Legend
 		private int coolness;
 
-		protected override Size DefaultSize
-		{
-			get
-			{
+		protected override Size DefaultSize {
+			get {
 				return new Size(171, 179);
 			}
 		}
 
-		public Image SlotImage
-		{
-			get
-			{
+		public Image SlotImage {
+			get {
 				return _imageSlot;
 			}
-			set
-			{
+			set {
 				_imageSlot = value;
 				RecreateHandle();
 			}
 		}
 
-		public Image SetImage
-		{
-			get
-			{
+		public Image SetImage {
+			get {
 				return _imageSet;
 			}
-			set
-			{
+			set {
 				_imageSet = value;
 				RecreateHandle();
 			}
 		}
 
-		public Image StarImage
-		{
-			get
-			{
+		public Image StarImage {
+			get {
 				return _imageStars;
 			}
-			set
-			{
+			set {
 				_imageStars = value;
 				RecreateHandle();
 			}
 		}
 
-		public Image BackImage
-		{
-			get
-			{
+		public Image BackImage {
+			get {
 				return _imageBack;
 			}
-			set
-			{
+			set {
 				_imageBack = value;
 				RecreateHandle();
 			}
 		}
 
-		public float Gamma
-		{
-			get
-			{
+		public float Gamma {
+			get {
 				return gamma;
 			}
-			set
-			{
+			set {
 				gamma = value;
 			}
 		}
@@ -107,8 +88,7 @@ namespace RuneApp
 		public bool ShowStars { get { return renderStars; } set { renderStars = value; } }
 		public int Coolness { get { return coolness; } set { coolness = value; } }
 
-		public RuneControl()
-		{
+		public RuneControl() {
 			SetStyle(ControlStyles.SupportsTransparentBackColor, true);
 			BackColor = Color.Transparent;
 			gamma = 1;
@@ -120,36 +100,31 @@ namespace RuneApp
 			grade = 1;
 		}
 
-		protected override CreateParams CreateParams
-		{
-			get
-			{
+		protected override CreateParams CreateParams {
+			get {
 				CreateParams cp = base.CreateParams;
 				cp.ExStyle |= 0x20;
 				return cp;
 			}
 		}
 
-		protected override void OnMove(EventArgs e)
-		{
+		protected override void OnMove(EventArgs e) {
 			RecreateHandle();
 		}
 
-		public void SetCraft(RuneOptim.Craft craft)
-		{
+		public void SetCraft(RuneOptim.Craft craft) {
 			grade = 0;
 
 			_imageSlot = runeSlotImages[(int)craft.Type + 6];
 			_imageSet = runeSetImages[craft.Set];
 
-			_imageBack = runeRarityImages[craft.Rarity-1];
-			coolness = craft.Rarity-1;
+			_imageBack = runeRarityImages[craft.Rarity - 1];
+			coolness = craft.Rarity - 1;
 
 			Refresh();
 		}
 
-		public void SetRune(RuneOptim.Rune rune)
-		{
+		public void SetRune(RuneOptim.Rune rune) {
 			Tag = rune;
 			if (rune == null)
 				return;
@@ -169,10 +144,8 @@ namespace RuneApp
 			Refresh();
 		}
 
-		protected override void OnPaint(PaintEventArgs e)
-		{
-			if (_imageSlot != null)
-			{
+		protected override void OnPaint(PaintEventArgs e) {
+			if (_imageSlot != null) {
 				var attr = new ImageAttributes();
 
 				attr.SetGamma(gamma);
@@ -184,20 +157,19 @@ namespace RuneApp
 					e.Graphics.DrawImage(_imageBack,
 						new Rectangle((Width / 2) - (squarish / 2), (Height / 2) - (squarish / 2), squarish, squarish),
 						new Rectangle(0, 0, _imageBack.Width, _imageBack.Height), GraphicsUnit.Pixel);
-					//e.Graphics.DrawImage(_imageBack, (Width / 2) - (_imageBack.Width / 2), (Height / 2) - (_imageBack.Height / 2));
+				//e.Graphics.DrawImage(_imageBack, (Width / 2) - (_imageBack.Width / 2), (Height / 2) - (_imageBack.Height / 2));
 
 				//e.Graphics.DrawImage(_image, (Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2));
 
 				//Point[] dest = new Point[]{ new Point(top, left), new Point(top, right), new Point(bottom, right)};
-				e.Graphics.DrawImage(_imageSlot, 
-					new Rectangle((Width / 2) - (_imageSlot.Width / 2), (Height / 2) - (_imageSlot.Height / 2), _imageSlot.Width, _imageSlot.Height), 
-					0, 0, _imageSlot.Width, _imageSlot.Height, 
+				e.Graphics.DrawImage(_imageSlot,
+					new Rectangle((Width / 2) - (_imageSlot.Width / 2), (Height / 2) - (_imageSlot.Height / 2), _imageSlot.Width, _imageSlot.Height),
+					0, 0, _imageSlot.Width, _imageSlot.Height,
 					GraphicsUnit.Pixel, attr);
 
 				int smallish = (int)(squarish * 0.5);
 
-				if (coolness != 0)
-				{
+				if (coolness != 0) {
 					// https://www.w3schools.com/colors/colors_converter.asp
 					// var qq = document.getElementById("rgb01").innerHTML; qq = qq.substring(4, qq.length-1).split(","); for (var i in qq) { console.log(qq[i].trim()/255-0.8);}
 
@@ -210,7 +182,7 @@ namespace RuneApp
 					else if (coolness == 4)
 						colour = new float[] { 0.98f, 0.68f, 0.48f, 0, 1 };
 
-					float[][] ptsArray = 
+					float[][] ptsArray =
 					{
 						new float[] { colour[0], 0, 0, 0, 0},
 						new float[] {0, colour[1], 0, 0, 0},
@@ -222,8 +194,7 @@ namespace RuneApp
 					attr.SetColorMatrix(clrMatrix, ColorMatrixFlag.Default, ColorAdjustType.Bitmap);
 				}
 
-				if (_imageSet != null)
-				{
+				if (_imageSet != null) {
 					e.Graphics.DrawImage(_imageSet,
 						new Rectangle((Width / 2) - (smallish / 2), (Height / 2) - (smallish / 2), smallish, smallish),
 						0, 0, _imageSet.Width, _imageSet.Height,
@@ -231,10 +202,8 @@ namespace RuneApp
 				}
 
 				// for int grade draw star
-				if (renderStars)
-				{
-					for (int i = 0; i < grade; i++)
-					{
+				if (renderStars) {
+					for (int i = 0; i < grade; i++) {
 						e.Graphics.DrawImage(_imageStars,
 							new Rectangle((Width / 2) - (squarish / 2) + 2 + (8 + 6 / grade) * i, (Height / 2) - (squarish / 2) + 3, 13, 13),
 							new Rectangle(0, 0, _imageStars.Width, _imageStars.Height),
@@ -245,19 +214,16 @@ namespace RuneApp
 			}
 		}
 
-		protected override void OnPaintBackground(PaintEventArgs e)
-		{
+		protected override void OnPaintBackground(PaintEventArgs e) {
 			//Do not paint background
 		}
 
 		//Hack
-		public void Redraw()
-		{
+		public void Redraw() {
 			RecreateHandle();
 		}
 
-		private void TimerOnTick(object source, EventArgs e)
-		{
+		private void TimerOnTick(object source, EventArgs e) {
 			RecreateHandle();
 			refresher.Stop();
 		}

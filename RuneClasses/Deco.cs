@@ -2,11 +2,9 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace RuneOptim
-{
+namespace RuneOptim {
 	[JsonConverter(typeof(StringEnumConverter))]
-	public enum Shrine
-	{
+	public enum Shrine {
 		[EnumMember(Value = "Unknown")]
 		Unknown = -1,
 		[EnumMember(Value = "")]
@@ -37,8 +35,7 @@ namespace RuneOptim
 
 	}
 
-	public class Deco
-	{
+	public class Deco {
 		public readonly static string[] ShrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
 		public readonly static double[] ShrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
 
@@ -64,12 +61,9 @@ namespace RuneOptim
 		public int MasterId;
 
 		[JsonIgnore]
-		public Shrine Shrine
-		{
-			get
-			{
-				switch (MasterId)
-				{
+		public Shrine Shrine {
+			get {
+				switch (MasterId) {
 					case 4:
 					case 6:
 					case 8:
@@ -87,8 +81,7 @@ namespace RuneOptim
 			}
 		}
 
-		public override string ToString()
-		{
+		public override string ToString() {
 			return "Lvl. " + Level + " " + Shrine;
 		}
 	}

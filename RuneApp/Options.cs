@@ -3,28 +3,24 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace RuneApp {
-	public partial class Options : Form
-	{
+	public partial class Options : Form {
 		Dictionary<string, CheckBox> checks = new Dictionary<string, CheckBox>();
 		Dictionary<string, TextBox> nums = new Dictionary<string, TextBox>();
 		bool loading;
 		bool isUnchecking = false;
 
-		public void AddCheck(string config, CheckBox box)
-		{
+		public void AddCheck(string config, CheckBox box) {
 			box.Tag = config;
 			checks.Add(config, box);
 		}
 
-		public void AddNum(string config, TextBox box)
-		{
+		public void AddNum(string config, TextBox box) {
 			box.Tag = config;
-			
+
 			nums.Add(config, box);
 		}
 
-		public Options()
-		{
+		public Options() {
 			loading = true;
 			InitializeComponent();
 
@@ -48,20 +44,17 @@ namespace RuneApp {
 			AddNum("TestShow", gTestShow);
 			AddNum("TestTime", gTestTime);
 
-			foreach (var p in checks)
-			{
+			foreach (var p in checks) {
 				p.Value.Checked = (bool)Program.Settings[p.Key];
 			}
-			foreach (var p in nums)
-			{
+			foreach (var p in nums) {
 				p.Value.Text = ((int)Program.Settings[p.Key]).ToString();
 			}
 
 			loading = false;
 		}
 
-		private void CInternalServer_CheckedChanged(object sender, EventArgs e)
-		{
+		private void CInternalServer_CheckedChanged(object sender, EventArgs e) {
 			if (loading || isUnchecking)
 				return;
 
@@ -69,27 +62,21 @@ namespace RuneApp {
 			cInternalServer.Checked = !cInternalServer.Checked;
 			cInternalServer.Enabled = false;
 
-			if (!cInternalServer.Checked)
-			{
-				try
-				{
+			if (!cInternalServer.Checked) {
+				try {
 					Program.master.Start();
 					cInternalServer.Checked = true;
 				}
-				catch (Exception ex)
-				{
+				catch (Exception ex) {
 					MessageBox.Show("Failed starting server\r\n" + ex.GetType() + ": " + ex.Message);
 				}
 			}
-			else
-			{
-				try
-				{
+			else {
+				try {
 					Program.master.Stop();
 					cInternalServer.Checked = false;
 				}
-				catch (Exception ex)
-				{
+				catch (Exception ex) {
 					MessageBox.Show("Failed stopping server\r\n" + ex.GetType() + ": " + ex.Message);
 				}
 			}
@@ -97,8 +84,7 @@ namespace RuneApp {
 			isUnchecking = false;
 		}
 
-		private void CHelpStart_CheckedChanged(object sender, EventArgs e)
-		{
+		private void CHelpStart_CheckedChanged(object sender, EventArgs e) {
 			if (loading)
 				return;
 
@@ -106,18 +92,15 @@ namespace RuneApp {
 				Main.help.SetStartupCheck(cHelpStart.Checked);
 		}
 
-		private void Options_FormClosing(object sender, FormClosingEventArgs e)
-		{
+		private void Options_FormClosing(object sender, FormClosingEventArgs e) {
 		}
 
-		private void button1_Click(object sender, EventArgs e)
-		{
+		private void button1_Click(object sender, EventArgs e) {
 			DialogResult = DialogResult.OK;
 			Close();
 		}
 
-		private void check_CheckedChanged(object sender, EventArgs e)
-		{
+		private void check_CheckedChanged(object sender, EventArgs e) {
 			if (loading)
 				return;
 
@@ -128,28 +111,26 @@ namespace RuneApp {
 			Program.Settings.Save();
 		}
 
-		private void num_TextChanged(object sender, EventArgs e)
-		{
+		private void num_TextChanged(object sender, EventArgs e) {
 			if (loading)
 				return;
 
 			var ctrl = (TextBox)sender;
 			string key = ctrl.Tag.ToString();
 			int val;
-			
+
 			if (!int.TryParse(ctrl.Text, out val)) return;
 			Program.Settings[key] = val;
 			Program.Settings.Save();
 		}
 
-		private void btnHelp_Click(object sender, EventArgs e)
-		{
+		private void btnHelp_Click(object sender, EventArgs e) {
 			if (Main.help != null)
 				Main.help.Close();
-			
+
 			Main.help = new Help();
 			Main.Instance.OpenHelp(Environment.CurrentDirectory + "\\User Manual\\options.html");//, this);
 		}
-		
+
 	}
 }

@@ -581,7 +581,7 @@ namespace RuneApp {
 			runSource?.Cancel();
 		}
 
-		public static void RunBuild(Build b, bool saveStats = false) {
+		public static void RunBuild(Build build, bool saveStats = false) {
 			if (Program.data == null)
 				return;
 
@@ -598,159 +598,159 @@ namespace RuneApp {
 			runSource = new CancellationTokenSource();
 			runToken = runSource.Token;
 			runTask = Task.Factory.StartNew(() => {
-				runBuild(b, saveStats);
+				runBuild(build, saveStats);
 			});
 		}
 
-		private static void runBuild(Build b, bool saveStats = false) {
+		private static void runBuild(Build build, bool saveStats = false) {
 			try {
-				if (b == null) {
+				if (build == null) {
 					log.Info("Build is null");
 					return;
 				}
 				if (currentBuild != null)
 					throw new InvalidOperationException("Already running a build");
-				if (b.IsRunning)
+				if (build.IsRunning)
 					throw new InvalidOperationException("This build is already running");
-				currentBuild = b;
-				
-				log.Info("Starting watch " + b.ID + " " + b.MonName);
+				currentBuild = build;
+
+				log.Info("Starting watch " + build.ID + " " + build.MonName);
 
 				Stopwatch buildTime = Stopwatch.StartNew();
-				
-				b.RunesUseEquipped = Program.Settings.UseEquipped;
-				b.RunesUseLocked = false;
-				b.BuildGenerate = 0;
-				b.BuildTake = 0;
-				b.BuildTimeout = 0;
-				b.shrines = Program.data.shrines;
-				b.BuildDumpBads = true;
-				b.BuildSaveStats = saveStats;
-				b.BuildGoodRunes = false;
-				b.RunesOnlyFillEmpty = Program.fillRunes;
-				b.RunesDropHalfSetStat = Program.goFast;
 
-				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Runes..."));
-				if (b.Type == BuildType.Link) {
-					b.CopyFrom(b.LinkBuild);
+				build.RunesUseEquipped = Program.Settings.UseEquipped;
+				build.RunesUseLocked = false;
+				build.BuildGenerate = 0;
+				build.BuildTake = 0;
+				build.BuildTimeout = 0;
+				build.shrines = Program.data.shrines;
+				build.BuildDumpBads = true;
+				build.BuildSaveStats = saveStats;
+				build.BuildGoodRunes = false;
+				build.RunesOnlyFillEmpty = Program.fillRunes;
+				build.RunesDropHalfSetStat = Program.goFast;
+
+				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Runes..."));
+				if (build.Type == BuildType.Link) {
+					build.CopyFrom(build.LinkBuild);
 				}
-				b.GenRunes(Program.data);
+				build.GenRunes(Program.data);
 
 				#region Check enough runes
 				string nR = "";
-				for (int i = 0; i < b.runes.Length; i++) {
-					if (b.runes[i] != null && b.runes[i].Length == 0)
+				for (int i = 0; i < build.runes.Length; i++) {
+					if (build.runes[i] != null && build.runes[i].Length == 0)
 						nR += (i + 1) + " ";
 				}
 
 				if (nR != "") {
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, ":( " + nR + "Runes"));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, ":( " + nR + "Runes"));
 					return;
 				}
 				#endregion
-				
-				b.BuildPrintTo += BuildsPrintTo;
-				b.BuildProgTo += BuildsProgressTo;
+
+				build.BuildPrintTo += BuildsPrintTo;
+				build.BuildProgTo += BuildsProgressTo;
 
 				EventHandler<PrintToEventArgs> qw = (bq, s) => {
 					if (runToken.IsCancellationRequested)
-						b.Cancel();
+						build.Cancel();
 				};
-				b.BuildPrintTo += qw;
+				build.BuildPrintTo += qw;
 
-				var result = b.GenBuilds();
+				var result = build.GenBuilds();
 
 				buildTime.Stop();
-				b.Time = buildTime.ElapsedMilliseconds;
-				log.Info("Stopping watch " + b.ID + " " + b.MonName + " @ " + buildTime.ElapsedMilliseconds);
+				build.Time = buildTime.ElapsedMilliseconds;
+				log.Info("Stopping watch " + build.ID + " " + build.MonName + " @ " + buildTime.ElapsedMilliseconds);
 
-				if (b.Best != null) {
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Best"));
+				if (build.Best != null) {
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Best"));
 
-					b.Best.Current.BuildID = b.ID;
+					build.Best.Current.BuildID = build.ID;
 
 					#region Get the rune diff
-					b.Best.Current.Lock();
-					b.Best.Current.RecountDiff(b.mon.Id);
+					build.Best.Current.Lock();
+					build.Best.Current.RecountDiff(build.mon.Id);
 					#endregion
 
 					//currentBuild = null;
-					b.Best.Current.Time = b.Time;
+					build.Best.Current.Time = build.Time;
 
-					var dmon = Program.data.GetMonster(b.Best.Id);
+					var dmon = Program.data.GetMonster(build.Best.Id);
 
 					var dmonld = dmon.Current.Leader;
 					var dmonsh = dmon.Current.Shrines;
-					dmon.Current.Leader = b.Best.Current.Leader;
-					dmon.Current.Shrines = b.Best.Current.Shrines;
+					dmon.Current.Leader = build.Best.Current.Leader;
+					dmon.Current.Shrines = build.Best.Current.Shrines;
 					var dmonfl = dmon.Current.FakeLevel;
 					var dmonps = dmon.Current.PredictSubs;
-					dmon.Current.FakeLevel = b.Best.Current.FakeLevel;
-					dmon.Current.PredictSubs = b.Best.Current.PredictSubs;
+					dmon.Current.FakeLevel = build.Best.Current.FakeLevel;
+					dmon.Current.PredictSubs = build.Best.Current.PredictSubs;
 
-					b.Best.Current.DeltaPoints = b.CalcScore(b.Best.Current.GetStats(b.Best)) - b.CalcScore(dmon.GetStats());
+					build.Best.Current.DeltaPoints = build.CalcScore(build.Best.Current.GetStats(build.Best)) - build.CalcScore(dmon.GetStats());
 
 					dmon.Current.Leader = dmonld;
 					dmon.Current.Shrines = dmonsh;
 					dmon.Current.FakeLevel = dmonfl;
 					dmon.Current.PredictSubs = dmonps;
 
-					loads.Add(b.Best.Current);
+					loads.Add(build.Best.Current);
 
 					// if we are on the hunt of good runes.
-					if (goodRunes && saveStats && b.Type != BuildType.Lock) {
-						var theBest = b.Best;
+					if (goodRunes && saveStats && build.Type != BuildType.Lock) {
+						var theBest = build.Best;
 						int count = 0;
 						// we must progressively ban more runes from the build to find second-place runes.
 						//GenDeep(b, 0, printTo, ref count);
-						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.Id).ToArray());
-						RunBanned(b, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.Id).ToArray());
-						RunBanned(b, ++count, theBest.Current.Runes.Select(r => r.Id).ToArray());
+						RunBanned(build, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 != 0).Select(r => r.Id).ToArray());
+						RunBanned(build, ++count, theBest.Current.Runes.Where(r => r.Slot % 2 == 0).Select(r => r.Id).ToArray());
+						RunBanned(build, ++count, theBest.Current.Runes.Select(r => r.Id).ToArray());
 
 						// after messing all that shit up
-						b.Best = theBest;
+						build.Best = theBest;
 					}
 
 					#region Save Build stats
 
 					/* TODO: put Excel on Program */
-					if (saveStats && b.Type != BuildType.Lock) {
-						BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Excel"));
-						runeSheet.StatsExcelBuild(b, b.mon, b.Best.Current, true);
+					if (saveStats && build.Type != BuildType.Lock) {
+						BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Excel"));
+						runeSheet.StatsExcelBuild(build, build.mon, build.Best.Current, true);
 					}
 
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Clean"));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Clean"));
 					// clean up for GC
-					if (b.buildUsage != null)
-						b.buildUsage.loads.Clear();
-					if (b.runeUsage != null) {
-						b.runeUsage.runesGood.Clear();
-						b.runeUsage.runesUsed.Clear();
+					if (build.buildUsage != null)
+						build.buildUsage.loads.Clear();
+					if (build.runeUsage != null) {
+						build.runeUsage.runesGood.Clear();
+						build.runeUsage.runesUsed.Clear();
 					}
-					b.runeUsage = null;
-					b.buildUsage = null;
+					build.runeUsage = null;
+					build.buildUsage = null;
 					/**/
 					#endregion
 				}
 
-				b.BuildPrintTo -= BuildsPrintTo;
-				b.BuildPrintTo -= qw;
-				b.BuildProgTo -= BuildsProgressTo;
+				build.BuildPrintTo -= BuildsPrintTo;
+				build.BuildPrintTo -= qw;
+				build.BuildProgTo -= BuildsProgressTo;
 
 				//if (plsDie)
 				//    printTo?.Invoke("Canned");
 				//else 
-				if (b.Best != null)
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, "Done"));
+				if (build.Best != null)
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Done"));
 				else
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(b, result + " :("));
+					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, result + " :("));
 
 				log.Info("Cleaning up");
 				//b.isRun = false;
 				//currentBuild = null;
 			}
 			catch (Exception e) {
-				log.Error("Error during build " + b.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
+				log.Error("Error during build " + build.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
 			}
 			finally {
 				currentBuild = null;

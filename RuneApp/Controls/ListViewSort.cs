@@ -3,11 +3,9 @@ using System.Collections;
 using System.Windows.Forms;
 
 
-namespace RuneApp
-{
+namespace RuneApp {
 	// I remember taking this from somewhere on stackoverflow maybe
-	class ListViewSort : IComparer
-	{
+	class ListViewSort : IComparer {
 		// which column/subitem to sort on
 		int sortPrimary = -1;
 		int sortSecondary = -1;
@@ -18,8 +16,7 @@ namespace RuneApp
 		public bool ShouldSort = true;
 
 		// Compare two ListViewItems
-		public int Compare(object a, object b)
-		{
+		public int Compare(object a, object b) {
 			if (!ShouldSort)
 				return 0;
 
@@ -28,7 +25,7 @@ namespace RuneApp
 
 			if (sortPrimary == -1)
 				return 0;
-			
+
 			// Okay so this will attempt to turn strings into numbers eg. "435" -> 435, "32 (124)" -> 32
 			// this is to help sort the Generate scoring columns, otherwise it will sort by string
 
@@ -57,14 +54,12 @@ namespace RuneApp
 
 			double comp;
 			double val, valc;
-			if (double.TryParse(val1i, out val))
-			{
+			if (double.TryParse(val1i, out val)) {
 				if (val2 == "" || !double.TryParse(val2i, out valc))
 					return -(int)Math.Max(1, val);
 				comp = val - valc;
 			}
-			else
-			{
+			else {
 				comp = String.Compare(val1, val2, StringComparison.Ordinal);
 			}
 			if (Math.Abs(comp) > 0.00000001)
@@ -75,7 +70,7 @@ namespace RuneApp
 
 			string val3 = lhs.SubItems[sortSecondary].Text;
 			string val4 = rhs.SubItems[sortSecondary].Text;
-			
+
 			int val3sp = val1.IndexOf(' ');
 			int val4sp = val2.IndexOf(' ');
 
@@ -86,38 +81,32 @@ namespace RuneApp
 			if (val4sp != -1)
 				val4i = val2.Substring(0, val4sp);
 
-			if (double.TryParse(val3i, out val))
-			{
+			if (double.TryParse(val3i, out val)) {
 				if (val4 == "" || !double.TryParse(val4i, out valc))
 					return -(int)Math.Max(1, val);
 				comp = val - valc;
 			}
-			else
-			{
+			else {
 				comp = String.Compare(val3, val4, StringComparison.Ordinal);
 			}
 
-			return Math.Sign(comp) * (int)Math.Max(1, Math.Abs( comp)) * (orderSecondary ? 1 : -1);
+			return Math.Sign(comp) * (int)Math.Max(1, Math.Abs(comp)) * (orderSecondary ? 1 : -1);
 		}
 
-		public void OrderBy(int column, bool ascend = true)
-		{
+		public void OrderBy(int column, bool ascend = true) {
 			sortPrimary = column;
 			orderPrimary = ascend;
 		}
 
-		public void ThenBy(int column, bool ascend = true)
-		{
+		public void ThenBy(int column, bool ascend = true) {
 			sortSecondary = column;
 			orderSecondary = ascend;
 		}
 
 		// When the lists column is clicked
-		public void OnColumnClick(int column, bool ascend = true, bool force = false)
-		{
+		public void OnColumnClick(int column, bool ascend = true, bool force = false) {
 			// if we don't care about fancy stuff
-			if (force)
-			{
+			if (force) {
 				sortPrimary = column;
 				orderPrimary = ascend;
 				return;
@@ -125,8 +114,7 @@ namespace RuneApp
 
 			if (column == sortPrimary)
 				orderPrimary = !orderPrimary;
-			else
-			{
+			else {
 				// seems okay, right?
 				orderSecondary = orderPrimary;
 				sortSecondary = sortPrimary;

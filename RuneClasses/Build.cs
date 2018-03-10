@@ -1128,7 +1128,7 @@ namespace RuneOptim {
 										if (GrindLoads) {
 											for (int rg = 0; rg < 6; rg++) {
 												//test.Runes[rg].FilterGrinds(grinds);
-											// TODO: 
+												// TODO: 
 											}
 										}
 

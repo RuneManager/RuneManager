@@ -8,17 +8,13 @@ using System.Text;
 using RuneOptim;
 
 namespace RuneApp.InternalServer {
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 		[PageAddressRender("css")]
-		public class CssRenderer : PageRenderer
-		{
-			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-			{
+		public class CssRenderer : PageRenderer {
+			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 				var themeSet = Themes.Themes.ResourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
 
-				if (uri.Length > 0 && uri[0].Contains(".css"))
-				{
+				if (uri.Length > 0 && uri[0].Contains(".css")) {
 					var theme = themeSet.Cast<DictionaryEntry>().FirstOrDefault(kv => kv.Key.ToString() == uri[0].Replace(".css", ""));
 					if (theme.Key != null)
 						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(theme.Value.ToString()) };
@@ -36,11 +32,9 @@ namespace RuneApp.InternalServer {
 					new ServedResult("button") { contentDic = { { "onclick", "javascript:window.location.href=\"/css/set?theme=/css/none.css\"" } }, contentList = { "Reset to default" } }
 				};
 
-				foreach (DictionaryEntry t in themeSet)
-				{
+				foreach (DictionaryEntry t in themeSet) {
 					sr.Add(new ServedResult("iframe") { contentDic = { { "src", "\"css/" + t.Key + ".html\"" }, { "style", "\"display:block;\"" } }, contentList = { " " } });
-					sr.Add(new ServedResult("button")
-					{
+					sr.Add(new ServedResult("button") {
 						contentDic = { { "onclick", "\"javascript:window.location.href='/css/set?theme=/css/" + t.Key + ".css'\"" } },
 						contentList = { "Use this theme" }
 					});
@@ -50,51 +44,40 @@ namespace RuneApp.InternalServer {
 			}
 
 			[PageAddressRender("preview.html")]
-			public class ThemePreviewer : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class ThemePreviewer : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return returnHtml(null, new ThemePreview());
 				}
 			}
 
-			public class ThemePreview : ServedResult
-			{
-				public override string ToJson()
-				{
+			public class ThemePreview : ServedResult {
+				public override string ToJson() {
 					return "HTML previewer";
 				}
 
-				public override string ToHtml()
-				{
+				public override string ToHtml() {
 					return InternalServer.theme_preview.Replace("{guid}", new Guid().ToString());
 				}
 			}
 
 			[PageAddressRender("set")]
-			public class SetCss : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class SetCss : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					currentTheme = req.getHeadOrParam("theme");
 					return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "/" } } };
 				}
 			}
 
 			[PageAddressRender("swagger.css")]
-			public class SwaggerCss : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class SwaggerCss : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(Swagger.Swagger.swagger_css) };
 				}
 			}
 
 			[PageAddressRender("runes.css")]
-			public class RuneCss : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class RuneCss : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					var cssStr = new StringBuilder(InternalServer.runes_css);
 
 					foreach (var s in new string[] { "normal", "magic", "rare", "hero", "legend" })
@@ -111,28 +94,22 @@ namespace RuneApp.InternalServer {
 			}
 
 			[PageAddressRender("light.html")]
-			public class LightPreview : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class LightPreview : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "light.css" } } } }, new ThemePreview());
 				}
 			}
 
 			[PageAddressRender("none.css")]
-			public class NoneTheme : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class NoneTheme : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(@"") };
 				}
 			}
 
 			[PageAddressRender("dark.html")]
-			public class DarkPreview : PageRenderer
-			{
-				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri)
-				{
+			public class DarkPreview : PageRenderer {
+				public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 					return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "dark.css" } } } }, new ThemePreview());
 				}
 			}

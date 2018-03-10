@@ -5,10 +5,8 @@ using System.Linq;
 using System.Windows.Forms;
 using RuneOptim;
 
-namespace RuneApp
-{
-	public partial class RuneSelect : Form
-	{
+namespace RuneApp {
+	public partial class RuneSelect : Form {
 		public IEnumerable<Rune> runes;
 
 		public Rune returnedRune = null;
@@ -20,8 +18,7 @@ namespace RuneApp
 
 		public SlotIndex slot = SlotIndex.Global;
 
-		public RuneSelect()
-		{
+		public RuneSelect() {
 			InitializeComponent();
 			// when show, check if we have been given cool things
 			Shown += RuneSelect_Shown;
@@ -31,17 +28,14 @@ namespace RuneApp
 
 		}
 
-		void RuneSelect_Shown(object sender, EventArgs e)
-		{
+		void RuneSelect_Shown(object sender, EventArgs e) {
 			if (runeStatKey == null)
 				this.runeStats.Width = 0;
 
 			// dump out the rune details
-			foreach (Rune rune in runes.OrderBy(sortFunc))
-			{
+			foreach (Rune rune in runes.OrderBy(sortFunc)) {
 				double points = 0;
-				if (build != null)
-				{
+				if (build != null) {
 					points = build.ScoreRune(rune, build.GetFakeLevel(rune), false);
 
 					if (rune.Slot % 2 == 0 && build.slotStats[rune.Slot - 1].Any() && !build.slotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
@@ -63,18 +57,16 @@ namespace RuneApp
 					item.ForeColor = Color.Red;
 				// stash the rune into the tag
 				item.Tag = rune;
-				
+
 
 				listRunes.Items.Add(item);
 			}
-			if (build != null)
-			{
+			if (build != null) {
 				listRunes.Columns[5].Width = 50;
 
 				// Find all the runes in the build for the slot
 				List<Rune> fr = new List<Rune>();
-				switch (slot)
-				{
+				switch (slot) {
 					case SlotIndex.Even:
 						fr.AddRange(build.runes[1]);
 						fr.AddRange(build.runes[3]);
@@ -107,12 +99,10 @@ namespace RuneApp
 			}
 
 			// if we are given a rune, see if we can pre-select it
-			if (returnedRune != null)
-			{
+			if (returnedRune != null) {
 				ShowRune(returnedRune);
 				// find the precious
-				foreach (ListViewItem li in listRunes.Items)
-				{
+				foreach (ListViewItem li in listRunes.Items) {
 					if (li.Tag != null && ((Rune)li.Tag).Equals(returnedRune))
 						listRunes.SelectedIndices.Add(li.Index);
 				}
@@ -123,13 +113,10 @@ namespace RuneApp
 		}
 
 		// preview the selected rune
-		private void listView2_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (listRunes.FocusedItem != null)
-			{
+		private void listView2_SelectedIndexChanged(object sender, EventArgs e) {
+			if (listRunes.FocusedItem != null) {
 				var item = listRunes.FocusedItem;
-				if (item.Tag != null)
-				{
+				if (item.Tag != null) {
 					Rune rune = (Rune)item.Tag;
 					ShowRune(rune);
 				}
@@ -137,17 +124,14 @@ namespace RuneApp
 		}
 
 		// Show the little preview window of the given rune
-		private void ShowRune(Rune rune)
-		{
+		private void ShowRune(Rune rune) {
 			runeBox1.Show();
 			runeBox1.SetRune(rune);
 		}
 
 		// return the highlighted rune
-		private void button3_Click(object sender, EventArgs e)
-		{
-			if (listRunes.SelectedItems.Count > 0)
-			{
+		private void button3_Click(object sender, EventArgs e) {
+			if (listRunes.SelectedItems.Count > 0) {
 				returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
 				DialogResult = DialogResult.OK;
 				Close();
@@ -155,25 +139,21 @@ namespace RuneApp
 		}
 
 		// cancel selecting a rune
-		private void button1_Click(object sender, EventArgs e)
-		{
+		private void button1_Click(object sender, EventArgs e) {
 			DialogResult = DialogResult.Cancel;
 			Close();
 		}
 
 		// return the selected rune
-		private void listView2_DoubleClick(object sender, EventArgs e)
-		{
-			if (listRunes.SelectedItems.Count > 0)
-			{
+		private void listView2_DoubleClick(object sender, EventArgs e) {
+			if (listRunes.SelectedItems.Count > 0) {
 				returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
 				DialogResult = DialogResult.OK;
 				Close();
 			}
 		}
-		
-		private void listView2_ColumnClick(object sender, ColumnClickEventArgs e)
-		{
+
+		private void listView2_ColumnClick(object sender, ColumnClickEventArgs e) {
 			var sorter = (ListViewSort)((ListView)sender).ListViewItemSorter;
 			sorter.OnColumnClick(e.Column);
 			((ListView)sender).Sort();

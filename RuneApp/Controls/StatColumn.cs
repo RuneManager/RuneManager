@@ -4,20 +4,17 @@ using System.Windows.Forms;
 using RuneOptim;
 
 namespace RuneApp {
-	public partial class StatColumn : UserControl
-	{
+	public partial class StatColumn : UserControl {
 		bool editable = false;
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always), DefaultValue(false)]
-		public bool Editable
-		{
+		public bool Editable {
 			get { return editable; }
 			set { editable = value; ShowExtras = Editable; refreshControls(); }
 		}
 
 		bool locked = false;
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always), DefaultValue(false)]
-		public bool Locked
-		{
+		public bool Locked {
 			get { return locked; }
 			set { locked = value; refreshControls(); }
 		}
@@ -28,29 +25,23 @@ namespace RuneApp {
 		[DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
 		[Bindable(true)]
 		[DefaultValue("Title")]
-		public override string Text
-		{
+		public override string Text {
 			get { return text; }
 			set { text = value; this.lbTitle.Text = value; }
 		}
 
 		bool labels = false;
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always), DefaultValue(false)]
-		public bool IsLabel
-		{
+		public bool IsLabel {
 			get { return labels; }
-			set
-			{
+			set {
 				labels = value;
-				foreach (var a in Build.statAll)
-				{
-					if (!labels)
-					{
+				foreach (var a in Build.statAll) {
+					if (!labels) {
 						ChangeLabel(a, 12345.67);
 						ChangeTextBox(a, 12345.67);
 					}
-					else
-					{
+					else {
 						ChangeLabel(a, null);
 						ChangeTextBox(a, null);
 					}
@@ -61,18 +52,15 @@ namespace RuneApp {
 
 		public bool ShowExtras = false;
 
-		public Stats Stats
-		{
+		public Stats Stats {
 			get { return stats; }
-			set
-			{
+			set {
 				loading = true;
 				stats = value;
 				if (stats != null) {
 					stats.OnStatChanged += Stats_OnStatChanged;
 				}
-				foreach (var a in Build.statAll)
-				{
+				foreach (var a in Build.statAll) {
 					ChangeTextBox(a, stats?[a]);
 					ChangeLabel(a, stats?[a]);
 				}
@@ -81,10 +69,8 @@ namespace RuneApp {
 					//ChangeLabel(a, stats?.DamageSkillups[(int)a - 22]);
 					ChangeLabel(a, stats?.GetSkillDamage(Attr.AverageDamage, a - Attr.Skill1, stats));
 				}
-				if (stats != null && !ShowExtras)
-				{
-					foreach (var a in Build.extraEnums)
-					{
+				if (stats != null && !ShowExtras) {
+					foreach (var a in Build.extraEnums) {
 						ChangeLabel(a, stats.ExtraValue(a));
 					}
 				}
@@ -94,45 +80,36 @@ namespace RuneApp {
 
 		bool loading = true;
 
-		public StatColumn()
-		{
+		public StatColumn() {
 			InitializeComponent();
 			refreshControls();
 			this.lbTitle.Text = text;
 		}
 
-		private void StatColumn_Load(object sender, EventArgs e)
-		{
+		private void StatColumn_Load(object sender, EventArgs e) {
 			loading = false;
 		}
 
-		public void RecheckExtras()
-		{
-			if (stats != null && !ShowExtras)
-			{
-				foreach (var a in Build.extraEnums)
-				{
+		public void RecheckExtras() {
+			if (stats != null && !ShowExtras) {
+				foreach (var a in Build.extraEnums) {
 					ChangeLabel(a, stats.ExtraValue(a));
 				}
 			}
 		}
 
-		private void Stats_OnStatChanged(object sender, StatModEventArgs e)
-		{
+		private void Stats_OnStatChanged(object sender, StatModEventArgs e) {
 			if (loading) return;
 			ChangeTextBox(e.Attr, e.Value);
 			ChangeLabel(e.Attr, e.Value);
 		}
 
-		public void ChangeTextBox(Attr a, double? v)
-		{
+		public void ChangeTextBox(Attr a, double? v) {
 			var astr = a.ToString();
 			loading = true;
-			foreach (Control c in Controls)
-			{
+			foreach (Control c in Controls) {
 				if (!(c is TextBox)) continue;
-				if (c.Tag != null && c.Tag.ToString() == astr)
-				{
+				if (c.Tag != null && c.Tag.ToString() == astr) {
 					if (v != null)
 						c.Text = v != 0 ? v.ToString() : "";
 					else
@@ -142,14 +119,11 @@ namespace RuneApp {
 			loading = false;
 		}
 
-		public void ChangeLabel(Attr a, double? v)
-		{
+		public void ChangeLabel(Attr a, double? v) {
 			var astr = a.ToString();
-			foreach (Control c in Controls)
-			{
+			foreach (Control c in Controls) {
 				if (!(c is Label)) continue;
-				if (c.Tag != null && c.Tag.ToString() == astr)
-				{
+				if (c.Tag != null && c.Tag.ToString() == astr) {
 					if (v != null)
 						c.Text = v != 0 ? v.ToString() : "";
 					else
@@ -158,16 +132,12 @@ namespace RuneApp {
 			}
 		}
 
-		private void refreshControls()
-		{
-			foreach (Control c in Controls)
-			{
-				if (c is Label)
-				{
+		private void refreshControls() {
+			foreach (Control c in Controls) {
+				if (c is Label) {
 					c.Visible = !editable;
 				}
-				else if (c is TextBox)
-				{
+				else if (c is TextBox) {
 					c.Visible = editable;
 					c.Enabled = !locked;
 				}
@@ -175,13 +145,11 @@ namespace RuneApp {
 			lbTitle.Show();
 		}
 
-		private void tb_TextChanged(object sender, EventArgs e)
-		{
+		private void tb_TextChanged(object sender, EventArgs e) {
 			if (loading) return;
 
 			TextBox tb = sender as TextBox;
-			if (tb != null && stats != null)
-			{
+			if (tb != null && stats != null) {
 				var tag = tb.Tag;
 				Attr attr;
 				double v;

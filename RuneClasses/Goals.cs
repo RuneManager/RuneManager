@@ -75,7 +75,7 @@ namespace RuneOptim {
 		public int level;
 		public int grade;
 	}
-	
+
 	public enum FufilmentStatus {
 		Pending,
 		Dependent,
@@ -101,7 +101,7 @@ namespace RuneOptim {
 		ChargerShark_Wind = 19503,
 		ChargerShark_Wind_Zephicus = 19513,
 	}
-	
+
 	public class AwakenGoalDef : GoalDef {
 		public AwakenGoalDef(MonsterTypeMap monsterType) : base(monsterType, GoalType.Awaken) {
 			type = monsterType;

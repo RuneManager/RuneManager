@@ -105,7 +105,7 @@ namespace RuneApp {
 				}
 			}
 		}
-		
+
 		private void richTextSpeech_LinkClicked(object sender, LinkClickedEventArgs e) {
 			if (e.LinkText.Contains("[CBox]")) {
 				var ss = e.LinkText.Substring(e.LinkText.IndexOf("[CBox]") + 6);
@@ -133,7 +133,7 @@ namespace RuneApp {
 		}
 
 		private void lnkResponse_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-			
+
 		}
 
 		private void HoverTimer_Tick(object sender, EventArgs e) {

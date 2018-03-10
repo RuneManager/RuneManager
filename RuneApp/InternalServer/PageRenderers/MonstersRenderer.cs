@@ -8,11 +8,9 @@ using System.Text;
 using RuneOptim;
 
 namespace RuneApp.InternalServer {
-	public partial class Master : PageRenderer
-	{
+	public partial class Master : PageRenderer {
 		[PageAddressRender("monsters")]
-		public class MonstersRenderer : PageRenderer
-		{
+		public class MonstersRenderer : PageRenderer {
 			public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
 				if (uri.Length == 0) {
 					return returnHtml(new ServedResult[]{
@@ -30,7 +28,7 @@ namespace RuneApp.InternalServer {
 function popBox(id, ev, ele) {{
 if (ev.button == 0 && !ev.ctrlKey && !ev.shiftKey && !ev.altKey) {{
 		var frame = document.getElementById(""frame"");
-		frame.src = ""/monsters/"" + id;
+		frame.src = ""monsters/"" + id;
 		frame.style.position = ""absolute"";
 		frame.style.left = ""500px"";
 		frame.style.display = 'block';
@@ -75,7 +73,7 @@ function closeBox() {{
 							contentDic = { { "type", "\"application/javascript\"" } },
 							contentList = { $@"function performAction(action, params) {{
 var http = new XMLHttpRequest();
-var url = ""/api/monsters/{mid}?action="" + action;
+var url = ""api/monsters/{mid}?action="" + action;
 http.open(""POST"", url, true);
 
 //Send the proper header information along with the request
@@ -91,14 +89,13 @@ http.send(params);
 				}}" } }
 					}, renderMonster(m));
 				}
-				else
-				{
+				else {
 					if (Program.data == null)
 						return returnHtml(null, "missingdata");
 
 					var m = Program.data.GetMonster(uri[0]);
 					if (m != null)
-						return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "/monsters/" + m.Id } } };
+						return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "monsters/" + m.Id } } };
 				}
 				return return404();
 			}
@@ -108,7 +105,7 @@ http.send(params);
 		static ServedResult renderMonster(Monster mon) {
 			var div = new ServedResult("div") {
 				contentList = {
-					renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{mon.monsterTypeId}.png\"" }, { "width", "50px" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
+					renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"monsters/{mon.monsterTypeId}.png\"" }, { "width", "50px" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
 					new ServedResult("br"),
 					new ServedResult("span") { contentList = { mon.Id.ToString() } },
 					new ServedResult("br"),
@@ -121,7 +118,7 @@ http.send(params);
 
 
 			return div;
-			//return (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } };
+			//return (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"monsters/{m.monsterTypeId}.png\"" } } };
 		}
 		#endregion
 
@@ -156,7 +153,54 @@ http.send(params);
 			foreach (var i in remids) {
 				Program.goals.ReservedIds.Remove(i);
 			}
-			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null);
+			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null).ToList();
+			//reserved = reserved.Union(Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).GroupBy(m => m.monsterTypeId).Select(m => m.First())).Distinct();
+
+			var fuss = Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
+			var nKfg = 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
+			var nJojo = 1;
+			var dict = new Dictionary<string, int>();
+
+			foreach (var m in fuss) {
+				var idk = m.monsterTypeId.ToString().Substring(0,3);
+				if (!dict.ContainsKey(idk))
+					dict.Add(idk, 0);
+				if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("110") && m.Element == Element.Fire) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("102") && m.Element == Element.Water) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("195") && m.Element == Element.Wind) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("160") && m.Element == Element.Wind) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("154") && m.Element == Element.Fire) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("140") && m.Element == Element.Fire) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("114") && m.Element == Element.Water) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("132") && m.Element == Element.Wind) {
+					reserved.Add(m);
+					dict[idk]++; ;
+				}
+				if (reserved.Count(r => r.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3)) == 0)
+					reserved.Add(m);
+			}
+
 			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
 			var locked = Program.data.Monsters.Where(m => m.Locked).Union(bb.Select(b => b.mon)).Except(reserved).ToList();
@@ -324,16 +368,13 @@ http.send(params);
 			return list;
 		}
 
-		static ServedResult recurseFood(Food f)
-		{
+		static ServedResult recurseFood(Food f) {
 			ServedResult sr = new ServedResult("li");
 			sr.contentList.Add(renderMonLink(f.mon, null, LinkRenderOptions.None));
 			sr.contentList.Add(" " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
-			if (f.food.Any())
-			{
+			if (f.food.Any()) {
 				var rr = new ServedResult("ul");
-				foreach (var o in f.food)
-				{
+				foreach (var o in f.food) {
 					rr.contentList.Add(recurseFood(o));
 				}
 				sr.contentList.Add(rr);
@@ -341,14 +382,11 @@ http.send(params);
 			return sr;
 		}
 
-		static List<Food> makeFood(int lev, List<Food> food)
-		{
+		static List<Food> makeFood(int lev, List<Food> food) {
 			var outFood = new List<Food>();
 			Food current = null;
-			while (food.Any(f => f.fakeLevel == lev - 1))
-			{
-				if (current == null)
-				{
+			while (food.Any(f => f.fakeLevel == lev - 1)) {
+				if (current == null) {
 					if (food.Count(f => f.fakeLevel == lev - 1) <= lev - 1)
 						break;
 					current = food.OrderByDescending(f => f.mon.level).FirstOrDefault(f => f.fakeLevel == lev - 1);
@@ -358,18 +396,15 @@ http.send(params);
 					outFood.Add(current);
 					current.fakeLevel = lev;
 				}
-				else
-				{
+				else {
 					// only eat things which are 1 or upgraded
 					var tfood = food.Where(f => f.mon.level == 1 || f.fakeLevel != f.mon.Grade).FirstOrDefault(f => f.fakeLevel == lev - 1);
 					if (tfood == null)
 						break;
-					if (current.food.Count(f => f.fakeLevel == lev - 1) >= lev - 1)
-					{
+					if (current.food.Count(f => f.fakeLevel == lev - 1) >= lev - 1) {
 						current = null;
 					}
-					else
-					{
+					else {
 						current.food.Add(tfood);
 						food.Remove(tfood);
 					}
@@ -379,8 +414,7 @@ http.send(params);
 			return outFood.Concat(food).ToList();
 		}
 
-		class Food
-		{
+		class Food {
 			public Monster mon;
 			public List<Food> food = new List<Food>();
 			public int fakeLevel;
@@ -396,13 +430,12 @@ http.send(params);
 			Locked = 16,
 			All = Portrait | Grade | Level | Locked | Skillups
 		}
-		public static ServedResult renderMonLink(Monster m, ServedResult prefix = null, LinkRenderOptions renderOptions = LinkRenderOptions.All, bool linkify = true)
-		{
+		public static ServedResult renderMonLink(Monster m, ServedResult prefix = null, LinkRenderOptions renderOptions = LinkRenderOptions.All, bool linkify = true) {
 			var res = new ServedResult("span");
 			if (prefix != null)
 				res.contentList.Add(prefix);
 			if ((renderOptions & LinkRenderOptions.Portrait) == LinkRenderOptions.Portrait)
-				res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"/monsters/{m.monsterTypeId}.png\"" } } });
+				res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"monsters/{m.monsterTypeId}.png\"" } } });
 			var str = m.FullName;
 			var suff = "";
 			if (m.Name.Contains("Pieces")) {
@@ -433,8 +466,7 @@ http.send(params);
 			return res;
 		}
 
-		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs)
-		{
+		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs) {
 			var b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
 			var m = b.mon;
 
@@ -457,8 +489,7 @@ http.send(params);
 					//{ "class", "\"rune-container\"" }
 			}
 			};
-			foreach (var r in l.Runes)
-			{
+			foreach (var r in l.Runes) {
 				if (r == null) continue;
 				var rd = RuneRenderer.renderRune(r);
 				var hide = rd.contentList.FirstOrDefault(ele => ele.contentDic.Any(pr => pr.Value.ToString().Contains(r.Id.ToString() + "_")));
