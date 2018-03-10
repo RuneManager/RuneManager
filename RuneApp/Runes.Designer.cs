@@ -163,6 +163,16 @@ namespace RuneApp {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap enchant_gem_common {
+            get {
+                object obj = ResourceManager.GetObject("enchant_gem_common", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap endure {
             get {
                 object obj = ResourceManager.GetObject("endure", resourceCulture);
@@ -216,6 +226,16 @@ namespace RuneApp {
         internal static System.Drawing.Bitmap focus {
             get {
                 object obj = ResourceManager.GetObject("focus", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap grindstone_common {
+            get {
+                object obj = ResourceManager.GetObject("grindstone_common", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

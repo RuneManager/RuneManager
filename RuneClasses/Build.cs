@@ -172,6 +172,9 @@ namespace RuneOptim {
 		[JsonIgnore]
 		public bool RunesOnlyFillEmpty = false;
 
+		[JsonIgnore]
+		public bool GrindLoads = false;
+
 		public event EventHandler<PrintToEventArgs> BuildPrintTo;
 
 		public event EventHandler<ProgToEventArgs> BuildProgTo;
@@ -1122,6 +1125,13 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
+										if (GrindLoads) {
+											for (int rg = 0; rg < 6; rg++) {
+												//test.Runes[rg].FilterGrinds(grinds);
+											// TODO: 
+											}
+										}
+
 										isBad = false;
 
 										cstats = test.GetStats();
@@ -1268,7 +1278,7 @@ namespace RuneOptim {
 									plus = 0;
 
 									// if we've got enough, stop
-									if (BuildGenerate > 0 && count >= BuildGenerate) {
+									if (BuildGenerate > 0 && buildUsage.passed >= BuildGenerate) {
 										IsRunning = false;
 										break;
 									}

@@ -124,6 +124,12 @@
     <Compile Include="GenerateLive.Designer.cs">
       <DependentUpon>GenerateLive.cs</DependentUpon>
     </Compile>
+    <Compile Include="GrindPreview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GrindPreview.Designer.cs">
+      <DependentUpon>GrindPreview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Help.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -250,6 +256,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GenerateLive.resx">
       <DependentUpon>GenerateLive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GrindPreview.resx">
+      <DependentUpon>GrindPreview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Help.resx">
       <DependentUpon>Help.cs</DependentUpon>
@@ -3872,6 +3881,7 @@
     <None Include="Resources\building_icon_0000_2_1.png" />
     <None Include="Resources\building_store.png" />
     <None Include="Resources\building_store_small.png" />
+    <None Include="Resources\enchant_gem_common.png" />
     <Content Include="Resources\fromMon.png" />
     <None Include="Resources\icon_duration_attack_down.png" />
     <None Include="Resources\icon_duration_attack_up.png" />
@@ -3906,6 +3916,7 @@
     <None Include="Resources\icon_duration_speed_down.png" />
     <None Include="Resources\icon_duration_speed_up.png" />
     <None Include="Resources\icon_duration_stun.png" />
+    <None Include="Resources\grindstone_common.png" />
     <Content Include="Resources\locked.png" />
     <Content Include="Resources\lockedNo.png" />
     <Content Include="Resources\mon.png" />

@@ -45,6 +45,21 @@ namespace RuneOptim {
 			}
 		}
 
+		public override string ToString() {
+			return Rarity + " " + Set + " " + Stat + " " + Type;
+		}
+
+		public ValueRange Value {
+			get {
+				if (Type == CraftType.Grind) {
+					return GrindValues[this.Stat][this.Rarity];
+				}
+				else {
+					return EnchantValues[this.Stat][this.Rarity];
+				}
+			}
+		}
+
 		#region Grind/Enchant Values
 		// 1 = normal, 2 = magic, 3 = rare, 4 = hero, 5 = legend
 		private static readonly ImmutableDictionary<int, ValueRange> FlatAtkDefGrindValues = new Dictionary<int, ValueRange>() {

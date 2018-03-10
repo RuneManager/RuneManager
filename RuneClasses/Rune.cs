@@ -312,7 +312,7 @@ namespace RuneOptim {
 
 		public static string StringIt(List<RuneAttr> subs, int v) {
 			if (subs.Count > v)
-				return StringIt(subs[v].Type, subs[v].Value);
+				return StringIt(subs[v].Type, subs[v].Value) + (subs[v].IsEnchanted ? "↺" : "");
 			return "";
 		}
 
@@ -514,5 +514,64 @@ namespace RuneOptim {
 			PrebuildAttributes();
 		}
 
+		public IEnumerable<Craft> FilterGrinds(IEnumerable<Craft> data) {
+			var grinds = data.Where(c => c.Type == CraftType.Grind);
+			grinds = grinds.Where(c => c.Set == this.Set);
+			grinds = grinds.Where(c => c.Stat != this.Main.Type);
+			grinds = grinds.Where(c => c.Stat != this.Innate?.Type);
+			grinds = grinds.Where(c => this.HasStat(c.Stat));
+			switch (this.Slot) {
+				case 1:
+					grinds = grinds.Where(c => c.Stat != Attr.DefenseFlat && c.Stat != Attr.DefensePercent);
+					break;
+				case 3:
+					grinds = grinds.Where(c => c.Stat != Attr.AttackFlat && c.Stat != Attr.AttackPercent);
+					break;
+			}
+			return grinds;
+		}
+
+		public IEnumerable<Craft> FilterEnchants(IEnumerable<Craft> data) {
+			var enchants = data.Where(c => c.Type == CraftType.Enchant);
+			enchants = enchants.Where(c => c.Set == this.Set);
+			// except you can enchant 4% resist to 5-7% resist >.>
+			enchants = enchants.Where(c => !this.HasStat(c.Stat));
+			switch (this.Slot) {
+				case 1:
+					enchants = enchants.Where(c => c.Stat != Attr.DefenseFlat && c.Stat != Attr.DefensePercent);
+					break;
+				case 3:
+					enchants = enchants.Where(c => c.Stat != Attr.AttackFlat && c.Stat != Attr.AttackPercent);
+					break;
+			}
+			return enchants;
+		}
+
+		public Rune Grind(Craft craft, int index = 0) {
+			// assume craft is valid
+			var r = new Rune();
+			this.CopyTo(r, true, null);
+			r.manageStats = new ConcurrentDictionary<string, double>(this.manageStats);
+			if (craft.Type == CraftType.Grind) {
+				var sub = r.Subs.FirstOrDefault(s => s.Type == craft.Stat);
+				if (sub != null) {
+					if (craft.Value.Average > sub.GrindBonus) {
+						var d = Math.Max(craft.Value.Min, sub.GrindBonus);
+						sub.GrindBonus = (craft.Value.Max - d) / 2 + d;
+					}
+					sub.Refresh();
+				}
+			}
+			else {
+				r.Subs[index].Type = craft.Stat;
+				r.Subs[index].Enchanted = 1;
+				r.Subs[index].BaseValue = (int)craft.Value.Average;
+				r.Subs[index].GrindBonus = 0;
+
+				r.Subs[index].Refresh();
+			}
+
+			return r;
+		}
 	}
 }

@@ -711,6 +711,10 @@ namespace RuneOptim {
 				_calcVal = 0;
 		}
 
+		public void Refresh() {
+			OnChange(0,0);
+		}
+
 		[JsonIgnore]
 		public int Value
 		{

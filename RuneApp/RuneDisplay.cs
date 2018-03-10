@@ -11,6 +11,9 @@ namespace RuneApp
 		{
 			InitializeComponent();
 			runeBoxes = new RuneBox[] { runeBox1, runeBox2, runeBox3, runeBox4, runeBox5, runeBox6 };
+			foreach (var rb in runeBoxes) {
+				rb.AllowGrind = false;
+			}
 		}
 		
 		public void UpdateLoad(Loadout load)

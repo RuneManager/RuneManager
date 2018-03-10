@@ -137,9 +137,15 @@ namespace RuneApp
 
 		public void SetCraft(RuneOptim.Craft craft)
 		{
+			grade = 0;
+
+			_imageSlot = runeSlotImages[(int)craft.Type + 6];
 			_imageSet = runeSetImages[craft.Set];
-			_imageBack = runeRarityImages[craft.Rarity];
-			coolness = craft.Rarity;
+
+			_imageBack = runeRarityImages[craft.Rarity-1];
+			coolness = craft.Rarity-1;
+
+			Refresh();
 		}
 
 		public void SetRune(RuneOptim.Rune rune)
@@ -265,6 +271,8 @@ namespace RuneApp
 			Runes.rune4,
 			Runes.rune5,
 			Runes.rune6,
+			Runes.enchant_gem_common,
+			Runes.grindstone_common,
 		};
 
 		readonly Bitmap[] runeRarityImages =

@@ -38,6 +38,7 @@
 			this.lb4 = new System.Windows.Forms.Label();
 			this.lbMon = new System.Windows.Forms.Label();
 			this.lbClose = new System.Windows.Forms.Label();
+			this.btnGrind = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// lbMain
@@ -59,7 +60,7 @@
 			this.lbInnate.TabIndex = 0;
 			this.lbInnate.Text = "Innate";
 			// 
-			// runeControl1
+			// runeControl
 			// 
 			this.runeControl.BackColor = System.Drawing.Color.Transparent;
 			this.runeControl.BackImage = global::RuneApp.Runes.bg_normal;
@@ -68,7 +69,7 @@
 			this.runeControl.Grade = 2;
 			this.runeControl.Location = new System.Drawing.Point(4, 17);
 			this.runeControl.Margin = new System.Windows.Forms.Padding(2);
-			this.runeControl.Name = "runeControl1";
+			this.runeControl.Name = "runeControl";
 			this.runeControl.SetImage = global::RuneApp.Runes.despair;
 			this.runeControl.ShowBack = true;
 			this.runeControl.ShowStars = true;
@@ -136,7 +137,7 @@
 			// 
 			this.lbClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.lbClose.AutoSize = true;
-			this.lbClose.Location = new System.Drawing.Point(235, 15);
+			this.lbClose.Location = new System.Drawing.Point(225, 15);
 			this.lbClose.Name = "lbClose";
 			this.lbClose.Size = new System.Drawing.Size(14, 13);
 			this.lbClose.TabIndex = 22;
@@ -144,8 +145,19 @@
 			this.lbClose.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			this.lbClose.Click += new System.EventHandler(this.lbClose_Click);
 			// 
+			// btnGrind
+			// 
+			this.btnGrind.Location = new System.Drawing.Point(144, 119);
+			this.btnGrind.Name = "btnGrind";
+			this.btnGrind.Size = new System.Drawing.Size(65, 23);
+			this.btnGrind.TabIndex = 23;
+			this.btnGrind.Text = "Grind";
+			this.btnGrind.UseVisualStyleBackColor = true;
+			this.btnGrind.Click += new System.EventHandler(this.btnGrind_Click);
+			// 
 			// RuneBox
 			// 
+			this.Controls.Add(this.btnGrind);
 			this.Controls.Add(this.lbClose);
 			this.Controls.Add(this.runeControl);
 			this.Controls.Add(this.lbMain);
@@ -156,8 +168,7 @@
 			this.Controls.Add(this.lb3);
 			this.Controls.Add(this.lb4);
 			this.Controls.Add(this.lbMon);
-			this.Name = "RuneBox";
-			this.Size = new System.Drawing.Size(257, 186);
+			this.Size = new System.Drawing.Size(241, 148);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -175,5 +186,6 @@
         private System.Windows.Forms.Label lb4;
         private System.Windows.Forms.Label lbMon;
 		private System.Windows.Forms.Label lbClose;
+		private System.Windows.Forms.Button btnGrind;
 	}
 }
