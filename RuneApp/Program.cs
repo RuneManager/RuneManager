@@ -250,6 +250,8 @@ namespace RuneApp {
 			{
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
 
+				//var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
+
 				if (data.isModified) {
 					Console.WriteLine("Loaded data has been touched, untouching...");
 					data.isModified = false;
@@ -687,6 +689,8 @@ namespace RuneApp {
 					var dmonps = dmon.Current.PredictSubs;
 					dmon.Current.FakeLevel = build.Best.Current.FakeLevel;
 					dmon.Current.PredictSubs = build.Best.Current.PredictSubs;
+					var dmonbf = dmon.Current.Buffs;
+					dmon.Current.Buffs = build.Best.Current.Buffs;
 
 					build.Best.Current.DeltaPoints = build.CalcScore(build.Best.Current.GetStats(build.Best)) - build.CalcScore(dmon.GetStats());
 
@@ -694,6 +698,7 @@ namespace RuneApp {
 					dmon.Current.Shrines = dmonsh;
 					dmon.Current.FakeLevel = dmonfl;
 					dmon.Current.PredictSubs = dmonps;
+					dmon.Current.Buffs = dmonbf;
 
 					loads.Add(build.Best.Current);
 

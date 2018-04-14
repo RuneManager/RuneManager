@@ -457,9 +457,9 @@ namespace RuneOptim {
 				case Attr.DamagePerSpeed:
 					return ExtraValue(Attr.AverageDamage) * Speed * 0.01;
 				case Attr.AverageDamage:
-					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage * 0.01 * Math.Min(CritRate + ExtraCritRate, 100) * 0.01);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01 * Math.Min(CritRate + ExtraCritRate, 100) * 0.01);
 				case Attr.MaxDamage:
-					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage * 0.01);
+					return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01);
 				default:
 					throw new NotImplementedException();
 			}

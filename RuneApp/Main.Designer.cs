@@ -1225,6 +1225,7 @@
 			this.listView4.TabIndex = 1;
 			this.listView4.UseCompatibleStateImageBehavior = false;
 			this.listView4.View = System.Windows.Forms.View.Details;
+			this.listView4.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
 			// 
 			// buildID
 			// 
@@ -1282,6 +1283,7 @@
 			this.dataCraftList.TabIndex = 2;
 			this.dataCraftList.UseCompatibleStateImageBehavior = false;
 			this.dataCraftList.View = System.Windows.Forms.View.Details;
+			this.dataCraftList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
 			this.dataCraftList.SelectedIndexChanged += new System.EventHandler(this.crafttab_list_select);
 			// 
 			// columnHeader5
@@ -1879,6 +1881,7 @@
 			// 
 			// runeInventory
 			// 
+			this.runeInventory.AllowGrind = true;
 			this.runeInventory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeInventory.Location = new System.Drawing.Point(885, 135);
 			this.runeInventory.Name = "runeInventory";
@@ -1891,6 +1894,7 @@
 			// 
 			// runeEquipped
 			// 
+			this.runeEquipped.AllowGrind = true;
 			this.runeEquipped.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.runeEquipped.Location = new System.Drawing.Point(885, 320);
 			this.runeEquipped.Name = "runeEquipped";

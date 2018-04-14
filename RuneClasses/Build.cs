@@ -553,12 +553,17 @@ namespace RuneOptim {
 			string str;
 			double vv, v2, pts = 0;
 			// dodgy hack for indexing in Generate ListView
+
+			// TODO: instead of -Goal, make everything >Goal /2
 			int i = 2;
 			foreach (Attr stat in Build.statEnums) {
 				vv = current[stat];
 				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 				if (Sort[stat] != 0) {
-					v2 = ((Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat])) - Goal[stat]) / Sort[stat];
+					v2 = (Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]));
+					if (v2 > Goal[stat])
+						v2 = (v2 - Goal[stat]) / 2 + Goal[stat];
+					v2 /= Sort[stat];
 					if (outvals != null)
 						outvals[stat] = v2;
 					if (writeTo != null)
@@ -573,7 +578,10 @@ namespace RuneOptim {
 				vv = current.ExtraValue(stat);
 				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 				if (Sort.ExtraGet(stat) != 0) {
-					v2 = ((Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat))) - Goal.ExtraGet(stat)) / Sort.ExtraGet(stat);
+					v2 = (Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat)));
+					if (v2 > Goal.ExtraGet(stat))
+						v2 = (v2 - Goal.ExtraGet(stat)) / 2 + Goal.ExtraGet(stat);
+					v2 /= Sort.ExtraGet(stat);
 					if (outvals != null)
 						outvals.ExtraSet(stat, v2);
 					if (writeTo != null)
@@ -589,7 +597,10 @@ namespace RuneOptim {
 					vv = current.GetSkillDamage(Attr.AverageDamage, j); //current.SkillFunc[j](current);
 					str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 					if (Sort.DamageSkillups[j] != 0) {
-						v2 = ((Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j])) - Goal.DamageSkillups[j]) / Sort.DamageSkillups[j];
+						v2 = (Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j]));
+						if (v2 > Goal.DamageSkillups[j])
+							v2 = (v2 - Goal.DamageSkillups[j]) / 2 + Goal.DamageSkillups[j];
+						v2 /= Sort.DamageSkillups[j];
 						if (outvals != null)
 							outvals.DamageSkillups[j] = v2;
 						if (writeTo != null)

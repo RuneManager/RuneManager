@@ -70,7 +70,9 @@ namespace RuneApp {
 
 			dataRuneList.ListViewItemSorter = new ListViewSort();
 
-			dataCraftList.ListViewItemSorter = new ListViewSort();
+			sorter = new ListViewSort();
+			sorter.OnColumnClick(1);
+			dataCraftList.ListViewItemSorter = sorter;
 
 			sorter = new ListViewSort();
 			sorter.OnColumnClick(1);

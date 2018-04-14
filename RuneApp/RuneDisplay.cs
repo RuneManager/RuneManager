@@ -26,6 +26,7 @@ namespace RuneApp {
 				if (r != null) {
 					int i = r.Slot - 1;
 					runeBoxes[i].SetRune(r);
+					runeBoxes[i].AllowGrind = false;
 				}
 			}
 		}

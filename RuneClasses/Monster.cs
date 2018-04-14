@@ -272,6 +272,8 @@ namespace RuneOptim {
 				checkSkillups();
 				Current.Element = this.Element;
 				Current.GetStats(this, ref curStats);
+				curStats.SkillupDamage = SkillupDamage;
+				curStats.damageFormula = damageFormula;
 				changeStats = false;
 			}
 
