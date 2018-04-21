@@ -791,7 +791,7 @@ namespace RuneApp {
 		private void loadoutlist_SelectedIndexChanged(object sender, EventArgs e) {
 			if (loadoutList.SelectedItems.Count == 0)
 				lastFocused = null;
-			if (loadoutList.FocusedItem != null && lastFocused != loadoutList.FocusedItem) {
+			if (loadoutList.FocusedItem != null && lastFocused != loadoutList.FocusedItem && loadoutList.SelectedItems.Count == 1) {
 				var item = loadoutList.FocusedItem;
 				if (item.Tag != null) {
 					Loadout load = (Loadout)item.Tag;

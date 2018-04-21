@@ -882,7 +882,10 @@ namespace RuneOptim {
 
 				timeThread = new Thread(() => {
 					while (IsRunning) {
-						Thread.Sleep(400);
+						if (RunesOnlyFillEmpty)
+							Thread.Sleep(30 / ((mon?.Current?.RuneCount ?? 1) + 1));
+						else
+							Thread.Sleep(400);
 						// every second, give a bit of feedback to those watching
 						//if (DateTime.Now > timerShared.AddSeconds(0.5)) {
 						//	timerShared = DateTime.Now;
