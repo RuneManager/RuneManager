@@ -1,7 +1,6 @@
-0.6.2
+0.6.3
 https://github.com/Skibisky/RuneManager/releases/latest
-*Faster* by mashing shared lists less.
-Resist lead, better integration.
+Boomerang/Chakram skills/names added, icons later >.>
+Bug fixes, can look at grinds (nothing special).
+0.6.2: *Faster* by mashing shared lists less.
 0.6.1: Build Locks and Links.
-Shrine ele damage, buffs!
-0.6: Really really fast for some builds.
