@@ -44,8 +44,8 @@ function closeBox() {{
 					}, renderMagicList(), new ServedResult("iframe") { contentDic = { { "id", "frame" }, { "style", "'display: none;'" } } });
 				}
 
-				if (uri.Length > 0 && uri[0].Contains(".png")) {
-					var res = uri[0].Replace(".png", "").ToLower();
+				if (uri.Length > 0 && uri.Any(f => f.Contains(".png"))) {
+					var res = uri.FirstOrDefault(f => f.Contains(".png")).Replace(".png", "");//.ToLower();
 					try {
 						using (var stream = new MemoryStream()) {
 							var img = Program.GetMonPortrait(int.Parse(res));
@@ -73,7 +73,7 @@ function closeBox() {{
 							contentDic = { { "type", "\"application/javascript\"" } },
 							contentList = { $@"function performAction(action, params) {{
 var http = new XMLHttpRequest();
-var url = ""api/monsters/{mid}?action="" + action;
+var url = ""../api/monsters/{mid}?action="" + action;
 http.open(""POST"", url, true);
 
 //Send the proper header information along with the request
@@ -116,6 +116,16 @@ http.send(params);
 			else
 				div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('reserve');" } }, contentList = { "Reserve" } });
 
+			if (Program.goals.NoSkillIds.Contains(mon.Id)) {
+				div.contentList.Add(new ServedResult("br"));
+				div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('doskill');" } }, contentList = { "Not Skilling" } });
+				div.contentList.Add(new ServedImage($"../images/mon.png"));
+			}
+			else {
+				div.contentList.Add(new ServedResult("br"));
+				div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('noskill');" } }, contentList = { "Skilling" } });
+				div.contentList.Add(new ServedImage($"../images/toMon.png"));
+			}
 
 			return div;
 			//return (m.Locked ? "L " : "") + m.FullName + " " + m.Id, new ServedResult("img") { contentDic = { { "src", $"\"monsters/{m.monsterTypeId}.png\"" } } };
@@ -157,7 +167,7 @@ http.send(params);
 			//reserved = reserved.Union(Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).GroupBy(m => m.monsterTypeId).Select(m => m.First())).Distinct();
 
 			var fuss = Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
-			var nKfg = 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
+			var nKfg = 1;// 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
 			var nJojo = 1;
 			var dict = new Dictionary<string, int>();
 
@@ -211,7 +221,7 @@ http.send(params);
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
 			var rem = new List<Monster>();
-			foreach (var m in locked.OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
@@ -238,7 +248,7 @@ http.send(params);
 					unlocked.Remove(um);
 				}
 			}
-			foreach (var m in locked.OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)

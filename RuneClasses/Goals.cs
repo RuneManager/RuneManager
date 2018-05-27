@@ -21,6 +21,8 @@ namespace RuneOptim {
 
 		public List<ulong> ReservedIds = new List<ulong>();
 
+		public List<ulong> NoSkillIds = new List<ulong>();
+
 		public List<Goal> goals { get; set; }
 		public List<Goal> Calculate(Save data) {
 			GoalState gs = new GoalState(data);

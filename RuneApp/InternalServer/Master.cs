@@ -251,6 +251,24 @@ namespace RuneApp.InternalServer {
 					new ServedResult("a") { contentDic = { { "href", "css" } }, contentList = { "Choose a theme!" } }, "<br/>",
 					"<br/>");
 			}
+			if (uri != null && uri.Length > 1 && uri[0] == "images" && uri[1].Contains(".png")) {
+				var res = uri[1].Replace(".png", "");//.ToLower();
+				try {
+					using (var stream = new MemoryStream()) {
+						var mgr = App.ResourceManager;
+						var obj = mgr.GetObject(res, null);
+						var img = (System.Drawing.Bitmap)obj;
+						img.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+						//return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StreamContent(stream) };
+
+						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new FileContent(res, stream.ToArray(), "image/png") };
+					}
+				}
+				catch (Exception e) {
+					Program.log.Error(e.GetType() + " " + e.Message);
+					return returnException(e);
+				}
+			}
 			else {
 				return Recurse(req, uri);
 			}
@@ -259,6 +277,11 @@ namespace RuneApp.InternalServer {
 		protected static HttpResponseMessage return404() {
 			// TODO:
 			return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("404 lol") };
+		}
+
+		protected static HttpResponseMessage returnException(Exception e) {
+			// TODO:
+			return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("500! " + e.GetType() + ": " + e.Message + "<br/>" + e.StackTrace) };
 		}
 
 		protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body) {

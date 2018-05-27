@@ -208,6 +208,14 @@ function log() {
 								Program.data.LockedUnits.Remove(mon.Id);
 								Program.data.isModified = true;
 								break;
+							case "doskill":
+								Program.goals.NoSkillIds.Remove(id);
+								Program.SaveGoals();
+								break;
+							case "noskill":
+								Program.goals.NoSkillIds.Add(id);
+								Program.SaveGoals();
+								break;
 						}
 					}
 					return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "POST", id.ToString() } } }.ToJson()) };
