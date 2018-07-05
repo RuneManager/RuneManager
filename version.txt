@@ -1,6 +1,7 @@
-0.6.3
+0.6.4
 https://github.com/Skibisky/RuneManager/releases/latest
-Boomerang/Chakram skills/names added, icons later >.>
+Goal calc now halves points over goal, delta loadout points fixed
+Skip button and ignore changes less than 5 percent option.
+Boomchak icons, maybe the tiniest bit faster?
+0.6.3: Boomerang/Chakram skills/names added
 Bug fixes, can look at grinds (nothing special).
-0.6.2: *Faster* by mashing shared lists less.
-0.6.1: Build Locks and Links.
