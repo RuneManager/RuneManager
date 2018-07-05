@@ -41,6 +41,7 @@
 			this.cHelpStart = new System.Windows.Forms.CheckBox();
 			this.cOtherUpdate = new System.Windows.Forms.CheckBox();
 			this.label3 = new System.Windows.Forms.Label();
+			this.cIreneStart = new System.Windows.Forms.CheckBox();
 			this.cBuildWizard = new System.Windows.Forms.CheckBox();
 			this.cColorTeams = new System.Windows.Forms.CheckBox();
 			this.cDisplayGray = new System.Windows.Forms.CheckBox();
@@ -51,13 +52,14 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
-			this.cIreneStart = new System.Windows.Forms.CheckBox();
+			this.cIgnore5Less = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.cIgnore5Less);
 			this.tabPage1.Controls.Add(this.cWatchSave);
 			this.tabPage1.Controls.Add(this.cOtherStats);
 			this.tabPage1.Controls.Add(this.label6);
@@ -203,6 +205,17 @@
 			this.label3.TabIndex = 2;
 			this.label3.Text = "Other";
 			// 
+			// cIreneStart
+			// 
+			this.cIreneStart.AutoSize = true;
+			this.cIreneStart.Location = new System.Drawing.Point(246, 111);
+			this.cIreneStart.Name = "cIreneStart";
+			this.cIreneStart.Size = new System.Drawing.Size(118, 17);
+			this.cIreneStart.TabIndex = 1;
+			this.cIreneStart.Text = "Show Irene on start";
+			this.cIreneStart.UseVisualStyleBackColor = true;
+			this.cIreneStart.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// cBuildWizard
 			// 
 			this.cBuildWizard.AutoSize = true;
@@ -310,16 +323,15 @@
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
 			// 
-			// cIreneStart
+			// cbIgnore5Less
 			// 
-			this.cIreneStart.AutoSize = true;
-			this.cIreneStart.Location = new System.Drawing.Point(246, 111);
-			this.cIreneStart.Name = "cIreneStart";
-			this.cIreneStart.Size = new System.Drawing.Size(118, 17);
-			this.cIreneStart.TabIndex = 1;
-			this.cIreneStart.Text = "Show Irene on start";
-			this.cIreneStart.UseVisualStyleBackColor = true;
-			this.cIreneStart.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			this.cIgnore5Less.AutoSize = true;
+			this.cIgnore5Less.Location = new System.Drawing.Point(9, 119);
+			this.cIgnore5Less.Name = "cbIgnore5Less";
+			this.cIgnore5Less.Size = new System.Drawing.Size(142, 17);
+			this.cIgnore5Less.TabIndex = 10;
+			this.cIgnore5Less.Text = "Ignore builds < 5% better";
+			this.cIgnore5Less.UseVisualStyleBackColor = true;
 			// 
 			// Options
 			// 
@@ -366,5 +378,6 @@
 		private System.Windows.Forms.CheckBox cBuildWizard;
 		private System.Windows.Forms.CheckBox cWatchSave;
 		private System.Windows.Forms.CheckBox cIreneStart;
+		private System.Windows.Forms.CheckBox cIgnore5Less;
 	}
 }

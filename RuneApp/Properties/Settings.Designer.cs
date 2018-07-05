@@ -262,5 +262,17 @@ namespace RuneApp.Properties {
                 this["ShowIreneOnStart"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IgnoreLess5 {
+            get {
+                return ((bool)(this["IgnoreLess5"]));
+            }
+            set {
+                this["IgnoreLess5"] = value;
+            }
+        }
     }
 }

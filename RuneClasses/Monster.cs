@@ -192,7 +192,9 @@ namespace RuneOptim {
 		public Loadout Current {
 			get {
 				if (current == null)
-					current = new Loadout();
+					current = new Loadout() {
+						Element = this.Element,
+					};
 				return current;
 			}
 			set {

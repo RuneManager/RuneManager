@@ -196,6 +196,7 @@
 			this.cbFillRunes = new System.Windows.Forms.CheckBox();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
+			this.tsBtnSkip = new System.Windows.Forms.ToolStripButton();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -1492,7 +1493,8 @@
             this.tsBtnBuildsSave,
             this.tsBtnBuildsUnlock,
             this.tsBtnFindSpeed,
-            this.tsBtnLink});
+            this.tsBtnLink,
+            this.tsBtnSkip});
 			this.toolStrip6.Location = new System.Drawing.Point(2, 15);
 			this.toolStrip6.Name = "toolStrip6";
 			this.toolStrip6.Size = new System.Drawing.Size(295, 25);
@@ -1905,6 +1907,17 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
+			// tsBtnSkip
+			// 
+			this.tsBtnSkip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnSkip.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnSkip.Image")));
+			this.tsBtnSkip.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnSkip.Name = "tsBtnSkip";
+			this.tsBtnSkip.Size = new System.Drawing.Size(23, 22);
+			this.tsBtnSkip.Text = "Skip";
+			this.tsBtnSkip.ToolTipText = "Skip";
+			this.tsBtnSkip.Click += new System.EventHandler(this.tsBtnSkip_Click);
+			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2147,6 +2160,7 @@
 		private System.Windows.Forms.CheckBox cbGoFast;
 		private System.Windows.Forms.CheckBox cbFillRunes;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripBuildStatus;
+		private System.Windows.Forms.ToolStripButton tsBtnSkip;
 	}
 }
 

@@ -175,6 +175,9 @@ namespace RuneOptim {
 		[JsonIgnore]
 		public bool GrindLoads = false;
 
+		[JsonIgnore]
+		public bool IgnoreLess5 = false;
+
 		public event EventHandler<PrintToEventArgs> BuildPrintTo;
 
 		public event EventHandler<ProgToEventArgs> BuildProgTo;
@@ -838,6 +841,33 @@ namespace RuneOptim {
 				total *= runes[5].Length;
 				long complete = total;
 
+				mon.ExtraCritRate = extraCritRate;
+				mon.GetStats();
+				mon.DamageFormula?.Invoke(mon);
+
+				int?[] slotFakesTemp = new int?[6];
+				bool[] slotPred = new bool[6];
+				GetPrediction(slotFakesTemp, slotPred);
+
+				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
+
+				var currentLoad = new Monster(mon, true);
+				currentLoad.Current.TempLoad = true;
+				currentLoad.Current.Buffs = this.Buffs;
+				currentLoad.Current.Shrines = shrines;
+				currentLoad.Current.Leader = leader;
+
+				currentLoad.Current.FakeLevel = slotFakes;
+				currentLoad.Current.PredictSubs = slotPred;
+
+				double currentScore = CalcScore(currentLoad.GetStats(true));
+
+				if ((!Sort[Attr.Speed].EqualTo(0) && Sort[Attr.Speed] <= 1) // 1 SPD is too good to pass
+					|| mon.Current.Runes.Any(r => r == null)
+					|| !mon.Current.Runes.All(r => this.runes[r.Slot - 1].Contains(r)) // only IgnoreLess5 if I have my own runes
+					|| Sort.GetNonZero().Count() == 1) // if there is only 1 sorting, must be too important to drop???
+					IgnoreLess5 = false;
+
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "cooking"));
 
 				if (total == 0) {
@@ -858,17 +888,8 @@ namespace RuneOptim {
 
 				RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
 
-				int?[] slotFakesTemp = new int?[6];
-				bool[] slotPred = new bool[6];
-				GetPrediction(slotFakesTemp, slotPred);
-
-				int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
-
 				loads.Clear();
-				mon.ExtraCritRate = extraCritRate;
-				mon.GetStats();
-				mon.DamageFormula?.Invoke(mon);
-
+				
 				// set to running
 				IsRunning = true;
 
@@ -908,8 +929,12 @@ namespace RuneOptim {
 
 				double bestScore = double.MinValue;
 
+				var opts = new ParallelOptions() {
+					MaxDegreeOfParallelism = Environment.ProcessorCount - 1
+				};
+
 				// Parallel the outer loop
-				Parallel.ForEach(runes[0], (r0, loopState) => {
+				Parallel.ForEach(runes[0], opts, (r0, loopState) => {
 					var tempTimer = DateTime.Now;
 					//var tempReq = RequiredSets.OrderBy(i => i).ToList();
 					var tempReq = RequiredSets.ToList();
@@ -1151,11 +1176,10 @@ namespace RuneOptim {
 										cstats = test.GetStats();
 
 										// check if build meets minimum
-										if (!RunesOnlyFillEmpty) {
-											isBad |= (!AllowBroken && !test.Current.SetsFull);
-											isBad |= (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
-										}
+										isBad |= !RunesOnlyFillEmpty && (!AllowBroken && !test.Current.SetsFull);
+
 										isBad |= (tempMax != null && cstats.CheckMax(tempMax));
+										isBad |= !RunesOnlyFillEmpty && (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
 										// if no broken sets, check for broken sets
 										// if there are required sets, ensure we have them
 										/*isBad |= (tempReq != null && tempReq.Count > 0
@@ -1186,12 +1210,19 @@ namespace RuneOptim {
 
 										if (isBad) {
 											kill++;
+											curScore = 0;
+										}
+										else {
+											// try to reduce CalcScore hits
+											curScore = CalcScore(cstats);
+											isBad |= IgnoreLess5 && curScore < currentScore * 1.05;
+											if (isBad)
+												kill++;
 										}
 
-										else {
+										if (!isBad) {
 											// we found an okay build!
 											plus++;
-											curScore = CalcScore(cstats);
 											test.score = curScore;
 
 											if (BuildSaveStats) {
@@ -1275,7 +1306,6 @@ namespace RuneOptim {
 											}
 
 										}
-
 									}
 									// sum up what work we've done
 									Interlocked.Add(ref count, kill);
@@ -1339,6 +1369,8 @@ namespace RuneOptim {
 				if (BuildTake > 0)
 					takeAmount = BuildTake;
 
+				if (IgnoreLess5)
+					tests.Add(new Monster(mon, true));
 
 				foreach (var ll in tests.Where(t => t != null).OrderByDescending(r => CalcScore(r.GetStats())).Take(takeAmount))
 					loads.Add(ll);

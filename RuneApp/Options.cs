@@ -39,6 +39,7 @@ namespace RuneApp {
 			AddCheck("ShowBuildWizard", cBuildWizard);
 			AddCheck("WatchSave", cWatchSave);
 			AddCheck("ShowIreneOnStart", cIreneStart);
+			AddCheck("IgnoreLess5", cIgnore5Less);
 
 			AddNum("TestGen", gTestRun);
 			AddNum("TestShow", gTestShow);

@@ -270,6 +270,8 @@ namespace RuneOptim {
 			DamageSkillups = rhs.DamageSkillups;
 			ExtraCritRate = rhs.ExtraCritRate;
 
+			SkillupDamage = rhs.SkillupDamage;
+
 			if (copyExtra) {
 				EffectiveHP = rhs.EffectiveHP;
 				EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
@@ -999,22 +1001,22 @@ namespace RuneOptim {
 
 			return ret;
 		}
-
-		public Attr[] NonZero = null;
-
-		public void BakeNonZero() {
-			NonZero = GetNonZero().ToArray();
-		}
-
+		
 		public System.Collections.Generic.IEnumerable<Attr> GetNonZero() {
 			foreach (var a in Build.statAll) {
 				if (!this[a].EqualTo(0))
 					yield return a;
 			}
-			yield return default(Attr);
+			for (int i = 0; i < 4; i++) {
+				if (!this.DamageSkillups[i].EqualTo(0))
+					yield return (Attr)(Attr.Skill1 + i);
+			}
+			yield break;
 		}
 
 		public bool IsNonZero() {
+			return GetNonZero().Any();
+
 			if (!Accuracy.EqualTo(0))
 				return true;
 			if (!Attack.EqualTo(0))

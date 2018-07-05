@@ -571,6 +571,7 @@ namespace RuneApp {
 				build.BuildGoodRunes = false;
 				build.RunesOnlyFillEmpty = Program.fillRunes;
 				build.RunesDropHalfSetStat = Program.goFast;
+				build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
 				build.GenRunes(Program.data);
 				var result = build.GenBuilds();
@@ -631,6 +632,7 @@ namespace RuneApp {
 				build.BuildGoodRunes = false;
 				build.RunesOnlyFillEmpty = Program.fillRunes;
 				build.RunesDropHalfSetStat = Program.goFast;
+				build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
 				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Runes..."));
 				if (build.Type == BuildType.Link) {
@@ -774,6 +776,7 @@ namespace RuneApp {
 				b.RunesOnlyFillEmpty = Program.fillRunes;
 				b.BuildGoodRunes = goodRunes;
 				b.RunesDropHalfSetStat = Program.goFast;
+				b.IgnoreLess5 = Program.Settings.IgnoreLess5;
 				b.GenRunes(Program.data);
 
 				b.BuildTimeout = 0;

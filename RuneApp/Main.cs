@@ -1778,6 +1778,25 @@ namespace RuneApp {
 		private void cbFillRunes_CheckedChanged(object sender, EventArgs e) {
 			fillRunes = cbFillRunes.Checked;
 		}
+
+		private void tsBtnSkip_Click(object sender, EventArgs e) {
+			if (buildList.SelectedItems.Count > 0) {
+				var build = buildList.SelectedItems[0].Tag as Build;
+				if (build != null && !Program.loads.Any(l => l.BuildID == build.ID)) {
+					Program.loads.Add(new Loadout(build.mon.Current) {
+						BuildID = build.ID,
+						Leader = build.leader,
+						Shrines = build.shrines,
+						Buffs = build.Buffs,
+						Element = build.mon.Element,
+					});
+					foreach (var r in build.mon.Current.Runes.Where(r => r != null)) {
+						r.Locked = true;
+					}
+					checkLocked();
+				}
+			}
+		}
 	}
 
 }
