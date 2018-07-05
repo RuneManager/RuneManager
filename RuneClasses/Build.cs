@@ -544,6 +544,88 @@ namespace RuneOptim {
 			}
 		}
 
+		public double ScoreStat(Stats current, string attrstr) {
+			var attr = Build.statEnums[Array.IndexOf(Build.statNames, attrstr)];
+			string s;
+			return ScoreStat(current, attr, out s);
+		}
+
+		public double ScoreExtra(Stats current, string attrstr) {
+			var attr = Build.extraEnums[Array.IndexOf(Build.extraNames, attrstr)];
+			string s;
+			return ScoreExtra(current, attr, out s);
+		}
+
+		public double ScoreSkill(Stats current, int j) {
+			string s;
+			return ScoreSkill(current, j, out s);
+		}
+
+		public double ScoreStat(Stats current, Attr stat, out string str, Stats outvals = null) {
+			str = "";
+			if (current == null)
+				return 0;
+			double vv = current[stat];
+			double v2 = 0;
+
+			vv = current[stat];
+			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+				vv = 100;
+			str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+			if (Sort[stat] != 0) {
+				v2 = (Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]));
+				if (v2 > Goal[stat] && Goal[stat] > 0)
+					v2 = (v2 - Goal[stat]) / 2 + Goal[stat];
+				v2 /= Sort[stat];
+				if (outvals != null)
+					outvals[stat] = v2;
+				str = v2.ToString("0.#") + " (" + current[stat] + ")";
+			}
+
+			return v2;
+		}
+
+		public double ScoreExtra(Stats current, Attr stat, out string str, Stats outvals = null) {
+			str = "";
+			if (current == null)
+				return 0;
+			double vv = current.ExtraValue(stat);
+			double v2 = 0;
+
+			str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+			if (Sort.ExtraGet(stat) != 0) {
+				v2 = (Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat)));
+				if (v2 > Goal.ExtraGet(stat) && Goal.ExtraGet(stat) > 0)
+					v2 = (v2 - Goal.ExtraGet(stat)) / 2 + Goal.ExtraGet(stat);
+				v2 /= Sort.ExtraGet(stat);
+				if (outvals != null)
+					outvals.ExtraSet(stat, v2);
+				str = v2.ToString("0.#") + " (" + vv + ")";
+			}
+			return v2;
+		}
+
+		public double ScoreSkill(Stats current, int j, out string str, Stats outvals = null) {
+			str = "";
+			if (current == null)
+				return 0;
+			double vv = current.GetSkillDamage(Attr.AverageDamage, j); //current.SkillFunc[j](current);
+			double v2 = 0;
+
+			str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+			if (Sort.DamageSkillups[j] != 0) {
+				v2 = (Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j]));
+				if (v2 > Goal.DamageSkillups[j] && Goal.DamageSkillups[j] > 0)
+					v2 = (v2 - Goal.DamageSkillups[j]) / 2 + Goal.DamageSkillups[j];
+				v2 /= Sort.DamageSkillups[j];
+				if (outvals != null)
+					outvals.DamageSkillups[j] = v2;
+				str = v2.ToString("0.#") + " (" + vv + ")";
+			}
+
+			return v2;
+		}
+
 		// build the scoring function
 		public double CalcScore(Stats current, Stats outvals = null, Action<string, int> writeTo = null) {
 			if (current == null)
@@ -554,63 +636,26 @@ namespace RuneOptim {
 				outvals.SetTo(0);
 
 			string str;
-			double vv, v2, pts = 0;
+			double pts = 0;
 			// dodgy hack for indexing in Generate ListView
 
 			// TODO: instead of -Goal, make everything >Goal /2
 			int i = 2;
 			foreach (Attr stat in Build.statEnums) {
-				vv = current[stat];
-				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-				if (Sort[stat] != 0) {
-					v2 = (Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]));
-					if (v2 > Goal[stat])
-						v2 = (v2 - Goal[stat]) / 2 + Goal[stat];
-					v2 /= Sort[stat];
-					if (outvals != null)
-						outvals[stat] = v2;
-					if (writeTo != null)
-						str = v2.ToString("0.#") + " (" + current[stat] + ")";
-					pts += v2;
-				}
+				pts += ScoreStat(current, stat, out str, outvals);
 				writeTo?.Invoke(str, i);
 				i++;
 			}
 
 			foreach (Attr stat in Build.extraEnums) {
-				vv = current.ExtraValue(stat);
-				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-				if (Sort.ExtraGet(stat) != 0) {
-					v2 = (Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat)));
-					if (v2 > Goal.ExtraGet(stat))
-						v2 = (v2 - Goal.ExtraGet(stat)) / 2 + Goal.ExtraGet(stat);
-					v2 /= Sort.ExtraGet(stat);
-					if (outvals != null)
-						outvals.ExtraSet(stat, v2);
-					if (writeTo != null)
-						str = v2.ToString("0.#") + " (" + vv + ")";
-					pts += v2;
-				}
+				pts += ScoreExtra(current, stat, out str, outvals);
 				writeTo?.Invoke(str, i);
 				i++;
 			}
 
 			for (int j = 0; j < 4; j++) {
 				if (current.SkillFunc[j] != null) {
-					vv = current.GetSkillDamage(Attr.AverageDamage, j); //current.SkillFunc[j](current);
-					str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
-					if (Sort.DamageSkillups[j] != 0) {
-						v2 = (Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j]));
-						if (v2 > Goal.DamageSkillups[j])
-							v2 = (v2 - Goal.DamageSkillups[j]) / 2 + Goal.DamageSkillups[j];
-						v2 /= Sort.DamageSkillups[j];
-						if (outvals != null)
-							outvals.DamageSkillups[j] = v2;
-						if (writeTo != null)
-							str = v2.ToString("0.#") + " (" + vv + ")";
-						pts += v2;
-					}
-
+					pts += ScoreSkill(current, j, out str, outvals);
 					writeTo?.Invoke(str, i);
 					i++;
 				}

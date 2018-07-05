@@ -387,13 +387,17 @@ namespace RuneApp {
 
 		private void Mm_OnRunesChanged(object sender, EventArgs e) {
 			var bb = Program.builds.FirstOrDefault(b => b.mon != null && b.mon == (sender as Monster));
-			if (bb != null) {
-				var l = Program.loads.FirstOrDefault(lo => lo.BuildID == bb.ID);
-				Invoke((MethodInvoker)delegate {
-					ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
-					ListViewItemLoad(nli, l);
-				});
-			}
+			if (bb == null)
+				return;
+
+			var l = Program.loads.FirstOrDefault(lo => lo.BuildID == bb.ID);
+			if (l == null)
+				return;
+
+			Invoke((MethodInvoker)delegate {
+				ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+				ListViewItemLoad(nli, l);
+			});
 		}
 
 		private ListViewItem ListViewItemRune(Rune rune, ListViewItem nli = null) {
@@ -834,7 +838,10 @@ namespace RuneApp {
 							var dScore = load.DeltaPoints;
 							if (dScore == 0)
 								dScore = afterScore - beforeScore;
-							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = dScore.ToString("0.##");
+							string str = dScore.ToString("0.##");
+							if (dScore != 0)
+								str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
+							groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
 						}
 						ShowDiff(dmon.GetStats(), load.GetStats(mon), build);
 
@@ -1355,7 +1362,9 @@ namespace RuneApp {
 				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
 				string pts = (load[stat] - old[stat]).ToString();
 				if (build != null && !build.Sort[stat].EqualTo(0)) {
-					pts += " (" + ((load[stat] - old[stat]) / build.Sort[stat]).ToString("0.##") + ")";
+					var left = build.ScoreStat(load, stat);
+					var right = build.ScoreStat(old, stat);
+					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
 				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
@@ -1363,9 +1372,17 @@ namespace RuneApp {
 			foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" }) {
 				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
 				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
-				string pts = (load[stat] - old[stat]).ToString();
+				var before = old[stat];
+				var after = load[stat];
+				if (stat != "CD") {
+					before = Math.Min(100, before);
+					after = Math.Min(100, after);
+				}
+				string pts = (after - before).ToString();
 				if (build != null && !build.Sort[stat].EqualTo(0)) {
-					pts += " (" + ((load[stat] - old[stat]) / build.Sort[stat]).ToString("0.##") + ")";
+					var left = build.ScoreStat(load, stat);
+					var right = build.ScoreStat(old, stat);
+					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
 				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
@@ -1379,7 +1396,10 @@ namespace RuneApp {
 					var cc = old.ExtraValue(extra);
 					var ss = build.Sort.ExtraGet(extra);
 
-					pts += " (" + ((aa - cc) / ss).ToString("0.##") + ")";
+					var left = build.ScoreExtra(load, extra);
+					var right = build.ScoreExtra(old, extra);
+
+					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
 
 				groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = pts;
@@ -1392,7 +1412,11 @@ namespace RuneApp {
 				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
 				string pts = (load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)).ToString("0.##");
 				if (build != null && !build.Sort.DamageSkillups[i].EqualTo(0)) {
-					pts += " (" + ((load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)) / build.Sort.DamageSkillups[i]).ToString("0.##") + ")";
+
+					var left = build.ScoreSkill(load, i);
+					var right = build.ScoreSkill(old, i);
+
+					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
 				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
