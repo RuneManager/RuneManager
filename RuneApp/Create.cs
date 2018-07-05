@@ -1275,7 +1275,7 @@ namespace RuneApp {
 				var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
 				if (worth != 0 && current != 0) {
 					double pts = current;
-					if (current > goal)
+					if (goal > 0 && current > goal)
 						pts = (current - goal) / 2 + goal;
 					if (max != 0)
 						pts = Math.Min(max, current);
@@ -1322,7 +1322,7 @@ namespace RuneApp {
 				var ctrlWorthPts = groupBox1.Controls.Find(extra + "CurrentPts", true).FirstOrDefault();
 				if (worth != 0 && current != 0) {
 					double pts = current;
-					if (current > goal)
+					if (goal > 0 && current > goal)
 						pts = (current - goal) / 2 + goal;
 					if (max != 0)
 						pts = Math.Min(max, current);
@@ -1377,7 +1377,7 @@ namespace RuneApp {
 					var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
 					if (worth != 0 && current != 0) {
 						double pts = current;
-						if (current > goal)
+						if (goal > 0 && current > goal)
 							pts = (current - goal) / 2 + goal;
 						if (max != 0)
 							pts = Math.Min(max, current);
