@@ -21,6 +21,8 @@ namespace RuneApp {
 
 		private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
 
+		bool loading = true;
+
 		private Task runTask = null;
 		private CancellationToken runToken;
 		private CancellationTokenSource runSource = null;
@@ -72,23 +74,6 @@ namespace RuneApp {
 			findGoodRunes.Enabled = Program.Settings.MakeStats;
 			if (!Program.Settings.MakeStats)
 				findGoodRunes.Checked = false;
-
-			#region Sorter
-			var sorter = new ListViewSort();
-			dataMonsterList.ListViewItemSorter = sorter;
-			sorter.OnColumnClick(colMonGrade.Index);
-			sorter.OnColumnClick(colMonPriority.Index);
-
-			dataRuneList.ListViewItemSorter = new ListViewSort();
-
-			sorter = new ListViewSort();
-			sorter.OnColumnClick(1);
-			dataCraftList.ListViewItemSorter = sorter;
-
-			sorter = new ListViewSort();
-			sorter.OnColumnClick(1);
-			buildList.ListViewItemSorter = sorter;
-			#endregion
 
 			#region Update
 
@@ -181,6 +166,24 @@ namespace RuneApp {
 			}
 
 			#endregion
+
+
+
+			#region DoubleBuffered and Sort
+			this.SetDoubleBuffered();
+			buildList.SetDoubleBuffered();
+			dataMonsterList.SetDoubleBuffered();
+			dataRuneList.SetDoubleBuffered();
+			dataCraftList.SetDoubleBuffered();
+			loadoutList.SetDoubleBuffered();
+
+			buildList.ListViewItemSorter = null;
+			dataMonsterList.ListViewItemSorter = null;
+			dataRuneList.ListViewItemSorter = null;
+			dataCraftList.ListViewItemSorter = null;
+			loadoutList.ListViewItemSorter = null;
+			#endregion
+
 		}
 
 		private void AddShrine(string stat, int num, int value, ToolStripMenuItem owner) {
@@ -219,51 +222,60 @@ namespace RuneApp {
 		private void Main_Load(object sender, EventArgs e) {
 			#region Watch collections and try loading
 			Program.saveFileTouched += Program_saveFileTouched;
-			Program.builds.CollectionChanged += Builds_CollectionChanged;
 			Program.OnRuneUpdate += Program_OnRuneUpdate;
 			Program.OnMonsterUpdate += Program_OnMonsterUpdate;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
 			Program.BuildsPrintTo += Program_BuildsPrintTo;
 			Program.BuildsProgressTo += Program_BuildsProgressTo;
 
-#if !DEBUG
-			try {
-#endif
-				LoadSaveResult loadResult = 0;
-				do {
-					loadResult = Program.FindSave();
-					switch (loadResult) {
-						case LoadSaveResult.Success:
-							break;
-						default:
-							if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-								loadResult = loadSaveDialogue();
-							}
-							else {
-								Application.Exit();
-								return;
-							}
-							break;
-					}
-				} while (loadResult != LoadSaveResult.Success);
+			buildList.Items.Add("Loading...");
+			dataMonsterList.Items.Add("Loading...");
 
-				loadResult = 0;
-				do {
-					loadResult = Program.LoadBuilds();
-					switch (loadResult) {
-						case LoadSaveResult.Failure:
-							if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-								loadResult = loadSaveDialogue();
-							}
-							break;
-						case LoadSaveResult.EmptyFile:
-						case LoadSaveResult.FileNotFound:
-							loadResult = LoadSaveResult.Success;
-							break;
-						default:
-							break;
-					}
-				} while (loadResult != LoadSaveResult.Success);
+			Task.Run(() => {
+#if !DEBUG
+				try {
+#endif
+					LoadSaveResult loadResult = 0;
+					do {
+						loadResult = Program.FindSave();
+						switch (loadResult) {
+							case LoadSaveResult.Success:
+								break;
+							default:
+								if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+									loadResult = loadSaveDialogue();
+								}
+								else {
+									Application.Exit();
+									return;
+								}
+								break;
+						}
+					} while (loadResult != LoadSaveResult.Success);
+
+					loadResult = 0;
+					do {
+						loadResult = Program.LoadBuilds();
+						switch (loadResult) {
+							case LoadSaveResult.Failure:
+								if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+									loadResult = loadSaveDialogue();
+								}
+								break;
+							case LoadSaveResult.EmptyFile:
+							case LoadSaveResult.FileNotFound:
+								loadResult = LoadSaveResult.Success;
+								break;
+							default:
+								break;
+						}
+					} while (loadResult != LoadSaveResult.Success);
+
+					this.Invoke((MethodInvoker)delegate {
+
+						RebuildLists();
+					});
+
 #if !DEBUG
 				}
 				catch (Exception ex) {
@@ -271,61 +283,67 @@ namespace RuneApp {
 					LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
 				}
 #endif
-			#endregion
 
-			RegenLists();
 
-			#region Shrines
+				#region Shrines
 
-			ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
+				ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
 			waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
-			for (int i = 0; i < 11; i++) {
-				for (int j = 0; j < Deco.ShrineStats.Length; j++) {
-					if (j < 4)
-						AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j]), shrineMenu[j]);
-					else if (j < 9)
-						AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j]), shrineMenu[j]);
-					else
-						AddShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j]), shrineMenu[j]);
-				}
-			}
+				this.Invoke((MethodInvoker)delegate {
+					for (int i = 0; i < 11; i++) {
+						for (int j = 0; j < Deco.ShrineStats.Length; j++) {
+							if (j < 4)
+								AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+							else if (j < 9)
+								AddShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j]), shrineMenu[j]);
+							else
+								AddShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+						}
+					}
+				});
+				#endregion
 
+				#region Sorter
+				var sorter = new ListViewSort();
+				this.Invoke((MethodInvoker)delegate {
+					dataMonsterList.ListViewItemSorter = sorter;
+					sorter.OnColumnClick(colMonGrade.Index);
+					sorter.OnColumnClick(colMonPriority.Index);
+					dataMonsterList.Sort();
+
+					dataRuneList.ListViewItemSorter = new ListViewSort();
+
+					sorter = new ListViewSort();
+					sorter.OnColumnClick(1);
+					dataCraftList.ListViewItemSorter = sorter;
+
+					sorter = new ListViewSort();
+					sorter.OnColumnClick(1);
+					buildList.ListViewItemSorter = sorter;
+				});
+				#endregion
+
+				RebuildBuildList();
+				Program.builds.CollectionChanged += Builds_CollectionChanged;
+			
+			});
 			#endregion
 
 			buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
-			#region DoubleBuffered
-			this.SetDoubleBuffered();
-			buildList.SetDoubleBuffered();
-			#endregion
+			LineLog.Debug("Preparing teams");
 
-			foreach (ToolStripItem ii in menu_buildlist.Items) {
-				if (ii.Text == "Team") {
-					toolmap = new Dictionary<string, List<string>>()
-					{
-						{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
-						{ "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
-						{ "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
-						{ "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA" } },
 
-						{ "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
-						{ "ToA", new List<string> { "ToAN", "ToAH" } }
-					};
+			tsTeamAdd(teamToolStripMenuItem, "PvE");
+			tsTeamAdd(teamToolStripMenuItem, "Dungeon");
+			tsTeamAdd(teamToolStripMenuItem, "Raid");
+			tsTeamAdd(teamToolStripMenuItem, "PvP");
 
-					ToolStripMenuItem tsmi = ii as ToolStripMenuItem;
+			var tsnone = new ToolStripMenuItem("(Clear)");
+			tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
+			tsnone.Click += tsTeamHandler;
 
-					tsTeamAdd(tsmi, "PvE");
-					tsTeamAdd(tsmi, "Dungeon");
-					tsTeamAdd(tsmi, "Raid");
-					tsTeamAdd(tsmi, "PvP");
-
-					var tsnone = new ToolStripMenuItem("(Clear)");
-					tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
-					tsnone.Click += tsTeamHandler;
-
-					tsmi.DropDownItems.Add(tsnone);
-				}
-			}
+			teamToolStripMenuItem.DropDownItems.Add(tsnone);
 
 			if (Program.Settings.StartUpHelp)
 				OpenHelp();
@@ -336,10 +354,15 @@ namespace RuneApp {
 				irene.Show(this);
 
 			LineLog.Info("Main form loaded");
+			loading = false;
+			buildList.Sort();
 		}
 
 		private void Program_BuildsProgressTo(object sender, ProgToEventArgs e) {
-			toolStripBuildStatus.Text = "Build Status: " + e.Progress;
+			ProgressToList(e.build, e.Percent.ToString("P2"));
+			this.Invoke((MethodInvoker)delegate {
+				toolStripBuildStatus.Text = "Build Status: " + e.Progress;
+			});
 		}
 		private void Program_saveFileTouched(object sender, EventArgs e) {
 			this.fileBox.Visible = true;
@@ -478,7 +501,10 @@ namespace RuneApp {
 			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
 			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
 			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
-			nli.ForeColor = mon.inStorage ? Color.Gray : Color.Black;
+			if (Program.builds.Any(b => b.MonId == mon.Id))
+				nli.ForeColor = Color.Green;
+			else if (mon.inStorage)
+				nli.ForeColor = Color.Gray;
 			return nli;
 		}
 
@@ -538,8 +564,12 @@ namespace RuneApp {
 
 					foreach (var b in e.NewItems.Cast<Build>()) {
 						ListViewItem li = new ListViewItem();
-						ListViewItemBuild(li, b);
-						this.Invoke((MethodInvoker)delegate { buildList.Items.Add(li); buildList.Sort(); });
+						this.Invoke((MethodInvoker)delegate {
+							ListViewItemBuild(li, b);
+							buildList.Items.Add(li);
+							if (!loading)
+								buildList.Sort();
+						});
 						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null) {
 							lv1li.ForeColor = Color.Green;
@@ -566,7 +596,6 @@ namespace RuneApp {
 				default:
 					throw new NotImplementedException();
 			}
-			buildList.Sort();
 		}
 
 		private void ListViewItemBuild(ListViewItem lvi, Build b) {
@@ -682,6 +711,7 @@ namespace RuneApp {
 				{
 					try {
 						loadres = Program.LoadSave(lsd.Filename);
+						RebuildLists();
 					}
 					catch (IOException ex) {
 						MessageBox.Show(ex.Message);
@@ -1085,7 +1115,7 @@ namespace RuneApp {
 		private void toolStripButton14_Click(object sender, EventArgs e) {
 			if (File.Exists(Program.Settings.SaveLocation)) {
 				Program.LoadSave(Program.Settings.SaveLocation);
-				RegenLists();
+				RebuildLists();
 			}
 		}
 
@@ -1439,10 +1469,13 @@ namespace RuneApp {
 			}
 		}
 
-		public void RegenLists() {
+		public void RebuildLists() {
 			// TODO: comment it up a little?
-			((ListViewSort)dataMonsterList.ListViewItemSorter).ShouldSort = false;
-			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = false;
+
+			var oldMonSort = dataMonsterList.ListViewItemSorter;
+			dataMonsterList.ListViewItemSorter = null;
+			var oldRuneSort = dataRuneList.ListViewItemSorter;
+			dataRuneList.ListViewItemSorter = null;
 
 			dataMonsterList.Items.Clear();
 			dataRuneList.Items.Clear();
@@ -1453,7 +1486,7 @@ namespace RuneApp {
 			if (Program.builds.Count > 0)
 				maxPri = Program.builds.Max(b => b.priority) + 1;
 			foreach (var mon in Program.data.Monsters) {
-				mon.priority = (Program.builds.FirstOrDefault(b => b.mon == mon)?.priority) ?? (mon.Current.RuneCount > 0 ? (maxPri++) : 0);
+				mon.priority = (Program.builds?.FirstOrDefault(b => b.MonId == mon.Id)?.priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
 			}
 			dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
@@ -1474,14 +1507,46 @@ namespace RuneApp {
 			checkLocked();
 			ColorMonsWithBuilds();
 
-			var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
-			mlvs.ShouldSort = true;
-			mlvs.OrderBy(colMonGrade.Index, false);
-			mlvs.ThenBy(colMonPriority.Index, true);
-			((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
+			dataMonsterList.ListViewItemSorter = oldMonSort;
+			if (dataMonsterList.ListViewItemSorter != null) {
+				var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
+				mlvs.ShouldSort = true;
+				mlvs.OrderBy(colMonGrade.Index, false);
+				mlvs.ThenBy(colMonPriority.Index, true);
+				dataMonsterList.Sort();
+			}
+			dataRuneList.ListViewItemSorter = oldRuneSort;
+			if (dataRuneList.ListViewItemSorter != null) {
+				((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
+				dataRuneList.Sort();
+			}
+		}
 
-			dataMonsterList.Sort();
-			dataRuneList.Sort();
+		public void RebuildBuildList() {
+			List<ListViewItem> tempMons = null;
+			this.Invoke((MethodInvoker)delegate {
+				tempMons = dataMonsterList.Items.Cast<ListViewItem>().ToList();
+				buildList.Items.Clear();
+			});
+
+			var lviList = new List<ListViewItem>();
+
+			foreach (var b in Program.builds) {
+				ListViewItem li = new ListViewItem();
+				this.Invoke((MethodInvoker)delegate {
+					ListViewItemBuild(li, b);
+				});
+				lviList.Add(li);
+				var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
+				if (lv1li != null) {
+					lv1li.ForeColor = Color.Green;
+				}
+			}
+
+			this.Invoke((MethodInvoker)delegate {
+				buildList.Items.AddRange(lviList.ToArray());
+				buildList.Sort();
+			});
 		}
 
 		public void checkLocked() {
