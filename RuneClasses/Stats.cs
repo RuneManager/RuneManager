@@ -1001,81 +1001,24 @@ namespace RuneOptim {
 
 			return ret;
 		}
-		
-		public System.Collections.Generic.IEnumerable<Attr> GetNonZero() {
-			foreach (var a in Build.statAll) {
-				if (!this[a].EqualTo(0))
-					yield return a;
+
+		public System.Collections.Generic.IEnumerable<Attr> NonZeroStats {
+			get {
+				foreach (var a in Build.statAll) {
+					if (!this[a].EqualTo(0))
+						yield return a;
+				}
+				for (int i = 0; i < 4; i++) {
+					if (!this.DamageSkillups[i].EqualTo(0))
+						yield return (Attr)(Attr.Skill1 + i);
+				}
 			}
-			for (int i = 0; i < 4; i++) {
-				if (!this.DamageSkillups[i].EqualTo(0))
-					yield return (Attr)(Attr.Skill1 + i);
-			}
-			yield break;
 		}
 
-		public bool IsNonZero() {
-			return GetNonZero().Any();
-
-			if (!Accuracy.EqualTo(0))
-				return true;
-			if (!Attack.EqualTo(0))
-				return true;
-			if (!CritDamage.EqualTo(0))
-				return true;
-			if (!CritRate.EqualTo(0))
-				return true;
-			if (!Defense.EqualTo(0))
-				return true;
-			if (!Health.EqualTo(0))
-				return true;
-			if (!Resistance.EqualTo(0))
-				return true;
-			if (!Speed.EqualTo(0))
-				return true;
-
-			if (!EffectiveHP.EqualTo(0))
-				return true;
-			if (!EffectiveHPDefenseBreak.EqualTo(0))
-				return true;
-			if (!DamagePerSpeed.EqualTo(0))
-				return true;
-			if (!AverageDamage.EqualTo(0))
-				return true;
-			if (!MaxDamage.EqualTo(0))
-				return true;
-
-			if (!DamageSkillups[0].EqualTo(0))
-				return true;
-			if (!DamageSkillups[1].EqualTo(0))
-				return true;
-			if (!DamageSkillups[2].EqualTo(0))
-				return true;
-			if (!DamageSkillups[3].EqualTo(0))
-				return true;
-
-			return false;
-		}
-
-		public Attr FirstNonZero() {
-			if (!Accuracy.EqualTo(0))
-				return Attr.Accuracy;
-			if (!Attack.EqualTo(0))
-				return Attr.AttackPercent;
-			if (!CritDamage.EqualTo(0))
-				return Attr.CritDamage;
-			if (!CritRate.EqualTo(0))
-				return Attr.CritRate;
-			if (!Defense.EqualTo(0))
-				return Attr.DefensePercent;
-			if (!Health.EqualTo(0))
-				return Attr.HealthPercent;
-			if (!Resistance.EqualTo(0))
-				return Attr.Resistance;
-			if (!Speed.EqualTo(0))
-				return Attr.SpeedPercent;
-
-			return Attr.Null;
+		public bool IsNonZero {
+			get {
+				return NonZeroStats.Any();
+			}
 		}
 	}
 }

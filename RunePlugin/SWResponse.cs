@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RuneOptim;
 using RunePlugin.Response;
 
 namespace RunePlugin {
@@ -35,7 +36,7 @@ namespace RunePlugin {
 				var commandTypes = this.GetType().Assembly.GetTypes().Where(t => typeof(SWResponse).IsAssignableFrom(t) && (t.GetCustomAttributes<SWCommandAttribute>()?.Any(a => a.Command == com) ?? false));
 
 				if (commandTypes.Any()) {
-					if (commandTypes.Count() == 1) {
+					if (commandTypes.HasCount(1)) {
 #if DEBUG
 						Console.WriteLine("Reflecting " + com + " response to " + commandTypes.FirstOrDefault().Name);
 #endif

@@ -293,7 +293,7 @@ namespace RuneOptim {
 		public Stats Sort = new Stats();
 
 		public bool ShouldSerializeSort() {
-			return Sort.IsNonZero();
+			return Sort.IsNonZero;
 		}
 
 		// resulting build must have every set in this collection
@@ -321,19 +321,19 @@ namespace RuneOptim {
 		public Stats Goal = new Stats();
 
 		public bool ShouldSerializeMinimum() {
-			return Minimum.IsNonZero();
+			return Minimum.IsNonZero;
 		}
 
 		public bool ShouldSerializeMaximum() {
-			return Maximum.IsNonZero();
+			return Maximum.IsNonZero;
 		}
 
 		public bool ShouldSerializeThreshold() {
-			return Threshold.IsNonZero();
+			return Threshold.IsNonZero;
 		}
 
 		public bool ShouldSerializeGoal() {
-			return Goal.IsNonZero();
+			return Goal.IsNonZero;
 		}
 
 		[JsonProperty]
@@ -463,7 +463,7 @@ namespace RuneOptim {
 		public Stats leader = new Stats();
 
 		public bool ShouldSerializeleader() {
-			return leader.IsNonZero();
+			return leader.IsNonZero;
 		}
 
 		// Seems to out-of-mem if too many
@@ -910,7 +910,7 @@ namespace RuneOptim {
 				if ((!Sort[Attr.Speed].EqualTo(0) && Sort[Attr.Speed] <= 1) // 1 SPD is too good to pass
 					|| mon.Current.Runes.Any(r => r == null)
 					|| !mon.Current.Runes.All(r => this.runes[r.Slot - 1].Contains(r)) // only IgnoreLess5 if I have my own runes
-					|| Sort.GetNonZero().Count() == 1) // if there is only 1 sorting, must be too important to drop???
+					|| Sort.NonZeroStats.HasCount(1)) // if there is only 1 sorting, must be too important to drop???
 					IgnoreLess5 = false;
 
 				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "cooking"));
@@ -921,7 +921,7 @@ namespace RuneOptim {
 					return BuildResult.NoPermutations;
 				}
 
-				bool hasSort = Sort.IsNonZero();
+				bool hasSort = Sort.IsNonZero;
 				if (BuildTake == 0 && !hasSort) {
 					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "No sort"));
 					RuneLog.Info("No method of determining best");
@@ -983,7 +983,7 @@ namespace RuneOptim {
 					var tempTimer = DateTime.Now;
 					//var tempReq = RequiredSets.OrderBy(i => i).ToList();
 					var tempReq = RequiredSets.ToList();
-					var tempMax = Maximum == null || !Maximum.IsNonZero() ? null : new Stats(Maximum, true);
+					var tempMax = Maximum == null || !Maximum.IsNonZero ? null : new Stats(Maximum, true);
 					//bool[] tempCheck = new bool[3];
 					int tempCheck = 0;
 

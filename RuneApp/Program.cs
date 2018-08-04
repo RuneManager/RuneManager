@@ -222,7 +222,7 @@ namespace RuneApp {
 				return LoadSave(Program.Settings.SaveLocation);
 			}
 			else if (files.Any()) {
-				if (files.Count() > 1)
+				if (!files.HasCount(1))
 					return LoadSaveResult.FileNotFound;
 				return LoadSave(files.First());
 			}

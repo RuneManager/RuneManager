@@ -574,8 +574,8 @@ namespace RuneApp {
 
 			check_autoRunes.Checked = build.autoRuneSelect;
 
-			if (build.leader.IsNonZero()) {
-				Attr t = build.leader.FirstNonZero();
+			if (build.leader.IsNonZero) {
+				Attr t = build.leader.NonZeroStats.FirstOrDefault();
 				if (t != Attr.Null) {
 					leaderTypeBox.SelectedIndex = leadTypes.ToList().FindIndex(lt => lt.type == t);
 				}
@@ -1718,7 +1718,7 @@ namespace RuneApp {
 				}
 			}
 
-			if (!build.Sort.IsNonZero()) {
+			if (!build.Sort.IsNonZero) {
 				var ctrl = groupBox1.Controls.Find("SPDWorth", false).FirstOrDefault();
 				if (ctrl != null) {
 					tooltipNoSorting.IsBalloon = true;

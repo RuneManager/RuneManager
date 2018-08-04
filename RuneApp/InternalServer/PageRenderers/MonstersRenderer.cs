@@ -348,12 +348,12 @@ http.send(params);
 			}));
 			list.contentList.AddRange(reserved.GroupBy(mg => mg.monsterTypeId).Select(mg => {
 				var li = new ServedResult("li");
-				li.contentList.Add(new ServedResult(mg.Count() > 1 ? "a" : "span") {
+				li.contentList.Add(new ServedResult(mg.AtLeast(2) ? "a" : "span") {
 					contentDic = { { "href", "\"javascript:showhide('g" + mg.First().Id + "')\"" } },
 					contentList = { "Reserved:" }
 				});
 				li.contentList.Add(renderMonLink(mg.First(), mg.Count() + "x ", LinkRenderOptions.All));
-				if (mg.Count() > 1) {
+				if (mg.AtLeast(2)) {
 					li.contentList.Add(new ServedResult("ul") {
 						contentDic = {
 							{ "id", "g" + mg.First().Id.ToString() },

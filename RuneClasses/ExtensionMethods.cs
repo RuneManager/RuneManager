@@ -75,6 +75,34 @@ namespace RuneOptim {
 				lhs.Add(t);
 		}
 
+		/// <summary>
+		/// Early false if enumerable Count exceeds count.
+		/// </summary>
+		/// <typeparam name="T">Type</typeparam>
+		/// <param name="enu">Enumerable</param>
+		/// <param name="count">Number of items</param>
+		/// <returns>True if enumerable has exactly count items.</returns>
+		public static bool HasCount<T>(this IEnumerable<T> enu, int count) {
+			int num = 0;
+			foreach (var i in enu) {
+				num++;
+				if (num > count)
+					return false;
+			}
+			return num == count;
+		}
+
+		public static bool AtLeast<T>(this IEnumerable<T> enu, int minimum) {
+			int num = 0;
+
+			foreach (var i in enu) {
+				num++;
+				if (num >= minimum)
+					return true;
+			}
+			return num >= minimum;
+		}
+
 		public static bool EqualTo(this double a, double b, double within = double.Epsilon) {
 			return (Math.Abs(a - b) < within);
 		}

@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RunePlugin.Request;
+using RuneOptim;
 
 namespace RunePlugin {
 	public class SWRequest : SWMessage {
@@ -22,7 +23,7 @@ namespace RunePlugin {
 				var commandTypes = this.GetType().Assembly.GetTypes().Where(t => typeof(SWRequest).IsAssignableFrom(t) && (t.GetCustomAttributes<SWCommandAttribute>()?.Any(a => a.Command == com) ?? false));
 
 				if (commandTypes.Any()) {
-					if (commandTypes.Count() == 1) {
+					if (commandTypes.HasCount(1)) {
 #if DEBUG
 						Console.WriteLine("Reflecting " + com + " request to " + commandTypes.FirstOrDefault().Name);
 #endif
