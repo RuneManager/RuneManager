@@ -74,7 +74,7 @@ namespace RuneApp {
 						return false;
 					}
 					else
-						Program.log.Error(e);
+						Program.LineLog.Error("Failed getting Excel", e);
 
 				}
 			}
@@ -342,7 +342,7 @@ namespace RuneApp {
 			col = 1;
 
 			StatsExcelRuneBoard(ws, ref row, ref col, build, load);
-			Program.log.Info("Finished Writing statsheet");
+			Program.LineLog.Info("Finished Writing statsheet");
 		}
 
 		private ExcelWorksheet getSheet(Monster mon) {

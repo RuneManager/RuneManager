@@ -44,7 +44,7 @@ namespace RuneApp {
 						templateList = JsonConvert.DeserializeObject<List<Build>>(bstr).OrderBy(t => t.priority).ThenBy(t => t.MonName).ToList();
 					}
 					else {
-						Program.log.Error(global::RuneApp.Properties.Resources.TemplatesJSON + " not found?");
+						Program.LineLog.Error(global::RuneApp.Properties.Resources.TemplatesJSON + " not found?");
 						templateList = new List<Build>();
 					}
 				}
@@ -57,7 +57,7 @@ namespace RuneApp {
 			InitializeComponent();
 			if (newB.mon == null) {
 				MessageBox.Show("Error: Build has no monster!");
-				Program.log.Error("Build has no monster!");
+				Program.LineLog.Error("Build has no monster!");
 				this.DialogResult = DialogResult.Abort;
 				this.Close();
 			}
@@ -131,7 +131,7 @@ namespace RuneApp {
 							pullTemplates(temps, fGroup);
 					}
 					catch (Exception e) {
-						Program.log.Error("Failed " + b.MonName, e);
+						Program.LineLog.Error("Failed " + b.MonName, e);
 						MessageBox.Show("Couldn't parse templates at " + b.MonName + " with " + e.GetType(), "Template Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 					}
 				}

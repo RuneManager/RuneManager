@@ -35,7 +35,7 @@ namespace RuneApp.InternalServer {
 						}
 					}
 					catch (Exception e) {
-						Program.log.Error(e.GetType() + " " + e.Message);
+						Program.LineLog.Error(e.GetType() + " " + e.Message);
 					}
 				}
 

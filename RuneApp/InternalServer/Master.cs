@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -15,7 +16,9 @@ namespace RuneApp.InternalServer {
 	/// </summary>
 	public partial class Master : PageRenderer {
 #if !TEST_SLAVE
-		public static log4net.ILog Log { get { return Program.log; } }
+		[Obsolete("Try LineLog")]
+		public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
+		public static lineLogger LineLog { [DebuggerStepThrough] get { return Program.LineLog; } }
 #else
 		public Logger Log { get { return Program.log; } }
 #endif
@@ -45,30 +48,30 @@ namespace RuneApp.InternalServer {
 					listener.Start();
 				}
 				catch {
-					Log.Error("Failed to bind to *, binding to localhost");
+					LineLog.Error("Failed to bind to *, binding to localhost");
 					listener = new HttpListener();
 					listener.Prefixes.Add("http://localhost:7676/");
 					listener.Start();
 				}
 
-				Log.Info("Server is listening on " + listener.Prefixes.First());
+				LineLog.Info("Server is listening on " + listener.Prefixes.First());
 				isRunning = true;
 			}
 			catch (Exception e) {
-				Log.Error("Failed to start server", e);
+				LineLog.Error("Failed to start server", e);
 				throw;
 			}
 
 			Task.Factory.StartNew(() => {
 				try {
 					while (isRunning) {
-						Log.Info("Waiting for a connection...");
+						//LineLog.Info("Waiting for a connection...");
 						var context = listener.GetContext();
 						new Thread(() => RemoteManageLoop(context)).Start();
 					}
 				}
 				catch (Exception e) {
-					Log.Error("Failed while running server", e);
+					LineLog.Error("Failed while running server", e);
 				}
 				isRunning = false;
 			}, TaskCreationOptions.LongRunning);
@@ -89,13 +92,13 @@ namespace RuneApp.InternalServer {
 
 		public async void RemoteManageLoop(HttpListenerContext context) {
 			try {
-				Log.Debug("serving: " + context.Request.RawUrl);
+				LineLog.Debug("serving: " + context.Request.RawUrl);
 				var req = context.Request;
 				var resp = context.Response;
 
 				var msg = getResponse(req);
 				resp.StatusCode = (int)msg.StatusCode;
-				Log.Debug("returning: " + resp.StatusCode);
+				LineLog.Debug("returning: " + resp.StatusCode);
 				foreach (var h in msg.Headers) {
 					foreach (var v in h.Value) {
 						resp.Headers.Add(h.Key, v);
@@ -180,7 +183,7 @@ namespace RuneApp.InternalServer {
 							output.Write(outBytes, 0, outBytes.Length);
 						}
 						catch (Exception ex) {
-							Program.log.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
+							Program.LineLog.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
 						}
 					}
 				}
@@ -189,7 +192,7 @@ namespace RuneApp.InternalServer {
 				}
 			}
 			catch (Exception e) {
-				Log.Error("Something went wrong.", e);
+				LineLog.Error("Something went wrong.", e);
 				var resp = context.Response;
 				resp.StatusCode = 500;
 				using (var output = resp.OutputStream) {
@@ -199,7 +202,7 @@ namespace RuneApp.InternalServer {
 						output.Write(outBytes, 0, outBytes.Length);
 					}
 					catch (Exception ex) {
-						Program.log.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
+						Program.LineLog.Error("Failed to write " + ex.GetType().ToString() + " " + ex.Message);
 					}
 				}
 			}
@@ -219,7 +222,7 @@ namespace RuneApp.InternalServer {
 			locList.RemoveAll(a => a == "");
 
 			msg.StatusCode = HttpStatusCode.OK;
-			Log.Debug("rendering response...");
+			LineLog.Debug("rendering response...");
 			return this.Render(req, locList.ToArray());
 
 			//<html><head><script src='/script.js'></script></head><body><button id='button1' style='width:50px' onclick='javascript:startProgress();'>Start</button></body></html>
@@ -265,7 +268,7 @@ namespace RuneApp.InternalServer {
 					}
 				}
 				catch (Exception e) {
-					Program.log.Error(e.GetType() + " " + e.Message);
+					Program.LineLog.Error(e.GetType() + " " + e.Message);
 					return returnException(e);
 				}
 			}

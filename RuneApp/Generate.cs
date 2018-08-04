@@ -361,7 +361,7 @@ namespace RuneApp {
 				}
 			}
 			catch (Exception ex) {
-				Program.log.Error("Error running tests: " + ex.GetType() + ": " + ex.Message);
+				Program.LineLog.Error("Error running tests: " + ex.GetType() + ": " + ex.Message);
 				MessageBox.Show("Error running tests: " + ex.GetType() + ": " + ex.Message);
 			}
 		}

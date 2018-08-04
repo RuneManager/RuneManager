@@ -10,7 +10,7 @@ namespace RuneApp.InternalServer {
 		public abstract HttpResponseMessage Render(HttpListenerRequest req, string[] uri);
 
 		protected virtual HttpResponseMessage Recurse(HttpListenerRequest req, string[] uri) {
-			Master.Log.Debug("recursing " + uri.Length + " " + uri.FirstOrDefault());
+			Master.LineLog.Debug("recursing " + uri.Length + " " + uri.FirstOrDefault());
 			if (uri.Length == 0)
 				return null;
 

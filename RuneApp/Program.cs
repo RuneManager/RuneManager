@@ -23,7 +23,7 @@ namespace RuneApp {
 		Success = 1,
 	}
 
-	class progLogger : TextWriter {
+	class progWriter : TextWriter {
 		public override Encoding Encoding {
 			get {
 				return Encoding.Default;
@@ -31,12 +31,92 @@ namespace RuneApp {
 		}
 
 		public override void WriteLine(string value) {
-			Program.log.Debug(value);
+#pragma warning disable CS0618 // Type or member is obsolete
+			Program.log.Debug("progWriter: " + value);
+#pragma warning restore CS0618 // Type or member is obsolete
 		}
 	}
 
+	public class lineLogger {
+		private log4net.ILog logger;
+		public lineLogger(log4net.ILog logger) {
+			this.logger = logger;
+		}
+		
+		[DebuggerStepThrough]
+		protected string Bake(string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			return System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str;
+		}
+
+		[DebuggerStepThrough]
+		public void Info(string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Info(Bake(str, lineNumber, caller, filepath));
+		}
+
+		[DebuggerStepThrough]
+		public void Debug(string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Debug(Bake(str, lineNumber, caller, filepath));
+		}
+
+		[DebuggerStepThrough]
+		public void Error(string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Error(Bake(str, lineNumber, caller, filepath));
+		}
+
+		[DebuggerStepThrough]
+		public void Error(string str, Exception e,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Error(Bake(str, lineNumber, caller, filepath), e);
+		}
+
+		[DebuggerStepThrough]
+		public void Fatal(string str,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Fatal(Bake(str, lineNumber, caller, filepath));
+		}
+
+		[DebuggerStepThrough]
+		public void Fatal(string str, Exception e,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			logger.Fatal(Bake(str, lineNumber, caller, filepath), e);
+		}
+
+	}
+
 	public static class Program {
+		[Obsolete("try using the lineLog")]
 		public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
+		private static lineLogger lineLog = null;
+		public static lineLogger LineLog {
+			[DebuggerStepThrough] get {
+				if (lineLog == null) {
+#pragma warning disable CS0618 // Type or member is obsolete
+					lineLog = new lineLogger(log);
+#pragma warning restore CS0618 // Type or member is obsolete
+				}
+				return lineLog;
+			}
+		}
+
 		public static readonly Configuration config = ConfigurationManager.OpenExeConfiguration(Application.ExecutablePath);
 
 		public static Save data;
@@ -104,6 +184,7 @@ namespace RuneApp {
 		[STAThread]
 		static void Main() {
 			ReadConfig();
+			LineLog.Info("Program start");
 			try {
 				if (Settings.UpgradeRequired) {
 					Settings.Upgrade();
@@ -112,12 +193,12 @@ namespace RuneApp {
 				}
 			}
 			catch (Exception e) {
-				log.Error("Failure upgrading settings.", e);
+				LineLog.Error("Failure upgrading settings.", e);
 			}
 
 			builds.CollectionChanged += Builds_CollectionChanged;
 			loads.CollectionChanged += Loads_CollectionChanged;
-			BuildsPrintTo += Program_BuildsProgressTo;
+			BuildsPrintTo += Program_BuildsPrintTo;
 
 			if (Program.Settings.InternalServer) {
 				try {
@@ -132,7 +213,7 @@ namespace RuneApp {
 			if (Program.Settings.WatchSave)
 				watchSave();
 
-			RuneLog.logTo = new progLogger();
+			RuneLog.logTo = new progWriter();
 
 			// TODO: find a better place to put this
 			LoadGoals();
@@ -142,8 +223,12 @@ namespace RuneApp {
 			Application.Run(new Main());
 		}
 
-		private static void Program_BuildsProgressTo(object sender, PrintToEventArgs e) {
-			log.Info("@" + e.Message);
+		static string lastPrint = null;
+		private static void Program_BuildsPrintTo(object sender, PrintToEventArgs e) {
+			if (e.Message != lastPrint) {
+				lastPrint = e.Message;
+				LineLog.Info(e.Message, e.Line, e.Caller, e.File);
+			}
 		}
 
 		public static void ReadConfig() {
@@ -188,9 +273,10 @@ namespace RuneApp {
 							//var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
 							// if there is a build with this monname, maybe I have 2 mons with that name?!
 							if (!System.Diagnostics.Debugger.IsAttached)
-								Program.log.Debug("finding " + b.MonId);
-							if (Program.data.GetMonster(b.MonId) != null) {
-								b.mon = Program.data.GetMonster(b.MonId);
+								Program.LineLog.Debug("finding " + b.MonId);
+							var mon = Program.data.GetMonster(b.MonId);
+							if (mon != null) {
+								b.mon = mon;
 							}
 							else {
 								var bnum = builds.Count(bu => bu.MonName == b.MonName);
@@ -235,14 +321,14 @@ namespace RuneApp {
 
 		public static LoadSaveResult LoadSave(string filename) {
 			if (string.IsNullOrWhiteSpace(filename)) {
-				log.Error("Filename for save is null");
+				LineLog.Error("Filename for save is null");
 				return LoadSaveResult.FileNotFound;
 			}
 			if (!File.Exists(filename)) {
-				log.Error($"File {filename} doesn't exist");
+				LineLog.Error($"File {filename} doesn't exist");
 				return LoadSaveResult.FileNotFound;
 			}
-			log.Info("Loading " + filename + " as save.");
+			LineLog.Info("Loading " + filename + " as save.");
 			string text = File.ReadAllText(filename);
 
 #if !DEBUG
@@ -304,10 +390,10 @@ namespace RuneApp {
 
 		public static LoadSaveResult LoadBuilds(string filename = "builds.json") {
 			if (!File.Exists(filename)) {
-				log.Error($"{filename} wasn't found.");
+				LineLog.Error($"{filename} wasn't found.");
 				return LoadSaveResult.FileNotFound;
 			}
-			log.Info($"Loading {filename} as builds.");
+			LineLog.Debug($"Loading {filename} as builds.");
 
 #if !DEBUG
 			try {
@@ -358,6 +444,7 @@ namespace RuneApp {
 		}
 
 		public static void SanitizeBuilds() {
+			LineLog.Debug("processing builds");
 			int current_pri = 1;
 			foreach (Build b in Program.builds.OrderBy(bu => bu.priority)) {
 				int id = b.ID;
@@ -403,7 +490,7 @@ namespace RuneApp {
 		}
 
 		public static LoadSaveResult SaveBuilds(string filename = "builds.json") {
-			log.Info($"Saving builds to {filename}");
+			LineLog.Debug($"Saving builds to {filename}");
 			// TODO: fix this mess
 			foreach (Build bb in builds) {
 				if (bb.mon != null && bb.mon.FullName != "Missingno") {
@@ -431,7 +518,7 @@ namespace RuneApp {
 					return LoadSaveResult.Success;
 				}
 				catch (Exception e) {
-					log.Error($"Error while saving builds {e.GetType()}", e);
+					LineLog.Error($"Error while saving builds {e.GetType()}", e);
 					throw;
 					//MessageBox.Show(e.ToString());
 				}
@@ -440,7 +527,7 @@ namespace RuneApp {
 		}
 
 		public static LoadSaveResult SaveLoadouts(string filename = "loads.json") {
-			log.Info($"Saving loads to {filename}");
+			LineLog.Debug($"Saving loads to {filename}");
 
 			if (loads.Count > 0) {
 				try {
@@ -452,7 +539,7 @@ namespace RuneApp {
 					return LoadSaveResult.Success;
 				}
 				catch (Exception e) {
-					log.Error($"Error while saving loads {e.GetType()}", e);
+					LineLog.Error($"Error while saving loads {e.GetType()}", e);
 					throw;
 					//MessageBox.Show(e.ToString());
 				}
@@ -486,7 +573,7 @@ namespace RuneApp {
 				return LoadSaveResult.Success;
 			}
 			catch (Exception e) {
-				log.Error($"Error while loading loads {e.GetType()}", e);
+				LineLog.Error($"Error while loading loads {e.GetType()}", e);
 				//MessageBox.Show("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
 				File.WriteAllText("error_loads.txt", e.ToString());
 				throw;
@@ -505,7 +592,7 @@ namespace RuneApp {
 		}
 
 		public static LoadSaveResult SaveGoals(string filename = "goals.json") {
-			log.Info($"Saving loads to {filename}");
+			LineLog.Debug($"Saving loads to {filename}");
 
 			try {
 				// keep a single recent backup
@@ -514,7 +601,7 @@ namespace RuneApp {
 				return LoadSaveResult.Success;
 			}
 			catch (Exception e) {
-				log.Error($"Error while saving loads {e.GetType()}", e);
+				LineLog.Error($"Error while saving loads {e.GetType()}", e);
 				throw;
 			}
 			return LoadSaveResult.Failure;
@@ -522,6 +609,7 @@ namespace RuneApp {
 
 		public static LoadSaveResult LoadGoals(string filename = "goals.json") {
 			try {
+				LineLog.Debug("Loading goals");
 				if (File.Exists(filename)) {
 					string text = File.ReadAllText(filename);
 					goals = JsonConvert.DeserializeObject<Goals>(text);
@@ -532,7 +620,7 @@ namespace RuneApp {
 				return LoadSaveResult.Success;
 			}
 			catch (Exception e) {
-				log.Error($"Error while loading goals {e.GetType()}", e);
+				LineLog.Error($"Error while loading goals {e.GetType()}", e);
 				File.WriteAllText("error_goals.txt", e.ToString());
 				throw;
 			}
@@ -603,13 +691,13 @@ namespace RuneApp {
 			runToken = runSource.Token;
 			runTask = Task.Factory.StartNew(() => {
 				runBuild(build, saveStats);
-			});
+			}, runToken);
 		}
 
 		private static void runBuild(Build build, bool saveStats = false) {
 			try {
 				if (build == null) {
-					log.Info("Build is null");
+					LineLog.Info("Build is null");
 					return;
 				}
 				if (currentBuild != null)
@@ -618,7 +706,7 @@ namespace RuneApp {
 					throw new InvalidOperationException("This build is already running");
 				currentBuild = build;
 
-				log.Info("Starting watch " + build.ID + " " + build.MonName);
+				LineLog.Info("Starting watch " + build.ID + " " + build.MonName);
 
 				Stopwatch buildTime = Stopwatch.StartNew();
 
@@ -635,7 +723,7 @@ namespace RuneApp {
 				build.RunesDropHalfSetStat = Program.goFast;
 				build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
-				BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Runes..."));
+				BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Runes..."));
 				if (build.Type == BuildType.Link) {
 					build.CopyFrom(build.LinkBuild);
 				}
@@ -649,7 +737,7 @@ namespace RuneApp {
 				}
 
 				if (nR != "") {
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, ":( " + nR + "Runes"));
+					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, ":( " + nR + "Runes"));
 					return;
 				}
 				#endregion
@@ -657,20 +745,20 @@ namespace RuneApp {
 				build.BuildPrintTo += BuildsPrintTo;
 				build.BuildProgTo += BuildsProgressTo;
 
-				EventHandler<PrintToEventArgs> qw = (bq, s) => {
+				EventHandler<ProgToEventArgs> qw = (bq, s) => {
 					if (runToken.IsCancellationRequested)
 						build.Cancel();
 				};
-				build.BuildPrintTo += qw;
+				build.BuildProgTo += qw;
 
 				var result = build.GenBuilds();
 
 				buildTime.Stop();
 				build.Time = buildTime.ElapsedMilliseconds;
-				log.Info("Stopping watch " + build.ID + " " + build.MonName + " @ " + buildTime.ElapsedMilliseconds);
+				LineLog.Info("Stopping watch " + build.ID + " " + build.MonName + " @ " + buildTime.ElapsedMilliseconds);
 
 				if (build.Best != null) {
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Best"));
+					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Best"));
 
 					build.Best.Current.BuildID = build.ID;
 
@@ -723,11 +811,11 @@ namespace RuneApp {
 
 					/* TODO: put Excel on Program */
 					if (saveStats && build.Type != BuildType.Lock) {
-						BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Excel"));
+						BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Excel"));
 						runeSheet.StatsExcelBuild(build, build.mon, build.Best.Current, true);
 					}
 
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Clean"));
+					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Clean"));
 					// clean up for GC
 					if (build.buildUsage != null)
 						build.buildUsage.loads.Clear();
@@ -742,32 +830,32 @@ namespace RuneApp {
 				}
 
 				build.BuildPrintTo -= BuildsPrintTo;
-				build.BuildPrintTo -= qw;
+				build.BuildProgTo -= qw;
 				build.BuildProgTo -= BuildsProgressTo;
 
 				//if (plsDie)
 				//    printTo?.Invoke("Canned");
 				//else 
 				if (build.Best != null)
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, "Done"));
+					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Done"));
 				else
-					BuildsPrintTo?.Invoke(null, new PrintToEventArgs(build, result + " :("));
+					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, result + " :("));
 
-				log.Info("Cleaning up");
+				LineLog.Info("Cleaning up");
 				//b.isRun = false;
 				//currentBuild = null;
 			}
 			catch (Exception e) {
-				log.Error("Error during build " + build.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
+				LineLog.Error("Error during build " + build.ID + " " + e.Message + Environment.NewLine + e.StackTrace);
 			}
 			finally {
 				currentBuild = null;
-				log.Info("Cleaned");
+				LineLog.Info("Cleaned");
 			}
 		}
 
 		private static void RunBanned(Build b, int c, params ulong[] doneIds) {
-			log.Info("Running ban");
+			LineLog.Info("Running ban");
 			try {
 				b.BanEmTemp(doneIds);
 
@@ -786,16 +874,16 @@ namespace RuneApp {
 				b.BuildDumpBads = true;
 				var result = b.GenBuilds($"{c} ");
 				b.BuildGoodRunes = false;
-				log.Info("ran ban with result: " + result);
+				LineLog.Info("ran ban with result: " + result);
 			}
 			catch (Exception ex) {
-				log.Error("Running ban failed ", ex);
+				LineLog.Error("Running ban failed ", ex);
 			}
 			finally {
 				b.BanEmTemp(new ulong[] { });
 				b.BuildSaveStats = false;
 				b.GenRunes(Program.data);
-				log.Info("Ban finished");
+				LineLog.Info("Ban finished");
 			}
 		}
 

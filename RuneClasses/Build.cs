@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace RuneOptim {
 	public class RuneUsage {
@@ -27,14 +28,44 @@ namespace RuneOptim {
 	public class PrintToEventArgs : EventArgs {
 		public Build build;
 		public string Message;
-		public PrintToEventArgs(Build b, string m) { build = b; Message = m; }
+
+		public string File;
+		public string Caller;
+		public int Line;
+
+		protected PrintToEventArgs(Build b, string m) { build = b; Message = m; }
+		public static PrintToEventArgs GetEvent(Build b, string m,
+			[CallerFilePath] string file = null,
+			[CallerMemberName] string caller = null,
+			[CallerLineNumber] int line = 0) {
+			return new PrintToEventArgs(b, m) {
+				File = file,
+				Caller = caller,
+				Line = line,
+			};
+		}
 	}
 
 	public class ProgToEventArgs : EventArgs {
 		public Build build;
 		public int Progress;
 		public double Percent;
-		public ProgToEventArgs(Build b, double d, int p) { build = b; Percent = d; Progress = p; }
+
+		public string File;
+		public string Caller;
+		public int Line;
+
+		protected ProgToEventArgs(Build b, double d, int p) { build = b; Percent = d; Progress = p; }
+		public static ProgToEventArgs GetEvent(Build b, double d, int p,
+			[CallerFilePath] string file = null,
+			[CallerMemberName] string caller = null,
+			[CallerLineNumber] int line = 0) {
+			return new ProgToEventArgs(b, d, p) {
+				File = file,
+				Caller = caller,
+				Line = line,
+			};
+		}
 	}
 
 	public class BuildUsage {
@@ -826,7 +857,7 @@ namespace RuneOptim {
 			}
 
 			if (runes.Any(r => r == null)) {
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Null rune"));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Null rune"));
 				return BuildResult.BadRune;
 			}
 			if (!BuildSaveStats)
@@ -839,31 +870,31 @@ namespace RuneOptim {
 			try {
 				// if to get awakened
 				if (DownloadAwake && !mon.downloaded) {
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloading Awake def"));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Downloading Awake def"));
 					var mref = MonsterStat.FindMon(mon);
 					if (mref != null) {
 						// download the current (unawakened monster)
 						var mstat = mref.Download();
-						BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Reading stats"));
+						BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Reading stats"));
 						// if the retrieved mon is unawakened, get the awakened
 						if (!mstat.Awakened && mstat.AwakenTo != null) {
-							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Awakening"));
+							BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Awakening"));
 							mon = mstat.AwakenTo.Download().GetMon(mon);
 						}
 					}
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloaded"));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Downloaded"));
 				}
 				// getting awakened also gets level 40, so...
 				// only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
 				else if (mon.level < 40 && DownloadStats && !mon.downloaded) {
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Downloading 40 def"));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Downloading 40 def"));
 					var mref = MonsterStat.FindMon(mon);
 					if (mref != null)
 						mon = mref.Download().GetMon(mon);
 				}
 			}
 			catch (Exception e) {
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Failed downloading def: " + e.Message + Environment.NewLine + e.StackTrace));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Failed downloading def: " + e.Message + Environment.NewLine + e.StackTrace));
 			}
 
 			if (!GetRunningHandle())
@@ -911,17 +942,17 @@ namespace RuneOptim {
 					|| Sort.NonZeroStats.HasCount(1)) // if there is only 1 sorting, must be too important to drop???
 					IgnoreLess5 = false;
 
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "cooking"));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "cooking"));
 
 				if (total == 0) {
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "0 perms"));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "0 perms"));
 					RuneLog.Info("Zero permuations");
 					return BuildResult.NoPermutations;
 				}
 
 				bool hasSort = Sort.IsNonZero;
 				if (BuildTake == 0 && !hasSort) {
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "No sort"));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "No sort"));
 					RuneLog.Info("No method of determining best");
 					return BuildResult.NoSorting;
 				}
@@ -939,7 +970,7 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 				SynchronizedCollection<string> outstrs = new SynchronizedCollection<string>();
 #endif
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "..."));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "..."));
 
 				//SynchronizedCollection<Monster> tests = new SynchronizedCollection<Monster>();
 				List<Monster> tests = new List<Monster>();
@@ -954,14 +985,13 @@ namespace RuneOptim {
 						//if (DateTime.Now > timerShared.AddSeconds(0.5)) {
 						//	timerShared = DateTime.Now;
 						RuneLog.Debug(count + "/" + total + "  " + string.Format("{0:P2}", (count + complete - total) / (double)complete));
-						BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + string.Format("{0:P2}", (count + complete - total) / (double)complete)));
 						if (tests != null)
-							BuildProgTo?.Invoke(this, new ProgToEventArgs(this, (count + complete - total) / (double)complete, tests.Count));
+							BuildProgTo?.Invoke(this, ProgToEventArgs.GetEvent(this, (count + complete - total) / (double)complete, tests.Count));
 
 						if (BuildTimeout > 0 && DateTime.Now > begin.AddSeconds(BuildTimeout)) {
 							RuneLog.Info("Timeout");
-							BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Timeout"));
-							BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
+							BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "Timeout"));
+							BuildProgTo?.Invoke(this, ProgToEventArgs.GetEvent(this, 1, tests.Count));
 
 							IsRunning = false;
 						}
@@ -1371,7 +1401,8 @@ namespace RuneOptim {
 				});
 
 
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "99%+"));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "finalizing..."));
+				BuildProgTo?.Invoke(this, ProgToEventArgs.GetEvent(this, 0.99, -1));
 
 #if BUILD_PRECHECK_BUILDS_DEBUG
 				System.IO.File.WriteAllLines("_into_the_bridge.txt", outstrs.ToArray());
@@ -1395,8 +1426,8 @@ namespace RuneOptim {
 
 				// write out completion
 				RuneLog.Debug(IsRunning + " " + count + "/" + total + "  " + String.Format("{0:P2}", (count + complete - total) / (double)complete));
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "100%"));
-				BuildProgTo?.Invoke(this, new ProgToEventArgs(this, 1, tests.Count));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + " completed"));
+				BuildProgTo?.Invoke(this, ProgToEventArgs.GetEvent(this, 1, tests.Count));
 
 				// sort *all* the builds
 				int takeAmount = 1;
@@ -1411,7 +1442,7 @@ namespace RuneOptim {
 				foreach (var ll in tests.Where(t => t != null).OrderByDescending(r => CalcScore(r.GetStats())).Take(takeAmount))
 					loads.Add(ll);
 
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, "Found a load " + loads.Count()));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Found a load " + loads.Count()));
 
 				if (!BuildGoodRunes)
 					buildUsage.loads = tests.ToList();
@@ -1426,14 +1457,14 @@ namespace RuneOptim {
 				// sadface if no builds
 				if (!loads.Any()) {
 					RuneLog.Info("No builds :(");
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Zero :("));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "Zero :("));
 				}
 				else {
 					// remember the good one
 					Best = loads.First();
 					Best.Current.TempLoad = false;
 					Best.score = CalcScore(Best.GetStats());
-					BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "best " + (Best?.score ?? -1)));
+					BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "best " + (Best?.score ?? -1)));
 					//Best.Current.runeUsage = usage.runeUsage;
 					//Best.Current.buildUsage = usage.buildUsage;
 					Best.Current.ActualTests = actual;
@@ -1470,12 +1501,12 @@ namespace RuneOptim {
 				//loads = null;
 				tests.Clear();
 				tests = null;
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + "Test cleared"));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "Test cleared"));
 				return BuildResult.Success;
 			}
 			catch (Exception e) {
 				RuneLog.Error("Error " + e);
-				BuildPrintTo?.Invoke(this, new PrintToEventArgs(this, prefix + e.ToString()));
+				BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + e.ToString()));
 				return BuildResult.Failure;
 			}
 			finally {

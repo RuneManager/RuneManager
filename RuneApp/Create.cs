@@ -144,7 +144,7 @@ namespace RuneApp {
 			int dlCheckX = 0;
 			int dlBtnX = 0;
 
-			Program.log.Debug("comb " + comb.Length + " " + string.Join(",", comb));
+			Program.LineLog.Debug("comb " + comb.Length + " " + string.Join(",", comb));
 
 			#region Statbox
 			foreach (var attr in comb) {

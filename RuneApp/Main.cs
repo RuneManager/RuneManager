@@ -56,11 +56,13 @@ namespace RuneApp {
 
 
 		//public static Configuration config {  get { return Program.config; } }
-		public static log4net.ILog Log { get { return Program.log; } }
+		[Obsolete("Try using LineLog instead")]
+		public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
+		public static lineLogger LineLog { [DebuggerStepThrough] get { return Program.LineLog; } }
 
 		public Main() {
 			InitializeComponent();
-			Log.Info("Initialized Main");
+			LineLog.Info("Initialized Main");
 			Instance = this;
 
 			currentMain = this;
@@ -93,7 +95,7 @@ namespace RuneApp {
 			if (Program.Settings.CheckUpdates) {
 				Task.Factory.StartNew(() => {
 					using (WebClient client = new WebClient()) {
-						Log.Info("Checking for updates");
+						LineLog.Info("Checking for updates");
 						client.DownloadStringCompleted += client_DownloadStringCompleted;
 						client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
 					}
@@ -101,7 +103,7 @@ namespace RuneApp {
 			}
 			else {
 				updateBox.Show();
-				Log.Info("Updates Disabled");
+				LineLog.Info("Updates Disabled");
 				updateComplain.Text = "Updates Disabled";
 				var ver = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
 				string oldvernum = ver.ProductVersion;
@@ -263,11 +265,11 @@ namespace RuneApp {
 					}
 				} while (loadResult != LoadSaveResult.Success);
 #if !DEBUG
-			}
-			catch (Exception ex) {
-				MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
-				Log.Fatal($"Fatal during load {ex.GetType()}", ex);
-			}
+				}
+				catch (Exception ex) {
+					MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
+					LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
+				}
 #endif
 			#endregion
 
@@ -332,6 +334,8 @@ namespace RuneApp {
 				irene = new Irene(this);
 			if (Program.Settings.ShowIreneOnStart)
 				irene.Show(this);
+
+			LineLog.Info("Main form loaded");
 		}
 
 		private void Program_BuildsProgressTo(object sender, ProgToEventArgs e) {
@@ -350,6 +354,7 @@ namespace RuneApp {
 		}
 
 		private void Program_BuildsPrintTo(object sender, PrintToEventArgs e) {
+			LineLog.Debug(e.Message, e.Line, e.Caller, e.File);
 			ProgressToList(e.build, e.Message);
 		}
 
@@ -1017,7 +1022,7 @@ namespace RuneApp {
 		}
 
 		public void ProgressToList(Build b, string str) {
-			Program.log.Info("_" + str);
+			//Program.log.Info("_" + str);
 			this.Invoke((MethodInvoker)delegate {
 				if (!IsDisposed) {
 					var lvi = buildList.Items.Cast<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
@@ -1045,6 +1050,7 @@ namespace RuneApp {
 		}
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e) {
+			LineLog.Info("Closing...");
 			if (CheckSaveChanges() == DialogResult.Cancel) {
 				e.Cancel = true;
 				return;

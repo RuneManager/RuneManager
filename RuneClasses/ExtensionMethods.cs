@@ -20,13 +20,13 @@ namespace RuneOptim {
 
 	[Flags]
 	public enum LogSeverity {
-		None = 0x00000000,
+		None	= 0x00000000,
 
-
+		Fatal	= 0x00001000,
+		Error	= 0x00010000,
+		Info	= 0x00100000,
+		Debug	= 0x01000000,
 		Verbose = 0x10000000,
-		Debug = 0x01000000,
-		Info = 0x00100000,
-		Error = 0x00010000,
 	}
 
 	public static class RuneLog {
@@ -66,6 +66,13 @@ namespace RuneOptim {
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
 			Log(sev | LogSeverity.Error, str, lineNumber, caller, filepath);
+		}
+
+		public static void Fatal(string str, LogSeverity sev = LogSeverity.None,
+			[CallerLineNumber] int lineNumber = 0,
+			[CallerMemberName] string caller = null,
+			[CallerFilePath] string filepath = null) {
+			Log(sev | LogSeverity.Fatal, str, lineNumber, caller, filepath);
 		}
 	}
 
