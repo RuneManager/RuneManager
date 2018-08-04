@@ -31,8 +31,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Request\SiegeRequest.cs" />
     <Compile Include="Request\UnitRequests.cs" />
     <Compile Include="Request\RuneRequests.cs" />
     <Compile Include="Response\BattleResultResponse.cs" />
@@ -56,6 +57,7 @@
     <Compile Include="Response\GuildResponse.cs" />
     <Compile Include="Response\RuneResponses.cs" />
     <Compile Include="Response\SacrificeUnitResponse.cs" />
+    <Compile Include="Response\SiegeResponse.cs" />
     <Compile Include="Response\UpgradeDecoResponse.cs" />
     <Compile Include="SWEvent.cs" />
     <Compile Include="SWMessage.cs" />
