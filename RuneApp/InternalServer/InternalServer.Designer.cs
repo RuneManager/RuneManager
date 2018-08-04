@@ -82,19 +82,16 @@ namespace RuneApp.InternalServer {
         
         /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
-        ///
         ///&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
         ///&lt;head&gt;
         ///	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;/&gt;
-        ///	&lt;meta charset=&quot;utf-8&quot; /&gt;
+        ///	&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+        ///	&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        ///	&lt;meta charset=&quot;utf-8&quot;/&gt;
         ///	&lt;title&gt;{title}&lt;/title&gt;
-        ///	&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;{theme}&quot;/&gt;
-        ///{head}
-        ///&lt;/head&gt;
-        ///&lt;body&gt;
-        ///{body}
-        ///&lt;/body&gt;
-        ///&lt;/html&gt;.
+        ///	&lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;/favicon.ico&quot;&gt;
+        ///	&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.css&quot; /&gt;
+        ///	&lt;l [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string default_tpl {
             get {
@@ -136,6 +133,8 @@ namespace RuneApp.InternalServer {
         ///	border-radius: 5pt;
         ///	margin: 1pt;
         ///	padding: 1pt;
+        ///	min-width: 11em;
+        ///	min-height: 8.7em;
         ///}
         ///.rune-icon {
         ///	text-align: center;
@@ -146,9 +145,7 @@ namespace RuneApp.InternalServer {
         ///}
         ///.rune-icon-back {
         ///	display: inline-block;
-        ///	background-size: 100%;
-        ///}
-        ///.rune-icon-b [rest of string was truncated]&quot;;.
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string runes_css {
             get {

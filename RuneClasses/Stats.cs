@@ -84,17 +84,20 @@ namespace RuneOptim {
 		[EnumMember(Value = "MxD")]
 		MaxDamage = 5 | ExtraStat,
 
+		// Flag for below
+		SkillStat = 32,
+
 		[EnumMember(Value = "Skill1")]
-		Skill1 = 6 | ExtraStat,
+		Skill1 = 1 | SkillStat,
 
 		[EnumMember(Value = "Skill2")]
-		Skill2 = 7 | ExtraStat,
+		Skill2 = 2 | SkillStat,
 
 		[EnumMember(Value = "Skill3")]
-		Skill3 = 8 | ExtraStat,
+		Skill3 = 3 | SkillStat,
 
 		[EnumMember(Value = "Skill4")]
-		Skill4 = 9 | ExtraStat,
+		Skill4 = 4 | SkillStat,
 	}
 
 	public enum AttributeCategory {
@@ -744,10 +747,13 @@ namespace RuneOptim {
 		/// </summary>
 		/// <param name="rhs">Stats to compare to</param>
 		/// <returns>If any values in this Stats are greater than rhs</returns>
-		public bool CheckMax(Stats rhs) {
-			double v;
+		public bool AnyExceed(Stats rhs) {
+			foreach (var a in rhs.NonZeroStats) {
+				if (this[a] > rhs[a])
+					return true;
+			}
 
-			v = rhs[Attr.HealthPercent];
+			/*v = rhs[Attr.HealthPercent];
 			if (v != 0 && Health > v)
 				return true;
 
@@ -778,7 +784,7 @@ namespace RuneOptim {
 			v = rhs[Attr.Accuracy];
 			if (v != 0 && Accuracy > v)
 				return true;
-
+				*/
 			// TODO: the rest
 
 			return false;

@@ -368,7 +368,7 @@ http.send(params);
 			}));
 
 			//
-			var food = trashOnes.OrderBy(t => t.Grade).ThenBy(t => t.Element).ThenBy(t => t.monsterTypeId).Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
+			var food = trashOnes.OrderBy(t => t.Grade).ThenBy(t => t.Element).ThenByDescending(t => t.monsterTypeId).Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
 			food = makeFood(2, food);
 			food = makeFood(3, food);
 			food = makeFood(4, food);

@@ -290,9 +290,9 @@ namespace RuneOptim {
 		private Monster getMonster(string name, int num) {
 			if (!System.Diagnostics.Debugger.IsAttached)
 				RuneLog.Debug("GetMonster " + num + "th " + name + " from " + Monsters.Count);
-			Monster mon = Monsters.Skip(num - 1).FirstOrDefault(m => m.FullName == name);
+			Monster mon = Monsters.Where(m => m.FullName == name).Skip(num - 1).FirstOrDefault();
 			if (mon == null)
-				mon = Monsters.FirstOrDefault(m => m.FullName == name);
+				mon = Monsters.Where(m => m.FullName == name).FirstOrDefault();
 			if (mon != null)
 				return mon;
 			return null;

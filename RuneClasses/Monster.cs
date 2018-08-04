@@ -120,7 +120,7 @@ namespace RuneOptim {
 
 		[JsonConverter(typeof(RuneLoadConverter))]
 		[JsonProperty("runes")]
-		public Rune[] Runes;
+		public Rune[] Runes = new Rune[0];
 
 		public int priority = 0;
 

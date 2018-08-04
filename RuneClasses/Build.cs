@@ -1244,7 +1244,8 @@ namespace RuneOptim {
 										// check if build meets minimum
 										isBad |= !RunesOnlyFillEmpty && (!AllowBroken && !test.Current.SetsFull);
 
-										isBad |= (tempMax != null && cstats.CheckMax(tempMax));
+										isBad |= (tempMax != null && cstats.AnyExceed(tempMax));
+
 										isBad |= !RunesOnlyFillEmpty && (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
 										// if no broken sets, check for broken sets
 										// if there are required sets, ensure we have them

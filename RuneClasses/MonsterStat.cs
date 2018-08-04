@@ -245,24 +245,34 @@ namespace RuneOptim {
 		public Element element;
 
 		static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
+		static object objLock = new object();
+
+		static object lockSlow = new object();
 
 		public static T AskSWApi<T>(string location, bool refetch = false) {
 			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache") + ".json";
 			var data = "";
-			if (apiObjs.ContainsKey(location)) {
-				return (T)apiObjs[location];
+			lock (objLock) {
+				if (apiObjs.ContainsKey(location)) {
+					return (T)apiObjs[location];
+				}
 			}
-			if (File.Exists(fpath) && new FileInfo(fpath).CreationTime < DateTime.Now.AddDays(-30)) {
-				File.Delete(fpath);
+			if (File.Exists(fpath) && new FileInfo(fpath).LastWriteTime < DateTime.Now.AddDays(-30)) {
+				//File.Delete(fpath);
 				// wait a second for the filesystem to actual refresh the new files Creation Time
 				// recreating too fast doesn't reset it >:|
-				System.Threading.Thread.Sleep(1000);
+				//System.Threading.Thread.Sleep(1000);
+				refetch = true;
 			}
 			if (!File.Exists(fpath) || refetch) {
 				Directory.CreateDirectory(new FileInfo(fpath).Directory.FullName);
 				using (WebClient client = new WebClient()) {
 					client.Headers["accept"] = "application/json";
+					lock (lockSlow) {
+						System.Threading.Thread.Sleep(200);
+					}
 					data = client.DownloadString(location);
+					
 					File.WriteAllText(fpath, data);
 				}
 			}
@@ -271,8 +281,10 @@ namespace RuneOptim {
 			}
 			if (string.IsNullOrWhiteSpace(data))
 				return default(T);
-			apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
-			return (T)apiObjs[location];
+			lock (objLock) {
+				apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
+				return (T)apiObjs[location];
+			}
 		}
 
 		public MonsterStat Download() {
