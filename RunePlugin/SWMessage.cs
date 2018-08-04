@@ -105,8 +105,6 @@ namespace RunePlugin {
 		EquipRuneList,
 		UnequipRune,
 		HubUserLogin,
-		GetGuildWarBattleLogByGuildId,
-		GetGuildWarBattleLogByWizardId,
 		LockUnit,
 		UnlockUnit,
 		SummonUnit,
@@ -123,8 +121,21 @@ namespace RunePlugin {
 		RevalueRune,
 		ConfirmRune,
 		UpgradeDeco,
+
+		// Guild War
 		GetGuildWarMatchupInfo,
 		GetGuildWarParticipationInfo,
 		GetGuildInfo,
+		GetGuildWarBattleLogByGuildId,
+		GetGuildWarBattleLogByWizardId,
+
+		// Siege Battle
+		GetTargetUnitInfo,
+		GetGuildSiegeDefenseDeckByWizardId,
+		GetGuildSiegeRankingInfo,
+		GetGuildSiegeBaseDefenseUnitList,
+		GetGuildSiegeBattleLogByDeckId,
+		GetGuildSiegeMatchupInfo,
+		GetGuildSiegeBattleLogByWizardId,
 	}
 }

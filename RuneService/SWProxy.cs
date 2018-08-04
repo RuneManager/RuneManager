@@ -130,16 +130,21 @@ namespace RuneService
 			plugins = new List<SWPlugin>(pluginTypes.Count);
 			foreach (Type type in pluginTypes)
 			{
+				SWPlugin plugin = null;
 				try
 				{
-					SWPlugin plugin = (SWPlugin)Activator.CreateInstance(type);
-					plugins.Add(plugin);
+					plugin = (SWPlugin)Activator.CreateInstance(type);
 					plugin.OnLoad();
+					plugins.Add(plugin);
 					this.SWResponse += plugin.ProcessRequest;
 					Console.WriteLine($"Successfully loaded plugin: {plugin.GetType().Name}");
 				}
 				catch (Exception e)
 				{
+					if (plugin != null) {
+						plugins.Remove(plugin);
+						this.SWResponse -= plugin.ProcessRequest;
+					}
 					Console.WriteLine($"Failed loading plugin: {type.Name} with exception: {e.GetType().Name}: {e.Message}");
 #if DEBUG
 					Console.WriteLine(e.StackTrace);
