@@ -511,10 +511,6 @@ function hackLots(prop, num, on) {
 					}
 					else if (action == ActionType.RuneOut) {
 						return new ServedResult("span");
-						ret.contentList.Add(ServeImageClass($"monsters/{mon.monsterTypeId}.png", "mon-portrait"));
-						ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
-						foreach (var r in manyRunes)
-							ret.contentList.Add(RuneRenderer.renderRune(r, true));
 					}
 
 					return ret;

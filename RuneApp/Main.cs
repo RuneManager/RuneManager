@@ -39,7 +39,16 @@ namespace RuneApp {
 
 		bool teamChecking = false;
 		Build teamBuild = null;
-		Dictionary<string, List<string>> toolmap = null;
+		Dictionary<string, List<string>> toolmap = new Dictionary<string, List<string>>() {
+			{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
+			{ "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
+			{ "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
+			{ "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA" } },
+
+			{ "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
+			{ "ToA", new List<string> { "ToAN", "ToAH" } }
+		};
+
 		List<string> knownTeams = new List<string>();
 		List<string> extraTeams = new List<string>();
 
@@ -1337,44 +1346,45 @@ namespace RuneApp {
 				runeDisplay.UpdateLoad(l);
 		}
 
-		private static string[] statCtrlNames = {"", "HP", "", "ATK", "", "DEF", "", "", "SPD", "CR", "CD", "RES", "ACC" };
 		private static Control[] statCtrls = new Control[37];
 
 		private void ShowStats(Stats cur, Stats mon) {
 			foreach (Attr a in new Attr[] { Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
 				if (statCtrls[(int)a] == null)
-					statCtrls[(int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Base", false).FirstOrDefault();
+					statCtrls[(int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Base", false).FirstOrDefault();
 				statCtrls[(int)a].Text = mon[a] + (((int)a) > 8 ? "%" : "");
 
 				if (statCtrls[12 + (int)a] == null)
-					statCtrls[12 + (int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Total", false).FirstOrDefault();
+					statCtrls[12 + (int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Total", false).FirstOrDefault();
 				statCtrls[12 + (int)a].Text = cur[a] + (((int)a) > 8 ? "%" : "");
 
 				if (statCtrls[24 + (int)a] == null)
-					statCtrls[24 + (int)a] = groupBox1.Controls.Find(statCtrlNames[(int)a] + "Bonus", false).FirstOrDefault();
+					statCtrls[24 + (int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Bonus", false).FirstOrDefault();
 				statCtrls[24 + (int)a].Text = "+" + (cur[a] - mon[a]);
 			}
 		}
 
 		private void ShowDiff(Stats old, Stats load, Build build = null) {
-			foreach (string stat in new string[] { "HP", "ATK", "DEF", "SPD" }) {
-				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
-				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
+			foreach (Attr stat in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed }) {
+				string sstat = stat.ToShortForm();
+				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
+				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
 				string pts = (load[stat] - old[stat]).ToString();
 				if (build != null && !build.Sort[stat].EqualTo(0)) {
 					var left = build.ScoreStat(load, stat);
 					var right = build.ScoreStat(old, stat);
 					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
-				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
+				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
 
-			foreach (string stat in new string[] { "CR", "CD", "RES", "ACC" }) {
-				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
-				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
+			foreach (Attr stat in new Attr[] { Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
+				string sstat = stat.ToShortForm();
+				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
+				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
 				var before = old[stat];
 				var after = load[stat];
-				if (stat != "CD") {
+				if (stat != Attr.CritDamage) {
 					before = Math.Min(100, before);
 					after = Math.Min(100, after);
 				}
@@ -1384,12 +1394,13 @@ namespace RuneApp {
 					var right = build.ScoreStat(old, stat);
 					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
-				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
+				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
 
-			foreach (string extra in Build.extraNames) {
-				groupBox1.Controls.Find(extra + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString("0");
-				groupBox1.Controls.Find(extra + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString("0");
+			foreach (Attr extra in Build.extraEnums) {
+				string sstat = extra.ToShortForm();
+				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString("0");
+				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString("0");
 				string pts = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString("0");
 				if (build != null && !build.Sort.ExtraGet(extra).EqualTo(0)) {
 					var aa = load.ExtraValue(extra);
@@ -1402,7 +1413,7 @@ namespace RuneApp {
 					pts += " (" + (left - right).ToString("0.##") + ")";
 				}
 
-				groupBox1.Controls.Find(extra + "compDiff", false).FirstOrDefault().Text = pts;
+				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 
 			}
 

@@ -22,8 +22,6 @@ namespace RuneApp {
 
 			// master has given Gener a Build?
 			build = bb;
-			Label label;
-			TextBox textBox;
 
 			// cool clicky thing
 			var sorter = new ListViewSort();
@@ -32,36 +30,10 @@ namespace RuneApp {
 			loadoutList.ListViewItemSorter = sorter;
 
 			// place controls in a nice grid-like manner
-			int x, y;
-
-			y = 20;
-
 			foreach (string stat in Build.statNames) {
-				/*x = 25;
-				label = groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, text: stat);
-				x += 45;
-
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y);
-				if (build.Sort[stat] != 0)
-					textBox.Text = build.Sort[stat].ToString();
-				textBox.TextChanged += textBox_TextChanged;
-
-				y += 22;
-				*/
 				loadoutList.Columns.Add(stat).Width = 80;
 			}
 			foreach (string extra in Build.extraNames) {
-				/*x = 25;
-				label = groupBox1.Controls.MakeControl<Label>(extra, "Label", x, y, text: extra);
-				x += 45;
-
-				textBox = groupBox1.Controls.MakeControl<TextBox>(extra, "Worth", x, y);
-				if (build.Sort.ExtraGet(extra) != 0)
-					textBox.Text = build.Sort.ExtraGet(extra).ToString();
-				textBox.TextChanged += textBox_TextChanged;
-
-				y += 22;
-				*/
 				loadoutList.Columns.Add(extra).Width = 80;
 			}
 			loadoutList.Columns.Add("Skill1").Width = 80;

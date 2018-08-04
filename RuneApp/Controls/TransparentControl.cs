@@ -82,7 +82,7 @@ namespace RuneApp {
 			}
 		}
 
-		public float Scale {
+		public float ImageScale {
 			get {
 				return scale;
 			}

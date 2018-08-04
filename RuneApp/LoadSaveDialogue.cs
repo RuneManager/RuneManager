@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ namespace RuneApp {
 		private string file = null;
 		public string Filename
 		{
+			[DebuggerStepThrough]
 			get { return file; }
 			set
 			{
@@ -22,6 +24,7 @@ namespace RuneApp {
 		private string lookupFile = null;
 		private string LookupFile
 		{
+			[DebuggerStepThrough]
 			get
 			{
 				return lookupFile;

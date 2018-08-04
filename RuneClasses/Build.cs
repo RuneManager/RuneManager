@@ -543,15 +543,13 @@ namespace RuneOptim {
 				bannedRunesTemp.Add(r);
 			}
 		}
-
-		public double ScoreStat(Stats current, string attrstr) {
-			var attr = Build.statEnums[Array.IndexOf(Build.statNames, attrstr)];
+		
+		public double ScoreStat(Stats current, Attr attr) {
 			string s;
 			return ScoreStat(current, attr, out s);
 		}
 
-		public double ScoreExtra(Stats current, string attrstr) {
-			var attr = Build.extraEnums[Array.IndexOf(Build.extraNames, attrstr)];
+		public double ScoreExtra(Stats current, Attr attr) {
 			string s;
 			return ScoreExtra(current, attr, out s);
 		}
@@ -1209,13 +1207,6 @@ namespace RuneOptim {
 #if BUILD_PRECHECK_BUILDS_DEBUG
 										outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif
-										if (GrindLoads) {
-											for (int rg = 0; rg < 6; rg++) {
-												//test.Runes[rg].FilterGrinds(grinds);
-												// TODO: 
-											}
-										}
-
 										isBad = false;
 
 										cstats = test.GetStats();

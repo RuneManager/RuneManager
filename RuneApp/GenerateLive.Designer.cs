@@ -172,7 +172,6 @@
 		private System.Windows.Forms.ToolStripProgressBar toolStripProgressBar1;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.Button btnHelp;
-        private RuneControl[] runes;
         private System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.Button btn_powerrunes;
     }

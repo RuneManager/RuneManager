@@ -61,7 +61,7 @@ namespace RuneOptim {
 		}
 
 		[JsonIgnore]
-		int priority = 1;
+		public int priority = 1;
 
 		[JsonIgnore]
 		private int monLoaded = 0;

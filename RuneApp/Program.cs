@@ -7,6 +7,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -1103,6 +1104,11 @@ namespace RuneApp {
 			}
 			double avs = nls.Average();
 			return Math.Sqrt(avs);
+		}
+
+		public static T MakeControl<T>(this Control.ControlCollection ctrlC, Attr attr, string suff, int x, int y, int w = 40, int h = 20, string text = null)
+			where T : Control, new() {
+			return MakeControl<T>(ctrlC, attr.ToShortForm(), suff, x, y, w, h, text);
 		}
 
 		public static T MakeControl<T>(this Control.ControlCollection ctrlC, string name, string suff, int x, int y, int w = 40, int h = 20, string text = null)

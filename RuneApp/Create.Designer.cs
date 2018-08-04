@@ -187,7 +187,7 @@
 			this.tcSPD.Image = global::RuneApp.Icon.icon_duration_speed_up;
 			this.tcSPD.Location = new System.Drawing.Point(401, 639);
 			this.tcSPD.Name = "tcSPD";
-			this.tcSPD.Scale = 0.5F;
+			this.tcSPD.ImageScale = 0.5F;
 			this.tcSPD.Size = new System.Drawing.Size(32, 32);
 			this.tcSPD.TabIndex = 97;
 			this.tcSPD.Text = "transparentControl1";
@@ -200,7 +200,7 @@
 			this.tcDEF.Image = global::RuneApp.Icon.icon_duration_defence_up;
 			this.tcDEF.Location = new System.Drawing.Point(363, 639);
 			this.tcDEF.Name = "tcDEF";
-			this.tcDEF.Scale = 0.5F;
+			this.tcDEF.ImageScale = 0.5F;
 			this.tcDEF.Size = new System.Drawing.Size(32, 32);
 			this.tcDEF.TabIndex = 97;
 			this.tcDEF.Text = "transparentControl1";
@@ -213,7 +213,7 @@
 			this.tcATK.Image = global::RuneApp.Icon.icon_duration_attack_up;
 			this.tcATK.Location = new System.Drawing.Point(325, 639);
 			this.tcATK.Name = "tcATK";
-			this.tcATK.Scale = 0.5F;
+			this.tcATK.ImageScale = 0.5F;
 			this.tcATK.Size = new System.Drawing.Size(32, 32);
 			this.tcATK.TabIndex = 97;
 			this.tcATK.Text = "transparentControl1";

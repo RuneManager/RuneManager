@@ -128,7 +128,6 @@ namespace RuneApp {
 			addAttrsToEvens();
 
 			Control textBox;
-			Label label;
 
 			// make a grid for the monsters base, min/max stats and the scoring
 
@@ -138,7 +137,7 @@ namespace RuneApp {
 			int colWidth = 50;
 			int rowHeight = 24;
 
-			var comb = Build.statNames.Concat(Build.extraNames).ToArray();
+			var comb = Build.statAll;
 
 			int genX = 0;
 
@@ -148,46 +147,47 @@ namespace RuneApp {
 			Program.log.Debug("comb " + comb.Length + " " + string.Join(",", comb));
 
 			#region Statbox
-			foreach (var stat in comb) {
+			foreach (var attr in comb) {
+				string strStat = attr.ToShortForm();
 				x = 4;
-				groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, stat);
+				groupBox1.Controls.MakeControl<Label>(strStat, "Label", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, stat);
+				groupBox1.Controls.MakeControl<Label>(strStat, "Base", x, y, 50, 20, strStat);
 				dlCheckX = x;
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, stat);
+				groupBox1.Controls.MakeControl<Label>(strStat, "Bonus", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Total", x, y, 40, 20);
 				textBox.TextChanged += global_TextChanged;
 				textBox.TextChanged += Total_TextChanged;
 				dlBtnX = x;
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, stat);
+				groupBox1.Controls.MakeControl<Label>(strStat, "Current", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Goal", x, y, 40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Goal", x, y, 40, 20);
 				textBox.TextChanged += global_TextChanged;
 				x += colWidth;
 
 
 				genX = x;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Worth", x, y, 40, 20);
 				textBox.TextChanged += global_TextChanged;
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, stat);
+				groupBox1.Controls.MakeControl<Label>(strStat, "CurrentPts", x, y, (int)(50 * 0.8), 20, strStat);
 				x += (int)(colWidth * 0.8);
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Thresh", x, y, 40, 20);
 				textBox.TextChanged += global_TextChanged;
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
+				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Max", x, y, 40, 20);
 				textBox.TextChanged += global_TextChanged;
 
 				y += rowHeight;
