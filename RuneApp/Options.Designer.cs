@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.cIgnore5Less = new System.Windows.Forms.CheckBox();
 			this.cWatchSave = new System.Windows.Forms.CheckBox();
 			this.cOtherStats = new System.Windows.Forms.CheckBox();
 			this.label6 = new System.Windows.Forms.Label();
@@ -52,7 +53,6 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
-			this.cIgnore5Less = new System.Windows.Forms.CheckBox();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
@@ -87,6 +87,17 @@
 			this.tabPage1.TabIndex = 0;
 			this.tabPage1.Text = "General";
 			this.tabPage1.UseVisualStyleBackColor = true;
+			// 
+			// cIgnore5Less
+			// 
+			this.cIgnore5Less.AutoSize = true;
+			this.cIgnore5Less.Location = new System.Drawing.Point(9, 119);
+			this.cIgnore5Less.Name = "cIgnore5Less";
+			this.cIgnore5Less.Size = new System.Drawing.Size(142, 17);
+			this.cIgnore5Less.TabIndex = 10;
+			this.cIgnore5Less.Text = "Ignore builds < 5% better";
+			this.cIgnore5Less.UseVisualStyleBackColor = true;
+			this.cIgnore5Less.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
 			// 
 			// cWatchSave
 			// 
@@ -322,16 +333,6 @@
 			this.btnHelp.Text = "Help?";
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
-			// 
-			// cbIgnore5Less
-			// 
-			this.cIgnore5Less.AutoSize = true;
-			this.cIgnore5Less.Location = new System.Drawing.Point(9, 119);
-			this.cIgnore5Less.Name = "cbIgnore5Less";
-			this.cIgnore5Less.Size = new System.Drawing.Size(142, 17);
-			this.cIgnore5Less.TabIndex = 10;
-			this.cIgnore5Less.Text = "Ignore builds < 5% better";
-			this.cIgnore5Less.UseVisualStyleBackColor = true;
 			// 
 			// Options
 			// 
