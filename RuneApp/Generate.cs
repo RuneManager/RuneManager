@@ -94,7 +94,7 @@ namespace RuneApp {
 		private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var b in e.NewItems.Cast<Monster>()) {
+					foreach (var b in e.NewItems.OfType<Monster>()) {
 						if (!IsDisposed && IsHandleCreated) {
 							// put the thing in on the main thread and bump the progress bar
 							Invoke((MethodInvoker)delegate {
@@ -105,9 +105,9 @@ namespace RuneApp {
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var b in e.OldItems.Cast<Monster>()) {
+					foreach (var b in e.OldItems.OfType<Monster>()) {
 						Invoke((MethodInvoker)delegate {
-							var lvi = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(l => l.Tag == b);
+							var lvi = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(l => l.Tag == b);
 							lvi.Remove();
 						});
 					}

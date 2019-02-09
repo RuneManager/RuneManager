@@ -384,7 +384,7 @@ namespace RuneApp {
 		private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var l in e.NewItems.Cast<Loadout>()) {
+					foreach (var l in e.NewItems.OfType<Loadout>()) {
 						var mm = Program.builds.FirstOrDefault(b => b.ID == l.BuildID)?.mon;
 						if (mm != null) {
 							mm.OnRunesChanged += Mm_OnRunesChanged;
@@ -392,7 +392,7 @@ namespace RuneApp {
 
 						checkLocked();
 						Invoke((MethodInvoker)delegate {
-							ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+							ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
 
 							ListViewItemLoad(nli, l);
 							if (!loadoutList.Items.Contains(nli))
@@ -404,14 +404,14 @@ namespace RuneApp {
 					loadoutList.Items.Clear();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var l in e.OldItems.Cast<Loadout>()) {
+					foreach (var l in e.OldItems.OfType<Loadout>()) {
 						var mm = Program.builds.FirstOrDefault(b => b.ID == l.BuildID)?.mon;
 						if (mm != null) {
 							mm.OnRunesChanged -= Mm_OnRunesChanged;
 						}
 
 						Invoke((MethodInvoker)delegate {
-							loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => li.Tag == l).Remove();
+							loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => li.Tag == l).Remove();
 						});
 					}
 					break;
@@ -432,7 +432,7 @@ namespace RuneApp {
 				return;
 
 			Invoke((MethodInvoker)delegate {
-				ListViewItem nli = loadoutList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+				ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
 				ListViewItemLoad(nli, l);
 			});
 		}
@@ -512,7 +512,7 @@ namespace RuneApp {
 			var mon = sender as Monster;
 			if (mon != null) {
 				Invoke((MethodInvoker)delegate {
-					var nli = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
+					var nli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
 					if (deleted) {
 						if (nli != null)
 							dataMonsterList.Items.Remove(nli);
@@ -534,7 +534,7 @@ namespace RuneApp {
 			var rune = sender as Rune;
 			if (rune != null) {
 				Invoke((MethodInvoker)delegate {
-					var nli = dataRuneList.Items.Cast<ListViewItem>().FirstOrDefault(li => (li.Tag as Rune).Id == rune.Id);
+					var nli = dataRuneList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Rune).Id == rune.Id);
 					if (deleted) {
 						if (nli != null)
 							dataRuneList.Items.Remove(nli);
@@ -560,9 +560,9 @@ namespace RuneApp {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
 					List<ListViewItem> tempMons = null;
-					this.Invoke((MethodInvoker)delegate { tempMons = dataMonsterList.Items.Cast<ListViewItem>().ToList(); });
+					this.Invoke((MethodInvoker)delegate { tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList(); });
 
-					foreach (var b in e.NewItems.Cast<Build>()) {
+					foreach (var b in e.NewItems.OfType<Build>()) {
 						ListViewItem li = new ListViewItem();
 						this.Invoke((MethodInvoker)delegate {
 							ListViewItemBuild(li, b);
@@ -570,18 +570,18 @@ namespace RuneApp {
 							if (!loading)
 								buildList.Sort();
 						});
-						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
+						var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 						if (lv1li != null) {
 							lv1li.ForeColor = Color.Green;
 						}
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var b in e.OldItems.Cast<Build>()) {
-						var bli = buildList.Items.Cast<ListViewItem>().FirstOrDefault(lvi => b.Equals(lvi.Tag));
+					foreach (var b in e.OldItems.OfType<Build>()) {
+						var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(lvi => b.Equals(lvi.Tag));
 						buildList.Items.Remove(bli);
 
-						var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.FullName));
+						var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.mon.FullName));
 						if (lv1li != null) {
 							lv1li.ForeColor = Color.Black;
 							if ((lv1li.Tag as Monster)?.inStorage ?? false)
@@ -686,7 +686,7 @@ namespace RuneApp {
 					teamBuild.Teams.Remove(tsmi.Text);
 				}
 			}
-			var bli = buildList.Items.Cast<ListViewItem>().FirstOrDefault(it => it.Tag == teamBuild);
+			var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(it => it.Tag == teamBuild);
 			if (bli != null) {
 				while (bli.SubItems.Count < 6) bli.SubItems.Add("");
 				bli.SubItems[5].Text = getTeamStr(teamBuild);
@@ -746,7 +746,7 @@ namespace RuneApp {
 		}
 
 		private void runetab_list_select(object sender, EventArgs e) {
-			var rune = dataRuneList.SelectedItems.Cast<ListViewItem>().FirstOrDefault()?.Tag as Rune;
+			var rune = dataRuneList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag as Rune;
 			if (rune != null) {
 				runeInventory.Show();
 				runeInventory.SetRune(rune);
@@ -754,7 +754,7 @@ namespace RuneApp {
 		}
 
 		private void crafttab_list_select(object sender, EventArgs e) {
-			var craft = dataCraftList.SelectedItems.Cast<ListViewItem>().FirstOrDefault()?.Tag as Craft;
+			var craft = dataCraftList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag as Craft;
 			if (craft != null) {
 				runeInventory.Show();
 				runeInventory.SetCraft(craft);
@@ -956,7 +956,7 @@ namespace RuneApp {
 
 				Program.builds.Add(bb);
 
-				var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
+				var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
 				if (lv1li != null)
 					lv1li.ForeColor = Color.Green;
 			}
@@ -980,11 +980,11 @@ namespace RuneApp {
 							item.ForeColor = bb.runePrediction.Any(p => p.Value.Value) ? Color.Purple : Color.Black;
 							if (bb.mon != before) {
 								// TODO: check tag?
-								var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.FullName));
+								var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.FullName));
 								if (lv1li != null)
 									lv1li.ForeColor = before.inStorage ? Color.Gray : Color.Black;
 
-								lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.FullName));
+								lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.mon.FullName));
 								if (lv1li != null)
 									lv1li.ForeColor = Color.Green;
 
@@ -1055,7 +1055,7 @@ namespace RuneApp {
 			//Program.log.Info("_" + str);
 			this.Invoke((MethodInvoker)delegate {
 				if (!IsDisposed) {
-					var lvi = buildList.Items.Cast<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
+					var lvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
 					if (lvi == null)
 						return;
 					while (lvi.SubItems.Count < 4)
@@ -1121,7 +1121,7 @@ namespace RuneApp {
 
 		private void tsBtnBuildsMoveUp_Click(object sender, EventArgs e) {
 			if (buildList.SelectedItems.Count > 0) {
-				foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderBy(l => (l.Tag as Build).priority)) {
+				foreach (ListViewItem sli in buildList.SelectedItems.OfType<ListViewItem>().Where(l => l.Tag != null).OrderBy(l => (l.Tag as Build).priority)) {
 					Build build = sli.Tag as Build;
 					if (build != null)
 						Program.BuildPriority(build, -1);
@@ -1134,7 +1134,7 @@ namespace RuneApp {
 		}
 
 		private void RegenBuildList() {
-			foreach (var lvi in buildList.Items.Cast<ListViewItem>()) {
+			foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
 				var b = lvi.Tag as Build;
 				if (b != null) {
 					lvi.SubItems[1].Text = b.priority.ToString();
@@ -1144,7 +1144,7 @@ namespace RuneApp {
 
 		private void tsBtnBuildsMoveDown_Click(object sender, EventArgs e) {
 			if (buildList.SelectedItems.Count > 0) {
-				foreach (ListViewItem sli in buildList.SelectedItems.Cast<ListViewItem>().Where(l => l.Tag != null).OrderByDescending(l => (l.Tag as Build).priority)) {
+				foreach (ListViewItem sli in buildList.SelectedItems.OfType<ListViewItem>().Where(l => l.Tag != null).OrderByDescending(l => (l.Tag as Build).priority)) {
 					Build build = sli.Tag as Build;
 					if (build != null)
 						Program.BuildPriority(build, 1);
@@ -1525,7 +1525,7 @@ namespace RuneApp {
 		public void RebuildBuildList() {
 			List<ListViewItem> tempMons = null;
 			this.Invoke((MethodInvoker)delegate {
-				tempMons = dataMonsterList.Items.Cast<ListViewItem>().ToList();
+				tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList();
 				buildList.Items.Clear();
 			});
 
@@ -1537,7 +1537,7 @@ namespace RuneApp {
 					ListViewItemBuild(li, b);
 				});
 				lviList.Add(li);
-				var lv1li = tempMons.FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
+				var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.mon?.Id ?? b.MonId).ToString()));
 				if (lv1li != null) {
 					lv1li.ForeColor = Color.Green;
 				}
@@ -1684,9 +1684,11 @@ namespace RuneApp {
 			}
 
 			if (b1 != null && b1.Type == BuildType.Link) {
-				var li = buildList.Items.Cast<ListViewItem>().FirstOrDefault(l => l.Tag == b1.LinkBuild);
+				var lis = buildList.Items.OfType<ListViewItem>();
+				lis = lis.Where(l => l?.Tag == b1.LinkBuild);
+				var li = lis.FirstOrDefault();
 				li.BackColor = Color.Fuchsia;
-				foreach (var lvi in buildList.Items.Cast<ListViewItem>().Where(l => {
+				foreach (var lvi in buildList.Items.OfType<ListViewItem>().Where(l => {
 					var b = l.Tag as Build;
 					if (b != null && b.Type == BuildType.Link && b.LinkId == b1.LinkId)
 						return true;
@@ -1731,7 +1733,7 @@ namespace RuneApp {
 		}
 
 		private void tsBtnFindSpeed_Click(object sender, EventArgs e) {
-			foreach (var li in buildList.Items.Cast<ListViewItem>()) {
+			foreach (var li in buildList.Items.OfType<ListViewItem>()) {
 				var b = li.Tag as Build;
 				if (b != null) {
 					b.RunesUseLocked = false;
@@ -1777,7 +1779,7 @@ namespace RuneApp {
 
 		private void buildList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e) {
 			if (e.ColumnIndex == buildCHTeams.Index) {
-				foreach (var lvi in buildList.Items.Cast<ListViewItem>()) {
+				foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
 					if (lvi.SubItems.Count > buildCHTeams.Index)
 						lvi.SubItems[buildCHTeams.Index].Text = getTeamStr(lvi.Tag as Build);
 				}
@@ -1818,7 +1820,7 @@ namespace RuneApp {
 
 			Program.builds.Add(bb);
 
-			var lv1li = dataMonsterList.Items.Cast<ListViewItem>().FirstOrDefault(i => i.SubItems.Cast<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
+			var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.mon.FullName));
 			if (lv1li != null)
 				lv1li.ForeColor = Color.Green;
 		}
@@ -1841,7 +1843,7 @@ namespace RuneApp {
 
 			if (buildList.SelectedItems.Count > 1) {
 				if (MessageBox.Show($"Link {buildList.SelectedItems.Count - 1} builds to [{build.ID} - {build.MonName}]?", "Link Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-					foreach (var lvi in buildList.SelectedItems.Cast<ListViewItem>().Skip(1)) {
+					foreach (var lvi in buildList.SelectedItems.OfType<ListViewItem>().Skip(1)) {
 						var b = lvi.Tag as Build;
 						if (b != null && b != build) {
 							b.Type = BuildType.Link;
@@ -1865,6 +1867,7 @@ namespace RuneApp {
 				MonName = build.mon.FullName,
 				Type = BuildType.Link,
 				priority = build.priority,
+				LinkBuild = build,
 				LinkId = build.ID,
 			};
 

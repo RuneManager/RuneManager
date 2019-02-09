@@ -55,7 +55,7 @@ namespace RuneApp {
 		}
 
 		private void listRunes_SelectedIndexChanged(object sender, EventArgs e) {
-			var fq = listRunes.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+			var fq = listRunes.SelectedItems.OfType<ListViewItem>().FirstOrDefault();
 			selCraft = fq?.Tag as Craft;
 			Craftify();
 		}

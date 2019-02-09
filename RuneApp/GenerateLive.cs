@@ -200,7 +200,7 @@ namespace RuneApp {
 					IEnumerable<Monster> llist = currentList.ToList();
 					List<ListViewItem> ilist = null;
 					Invoke((MethodInvoker)delegate {
-						ilist = loadoutList.Items.Cast<ListViewItem>().ToList();
+						ilist = loadoutList.Items.OfType<ListViewItem>().ToList();
 					});
 
 					foreach (var li in ilist) {
@@ -633,7 +633,7 @@ namespace RuneApp {
 				lock (listGenLock) {
 					listGenCancelled = false;
 					var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow);
-					var ilist = loadoutList.Items.Cast<ListViewItem>();
+					var ilist = loadoutList.Items.OfType<ListViewItem>();
 
 					int num = 0;
 					int total = ilist.Count() + llist.Count();
@@ -754,7 +754,7 @@ namespace RuneApp {
 
 		private void btn_powerrunes_Click(object sender, EventArgs e) {
 			if (!building) {
-				var mons = loadoutList.Items.Cast<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
+				var mons = loadoutList.Items.OfType<ListViewItem>().Select(lvi => lvi.Tag as Monster).Where(m => m != null);
 				List<Rune> lrunes = new List<Rune>();
 				foreach (var g in mons) {
 					foreach (var r in g.Current.Runes) {

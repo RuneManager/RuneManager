@@ -274,7 +274,7 @@ namespace RuneApp {
 				ComboBox filterJoin = new ComboBox();
 				filterJoin.DropDownStyle = ComboBoxStyle.DropDownList;
 				filterJoin.FormattingEnabled = true;
-				filterJoin.Items.AddRange(Enum.GetValues(typeof(FilterType)).Cast<FilterType>().OrderBy(f => f).Cast<object>().ToArray());
+				filterJoin.Items.AddRange(Enum.GetValues(typeof(FilterType)).OfType<FilterType>().OrderBy(f => f).OfType<object>().ToArray());
 				filterJoin.Location = new Point(298, 6);
 				filterJoin.Name = tab + "join";
 				filterJoin.Size = new Size(72, 21);
@@ -728,8 +728,8 @@ namespace RuneApp {
 		private void RequiredSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var set in e.NewItems.Cast<RuneSet>()) {
-						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+					foreach (var set in e.NewItems.OfType<RuneSet>()) {
+						var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsReq;
 						var num = (sender as IEnumerable<RuneSet>).Count(s => s == set);
 						lvi.Text = set.ToString();
@@ -739,8 +739,8 @@ namespace RuneApp {
 					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var set in e.OldItems.Cast<RuneSet>()) {
-						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+					foreach (var set in e.OldItems.OfType<RuneSet>()) {
+						var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsExc;
 						var num = (sender as IEnumerable<RuneSet>).Count(s => s == set);
 						lvi.Text = set.ToString();
@@ -764,17 +764,17 @@ namespace RuneApp {
 		private void BuildSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					/*foreach (var set in e.NewItems.Cast<RuneSet>())
+					/*foreach (var set in e.NewItems.OfType<RuneSet>())
 					{
-						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+						var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsInc;
 					}*/
 					RegenSetList();
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					/*foreach (var set in e.OldItems.Cast<RuneSet>())
+					/*foreach (var set in e.OldItems.OfType<RuneSet>())
 					{
-						var lvi = setList.Items.Cast<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
+						var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
 						lvi.Group = rsExc;
 					}*/
 					RegenSetList();
@@ -948,7 +948,7 @@ namespace RuneApp {
 			if (build == null)
 				return;
 
-			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>()) {
+			foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
 				var ss = (RuneSet)sl.Tag;
 				if (build.RequiredSets.Contains(ss)) {
 					int num = build.RequiredSets.Count(s => s == ss);
@@ -971,7 +971,7 @@ namespace RuneApp {
 			if (build == null)
 				return;
 
-			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>()) {
+			foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
 				var ss = (RuneSet)sl.Tag;
 				if (build.RequiredSets.Contains(ss)) {
 					build.removeRequiredSet(ss);
@@ -988,7 +988,7 @@ namespace RuneApp {
 			if (build == null)
 				return;
 
-			foreach (var sl in setList.SelectedItems.Cast<ListViewItem>()) {
+			foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
 				var ss = (RuneSet)sl.Tag;
 				if (build.RequiredSets.Contains(ss)) {
 					int num = build.RequiredSets.Count(s => s == ss);
@@ -1014,7 +1014,7 @@ namespace RuneApp {
 			if (build == null)
 				return;
 
-			foreach (var sl in setList.Items.Cast<ListViewItem>()) {
+			foreach (var sl in setList.Items.OfType<ListViewItem>()) {
 				var ss = (RuneSet)sl.Tag;
 				if (build.RequiredSets.Contains(ss)) {
 					sl.Group = setList.Groups[0];

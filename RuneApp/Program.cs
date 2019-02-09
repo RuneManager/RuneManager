@@ -145,7 +145,7 @@ namespace RuneApp {
 		}
 
 		private static bool DoesSettingExist(string settingName) {
-			return Properties.Settings.Default.Properties.Cast<SettingsProperty>().Any(prop => prop.Name == settingName);
+			return Properties.Settings.Default.Properties.OfType<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
 
 		public static event EventHandler<PrintToEventArgs> BuildsPrintTo;
@@ -251,7 +251,7 @@ namespace RuneApp {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-					foreach (var l in e.OldItems.Cast<Loadout>()) {
+					foreach (var l in e.OldItems.OfType<Loadout>()) {
 						foreach (Rune r in l.Runes.Where(r => r != null)) {
 							r.Locked = false;
 						}
@@ -267,10 +267,10 @@ namespace RuneApp {
 		private static void Builds_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-					foreach (var b in e.NewItems.Cast<Build>()) {
+					foreach (var b in e.NewItems.OfType<Build>()) {
 						if (Program.data != null) {
 							// for each build, find the build in the buildlist with the same mon name?
-							//var bnum = buildList.Items.Cast<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
+							//var bnum = buildList.Items.OfType<ListViewItem>().Select(it => it.Tag as Build).Where(d => d.MonName == b.MonName).Count();
 							// if there is a build with this monname, maybe I have 2 mons with that name?!
 							if (!System.Diagnostics.Debugger.IsAttached)
 								Program.LineLog.Debug("finding " + b.MonId);

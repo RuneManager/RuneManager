@@ -15,7 +15,7 @@ namespace RuneApp.InternalServer {
 				var themeSet = Themes.Themes.ResourceManager.GetResourceSet(System.Globalization.CultureInfo.CurrentCulture, true, true);
 
 				if (uri.Length > 0 && uri[0].Contains(".css")) {
-					var theme = themeSet.Cast<DictionaryEntry>().FirstOrDefault(kv => kv.Key.ToString() == uri[0].Replace(".css", ""));
+					var theme = themeSet.OfType<DictionaryEntry>().FirstOrDefault(kv => kv.Key.ToString() == uri[0].Replace(".css", ""));
 					if (theme.Key != null)
 						return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(theme.Value.ToString()) };
 				}

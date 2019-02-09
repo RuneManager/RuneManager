@@ -141,7 +141,7 @@ namespace RuneApp {
 					Invoke((MethodInvoker)delegate {
 						group = prebuildList.Groups.Count > gid ? prebuildList.Groups[gid] : null;
 						if (b.Teams.Count > 0) {
-							group = prebuildList.Groups.Cast<ListViewGroup>().FirstOrDefault(g => g.Header == b.Teams.First());
+							group = prebuildList.Groups.OfType<ListViewGroup>().FirstOrDefault(g => g.Header == b.Teams.First());
 							if (group == null) {
 								group = new ListViewGroup(b.Teams.First());
 								prebuildList.Groups.Add(group);
@@ -244,7 +244,7 @@ namespace RuneApp {
 		private void prebuildList_SelectedIndexChanged(object sender, EventArgs e) {
 			if (!CanLoad) return;
 			try {
-				var item = prebuildList.SelectedItems.Cast<ListViewItem>().FirstOrDefault();
+				var item = prebuildList.SelectedItems.OfType<ListViewItem>().FirstOrDefault();
 				if (item == null) return;
 
 				cShowWizard.Enabled = (item == defTemplate);
