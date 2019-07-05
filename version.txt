@@ -1,7 +1,5 @@
-0.6.4
+0.6.5
 https://github.com/Skibisky/RuneManager/releases/latest
-Goal calc now halves points over goal, delta loadout points fixed
+No longer crashes loading Ancient Runes / 2nd Awakenings.
+0.6.4: Goal calc now halves points over goal, delta loadout points fixed
 Skip button and ignore changes less than 5 percent option.
-Boomchak icons, maybe the tiniest bit faster?
-0.6.3: Boomerang/Chakram skills/names added
-Bug fixes, can look at grinds (nothing special).
