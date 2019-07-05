@@ -213,7 +213,7 @@ namespace RuneService
 				Console.ForegroundColor = ConsoleColor.Gray;
 #endif
 				requestUri = RequestLine.Uri;	// NOTE: used by ReceiveResponse
-				if (blacklistHosts.Contains(requestUri.Host))
+				if (blacklistHosts.Contains(requestUri?.Host))
 					SocketBP.CloseSocket();
 
 				var method = e.Method.ToUpper();

@@ -25,11 +25,14 @@ namespace RuneManagerBridge
 			else
 				File.WriteAllText(PluginDataDirectory + "\\settings.json", JsonConvert.SerializeObject(settings));
 
-			Console.WriteLine("RuneManager bridge connecting to " + settings["baseUri"]);
+			Console.WriteLine("RuneManager bridge connecting to " + settings["baseUri"] + "...");
 			api = new RuneManagerApi(settings["baseUri"]);
-			isConnected = true;
 			try {
-				api.TestConnection();
+				isConnected = api.TestConnection();
+				if (isConnected)
+					Console.WriteLine("RuneManager bridge connected!");
+				else
+					Console.WriteLine("RuneManager bridge failed.");
 			}
 			catch (Exception e) {
 				Console.WriteLine("RuneManager bridge failed with " + e.GetType() + ": " + e.Message);

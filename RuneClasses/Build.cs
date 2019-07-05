@@ -100,14 +100,17 @@ namespace RuneOptim {
 	// Contains most of the data needed to outline build requirements
 	public class Build {
 		// allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
-		[Obsolete("Consider changing to statEnums")]
+		// TODO: have another go at it
+		//[Obsolete("Consider changing to statEnums")]
 		public static readonly string[] statNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
 		public static readonly Attr[] statEnums = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
 		public static readonly Attr[] statBoth = { Attr.HealthFlat, Attr.HealthPercent, Attr.AttackFlat, Attr.AttackPercent, Attr.DefenseFlat, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
-		[Obsolete("Consider changing to extraEnums")]
+		//[Obsolete("Consider changing to extraEnums")]
 		public static readonly string[] extraNames = { "EHP", "EHPDB", "DPS", "AvD", "MxD" };
 		public static readonly Attr[] extraEnums = { Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
 		public static readonly Attr[] statAll = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy, Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
+
+
 
 		public Build() {
 			// for all 6 slots, init the list
@@ -438,6 +441,9 @@ namespace RuneOptim {
 		// The runes to be used to generate builds
 		[JsonIgnore]
 		public Rune[][] runes = new Rune[6][];
+
+		[JsonIgnore]
+		public Craft[] grinds;
 
 		/// ----------------
 
@@ -1246,6 +1252,17 @@ namespace RuneOptim {
 
 										isBad |= (tempMax != null && cstats.AnyExceed(tempMax));
 
+										if (!isBad && GrindLoads) {
+											var mahGrinds = grinds.ToList();
+											for (int rg = 0; rg < 6; rg++) {
+												var lgrinds = test.Runes[rg].FilterGrinds(mahGrinds);
+												foreach (var g in lgrinds) {
+													var tr = test.Runes[rg].Grind(g);
+												}
+												// TODO: 
+											}
+										}
+
 										isBad |= !RunesOnlyFillEmpty && (Minimum != null && !(cstats.GreaterEqual(Minimum, true)));
 										// if no broken sets, check for broken sets
 										// if there are required sets, ensure we have them
@@ -2016,6 +2033,8 @@ namespace RuneOptim {
 						runes[i] = tl.ToArray();
 					}
 				}
+
+				grinds = runes.SelectMany(rg => rg.SelectMany(r => r.FilterGrinds(save.Crafts).Concat(r.FilterEnchants(save.Crafts)))).Distinct().ToArray();
 			}
 			finally {
 				IsRunning = false;
