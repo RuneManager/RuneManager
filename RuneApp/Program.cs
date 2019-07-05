@@ -1159,7 +1159,11 @@ namespace RuneApp {
 			}
 			else {
 				var woke = (monsterTypeId / 10) % 10;
+				if (!monPortraitMap.ContainsKey(baseId.ToString()))
+					return null;
 				var idl = monPortraitMap[baseId.ToString()];
+				if (woke * 2 + 1 > idl.Length)
+					return null;
 				a = idl[woke * 2];
 				b = idl[woke * 2 + 1];
 				c = monsterTypeId % 10 - 1;
