@@ -443,15 +443,20 @@ namespace RuneApp {
 			nli.Tag = rune;
 			nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
 
-			while (nli.SubItems.Count < 6)
+			while (nli.SubItems.Count < 8)
 				nli.SubItems.Add("");
 
 			nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
+			if (RuneProperties.setUnicode.ContainsKey(rune.Set))
+				nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, RuneProperties.setUnicode[rune.Set]);
 			nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
 			nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
 			nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));
 			nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, rune.Main.Value.ToString());
 			nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, rune.Level.ToString());
+			nli.SubItems[6] = new ListViewItem.ListViewSubItem(nli, rune.BarionEfficiency.ToString("0%"));
+			nli.SubItems[7] = new ListViewItem.ListViewSubItem(nli, rune.MaxEfficiency.ToString("0%"));
+
 			return nli;
 		}
 

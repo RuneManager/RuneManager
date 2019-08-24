@@ -170,6 +170,7 @@
 			this.tsBtnBuildsUnlock = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnFindSpeed = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnLink = new System.Windows.Forms.ToolStripButton();
+			this.tsBtnSkip = new System.Windows.Forms.ToolStripButton();
 			this.buildList = new System.Windows.Forms.ListView();
 			this.buildCHName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.buildCHPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -196,7 +197,8 @@
 			this.cbFillRunes = new System.Windows.Forms.CheckBox();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.tsBtnSkip = new System.Windows.Forms.ToolStripButton();
+			this.runesEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.runesMaxEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -1151,7 +1153,9 @@
             this.runesGrade,
             this.runesMType,
             this.runesMValue,
-            this.runesLevel});
+            this.runesLevel,
+            this.runesEff,
+            this.runesMaxEff});
 			this.dataRuneList.FullRowSelect = true;
 			this.dataRuneList.Location = new System.Drawing.Point(0, 25);
 			this.dataRuneList.Margin = new System.Windows.Forms.Padding(2);
@@ -1174,9 +1178,9 @@
 			// 
 			// runesID
 			// 
-			this.runesID.DisplayIndex = 4;
+			this.runesID.DisplayIndex = 6;
 			this.runesID.Text = "ID";
-			this.runesID.Width = 40;
+			this.runesID.Width = 0;
 			// 
 			// runesGrade
 			// 
@@ -1191,7 +1195,7 @@
 			// 
 			// runesMValue
 			// 
-			this.runesMValue.DisplayIndex = 5;
+			this.runesMValue.DisplayIndex = 7;
 			this.runesMValue.Text = "MainValue";
 			// 
 			// runesLevel
@@ -1621,6 +1625,17 @@
 			this.tsBtnLink.ToolTipText = "Make a linked build";
 			this.tsBtnLink.Click += new System.EventHandler(this.tsBtnLink_Click);
 			// 
+			// tsBtnSkip
+			// 
+			this.tsBtnSkip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsBtnSkip.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnSkip.Image")));
+			this.tsBtnSkip.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsBtnSkip.Name = "tsBtnSkip";
+			this.tsBtnSkip.Size = new System.Drawing.Size(23, 22);
+			this.tsBtnSkip.Text = "Skip";
+			this.tsBtnSkip.ToolTipText = "Skip";
+			this.tsBtnSkip.Click += new System.EventHandler(this.tsBtnSkip_Click);
+			// 
 			// buildList
 			// 
 			this.buildList.AllowColumnReorder = true;
@@ -1907,16 +1922,17 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
-			// tsBtnSkip
+			// runesEff
 			// 
-			this.tsBtnSkip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.tsBtnSkip.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnSkip.Image")));
-			this.tsBtnSkip.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.tsBtnSkip.Name = "tsBtnSkip";
-			this.tsBtnSkip.Size = new System.Drawing.Size(23, 22);
-			this.tsBtnSkip.Text = "Skip";
-			this.tsBtnSkip.ToolTipText = "Skip";
-			this.tsBtnSkip.Click += new System.EventHandler(this.tsBtnSkip_Click);
+			this.runesEff.DisplayIndex = 4;
+			this.runesEff.Text = "Efficiency";
+			this.runesEff.Width = 40;
+			// 
+			// runesMaxEff
+			// 
+			this.runesMaxEff.DisplayIndex = 5;
+			this.runesMaxEff.Text = "Max Eff";
+			this.runesMaxEff.Width = 40;
 			// 
 			// Main
 			// 
@@ -2161,6 +2177,8 @@
 		private System.Windows.Forms.CheckBox cbFillRunes;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripBuildStatus;
 		private System.Windows.Forms.ToolStripButton tsBtnSkip;
+		private System.Windows.Forms.ColumnHeader runesEff;
+		private System.Windows.Forms.ColumnHeader runesMaxEff;
 	}
 }
 

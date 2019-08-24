@@ -58,6 +58,13 @@ namespace RuneOptim {
 			}
 		}
 
+		[JsonIgnore]
+		public double MaxEfficiency {
+			get {
+				return (BarionEfficiency + ((Math.Max(Math.Ceiling((12 - Level) / 3.0), 0) * 0.2) / 2.8));
+			}
+		}
+
 		public static readonly ImmutableDictionary<Attr, double> VivoMod = new Dictionary<Attr, double>()
 		{
 			{ Attr.HealthFlat, 110 },
@@ -440,23 +447,47 @@ namespace RuneOptim {
 		{
 			if (a <= Attr.Null)
 				return 0;
+			var g = rune.Grade;
+			if (g > 10)
+				g -= 10;
 			if (a == Attr.HealthFlat || a == Attr.AttackFlat || a == Attr.DefenseFlat)
-				return val / (double)2 / (5 * subUpgrades[a][rune.Grade - 1].Max);
+				return val / (double)2 / (5 * subUpgrades[a][g - 1].Max);
 
-			return val / (double)(5 * subUpgrades[a][rune.Grade - 1].Max);
+			return val / (double)(5 * subUpgrades[a][g - 1].Max);
 		}
 
 		public static double EffectiveBaseRank(this Rune r)
 		{
 			double ret = 0;
+			var g = r.Grade;
+			if (g > 10)
+				g -= 10;
 			foreach (RuneAttr s in r.Subs)
 			{
-				ret += (s.BaseValue - subUpgrades[s.Type][r.Grade - 1].Average) / (double)subUpgrades[s.Type][r.Grade - 1].Average;
+				ret += (s.BaseValue - subUpgrades[s.Type][g - 1].Average) / (double)subUpgrades[s.Type][g - 1].Average;
 			}
 			return ret;
 		}
 
 		#region stats
+
+		public static Dictionary<RuneSet, string> setUnicode = new Dictionary<RuneSet, string>() {
+			{ RuneSet.Blade, "ᚬ"},
+			{ RuneSet.Despair, "ᛃ" },
+			{ RuneSet.Violent, "ᛒ" },
+			{ RuneSet.Will, "ᛠ" },
+			{ RuneSet.Determination, "ᛗ" },
+			{ RuneSet.Revenge, "ᛝ" },
+			{ RuneSet.Rage, "ᛟ" },
+			{ RuneSet.Energy, "ᛊ" },
+			{ RuneSet.Fatal, "A" },
+			{ RuneSet.Guard, "ᚤ" },
+			{ RuneSet.Endure, "ᛡ" },
+			{ RuneSet.Nemesis, "ᚹ" },
+			{ RuneSet.Swift, "≈̇ " },
+
+		};
+
 
 		private static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
 		{

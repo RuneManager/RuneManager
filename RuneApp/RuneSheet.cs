@@ -638,7 +638,7 @@ namespace RuneApp {
 			List<string> colHead = new List<string>();
 
 			// ,MType,Points,FlatPts
-			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,VPM,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Orig,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(',')) {
+			foreach (var th in "Id,Grade,Set,Slot,Main,Innate,1,2,3,4,Level,SellVal,Select,Rune,Type,Load,Gen,Eff,EffMax,VPM,Used,Priority,CurMon,Mon,RatingScore,Keep,Action, ,BuildPercent,HPpts,ATKpts,Pts,_,Rarity,Orig,Flats,HPF,HPP,ATKF,ATKP,DEFF,DEFP,SPD,CR,CD,RES,ACC,BuildG,BuildT".Split(',')) {
 				colHead.Add(th);
 				ws.Cells[row, col].Value = th; col++;
 			}
@@ -764,6 +764,10 @@ namespace RuneApp {
 						case "Eff":
 							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
 							ws.Cells[row, col].Value = r.BarionEfficiency;
+							break;
+						case "EffMax":
+							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
+							ws.Cells[row, col].Value = r.MaxEfficiency;
 							break;
 						case "VPM":
 							ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
