@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public class WizardInfo {
 		[JsonProperty("wizard_id")]
 		public ulong Id;

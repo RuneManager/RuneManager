@@ -3,8 +3,9 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
+using RuneOptim.swar;
 
-namespace RuneOptim {
+namespace RuneOptim.Management {
 	public enum EquipCompare {
 		Unknown,
 		Worse,
@@ -449,7 +450,7 @@ namespace RuneOptim {
 				//if there is a uncounted rune in this slot
 				rune = runes[slotInd];
 				// && !used[slotInd]
-				if (rune != null && (use & (1 << slotInd)) != (1 << slotInd)) {
+				if (rune != null && (use & 1 << slotInd) != 1 << slotInd) {
 					// look for more in the set
 					set = rune.Set;
 					// how many runes we need to get
@@ -458,15 +459,15 @@ namespace RuneOptim {
 					gotNum = 1;
 					// we have now used this slot
 					//used[slotInd] = true;
-					use |= (1 << slotInd);
+					use |= 1 << slotInd;
 
 					// for the runes after this rune
 					for (int ind = slotInd + 1; ind < 6; ind++) {
 						// if there is a rune in this slot that is the type I want
 						// && !used[ind] 
-						if (runes[ind] != null && runes[ind].Set == set && (use & (1 << ind)) != (1 << ind)) {
+						if (runes[ind] != null && runes[ind].Set == set && (use & 1 << ind) != 1 << ind) {
 							//used[ind] = true;
-							use |= (1 << ind);
+							use |= 1 << ind;
 							gotNum++;
 						}
 
@@ -543,7 +544,7 @@ namespace RuneOptim {
 			}
 		}
 
-		private static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
+		private static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
 		private static Func<Stats, Stats> _getStats = null;
 
 		// Using the given stats as a base, apply the modifiers
@@ -661,9 +662,9 @@ namespace RuneOptim {
 					else
 						runesChanged++;
 				}
-				powerup += Math.Max(0, (FakeLevel[r.Slot - 1]) - r.Level);
+				powerup += Math.Max(0, FakeLevel[r.Slot - 1] - r.Level);
 				if (FakeLevel[r.Slot - 1] != 0) {
-					int tup = (int)Math.Floor(Math.Min(12, (FakeLevel[r.Slot - 1])) / (double)3);
+					int tup = (int)Math.Floor(Math.Min(12, FakeLevel[r.Slot - 1]) / (double)3);
 					int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
 					upgrades += Math.Max(0, tup - cup);
 				}

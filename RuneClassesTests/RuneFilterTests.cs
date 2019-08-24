@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuneOptim.BuidProcessing;
 
-namespace RuneOptim.Tests
-{
-    [TestClass()]
+namespace RuneOptim.Tests {
+	[TestClass()]
     public class RuneFilterTests
     { 
         [TestMethod()]

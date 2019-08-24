@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	// Specifying a new build, are we?
@@ -88,8 +90,39 @@ namespace RuneApp {
 			}
 		}
 
+		class ControlHolder<T> where T : Control {
+			Control parent;
+			public ControlHolder(Control p) {
+				parent = p;
+			}
+
+			public Dictionary<string, T> ctrls = new Dictionary<string, T>();
+			public T this[string s] {
+				get {
+					var ctrl = ctrls.ContainsKey(s) ? ctrls[s] : null;
+					if (ctrl == null)
+						ctrl = parent.Controls.Find(s, true).FirstOrDefault() as T;
+					return ctrl;
+				}
+			}
+		}
+
+		class ControlMap {
+			Control parent;
+			public ControlMap(Control p) {
+				parent = p;
+			}
+			public ControlHolder<Control> Box;
+		}
+
+		ControlMap Ctrls;
+
+
 		public Create(Build bb) {
 			InitializeComponent();
+			Ctrls = new ControlMap(this);
+			Ctrls.Box = new RuneApp.Create.ControlHolder<Control>(this.groupBox1);
+
 			this.SetDoubleBuffered();
 			// when show, check we have stuff
 
@@ -804,8 +837,8 @@ namespace RuneApp {
 
 				ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
 
-				var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-				ctrlCurrent.Text = cur[stat].ToString();
+				//var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
+				Ctrls.Box[stat + "Current"].Text = cur[stat].ToString();
 
 				var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
 
@@ -813,7 +846,7 @@ namespace RuneApp {
 
 				var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
 
-				var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+				//var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
 
 				if (build.Minimum[stat] > 0)
 					ctrlTotal.Text = build.Minimum[stat].ToString();
@@ -822,7 +855,7 @@ namespace RuneApp {
 				if (!build.Sort[stat].EqualTo(0))
 					ctrlWorth.Text = build.Sort[stat].ToString();
 				if (!build.Maximum[stat].EqualTo(0))
-					ctrlMax.Text = build.Maximum[stat].ToString();
+					Ctrls.Box[stat + "Max"].Text = build.Maximum[stat].ToString();
 				if (!build.Threshold[stat].EqualTo(0))
 					ctrlThresh.Text = build.Threshold[stat].ToString();
 
@@ -1262,9 +1295,9 @@ namespace RuneApp {
 					max = val;
 				build.Maximum[stat] = val;
 
-				var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
+				//var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
 				double thr = 0;
-				if (double.TryParse(ctrlThresh.Text, out val))
+				if (double.TryParse(Ctrls.Box[stat + "Thresh"].Text, out val))
 					thr = val;
 				build.Threshold[stat] = val;
 

@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.Management;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public enum LoadSaveResult {
@@ -541,9 +544,7 @@ namespace RuneApp {
 				catch (Exception e) {
 					LineLog.Error($"Error while saving loads {e.GetType()}", e);
 					throw;
-					//MessageBox.Show(e.ToString());
 				}
-				return LoadSaveResult.Failure;
 			}
 			return LoadSaveResult.EmptyFile;
 		}
@@ -578,7 +579,6 @@ namespace RuneApp {
 				File.WriteAllText("error_loads.txt", e.ToString());
 				throw;
 			}
-			return LoadSaveResult.Failure;
 		}
 
 		internal static void ClearLoadouts() {
@@ -604,7 +604,6 @@ namespace RuneApp {
 				LineLog.Error($"Error while saving loads {e.GetType()}", e);
 				throw;
 			}
-			return LoadSaveResult.Failure;
 		}
 
 		public static LoadSaveResult LoadGoals(string filename = "goals.json") {
@@ -624,7 +623,6 @@ namespace RuneApp {
 				File.WriteAllText("error_goals.txt", e.ToString());
 				throw;
 			}
-			return LoadSaveResult.Failure;
 		}
 
 		public static void BuildPriority(Build build, int deltaPriority) {

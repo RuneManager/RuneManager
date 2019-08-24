@@ -8,8 +8,9 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
+using RuneOptim.Management;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	// The monster stores its base stats in its base class
 	public class Monster : Stats, IComparable<Monster> {
 		[JsonProperty("name")]
@@ -177,7 +178,7 @@ namespace RuneOptim {
 					if (Current.Runes[i] != null)
 						cost += Current.Runes[i].UnequipCost;
 					// unequip new rune from host
-					if ((l.Runes[i].IsUnassigned) && l.Runes[i].Swapped != true) {
+					if (l.Runes[i].IsUnassigned && l.Runes[i].Swapped != true) {
 						cost += l.Runes[i].UnequipCost;
 					}
 				}
@@ -193,7 +194,7 @@ namespace RuneOptim {
 			get {
 				if (current == null)
 					current = new Loadout() {
-						Element = this.Element,
+						Element = Element,
 					};
 				return current;
 			}
@@ -255,7 +256,7 @@ namespace RuneOptim {
 		private static MonsterStat[] SkillList {
 			get {
 				if (skillList == null)
-					Monster.skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(global::RuneOptim.Properties.Resources.SkillsJSON));
+					skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(Properties.Resources.SkillsJSON));
 
 				return skillList;
 			}
@@ -263,7 +264,7 @@ namespace RuneOptim {
 
 		public int awakened {
 			get {
-				return (this.monsterTypeId / 10) - (this.monsterTypeId / 100) * 10;
+				return monsterTypeId / 10 - monsterTypeId / 100 * 10;
 			}
 		}
 
@@ -272,7 +273,7 @@ namespace RuneOptim {
 		public Stats GetStats(bool force = false) {
 			if (changeStats || Current.Changed || force) {
 				checkSkillups();
-				Current.Element = this.Element;
+				Current.Element = Element;
 				Current.GetStats(this, ref curStats);
 				curStats.SkillupDamage = SkillupDamage;
 				curStats.damageFormula = damageFormula;
@@ -283,7 +284,7 @@ namespace RuneOptim {
 		}
 
 		private void checkSkillups() {
-			if (this._skilllist != null && this.damageFormula == null && MonDefs.ContainsKey(monsterTypeId)) {
+			if (_skilllist != null && damageFormula == null && MonDefs.ContainsKey(monsterTypeId)) {
 				MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
 				int skdmg = 0;
@@ -291,25 +292,25 @@ namespace RuneOptim {
 
 				foreach (var si in _skilllist) {
 					i++;
-					this.SkillupLevel[i] = _skilllist[i].Level ?? 0;
-					if (this.SkillupMax[i] == 0)
-						this.SkillupMax[i] = this.SkillupLevel[i];
+					SkillupLevel[i] = _skilllist[i].Level ?? 0;
+					if (SkillupMax[i] == 0)
+						SkillupMax[i] = SkillupLevel[i];
 					if (!SkillDefs.ContainsKey(si.SkillId ?? 0))
 						continue;
 					var ss = SkillDefs[si.SkillId ?? 0];
 					var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
 					if (df.props.Count > 0) {
-						var levels = ss.LevelProgressDescription.Split('\n').Take((_skilllist[i].Level - 1) ?? 0);
-						this.SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
+						var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level - 1 ?? 0);
+						SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
 						var ct = levels.Count(s => s == "Cooltime Turn -1");
 						int cooltime = (ss.Cooltime ?? 1) - ct;
-						this.SkillTimes[i] = cooltime;
+						SkillTimes[i] = cooltime;
 						var dmg = levels.Where(s => s.StartsWith("Damage")).Select(s => int.Parse(s.Replace("%", "").Replace("Damage +", "")));
 
-						this.DamageSkillups[i] = (dmg.Any() ? dmg.Sum() : 0);
+						DamageSkillups[i] = dmg.Any() ? dmg.Sum() : 0;
 						skdmg += (dmg.Any() ? dmg.Sum() : 0) / cooltime;
 
-						this._SkillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(Stats.statType), Stats.statType).Compile();
+						_SkillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(statType), statType).Compile();
 
 						if (i != 0) {
 							df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
@@ -320,8 +321,8 @@ namespace RuneOptim {
 						average.props.Add(new MonsterDefinitions.MultiplierValue(df));
 					}
 				}
-				this.damageFormula = average;
-				this.SkillupDamage = skdmg;
+				damageFormula = average;
+				SkillupDamage = skdmg;
 			}
 		}
 
@@ -389,7 +390,7 @@ namespace RuneOptim {
 
 	public class RuneLoadConverter : JsonConverter {
 		public override bool CanConvert(Type objectType) {
-			return typeof(IList<RuneOptim.Rune>).IsAssignableFrom(objectType);
+			return typeof(IList<RuneOptim.swar.Rune>).IsAssignableFrom(objectType);
 		}
 
 		public override bool CanRead {
@@ -408,11 +409,11 @@ namespace RuneOptim {
 			Type objectType, object existingValue, JsonSerializer serializer) {
 			JToken tok = JToken.Load(reader);
 			if (tok is JArray) {
-				return tok.ToObject<RuneOptim.Rune[]>();
+				return tok.ToObject<RuneOptim.swar.Rune[]>();
 			}
 			else if (tok is JObject) {
 				var jo = tok as JObject;
-				return jo.Children().Select(o => o.First.ToObject<RuneOptim.Rune>()).ToArray();
+				return jo.Children().Select(o => o.First.ToObject<RuneOptim.swar.Rune>()).ToArray();
 			}
 			throw new InvalidCastException("A monsters runes are in an invalid format.");
 		}

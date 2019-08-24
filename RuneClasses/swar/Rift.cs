@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public enum RiftRating {
 		F,
 		E,

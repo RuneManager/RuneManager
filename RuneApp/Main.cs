@@ -12,35 +12,38 @@ using System.Net;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Text;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
+using RuneOptim.Management;
 
 namespace RuneApp {
 	public partial class Main : Form {
 		string filelink = "";
 		string whatsNewText = "";
-		Build currentBuild = null;
+		Build currentBuild;
 
 		private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
 
 		bool loading = true;
 
-		private Task runTask = null;
+		private Task runTask;
 		private CancellationToken runToken;
-		private CancellationTokenSource runSource = null;
-		bool plsDie = false;
-		bool isRunning = false;
-		public static Help help = null;
-		public static Irene irene = null;
+		private CancellationTokenSource runSource;
+		bool plsDie;
+		bool isRunning;
+		public static Help help;
+		public static Irene irene;
 
 		public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
 		public static bool goFast { get { return Program.goFast; } set { Program.goFast = value; } }
 		public static bool fillRunes { get { return Program.fillRunes; } set { Program.fillRunes = value; } }
 
-		public static Main currentMain = null;
-		public static RuneDisplay runeDisplay = null;
-		Monster displayMon = null;
+		public static Main currentMain;
+		public static RuneDisplay runeDisplay;
+		Monster displayMon;
 
-		bool teamChecking = false;
-		Build teamBuild = null;
+		bool teamChecking;
+		Build teamBuild;
 		Dictionary<string, List<string>> toolmap = new Dictionary<string, List<string>>() {
 			{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
 			{ "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
@@ -54,7 +57,7 @@ namespace RuneApp {
 		List<string> knownTeams = new List<string>();
 		List<string> extraTeams = new List<string>();
 
-		public static Main Instance = null;
+		public static Main Instance;
 
 
 		//public static Configuration config {  get { return Program.config; } }
@@ -220,8 +223,10 @@ namespace RuneApp {
 		}
 
 		private void Main_Load(object sender, EventArgs e) {
+
 			#region Watch collections and try loading
 			Program.saveFileTouched += Program_saveFileTouched;
+			//Program.data.Runes.CollectionChanged += Runes_CollectionChanged;
 			Program.OnRuneUpdate += Program_OnRuneUpdate;
 			Program.OnMonsterUpdate += Program_OnMonsterUpdate;
 			Program.loads.CollectionChanged += Loads_CollectionChanged;
@@ -364,6 +369,19 @@ namespace RuneApp {
 				toolStripBuildStatus.Text = "Build Status: " + e.Progress;
 			});
 		}
+
+		private void Runes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+			switch (e.Action) {
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+				case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+				default:
+					throw new NotImplementedException();
+			}
+		}
+
 		private void Program_saveFileTouched(object sender, EventArgs e) {
 			this.fileBox.Visible = true;
 		}
@@ -1446,6 +1464,7 @@ namespace RuneApp {
 				if (build != null && !build.Sort.ExtraGet(extra).EqualTo(0)) {
 					var aa = load.ExtraValue(extra);
 					var cc = old.ExtraValue(extra);
+					Console.WriteLine("" + aa + ", " + cc);
 					var ss = build.Sort.ExtraGet(extra);
 
 					var left = build.ScoreExtra(load, extra);

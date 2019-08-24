@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	// Deserializes the .json into this
 	public class Save {
 		[JsonProperty("unit_list")]
@@ -55,7 +55,7 @@ namespace RuneOptim {
 		public static Dictionary<int, string> MonIdNames {
 			get {
 				if (monIdNames == null)
-					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(global::RuneOptim.Properties.Resources.MonstersJSON));
+					monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(Properties.Resources.MonstersJSON));
 				return monIdNames;
 			}
 		}
@@ -78,7 +78,7 @@ namespace RuneOptim {
 
 		public static int getPiecesRequired(int monsterTypeId) {
 			var a = monsterTypeId / 100;
-			var b = Save.MonIdNames[a];
+			var b = MonIdNames[a];
 			var c = MonsterStat.BaseStars(b);
 			var d = InventoryItem.PiecesRequired(c);
 			return d;

@@ -2,10 +2,11 @@
 using System.Linq;
 using System.Timers;
 using System.Diagnostics;
+using RuneOptim.swar;
+using RuneOptim.Management;
 
-namespace RuneOptim.Tests
-{
-    [TestClass()]
+namespace RuneOptim.Tests {
+	[TestClass()]
     public class LoadoutTests
     {
 

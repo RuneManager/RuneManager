@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	// A really overloaded control to display runes cool-like with a million options
@@ -112,7 +113,7 @@ namespace RuneApp {
 			RecreateHandle();
 		}
 
-		public void SetCraft(RuneOptim.Craft craft) {
+		public void SetCraft(Craft craft) {
 			grade = 0;
 
 			_imageSlot = runeSlotImages[(int)craft.Type + 6];
@@ -124,7 +125,7 @@ namespace RuneApp {
 			Refresh();
 		}
 
-		public void SetRune(RuneOptim.Rune rune) {
+		public void SetRune(RuneOptim.swar.Rune rune) {
 			Tag = rune;
 			if (rune == null)
 				return;
@@ -250,30 +251,30 @@ namespace RuneApp {
 			Runes.bg_legend,
 		};
 
-		readonly System.Collections.Generic.Dictionary<RuneOptim.RuneSet, Bitmap> runeSetImages = new System.Collections.Generic.Dictionary<RuneOptim.RuneSet, Bitmap>()
+		readonly System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap> runeSetImages = new System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap>()
 		{
-			{ RuneOptim.RuneSet.Null, null },
-			{ RuneOptim.RuneSet.Blade, Runes.blade },
-			{ RuneOptim.RuneSet.Despair, Runes.despair },
-			{ RuneOptim.RuneSet.Destroy, Runes.destroy },
-			{ RuneOptim.RuneSet.Endure, Runes.endure },
-			{ RuneOptim.RuneSet.Energy, Runes.energy },
-			{ RuneOptim.RuneSet.Fatal, Runes.fatal },
-			{ RuneOptim.RuneSet.Focus, Runes.focus },
-			{ RuneOptim.RuneSet.Guard, Runes.guard },
-			{ RuneOptim.RuneSet.Nemesis, Runes.nemesis },
-			{ RuneOptim.RuneSet.Rage, Runes.rage },
-			{ RuneOptim.RuneSet.Revenge, Runes.revenge },
-			{ RuneOptim.RuneSet.Shield, Runes.shield },
-			{ RuneOptim.RuneSet.Swift, Runes.swift },
-			{ RuneOptim.RuneSet.Vampire, Runes.vampire },
-			{ RuneOptim.RuneSet.Violent, Runes.violent },
-			{ RuneOptim.RuneSet.Will, Runes.will },
-			{ RuneOptim.RuneSet.Fight, Runes.fight },
-			{ RuneOptim.RuneSet.Determination, Runes.determination },
-			{ RuneOptim.RuneSet.Enhance, Runes.enhance },
-			{ RuneOptim.RuneSet.Accuracy, Runes.accuracy },
-			{ RuneOptim.RuneSet.Tolerance, Runes.tolerance }
+			{ RuneOptim.swar.RuneSet.Null, null },
+			{ RuneOptim.swar.RuneSet.Blade, Runes.blade },
+			{ RuneOptim.swar.RuneSet.Despair, Runes.despair },
+			{ RuneOptim.swar.RuneSet.Destroy, Runes.destroy },
+			{ RuneOptim.swar.RuneSet.Endure, Runes.endure },
+			{ RuneOptim.swar.RuneSet.Energy, Runes.energy },
+			{ RuneOptim.swar.RuneSet.Fatal, Runes.fatal },
+			{ RuneOptim.swar.RuneSet.Focus, Runes.focus },
+			{ RuneOptim.swar.RuneSet.Guard, Runes.guard },
+			{ RuneOptim.swar.RuneSet.Nemesis, Runes.nemesis },
+			{ RuneOptim.swar.RuneSet.Rage, Runes.rage },
+			{ RuneOptim.swar.RuneSet.Revenge, Runes.revenge },
+			{ RuneOptim.swar.RuneSet.Shield, Runes.shield },
+			{ RuneOptim.swar.RuneSet.Swift, Runes.swift },
+			{ RuneOptim.swar.RuneSet.Vampire, Runes.vampire },
+			{ RuneOptim.swar.RuneSet.Violent, Runes.violent },
+			{ RuneOptim.swar.RuneSet.Will, Runes.will },
+			{ RuneOptim.swar.RuneSet.Fight, Runes.fight },
+			{ RuneOptim.swar.RuneSet.Determination, Runes.determination },
+			{ RuneOptim.swar.RuneSet.Enhance, Runes.enhance },
+			{ RuneOptim.swar.RuneSet.Accuracy, Runes.accuracy },
+			{ RuneOptim.swar.RuneSet.Tolerance, Runes.tolerance }
 		};
 
 	}

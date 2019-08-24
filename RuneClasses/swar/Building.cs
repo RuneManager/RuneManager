@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public class Building {
 		[JsonProperty("building_id")]
 		public ulong Id;

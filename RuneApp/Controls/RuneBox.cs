@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using RuneOptim;
 using System.Linq;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class RuneBox : GroupBox {

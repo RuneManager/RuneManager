@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer {
@@ -85,7 +87,7 @@ function hackLots(prop, num, on) {
 					);
 			}
 
-			private double calcSort(RuneOptim.Rune r) {
+			private double calcSort(RuneOptim.swar.Rune r) {
 				if (r == null)
 					return 0;
 				Monster m = null;
@@ -109,7 +111,7 @@ function hackLots(prop, num, on) {
 
 			public static Random rand = new Random();
 
-			public static ServedResult renderRune(RuneOptim.Rune r, bool forceExpand = false) {
+			public static ServedResult renderRune(RuneOptim.swar.Rune r, bool forceExpand = false) {
 				if (r == null)
 					return "";
 				var ret = new ServedResult("div") { contentDic = { { "class", "\"rune-box\"" } } };
@@ -181,7 +183,7 @@ function hackLots(prop, num, on) {
 					});
 
 				var propdiv = new ServedResult("div") { contentDic = { { "class", "\"rune-box-right\"" } } };
-				if (r.Innate != null && r.Innate.Type > RuneOptim.Attr.Null) {
+				if (r.Innate != null && r.Innate.Type > RuneOptim.swar.Attr.Null) {
 					propdiv.contentList.Add(new ServedResult("div") {
 						contentDic = { { "class", "\"rune-prop rune-sub rune-innate\"" } },
 						contentList = { "+" + r.Innate.Type + " " + r.Innate.Value }

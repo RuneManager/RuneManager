@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class GrindPreview : Form {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuneOptim.swar;
 
-namespace RuneOptim.Tests
-{
-    [TestClass()]
+namespace RuneOptim.Tests {
+	[TestClass()]
     public class RuneTests
     {
         [TestMethod()]

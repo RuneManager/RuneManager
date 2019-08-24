@@ -1,5 +1,6 @@
-﻿namespace RuneOptim.Tests
-{
+﻿using RuneOptim.swar;
+
+namespace RuneOptim.Tests {
 	static class TestData
 	{
 		#region Runes

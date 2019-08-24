@@ -1,5 +1,4 @@
-﻿namespace RuneApp
-{
+﻿namespace RuneApp {
 	partial class StatColumn
 	{
 		/// <summary> 
@@ -71,7 +70,7 @@
 			this.lbHP.Name = "lbHP";
 			this.lbHP.Size = new System.Drawing.Size(52, 13);
 			this.lbHP.TabIndex = 0;
-			this.lbHP.Tag = RuneOptim.Attr.HealthPercent;
+			this.lbHP.Tag = RuneOptim.swar.Attr.HealthPercent;
 			this.lbHP.Text = "HP";
 			this.lbHP.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -81,7 +80,7 @@
 			this.tbHP.Name = "tbHP";
 			this.tbHP.Size = new System.Drawing.Size(60, 20);
 			this.tbHP.TabIndex = 1;
-			this.tbHP.Tag = RuneOptim.Attr.HealthPercent;
+			this.tbHP.Tag = RuneOptim.swar.Attr.HealthPercent;
 			this.tbHP.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbTitle
@@ -99,7 +98,7 @@
 			this.tbATK.Name = "tbATK";
 			this.tbATK.Size = new System.Drawing.Size(60, 20);
 			this.tbATK.TabIndex = 1;
-			this.tbATK.Tag = RuneOptim.Attr.AttackPercent;
+			this.tbATK.Tag = RuneOptim.swar.Attr.AttackPercent;
 			this.tbATK.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbATK
@@ -108,7 +107,7 @@
 			this.lbATK.Name = "lbATK";
 			this.lbATK.Size = new System.Drawing.Size(52, 13);
 			this.lbATK.TabIndex = 0;
-			this.lbATK.Tag = RuneOptim.Attr.AttackPercent;
+			this.lbATK.Tag = RuneOptim.swar.Attr.AttackPercent;
 			this.lbATK.Text = "ATK";
 			this.lbATK.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -118,7 +117,7 @@
 			this.tbDEF.Name = "tbDEF";
 			this.tbDEF.Size = new System.Drawing.Size(60, 20);
 			this.tbDEF.TabIndex = 1;
-			this.tbDEF.Tag = RuneOptim.Attr.DefensePercent;
+			this.tbDEF.Tag = RuneOptim.swar.Attr.DefensePercent;
 			this.tbDEF.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbDEF
@@ -127,7 +126,7 @@
 			this.lbDEF.Name = "lbDEF";
 			this.lbDEF.Size = new System.Drawing.Size(52, 13);
 			this.lbDEF.TabIndex = 0;
-			this.lbDEF.Tag = RuneOptim.Attr.DefensePercent;
+			this.lbDEF.Tag = RuneOptim.swar.Attr.DefensePercent;
 			this.lbDEF.Text = "DEF";
 			this.lbDEF.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -137,7 +136,7 @@
 			this.tbSPD.Name = "tbSPD";
 			this.tbSPD.Size = new System.Drawing.Size(60, 20);
 			this.tbSPD.TabIndex = 1;
-			this.tbSPD.Tag = RuneOptim.Attr.Speed;
+			this.tbSPD.Tag = RuneOptim.swar.Attr.Speed;
 			this.tbSPD.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbSPD
@@ -146,7 +145,7 @@
 			this.lbSPD.Name = "lbSPD";
 			this.lbSPD.Size = new System.Drawing.Size(52, 13);
 			this.lbSPD.TabIndex = 0;
-			this.lbSPD.Tag = RuneOptim.Attr.Speed;
+			this.lbSPD.Tag = RuneOptim.swar.Attr.Speed;
 			this.lbSPD.Text = "SPD";
 			this.lbSPD.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -156,7 +155,7 @@
 			this.tbCRate.Name = "tbCRate";
 			this.tbCRate.Size = new System.Drawing.Size(60, 20);
 			this.tbCRate.TabIndex = 1;
-			this.tbCRate.Tag = RuneOptim.Attr.CritRate;
+			this.tbCRate.Tag = RuneOptim.swar.Attr.CritRate;
 			this.tbCRate.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbCRate
@@ -165,7 +164,7 @@
 			this.lbCRate.Name = "lbCRate";
 			this.lbCRate.Size = new System.Drawing.Size(52, 13);
 			this.lbCRate.TabIndex = 0;
-			this.lbCRate.Tag = RuneOptim.Attr.CritRate;
+			this.lbCRate.Tag = RuneOptim.swar.Attr.CritRate;
 			this.lbCRate.Text = "C Rate";
 			this.lbCRate.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -175,7 +174,7 @@
 			this.tbCDam.Name = "tbCDam";
 			this.tbCDam.Size = new System.Drawing.Size(60, 20);
 			this.tbCDam.TabIndex = 1;
-			this.tbCDam.Tag = RuneOptim.Attr.CritDamage;
+			this.tbCDam.Tag = RuneOptim.swar.Attr.CritDamage;
 			this.tbCDam.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbCDam
@@ -184,7 +183,7 @@
 			this.lbCDam.Name = "lbCDam";
 			this.lbCDam.Size = new System.Drawing.Size(52, 13);
 			this.lbCDam.TabIndex = 0;
-			this.lbCDam.Tag = RuneOptim.Attr.CritDamage;
+			this.lbCDam.Tag = RuneOptim.swar.Attr.CritDamage;
 			this.lbCDam.Text = "C Dam";
 			this.lbCDam.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -194,7 +193,7 @@
 			this.tbRES.Name = "tbRES";
 			this.tbRES.Size = new System.Drawing.Size(60, 20);
 			this.tbRES.TabIndex = 1;
-			this.tbRES.Tag = RuneOptim.Attr.Resistance;
+			this.tbRES.Tag = RuneOptim.swar.Attr.Resistance;
 			this.tbRES.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbRES
@@ -203,7 +202,7 @@
 			this.lbRES.Name = "lbRES";
 			this.lbRES.Size = new System.Drawing.Size(52, 13);
 			this.lbRES.TabIndex = 0;
-			this.lbRES.Tag = RuneOptim.Attr.Resistance;
+			this.lbRES.Tag = RuneOptim.swar.Attr.Resistance;
 			this.lbRES.Text = "RES";
 			this.lbRES.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -213,7 +212,7 @@
 			this.tbACC.Name = "tbACC";
 			this.tbACC.Size = new System.Drawing.Size(60, 20);
 			this.tbACC.TabIndex = 1;
-			this.tbACC.Tag = RuneOptim.Attr.Accuracy;
+			this.tbACC.Tag = RuneOptim.swar.Attr.Accuracy;
 			this.tbACC.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbACC
@@ -222,7 +221,7 @@
 			this.lbACC.Name = "lbACC";
 			this.lbACC.Size = new System.Drawing.Size(52, 13);
 			this.lbACC.TabIndex = 0;
-			this.lbACC.Tag = RuneOptim.Attr.Accuracy;
+			this.lbACC.Tag = RuneOptim.swar.Attr.Accuracy;
 			this.lbACC.Text = "ACC";
 			this.lbACC.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -232,7 +231,7 @@
 			this.tbEHP.Name = "tbEHP";
 			this.tbEHP.Size = new System.Drawing.Size(60, 20);
 			this.tbEHP.TabIndex = 1;
-			this.tbEHP.Tag = RuneOptim.Attr.EffectiveHP;
+			this.tbEHP.Tag = RuneOptim.swar.Attr.EffectiveHP;
 			this.tbEHP.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbEHP
@@ -241,7 +240,7 @@
 			this.lbEHP.Name = "lbEHP";
 			this.lbEHP.Size = new System.Drawing.Size(52, 13);
 			this.lbEHP.TabIndex = 0;
-			this.lbEHP.Tag = RuneOptim.Attr.EffectiveHP;
+			this.lbEHP.Tag = RuneOptim.swar.Attr.EffectiveHP;
 			this.lbEHP.Text = "EHP";
 			this.lbEHP.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -251,7 +250,7 @@
 			this.tbEHPDB.Name = "tbEHPDB";
 			this.tbEHPDB.Size = new System.Drawing.Size(60, 20);
 			this.tbEHPDB.TabIndex = 1;
-			this.tbEHPDB.Tag = RuneOptim.Attr.EffectiveHPDefenseBreak;
+			this.tbEHPDB.Tag = RuneOptim.swar.Attr.EffectiveHPDefenseBreak;
 			this.tbEHPDB.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbEHPDB
@@ -260,7 +259,7 @@
 			this.lbEHPDB.Name = "lbEHPDB";
 			this.lbEHPDB.Size = new System.Drawing.Size(52, 13);
 			this.lbEHPDB.TabIndex = 0;
-			this.lbEHPDB.Tag = RuneOptim.Attr.EffectiveHPDefenseBreak;
+			this.lbEHPDB.Tag = RuneOptim.swar.Attr.EffectiveHPDefenseBreak;
 			this.lbEHPDB.Text = "EHPDB";
 			this.lbEHPDB.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -270,7 +269,7 @@
 			this.tbDPS.Name = "tbDPS";
 			this.tbDPS.Size = new System.Drawing.Size(60, 20);
 			this.tbDPS.TabIndex = 1;
-			this.tbDPS.Tag = RuneOptim.Attr.DamagePerSpeed;
+			this.tbDPS.Tag = RuneOptim.swar.Attr.DamagePerSpeed;
 			this.tbDPS.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbDPS
@@ -279,7 +278,7 @@
 			this.lbDPS.Name = "lbDPS";
 			this.lbDPS.Size = new System.Drawing.Size(52, 13);
 			this.lbDPS.TabIndex = 0;
-			this.lbDPS.Tag = RuneOptim.Attr.DamagePerSpeed;
+			this.lbDPS.Tag = RuneOptim.swar.Attr.DamagePerSpeed;
 			this.lbDPS.Text = "DPS";
 			this.lbDPS.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -289,7 +288,7 @@
 			this.tbAvDam.Name = "tbAvDam";
 			this.tbAvDam.Size = new System.Drawing.Size(60, 20);
 			this.tbAvDam.TabIndex = 1;
-			this.tbAvDam.Tag = RuneOptim.Attr.AverageDamage;
+			this.tbAvDam.Tag = RuneOptim.swar.Attr.AverageDamage;
 			this.tbAvDam.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbAvDam
@@ -298,7 +297,7 @@
 			this.lbAvDam.Name = "lbAvDam";
 			this.lbAvDam.Size = new System.Drawing.Size(52, 13);
 			this.lbAvDam.TabIndex = 0;
-			this.lbAvDam.Tag = RuneOptim.Attr.AverageDamage;
+			this.lbAvDam.Tag = RuneOptim.swar.Attr.AverageDamage;
 			this.lbAvDam.Text = "AvDam";
 			this.lbAvDam.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 
@@ -308,7 +307,7 @@
 			this.tbMxDam.Name = "tbMxDam";
 			this.tbMxDam.Size = new System.Drawing.Size(60, 20);
 			this.tbMxDam.TabIndex = 1;
-			this.tbMxDam.Tag = RuneOptim.Attr.MaxDamage;
+			this.tbMxDam.Tag = RuneOptim.swar.Attr.MaxDamage;
 			this.tbMxDam.TextChanged += new System.EventHandler(this.tb_TextChanged);
 			// 
 			// lbMxDam
@@ -317,7 +316,7 @@
 			this.lbMxDam.Name = "lbMxDam";
 			this.lbMxDam.Size = new System.Drawing.Size(52, 13);
 			this.lbMxDam.TabIndex = 0;
-			this.lbMxDam.Tag = RuneOptim.Attr.MaxDamage;
+			this.lbMxDam.Tag = RuneOptim.swar.Attr.MaxDamage;
 			this.lbMxDam.Text = "MxDam";
 			this.lbMxDam.TextAlign = System.Drawing.ContentAlignment.TopRight;
 			// 

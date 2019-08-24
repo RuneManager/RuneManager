@@ -1,121 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using System.Linq.Expressions;
+using RuneOptim.BuidProcessing;
 
-namespace RuneOptim {
-	[System.AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
-	sealed class AttrFieldAttribute : Attribute {
-		readonly Attr attrName;
-
-		public AttrFieldAttribute(Attr attr) {
-			this.attrName = attr;
-		}
-
-		public Attr attr {
-			get { return attrName; }
-		}
-
-	}
-
-	// Allows me to steal the JSON values into Enum
-	[JsonConverter(typeof(StringEnumConverter))]
-	public enum Attr {
-		[EnumMember(Value = "-")]
-		Neg = -1,
-
-		[EnumMember(Value = "")]
-		// TODO: FIXME:
-		Null = 0,
-
-		[EnumMember(Value = "HP flat")]
-		HealthFlat = 1,
-
-		[EnumMember(Value = "HP%")]
-		HealthPercent = 2,
-
-		[EnumMember(Value = "ATK flat")]
-		AttackFlat = 3,
-
-		[EnumMember(Value = "ATK%")]
-		AttackPercent = 4,
-
-		[EnumMember(Value = "DEF flat")]
-		DefenseFlat = 5,
-
-		[EnumMember(Value = "DEF%")]
-		DefensePercent = 6,
-
-		// Thanks Swift -_-
-		SpeedPercent = 7,
-
-		[EnumMember(Value = "SPD")]
-		Speed = 8,
-
-		[EnumMember(Value = "CRate")]
-		CritRate = 9,
-
-		[EnumMember(Value = "CDmg")]
-		CritDamage = 10,
-
-		[EnumMember(Value = "RES")]
-		Resistance = 11,
-
-		[EnumMember(Value = "ACC")]
-		Accuracy = 12,
-
-		// Flag for below
-		ExtraStat = 16,
-
-		[EnumMember(Value = "EHP")]
-		EffectiveHP = 1 | ExtraStat,
-
-		[EnumMember(Value = "EHPDB")]
-		EffectiveHPDefenseBreak = 2 | ExtraStat,
-
-		[EnumMember(Value = "DPS")]
-		DamagePerSpeed = 3 | ExtraStat,
-
-		[EnumMember(Value = "AvD")]
-		AverageDamage = 4 | ExtraStat,
-
-		[EnumMember(Value = "MxD")]
-		MaxDamage = 5 | ExtraStat,
-
-		// Flag for below
-		SkillStat = 32,
-
-		[EnumMember(Value = "Skill1")]
-		Skill1 = 1 | SkillStat,
-
-		[EnumMember(Value = "Skill2")]
-		Skill2 = 2 | SkillStat,
-
-		[EnumMember(Value = "Skill3")]
-		Skill3 = 3 | SkillStat,
-
-		[EnumMember(Value = "Skill4")]
-		Skill4 = 4 | SkillStat,
-	}
-
-	public enum AttributeCategory {
-		Neutral,
-		Offensive,
-		Defensive,
-		Support
-	}
-
-	public class StatModEventArgs : EventArgs {
-		public Attr Attr { get; private set; }
-		public double Value { get; private set; }
-
-		public StatModEventArgs(Attr a, double v) {
-			Attr = a;
-			Value = v;
-		}
-	}
+namespace RuneOptim.swar {
 
 	public class Stats {
 		// allows mapping save.json into the program via Monster
@@ -333,7 +222,7 @@ namespace RuneOptim {
 		public MonsterDefinitions.MultiplierBase damageFormula = null;
 
 		[JsonIgnore]
-		protected static ParameterExpression statType = Expression.Parameter(typeof(RuneOptim.Stats), "stats");
+		protected static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
 
 		[JsonIgnore]
 		private Func<Stats, double> _damageFormula = null;
@@ -376,7 +265,7 @@ namespace RuneOptim {
 				return 0;
 			if (applyTo == null)
 				applyTo = this;
-			return this._SkillsFormula[skillNum](applyTo);
+			return _SkillsFormula[skillNum](applyTo);
 		}
 
 		public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null) {
@@ -429,7 +318,7 @@ namespace RuneOptim {
 				case Attr.Skill2:
 				case Attr.Skill3:
 				case Attr.Skill4:
-					return DamageSkillups[(int)(extra - Attr.Skill1)];
+					return DamageSkillups[extra - Attr.Skill1];
 				default:
 					throw new NotImplementedException();
 			}
@@ -520,7 +409,7 @@ namespace RuneOptim {
 				case Attr.Skill2:
 				case Attr.Skill3:
 				case Attr.Skill4:
-					DamageSkillups[(int)(extra - Attr.Skill1)] = value;
+					DamageSkillups[extra - Attr.Skill1] = value;
 					break;
 				default:
 					throw new NotImplementedException();
@@ -567,15 +456,15 @@ namespace RuneOptim {
 					case "RES":
 						return Resistance;
 					case "WaterATK":
-						return this.DamageSkillups[(int)Element.Water - 1];
+						return DamageSkillups[(int)Element.Water - 1];
 					case "FireATK":
-						return this.DamageSkillups[(int)Element.Fire - 1];
+						return DamageSkillups[(int)Element.Fire - 1];
 					case "WindATK":
-						return this.DamageSkillups[(int)Element.Wind - 1];
+						return DamageSkillups[(int)Element.Wind - 1];
 					case "LightATK":
-						return this.DamageSkillups[(int)Element.Light - 1];
+						return DamageSkillups[(int)Element.Light - 1];
 					case "DarkATK":
-						return this.DamageSkillups[(int)Element.Dark - 1];
+						return DamageSkillups[(int)Element.Dark - 1];
 					default:
 						return 0;
 						//throw new NotImplementedException();
@@ -620,19 +509,19 @@ namespace RuneOptim {
 						OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Resistance, value));
 						break;
 					case "WaterATK":
-						this.DamageSkillups[0] = value;
+						DamageSkillups[0] = value;
 						break;
 					case "FireATK":
-						this.DamageSkillups[1] = value;
+						DamageSkillups[1] = value;
 						break;
 					case "WindATK":
-						this.DamageSkillups[2] = value;
+						DamageSkillups[2] = value;
 						break;
 					case "LightATK":
-						this.DamageSkillups[3] = value;
+						DamageSkillups[3] = value;
 						break;
 					case "DarkATK":
-						this.DamageSkillups[4] = value;
+						DamageSkillups[4] = value;
 						break;
 					default:
 						break;
@@ -753,51 +642,7 @@ namespace RuneOptim {
 					return true;
 			}
 
-			/*v = rhs[Attr.HealthPercent];
-			if (v != 0 && Health > v)
-				return true;
-
-			v = rhs[Attr.AttackPercent];
-			if (v != 0 && Attack > v)
-				return true;
-
-			v = rhs[Attr.DefensePercent];
-			if (v != 0 && Defense > v)
-				return true;
-
-			v = rhs[Attr.Speed];
-			if (v != 0 && Speed > v)
-				return true;
-
-			v = rhs[Attr.CritRate];
-			if (v != 0 && CritRate > v)
-				return true;
-
-			v = rhs[Attr.CritDamage];
-			if (v != 0 && CritDamage > v)
-				return true;
-
-			v = rhs[Attr.Resistance];
-			if (v != 0 && Resistance > v)
-				return true;
-
-			v = rhs[Attr.Accuracy];
-			if (v != 0 && Accuracy > v)
-				return true;
-				*/
-			// TODO: the rest
-
 			return false;
-
-			// 17% instumentation preunroll?
-			foreach (var a in Build.statEnums) {
-				//if (rhs[a] != 0 && this[a] > rhs[a])
-				if (CheckMax(this[a], rhs[a]))
-					return true;
-			}
-			return false;
-
-			return Build.statEnums.Any(s => rhs[s] != 0 && this[s] > rhs[s]);
 		}
 
 		public bool CheckMax(double lhs, double rhs) {
@@ -893,10 +738,10 @@ namespace RuneOptim {
 				this[a] = rhs[a];
 			}
 			for (int i = 0; i < 4; i++) {
-				OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + i, this.GetSkillDamage(Attr.AverageDamage, i, this)));
+				OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Skill1 + i, GetSkillDamage(Attr.AverageDamage, i, this)));
 			}
 			for (int i = 0; i < 8; i++) {
-				this.DamageSkillups[i] = rhs.DamageSkillups[i];
+				DamageSkillups[i] = rhs.DamageSkillups[i];
 			}
 			return this;
 		}
@@ -1015,8 +860,8 @@ namespace RuneOptim {
 						yield return a;
 				}
 				for (int i = 0; i < 4; i++) {
-					if (!this.DamageSkillups[i].EqualTo(0))
-						yield return (Attr)(Attr.Skill1 + i);
+					if (!DamageSkillups[i].EqualTo(0))
+						yield return Attr.Skill1 + i;
 				}
 			}
 		}

@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace SWFarmLoader {
 	class MonDude : MonsterStat {
@@ -75,12 +75,14 @@ namespace SWFarmLoader {
 				List<MonsterStat> monsters = new List<MonsterStat>();
 				var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary", refetch);
 				int i = 0;
-				foreach (var it in list) {
+				//foreach (var it in list) {
+				Parallel.ForEach(list, it => {
 					Console.CursorLeft = 0;
 					Console.Write($"{i * 100.0 / list.Length:0.##}% "); i++;
 					var mm = StatReference.AskSWApi<MonsterStat>(it.URL, refetch);
 					monsters.Add(mm);
 				}
+				);
 				/*
 				File.WriteAllText("mons2.cs", $@"using RuneOptim;
 
@@ -107,7 +109,7 @@ namespace RuneOptim.Monsters {{
 	}}
 }}");
 */
-				File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters, Formatting.Indented));
+				File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.monsterTypeId), Formatting.Indented));
 			}
 			catch (Exception e) {
 				Console.WriteLine(e.GetType() + ": " + e.Message);

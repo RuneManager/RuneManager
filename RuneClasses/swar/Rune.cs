@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
+using RuneOptim.BuidProcessing;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public partial class Rune : RuneLink {
 		#region JSON Props
 
@@ -24,7 +25,22 @@ namespace RuneOptim {
 		public int _rank;
 
 		[JsonProperty("locked")]
-		public bool Locked;
+		protected bool locked;
+
+		[JsonIgnore]
+		public bool Locked {
+			get {
+				return locked;
+			}
+			set {
+				locked = value;
+				if (EnchantOf != null)
+					EnchantOf.locked = value;
+			}
+		}
+
+		[JsonIgnore]
+		public Rune EnchantOf;
 
 		[JsonProperty("occupied_type")]
 		public int _occupiedType;

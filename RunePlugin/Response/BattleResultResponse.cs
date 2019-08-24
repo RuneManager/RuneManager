@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RunePlugin.Response {
 	public enum WinLose {
@@ -24,7 +24,7 @@ namespace RunePlugin.Response {
 		public DungeonReward Reward;
 
 		[JsonProperty("unit_list")]
-		public RuneOptim.Monster[] Monsters;
+		public Monster[] Monsters;
 	}
 
 	[SWCommand(SWCommand.BattleDungeonResult)]
@@ -48,7 +48,7 @@ namespace RunePlugin.Response {
 		public RiftDeck BestDeckRiftDungeonInfo;
 
 		[JsonProperty("item_list")]
-		public RuneOptim.InventoryItem[] ItemList;
+		public InventoryItem[] ItemList;
 	}
 
 	public class ScenarioInfo {

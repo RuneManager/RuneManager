@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class MonSelect : Form {

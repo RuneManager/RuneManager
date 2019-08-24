@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using RuneOptim.swar;
 
 namespace RunePlugin {
 	public class SWMessage {
@@ -75,27 +76,27 @@ namespace RunePlugin {
 		public RewardCrate Crate;
 
 		[JsonProperty("item_list")]
-		public RuneOptim.InventoryItem[] Items;
+		public InventoryItem[] Items;
 	}
 
 	public class RewardCrate {
 		[JsonProperty("rune")]
-		public RuneOptim.Rune Rune;
+		public RuneOptim.swar.Rune Rune;
 
 		[JsonProperty("craft_stuff")]
-		public RuneOptim.Craft Craft;
+		public Craft Craft;
 
 		[JsonProperty("material")]
-		public RuneOptim.InventoryItem Material;
+		public InventoryItem Material;
 
 		//[JsonProperty("material")]
 		//public RuneOptim.InventoryItem[] Materials;
 
 		[JsonProperty("summon_pieces")]
-		public RuneOptim.InventoryItem[] SummoningPieces;
+		public InventoryItem[] SummoningPieces;
 
 		[JsonProperty("unit_info")]
-		public RuneOptim.Monster Monster;
+		public Monster Monster;
 	}
 
 	[JsonConverter(typeof(StringEnumConverter))]

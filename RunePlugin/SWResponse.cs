@@ -4,6 +4,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RuneOptim;
+using RuneOptim.swar;
 using RunePlugin.Response;
 
 namespace RunePlugin {
@@ -21,7 +22,7 @@ namespace RunePlugin {
 		public string TZone;
 
 		[JsonProperty("wizard_info")]
-		public RuneOptim.WizardInfo WizardInfo;
+		public WizardInfo WizardInfo;
 	}
 
 	public class SWResponseConverter : JsonConverter {

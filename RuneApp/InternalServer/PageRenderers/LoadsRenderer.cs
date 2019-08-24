@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer {

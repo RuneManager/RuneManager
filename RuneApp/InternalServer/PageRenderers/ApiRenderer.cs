@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Reflection;
 using Newtonsoft.Json;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer {

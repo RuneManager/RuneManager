@@ -245,3 +245,4 @@ RunePlugin/JsonReference/
 !**/packages/MSBuild.ILMerge.Task.*/
 **/packages/MSBuild.ILMerge.Task.*/*
 !**/packages/MSBuild.ILMerge.Task.*/build/
+Build/

@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum Shrine {
 		[EnumMember(Value = "Unknown")]

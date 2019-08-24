@@ -1,5 +1,6 @@
 ﻿using System.Windows.Forms;
-using RuneOptim;
+using RuneOptim.Management;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class RuneDisplay : Form {

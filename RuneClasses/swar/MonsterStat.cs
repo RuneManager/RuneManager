@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 using System.Net;
 using System.IO;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public class MonsterStat : StatLoader {
 		[JsonProperty("skills")]
 		public SkillDef[] Skills;
@@ -81,7 +81,7 @@ namespace RuneOptim {
 		public static List<StatLoader> MonStats {
 			get {
 				if (monStats == null)
-					monStats = StatReference.AskSWApi<List<StatLoader>>("https://swarfarm.com/api/bestiary");
+					monStats = AskSWApi<List<StatLoader>>("https://swarfarm.com/api/bestiary");
 				return monStats;
 			}
 		}
@@ -137,7 +137,7 @@ namespace RuneOptim {
 		public string attribute;
 		public int amount;
 		public string area;
-		public RuneOptim.Element? element;
+		public Element? element;
 	}
 
 	public class SkillDef {
@@ -272,7 +272,7 @@ namespace RuneOptim {
 						System.Threading.Thread.Sleep(200);
 					}
 					data = client.DownloadString(location);
-					
+
 					File.WriteAllText(fpath, data);
 				}
 			}
@@ -280,7 +280,7 @@ namespace RuneOptim {
 				data = File.ReadAllText(fpath);
 			}
 			if (string.IsNullOrWhiteSpace(data))
-				return default(T);
+				return default;
 			lock (objLock) {
 				apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
 				return (T)apiObjs[location];

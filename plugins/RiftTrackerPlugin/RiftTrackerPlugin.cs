@@ -8,13 +8,12 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OfficeOpenXml;
 using RunePlugin;
-using RuneOptim;
+using RuneOptim.swar;
 
-namespace RiftTrackerPlugin
-{
+namespace RiftTrackerPlugin {
 	public class RiftTrackerPlugin : RunePlugin.SWPlugin
 	{
-		Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>> allMons = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>();
+		Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, Monster>>> allMons = new Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, Monster>>>();
 
 		Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>> matchCount = new Dictionary<RiftDungeon, Dictionary<string, Dictionary<string, int>>>();
 
@@ -39,7 +38,7 @@ namespace RiftTrackerPlugin
 						{
 							gz.CopyTo(os);
 							var ostr = Encoding.ASCII.GetString(os.ToArray());
-							allMons = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>>>(ostr);
+							allMons = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<ulong, KeyValuePair<RiftDeck, Monster>>>>(ostr);
 						}
 					}
 				}
@@ -85,7 +84,7 @@ namespace RiftTrackerPlugin
 		{
 			var jobj = JsonConvert.DeserializeObject<JObject>(json);
 			var riftstats = JsonConvert.DeserializeObject<RiftDeck>(jobj["bestdeck_rift_dungeon"].ToString());
-			var mons = JsonConvert.DeserializeObject<RuneOptim.Monster[]>(jobj["unit_list"].ToString());
+			var mons = JsonConvert.DeserializeObject<Monster[]>(jobj["unit_list"].ToString());
 			foreach (var m in mons)
 			{
 				var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
@@ -131,9 +130,9 @@ namespace RiftTrackerPlugin
 				//var riftMons = allMons[riftstats.RiftDungeonId];
 
 				if (!allMons.ContainsKey(m.Name))
-					allMons.Add(m.Name, new Dictionary<ulong, KeyValuePair<RiftDeck, RuneOptim.Monster>>());
+					allMons.Add(m.Name, new Dictionary<ulong, KeyValuePair<RiftDeck, Monster>>());
 				var monList = allMons[m.Name];
-				monList[riftstats.WizardId] = new KeyValuePair<RiftDeck, RuneOptim.Monster>(riftstats, m);
+				monList[riftstats.WizardId] = new KeyValuePair<RiftDeck, Monster>(riftstats, m);
 			}
 
 		}

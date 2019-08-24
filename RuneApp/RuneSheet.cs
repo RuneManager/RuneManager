@@ -8,6 +8,9 @@ using System.Windows.Forms;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.Management;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	/// <summary>

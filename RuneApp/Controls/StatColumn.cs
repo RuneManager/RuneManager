@@ -1,7 +1,8 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class StatColumn : UserControl {

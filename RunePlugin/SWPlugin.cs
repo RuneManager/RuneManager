@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using RuneOptim.swar;
 
-namespace RunePlugin
-{
+namespace RunePlugin {
 	public abstract class SWPlugin
 	{
 		public string PluginDataDirectory {
@@ -42,19 +42,19 @@ namespace RunePlugin
 
 		public static string RuneEffectType(int id)
 		{
-			var memInfo = typeof(RuneOptim.Attr).GetMember(((RuneOptim.Attr)id).ToString());
+			var memInfo = typeof(Attr).GetMember(((Attr)id).ToString());
 			var attr = memInfo[0].GetCustomAttributes(false).OfType<System.Runtime.Serialization.EnumMemberAttribute>().FirstOrDefault();
 			if (attr != null)
 			{
 				return attr.Value;
 			}
 			
-			return Enum.GetName(typeof(RuneOptim.Attr), id);
+			return Enum.GetName(typeof(Attr), id);
 		}
 
 		public static JToken RuneSetId(int id)
 		{
-			return Enum.GetName(typeof(RuneOptim.RuneSet), id);
+			return Enum.GetName(typeof(RuneOptim.swar.RuneSet), id);
 		}
 
 		public static JObject MapMonster(JObject monster, Dictionary<long, long> monster_id_mapping, long? storage_id)
@@ -86,7 +86,7 @@ namespace RunePlugin
 
 		private static string MonsterAttribute(int id)
 		{
-			var memInfo = typeof(RuneOptim.Element).GetMember(((RuneOptim.Element)id).ToString());
+			var memInfo = typeof(Element).GetMember(((Element)id).ToString());
 			var attr = memInfo[0].GetCustomAttributes(false).OfType<System.Runtime.Serialization.EnumMemberAttribute>().FirstOrDefault();
 			string name = "";
 			if (attr != null)

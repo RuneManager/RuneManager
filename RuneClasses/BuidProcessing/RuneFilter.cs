@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.BuidProcessing {
 	// Per-stat filter
 	public class RuneFilter {
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
@@ -57,7 +57,7 @@ namespace RuneOptim {
 			if (a != null) {
 				if (b == null)
 					return a;
-				return (a < b ? a : b);
+				return a < b ? a : b;
 			}
 			else if (b != null)
 				return b;

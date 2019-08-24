@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
 using System.Collections.Concurrent;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	// Generates a bunch of builds to preview the stats

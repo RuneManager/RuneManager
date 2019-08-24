@@ -5,10 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using RuneOptim;
+using RuneOptim.swar;
 
-namespace RunePlugin.Response
-{
+namespace RunePlugin.Response {
 	[SWCommand(SWCommand.EquipRune)]
 	public class EquipRuneResponse : SWResponse
 	{
@@ -16,16 +15,16 @@ namespace RunePlugin.Response
 		public ulong RuneId;
 
 		[JsonProperty("unit_info")]
-		public RuneOptim.Monster Monster;
+		public Monster Monster;
 	}
 
 	[SWCommand(SWCommand.UnequipRune)]
 	public class UnequipRuneResponse : SWResponse {
 		[JsonProperty("rune")]
-		public RuneOptim.Rune Rune;
+		public RuneOptim.swar.Rune Rune;
 
 		[JsonProperty("unit_info")]
-		public RuneOptim.Monster Monster;
+		public Monster Monster;
 	}
 
 	[SWCommand(SWCommand.EquipRuneList)]

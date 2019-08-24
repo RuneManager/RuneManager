@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RuneManagerBridge {
 	// TODO: Swagger or swhat?

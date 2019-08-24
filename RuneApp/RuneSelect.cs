@@ -4,6 +4,8 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class RuneSelect : Form {

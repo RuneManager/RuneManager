@@ -6,6 +6,9 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.Management;
+using RuneOptim.swar;
 
 namespace RuneApp.InternalServer {
 	public partial class Master : PageRenderer {
@@ -166,7 +169,9 @@ http.send(params);
 			var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null).ToList();
 			//reserved = reserved.Union(Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).GroupBy(m => m.monsterTypeId).Select(m => m.First())).Distinct();
 
-			var fuss = Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
+			var monunNull = Program.data.Monsters.Where(m => m != null);
+
+			var fuss = monunNull.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
 			var nKfg = 1;// 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
 			var nJojo = 1;
 			var dict = new Dictionary<string, int>();
@@ -211,10 +216,10 @@ http.send(params);
 					reserved.Add(m);
 			}
 
-			var mm = Program.data.Monsters.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
+			var mm = monunNull.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
-			var locked = Program.data.Monsters.Where(m => m.Locked).Union(bb.Select(b => b.mon)).Except(reserved).ToList();
-			var unlocked = Program.data.Monsters.Except(locked).Except(reserved).ToList();
+			var locked = monunNull.Where(m => m.Locked).Union(bb.Select(b => b.mon).Where(m => m != null)).Except(reserved).ToList();
+			var unlocked = monunNull.Except(locked).Except(reserved).ToList();
 
 			var trashOnes = unlocked.Where(m => m.Grade == 1 && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon")).ToList();
 			unlocked = unlocked.Except(trashOnes).ToList();
@@ -441,6 +446,8 @@ http.send(params);
 			All = Portrait | Grade | Level | Locked | Skillups
 		}
 		public static ServedResult renderMonLink(Monster m, ServedResult prefix = null, LinkRenderOptions renderOptions = LinkRenderOptions.All, bool linkify = true) {
+			if (m == null)
+				return null;
 			var res = new ServedResult("span");
 			if (prefix != null)
 				res.contentList.Add(prefix);

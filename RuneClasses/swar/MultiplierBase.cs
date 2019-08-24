@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using RuneOptim.swar;
 
 namespace MonsterDefinitions {
 	[JsonConverter(typeof(StringEnumConverter))]
@@ -127,7 +128,7 @@ namespace MonsterDefinitions {
 	}
 
 	abstract public class MultiplierBase {
-		abstract public double GetValue(RuneOptim.Stats vals);
+		abstract public double GetValue(Stats vals);
 		abstract public Expression AsExpression(ParameterExpression statType);
 	}
 
@@ -164,10 +165,10 @@ namespace MonsterDefinitions {
 				if (key == MultiAttr.Neg)
 					return Expression.Constant(1.0);
 				var attr = GetAttr(key);
-				if (attr <= RuneOptim.Attr.Null)
+				if (attr <= RuneOptim.swar.Attr.Null)
 					return Expression.Constant(GetAttrValue(key));
-				else if (attr < RuneOptim.Attr.Null)
-					return Expression.Multiply(Expression.Property(statType, "Item", Expression.Constant((RuneOptim.Attr)(-(int)attr))), Expression.Constant(GetAttrValue(key)));
+				else if (attr < RuneOptim.swar.Attr.Null)
+					return Expression.Multiply(Expression.Property(statType, "Item", Expression.Constant((Attr)(-(int)attr))), Expression.Constant(GetAttrValue(key)));
 				return Expression.Property(statType, "Item", Expression.Constant(attr));
 			}
 			else {
@@ -175,7 +176,7 @@ namespace MonsterDefinitions {
 			}
 		}
 
-		public RuneOptim.Attr GetAttr(MultiAttr mattr) {
+		public Attr GetAttr(MultiAttr mattr) {
 			switch (mattr) {
 				case MultiAttr.HealthFlat:
 				case MultiAttr.HealthPercent:
@@ -189,7 +190,7 @@ namespace MonsterDefinitions {
 				case MultiAttr.CritDamage:
 				case MultiAttr.Resistance:
 				case MultiAttr.Accuracy:
-					return (RuneOptim.Attr)key;
+					return (Attr)key;
 				case MultiAttr.Neg:
 				case MultiAttr.Null:
 				case MultiAttr.PercentOfAlliesAlive:
@@ -201,10 +202,10 @@ namespace MonsterDefinitions {
 				case MultiAttr.DiceAverage:
 				case MultiAttr.DiceAverageTwoMin:
 				default:
-					return RuneOptim.Attr.Null;
+					return RuneOptim.swar.Attr.Null;
 				case MultiAttr.MissingHealth:
 				case MultiAttr.CurrentHealth:
-					return (RuneOptim.Attr)(-1 * (int)RuneOptim.Attr.HealthFlat);
+					return (Attr)(-1 * (int)RuneOptim.swar.Attr.HealthFlat);
 			}
 		}
 
@@ -273,7 +274,7 @@ namespace MonsterDefinitions {
 			return attr?.Value;
 		}
 
-		public override double GetValue(RuneOptim.Stats vals) {
+		public override double GetValue(Stats vals) {
 			if (inner != null)
 				return inner.GetValue(vals);
 			else if (key != MultiAttr.Null) {
@@ -309,7 +310,7 @@ namespace MonsterDefinitions {
 			return sb.ToString();
 		}
 
-		public override double GetValue(RuneOptim.Stats vals) {
+		public override double GetValue(Stats vals) {
 			if (props.Count == 0)
 				return 0;
 

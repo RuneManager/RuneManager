@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum CraftType {
 		Null = 0,
@@ -29,7 +29,7 @@ namespace RuneOptim {
 
 		public Attr Stat {
 			get {
-				return (Attr)((TypeId / 100) % 100);
+				return (Attr)(TypeId / 100 % 100);
 			}
 		}
 
@@ -52,10 +52,10 @@ namespace RuneOptim {
 		public ValueRange Value {
 			get {
 				if (Type == CraftType.Grind) {
-					return GrindValues[this.Stat][this.Rarity];
+					return GrindValues[Stat][Rarity];
 				}
 				else {
-					return EnchantValues[this.Stat][this.Rarity];
+					return EnchantValues[Stat][Rarity];
 				}
 			}
 		}

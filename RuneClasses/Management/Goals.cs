@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using RuneOptim.swar;
 
-namespace RuneOptim {
+namespace RuneOptim.Management {
 	public class Goals {
 		[JsonIgnore]
 		public static List<GoalDef> AvailableGoals { get; set; } = new List<GoalDef>() {

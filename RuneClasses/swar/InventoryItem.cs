@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim {
+namespace RuneOptim.swar {
 	public enum ItemType {
 		WizardInfo = 0,
 		Scrolls = 9,

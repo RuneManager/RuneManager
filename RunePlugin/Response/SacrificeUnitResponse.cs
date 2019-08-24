@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RuneOptim;
+using RuneOptim.swar;
 
 namespace RunePlugin.Response {
 	public class Gauge {

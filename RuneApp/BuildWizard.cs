@@ -7,6 +7,8 @@ using System.Net;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using RuneOptim;
+using RuneOptim.BuidProcessing;
+using RuneOptim.swar;
 
 namespace RuneApp {
 	public partial class BuildWizard : Form {

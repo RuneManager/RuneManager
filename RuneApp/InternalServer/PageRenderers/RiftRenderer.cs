@@ -23,7 +23,7 @@ namespace RuneApp.InternalServer {
 					var bestRift = JsonConvert.DeserializeObject<RunePlugin.Response.GetBestClearRiftDungeonResponse>(File.ReadAllText(best.First()), new SWResponseConverter());
 					Master.LineLog.Debug("deserialised " + bestRift.BestDeckRiftDungeons.Count() + " best teams");
 
-					Master.LineLog.Debug("can do name " + RuneOptim.Save.MonIdNames.FirstOrDefault());
+					Master.LineLog.Debug("can do name " + RuneOptim.swar.Save.MonIdNames.FirstOrDefault());
 					Master.LineLog.Debug("can do mon " + Program.data.Monsters.FirstOrDefault());
 					var sr = new List<ServedResult>();
 					foreach (var br in bestRift.BestDeckRiftDungeons) {
@@ -44,10 +44,10 @@ namespace RuneApp.InternalServer {
 								Master.LineLog.Debug("mon " + mon?.FullName);
 								if (mon == null) {
 									var name = mp.MonsterTypeId.ToString();
-									if (RuneOptim.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
-										name = RuneOptim.Save.MonIdNames[(int)mp.MonsterTypeId];
+									if (RuneOptim.swar.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
+										name = RuneOptim.swar.Save.MonIdNames[(int)mp.MonsterTypeId];
 									else
-										name = RuneOptim.Save.MonIdNames[(int)(mp.MonsterTypeId / 100)];
+										name = RuneOptim.swar.Save.MonIdNames[(int)(mp.MonsterTypeId / 100)];
 
 									table += name;
 								}
@@ -72,10 +72,10 @@ namespace RuneApp.InternalServer {
 								Master.LineLog.Debug("mon " + mon?.FullName);
 								if (mon == null) {
 									var name = mp.MonsterTypeId.ToString();
-									if (RuneOptim.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
-										name = RuneOptim.Save.MonIdNames[(int)mp.MonsterTypeId];
+									if (RuneOptim.swar.Save.MonIdNames.ContainsKey((int)mp.MonsterTypeId))
+										name = RuneOptim.swar.Save.MonIdNames[(int)mp.MonsterTypeId];
 									else
-										name = RuneOptim.Save.MonIdNames[(int)(mp.MonsterTypeId / 100)];
+										name = RuneOptim.swar.Save.MonIdNames[(int)(mp.MonsterTypeId / 100)];
 
 									table += name;
 								}
