@@ -30,7 +30,11 @@ namespace RuneApp {
 			// this is to help sort the Generate scoring columns, otherwise it will sort by string
 
 			string val1 = lhs.SubItems[sortPrimary].Text;
+			if (val1.EndsWith("%"))
+				val1 = val1.Replace("%", "");
 			string val2 = rhs.SubItems[sortPrimary].Text;
+			if (val2.EndsWith("%"))
+				val2 = val2.Replace("%", "");
 
 			int val1sp = val1.IndexOf(' ');
 			int val2sp = val2.IndexOf(' ');
