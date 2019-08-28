@@ -37,7 +37,7 @@ namespace RuneApp {
 			get { return labels; }
 			set {
 				labels = value;
-				foreach (var a in Build.statAll) {
+				foreach (var a in Build.StatAll) {
 					if (!labels) {
 						ChangeLabel(a, 12345.67);
 						ChangeTextBox(a, 12345.67);
@@ -61,7 +61,7 @@ namespace RuneApp {
 				if (stats != null) {
 					stats.OnStatChanged += Stats_OnStatChanged;
 				}
-				foreach (var a in Build.statAll) {
+				foreach (var a in Build.StatAll) {
 					ChangeTextBox(a, stats?[a]);
 					ChangeLabel(a, stats?[a]);
 				}
@@ -71,7 +71,7 @@ namespace RuneApp {
 					ChangeLabel(a, stats?.GetSkillDamage(Attr.AverageDamage, a - Attr.Skill1, stats));
 				}
 				if (stats != null && !ShowExtras) {
-					foreach (var a in Build.extraEnums) {
+					foreach (var a in Build.ExtraEnums) {
 						ChangeLabel(a, stats.ExtraValue(a));
 					}
 				}
@@ -93,7 +93,7 @@ namespace RuneApp {
 
 		public void RecheckExtras() {
 			if (stats != null && !ShowExtras) {
-				foreach (var a in Build.extraEnums) {
+				foreach (var a in Build.ExtraEnums) {
 					ChangeLabel(a, stats.ExtraValue(a));
 				}
 			}

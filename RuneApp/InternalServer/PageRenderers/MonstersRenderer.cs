@@ -171,54 +171,45 @@ http.send(params);
 
 			var monunNull = Program.data.Monsters.Where(m => m != null);
 
+
 			var fuss = monunNull.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
+			// TODO: pull these from goals
 			var nKfg = 1;// 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
 			var nJojo = 1;
 			var dict = new Dictionary<string, int>();
 
+			// TODO: get fuse recipes from somewhere else
 			foreach (var m in fuss) {
-				var idk = m.monsterTypeId.ToString().Substring(0,3);
+				var idk = m.monsterTypeId.ToString().Substring(0, 3);
 				if (!dict.ContainsKey(idk))
 					dict.Add(idk, 0);
-				if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("110") && m.Element == Element.Fire) {
-					reserved.Add(m);
-					dict[idk]++; ;
+				var mname = m.monsterTypeId.ToString();
+				if (dict[idk] < nKfg && !reserved.Contains(m)) {
+					if ((mname.StartsWith("110") && m.Element == Element.Fire) || 
+						(mname.StartsWith("102") && m.Element == Element.Water) || 
+						(mname.StartsWith("195") && m.Element == Element.Wind) || 
+						(mname.StartsWith("160") && m.Element == Element.Wind)) {
+						reserved.Add(m);
+						dict[idk]++;
+					}
 				}
-				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("102") && m.Element == Element.Water) {
-					reserved.Add(m);
-					dict[idk]++; ;
+				if (dict[idk] < nJojo && !reserved.Contains(m)) {
+					if ((mname.StartsWith("154") && m.Element == Element.Fire) || 
+						(mname.StartsWith("140") && m.Element == Element.Fire) || 
+						(mname.StartsWith("114") && m.Element == Element.Water) || 
+						(mname.StartsWith("132") && m.Element == Element.Wind)) {
+						reserved.Add(m);
+						dict[idk]++;
+					}
 				}
-				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("195") && m.Element == Element.Wind) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				else if (dict[idk] < nKfg && m.monsterTypeId.ToString().StartsWith("160") && m.Element == Element.Wind) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("154") && m.Element == Element.Fire) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("140") && m.Element == Element.Fire) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("114") && m.Element == Element.Water) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				else if (dict[idk] < nJojo && m.monsterTypeId.ToString().StartsWith("132") && m.Element == Element.Wind) {
-					reserved.Add(m);
-					dict[idk]++; ;
-				}
-				if (reserved.Count(r => r.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3)) == 0)
+				
+				if (!reserved.Any(r => r.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3)))
 					reserved.Add(m);
 			}
 
 			var mm = monunNull.Where(m => !bdic.ContainsKey(m.Id)).Except(reserved);
 
-			var locked = monunNull.Where(m => m.Locked).Union(bb.Select(b => b.mon).Where(m => m != null)).Except(reserved).ToList();
+			var locked = monunNull.Where(m => m.Locked).Union(bb.Select(b => b.Mon).Where(m => m != null)).Except(reserved).ToList();
 			var unlocked = monunNull.Except(locked).Except(reserved).ToList();
 
 			var trashOnes = unlocked.Where(m => m.Grade == 1 && !m.Name.Contains("Devilmon") && !m.FullName.Contains("Angelmon")).ToList();
@@ -226,7 +217,7 @@ http.send(params);
 
 			var pairs = new Dictionary<Monster, List<Monster>>();
 			var rem = new List<Monster>();
-			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
@@ -253,7 +244,7 @@ http.send(params);
 					unlocked.Remove(um);
 				}
 			}
-			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.mon == m)?.priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+			foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
 				.ThenByDescending(m => m.level)
 				.ThenBy(m => m.Element)
 				.ThenByDescending(m => m.awakened)
@@ -299,8 +290,8 @@ http.send(params);
 				}
 			}
 
-			mm = mm.Except(bb.Select(b => b.mon));
-			mm = mm.Except(Program.builds.Select(b => b.mon));
+			mm = mm.Except(bb.Select(b => b.Mon));
+			mm = mm.Except(Program.builds.Select(b => b.Mon));
 			mm = mm.Except(pairs.SelectMany(p => p.Value));
 			mm = mm.Except(rem);
 
@@ -319,7 +310,7 @@ http.send(params);
 			list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
 
 			list.contentList.AddRange(bb.Select(b => {
-				var m = b.mon;
+				var m = b.Mon;
 				var nl = new ServedResult("ul");
 				var li = new ServedResult("li")
 				{
@@ -446,8 +437,8 @@ http.send(params);
 			All = Portrait | Grade | Level | Locked | Skillups
 		}
 		public static ServedResult renderMonLink(Monster m, ServedResult prefix = null, LinkRenderOptions renderOptions = LinkRenderOptions.All, bool linkify = true) {
-			if (m == null)
-				return null;
+			if (m?.Name == null)
+				return new ServedResult("span") { contentList = { "error" } };
 			var res = new ServedResult("span");
 			if (prefix != null)
 				res.contentList.Add(prefix);
@@ -485,7 +476,7 @@ http.send(params);
 
 		protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs) {
 			var b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
-			var m = b.mon;
+			var m = b.Mon;
 
 			var li = new ServedResult("li");
 

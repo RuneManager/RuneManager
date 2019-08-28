@@ -292,7 +292,7 @@ namespace RuneOptim.swar {
 				RuneLog.Debug("GetMonster " + num + "th " + name + " from " + Monsters.Count);
 			Monster mon = Monsters.Where(m => m.FullName == name).Skip(num - 1).FirstOrDefault();
 			if (mon == null)
-				mon = Monsters.Where(m => m.FullName == name).FirstOrDefault();
+				mon = Monsters.FirstOrDefault(m => m.FullName == name);
 			if (mon != null)
 				return mon;
 			return null;

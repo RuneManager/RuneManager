@@ -59,7 +59,7 @@
 			this.runeControl6.ShowBack = false;
 			this.runeControl6.ShowStars = false;
 			this.runeControl6.Size = new System.Drawing.Size(56, 41);
-			this.runeControl6.SlotImage = global::RuneApp.Runes.rune6;
+			this.runeControl6.SlotImage = global::RuneApp.Resources.Runes.rune6;
 			this.runeControl6.StarImage = null;
 			this.runeControl6.TabIndex = 64;
 			this.runeControl6.Text = "runeControl6";
@@ -76,11 +76,11 @@
 			this.runeControl5.Location = new System.Drawing.Point(23, 87);
 			this.runeControl5.Margin = new System.Windows.Forms.Padding(2);
 			this.runeControl5.Name = "runeControl5";
-			this.runeControl5.SetImage = global::RuneApp.Runes.revenge;
+			this.runeControl5.SetImage = global::RuneApp.Resources.Runes.revenge;
 			this.runeControl5.ShowBack = false;
 			this.runeControl5.ShowStars = false;
 			this.runeControl5.Size = new System.Drawing.Size(54, 42);
-			this.runeControl5.SlotImage = global::RuneApp.Runes.rune5;
+			this.runeControl5.SlotImage = global::RuneApp.Resources.Runes.rune5;
 			this.runeControl5.StarImage = null;
 			this.runeControl5.TabIndex = 63;
 			this.runeControl5.Text = "runeControl5";
@@ -97,11 +97,11 @@
 			this.runeControl4.Location = new System.Drawing.Point(65, 104);
 			this.runeControl4.Margin = new System.Windows.Forms.Padding(2);
 			this.runeControl4.Name = "runeControl4";
-			this.runeControl4.SetImage = global::RuneApp.Runes.revenge;
+			this.runeControl4.SetImage = global::RuneApp.Resources.Runes.revenge;
 			this.runeControl4.ShowBack = false;
 			this.runeControl4.ShowStars = false;
 			this.runeControl4.Size = new System.Drawing.Size(44, 55);
-			this.runeControl4.SlotImage = global::RuneApp.Runes.rune4;
+			this.runeControl4.SlotImage = global::RuneApp.Resources.Runes.rune4;
 			this.runeControl4.StarImage = null;
 			this.runeControl4.TabIndex = 62;
 			this.runeControl4.Text = "runeControl4";
@@ -122,7 +122,7 @@
 			this.runeControl3.ShowBack = false;
 			this.runeControl3.ShowStars = false;
 			this.runeControl3.Size = new System.Drawing.Size(53, 41);
-			this.runeControl3.SlotImage = global::RuneApp.Runes.rune3;
+			this.runeControl3.SlotImage = global::RuneApp.Resources.Runes.rune3;
 			this.runeControl3.StarImage = null;
 			this.runeControl3.TabIndex = 61;
 			this.runeControl3.Text = "runeControl3";
@@ -143,7 +143,7 @@
 			this.runeControl2.ShowBack = false;
 			this.runeControl2.ShowStars = false;
 			this.runeControl2.Size = new System.Drawing.Size(53, 41);
-			this.runeControl2.SlotImage = global::RuneApp.Runes.rune2;
+			this.runeControl2.SlotImage = global::RuneApp.Resources.Runes.rune2;
 			this.runeControl2.StarImage = null;
 			this.runeControl2.TabIndex = 60;
 			this.runeControl2.Text = "runeControl2";
@@ -164,7 +164,7 @@
 			this.runeControl1.ShowBack = false;
 			this.runeControl1.ShowStars = false;
 			this.runeControl1.Size = new System.Drawing.Size(41, 55);
-			this.runeControl1.SlotImage = global::RuneApp.Runes.rune1;
+			this.runeControl1.SlotImage = global::RuneApp.Resources.Runes.rune1;
 			this.runeControl1.StarImage = null;
 			this.runeControl1.TabIndex = 58;
 			this.runeControl1.Text = "runeControl2";
@@ -173,7 +173,7 @@
 			// 
 			// pictureBox1
 			// 
-			this.pictureBox1.Image = global::RuneApp.Runes.runes;
+			this.pictureBox1.Image = global::RuneApp.Resources.Runes.runes;
 			this.pictureBox1.Location = new System.Drawing.Point(18, 15);
 			this.pictureBox1.Margin = new System.Windows.Forms.Padding(2);
 			this.pictureBox1.Name = "pictureBox1";

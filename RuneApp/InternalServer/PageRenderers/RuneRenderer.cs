@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using RuneApp.Resources;
 using RuneOptim;
 using RuneOptim.BuidProcessing;
 using RuneOptim.swar;
@@ -15,7 +16,7 @@ namespace RuneApp.InternalServer {
 			internal static global::System.Resources.ResourceManager ResourceManager {
 				get {
 					if (object.ReferenceEquals(resourceMan, null)) {
-						global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.Runes", typeof(Runes).Assembly);
+						global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("RuneApp.Resources.Runes", typeof(Runes).Assembly);
 						resourceMan = temp;
 					}
 					return resourceMan;
@@ -97,12 +98,12 @@ function hackLots(prop, num, on) {
 
 				Build b = null;
 				if (m != null) {
-					b = Program.builds.FirstOrDefault(bu => bu.mon == m);
+					b = Program.builds.FirstOrDefault(bu => bu.Mon == m);
 				}
 				double ret = r.manageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
 
 				ret *= r.BarionEfficiency;
-				ret /= (b?.priority ?? 0 + 100);
+				ret /= (b?.Priority ?? 0 + 100);
 				ret *= 1 + Math.Sqrt(r.manageStats.GetOrAdd("LoadFilt", 0) / (r.manageStats.GetOrAdd("LoadGen", 0) + 1000));
 				ret *= 10000;
 

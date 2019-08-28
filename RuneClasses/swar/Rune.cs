@@ -429,7 +429,7 @@ namespace RuneOptim.swar {
 
 		// For each non-zero stat in flat and percent, divide the runes value and see if any >= test
 		public bool Or(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false) {
-			foreach (Attr attr in Build.statEnums) {
+			foreach (Attr attr in Build.StatEnums) {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] >= rTest[attr])
 					return true;
 			}
@@ -442,7 +442,7 @@ namespace RuneOptim.swar {
 
 		// For each non-zero stat in flat and percent, divide the runes value and see if *ALL* >= test
 		public bool And(Stats rFlat, Stats rPerc, Stats rTest, int fake = -1, bool pred = false) {
-			foreach (Attr attr in Build.statEnums) {
+			foreach (Attr attr in Build.StatEnums) {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0) && !rTest[attr].EqualTo(0) && this[attr, fake, pred] / rPerc[attr] < rTest[attr])
 					return false;
 			}
@@ -456,7 +456,7 @@ namespace RuneOptim.swar {
 		// sum the result of dividing the runes value by flat/percent per stat
 		public double Test(Stats rFlat, Stats rPerc, int fake = -1, bool pred = false) {
 			double val = 0;
-			foreach (Attr attr in Build.statEnums) {
+			foreach (Attr attr in Build.StatEnums) {
 				if (attr != Attr.Speed && !rPerc[attr].EqualTo(0)) {
 					if (!System.Diagnostics.Debugger.IsAttached)
 						RuneLog.Debug(attr + ": " + this[attr, fake, pred] + "/" + rPerc[attr] + (this[attr, fake, pred] / rPerc[attr]));

@@ -168,7 +168,7 @@ namespace RuneOptim.swar {
 			}
 		}
 
-		public event EventHandler<EventArgs> OnRunesChanged;
+		public event EventHandler<RuneChangeEventArgs> OnRunesChanged;
 
 		public int SwapCost(Loadout l) {
 			int cost = 0;
@@ -178,7 +178,7 @@ namespace RuneOptim.swar {
 					if (Current.Runes[i] != null)
 						cost += Current.Runes[i].UnequipCost;
 					// unequip new rune from host
-					if (l.Runes[i].IsUnassigned && l.Runes[i].Swapped != true) {
+					if (l.Runes[i].IsUnassigned && !l.Runes[i].Swapped) {
 						cost += l.Runes[i].UnequipCost;
 					}
 				}
@@ -234,21 +234,21 @@ namespace RuneOptim.swar {
 		public Rune ApplyRune(Rune rune, int checkOn = 2) {
 			var old = Current.AddRune(rune, checkOn);
 			changeStats = true;
-			OnRunesChanged?.Invoke(this, null);
+			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { NewRune = rune, OldRune = old });
 			return old;
 		}
 
 		public Rune RemoveRune(int slot) {
 			var r = Current.RemoveRune(slot);
 			changeStats = true;
-			OnRunesChanged?.Invoke(this, null);
+			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { OldRune = r });
 			return r;
 		}
 
 		public void RefreshStats() {
 			changeStats = true;
 			GetStats();
-			OnRunesChanged?.Invoke(this, null);
+			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { });
 		}
 
 		private static MonsterStat[] skillList = null;
@@ -358,16 +358,16 @@ namespace RuneOptim.swar {
 			return Id + " " + FullName + " lvl. " + level;
 		}
 
-		int IComparable<Monster>.CompareTo(Monster rhs) {
-			var comp = rhs.Grade - Grade;
+		int IComparable<Monster>.CompareTo(Monster other) {
+			var comp = other.Grade - Grade;
 			if (comp != 0) return comp;
-			comp = rhs.level - level;
+			comp = other.level - level;
 			if (comp != 0) return comp;
-			comp = (int)Element - (int)rhs.Element;
+			comp = (int)Element - (int)other.Element;
 			if (comp != 0) return comp;
-			comp = rhs.awakened - awakened;
+			comp = other.awakened - awakened;
 			if (comp != 0) return comp;
-			comp = loadOrder - rhs.loadOrder;
+			comp = loadOrder - other.loadOrder;
 			return comp;
 		}
 	}
@@ -391,18 +391,6 @@ namespace RuneOptim.swar {
 	public class RuneLoadConverter : JsonConverter {
 		public override bool CanConvert(Type objectType) {
 			return typeof(IList<RuneOptim.swar.Rune>).IsAssignableFrom(objectType);
-		}
-
-		public override bool CanRead {
-			get {
-				return base.CanRead;
-			}
-		}
-
-		public override bool CanWrite {
-			get {
-				return base.CanWrite;
-			}
 		}
 
 		public override object ReadJson(JsonReader reader,

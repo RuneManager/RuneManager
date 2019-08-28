@@ -244,10 +244,10 @@ namespace RuneOptim.swar {
 		[JsonProperty("element")]
 		public Element element;
 
-		static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
-		static object objLock = new object();
+		readonly static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
+		readonly static object objLock = new object();
 
-		static object lockSlow = new object();
+		readonly static object lockSlow = new object();
 
 		public static T AskSWApi<T>(string location, bool refetch = false) {
 			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache") + ".json";

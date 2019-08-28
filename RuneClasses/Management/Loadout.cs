@@ -31,13 +31,10 @@ namespace RuneOptim.Management {
 		private int[] fakeLevel = new int[6];
 
 		private bool[] predictSubs = new bool[6];
-
-		private int buildID;
-
-		public int BuildID { get { return buildID; } set { buildID = value; } }
+		public int BuildID { get; set; }
 
 		[JsonIgnore]
-		public Rune[] Runes { get { return runes; } }
+		public Rune[] Runes => runes;
 
 		[JsonIgnore]
 		public int RuneCount { get { return runeCount; } }
@@ -123,7 +120,7 @@ namespace RuneOptim.Management {
 		private Stats leader = new Stats();
 
 		private bool changed = false;
-		public int runesNew;
+		public int RunesNew;
 		public int runesChanged;
 		public int upgrades;
 		public int powerup;
@@ -159,7 +156,7 @@ namespace RuneOptim.Management {
 				leader = rhs.leader;
 				fakeLevel = rhs.fakeLevel;
 				predictSubs = rhs.predictSubs;
-				buildID = rhs.buildID;
+				BuildID = rhs.BuildID;
 				Buffs = rhs.Buffs;
 				tempLoad = rhs.tempLoad;
 				Element = rhs.Element;
@@ -491,12 +488,13 @@ namespace RuneOptim.Management {
 				setsFull = true;
 			// notify hackers their attempt has failed
 			else if (setNums > 6)
-				throw new Exception("Wut");
+				throw new InvalidOperationException("Wut");
 
 		}
 
 		// pull how much Attr is in the equipped sets
 		public int SetStat(Attr attr) {
+#pragma warning disable S3358 // Ternary operators should not be nested
 			switch (attr) {
 				case Attr.Null:
 				case Attr.HealthFlat:
@@ -541,11 +539,12 @@ namespace RuneOptim.Management {
 						(sets[2] == RuneSet.Endure ? 20 : sets[2] == RuneSet.Tolerance ? 10 : 0);
 				default:
 					return 0;
+#pragma warning restore S3358 // Ternary operators should not be nested
 			}
 		}
 
 		private static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
-		private static Func<Stats, Stats> _getStats = null;
+		private static Func<Stats, Stats> _getStats;
 
 		// Using the given stats as a base, apply the modifiers
 		public Stats GetStats(Stats baseStats) {
@@ -553,17 +552,9 @@ namespace RuneOptim.Management {
 			return GetStats(baseStats, ref v);
 		}
 		public Stats GetStats(Stats baseStats, ref Stats value) {
-			/*if (_getStats == null)
-			{
-				Expression.
-				var expr = ;
-				_getStats = Expression.Lambda<Func<Stats, Stats>>(expr, statType).Compile();
-			}*/
-
 			if (value == null)
 				value = new Stats();
 
-			//Stats value = new Stats(baseStats);
 			value.CopyFrom(baseStats);
 
 			// Apply percent before flat
@@ -651,14 +642,14 @@ namespace RuneOptim.Management {
 		public void RecountDiff(ulong monId) {
 			powerup = 0;
 			upgrades = 0;
-			runesNew = 0;
+			RunesNew = 0;
 			runesChanged = 0;
 
 			foreach (Rune r in Runes) {
 				if (r == null) continue;
 				if (r.AssignedId != monId) {
 					if (r.IsUnassigned)
-						runesNew++;
+						RunesNew++;
 					else
 						runesChanged++;
 				}

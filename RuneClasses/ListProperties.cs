@@ -7,7 +7,7 @@ namespace RuneOptim {
 
 	public class OnSetEventArgs<T> {
 		public int i = -1;
-		public T val = default(T);
+		public T val = default;
 	}
 
 	public abstract class ListProp<T>
@@ -26,9 +26,9 @@ namespace RuneOptim {
 			}
 		}
 
-		public bool PreventOnChange = false;
+		public bool PreventOnChange { get; set; }
 
-		public int MaxInd { get { return maxInd; } }
+		public int MaxInd => maxInd;
 
 		virtual protected void OnChange(int i, T val) { }
 
@@ -72,6 +72,7 @@ namespace RuneOptim {
 			}
 		}
 
+#pragma warning disable S112 // General exceptions should never be thrown
 		virtual public T this[int index] {
 			get {
 				if (Props[index] == null)
@@ -82,11 +83,12 @@ namespace RuneOptim {
 				if (Props[index] == null)
 					throw new IndexOutOfRangeException("No class member assigned to that index!");
 
-				props[index].SetValue(this, (T)value);
+				props[index].SetValue(this, value);
 				if (!PreventOnChange)
 					onChanged(index, value);
 			}
 		}
+#pragma warning restore S112 // General exceptions should never be thrown
 
 		public int IndexOf(T item) { throw new NotImplementedException(); }
 

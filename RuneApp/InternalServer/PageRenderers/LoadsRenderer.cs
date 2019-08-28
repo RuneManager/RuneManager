@@ -88,7 +88,7 @@ namespace RuneApp.InternalServer {
 				foreach (var b in Program.builds) {
 					var mm = mons.FirstOrDefault(m => m.Id == b.MonId);
 					if (mm != null)
-						mm.priority = b.priority;
+						mm.priority = b.Priority;
 				}
 				foreach (var l in Program.loads) {
 					var b = Program.builds.FirstOrDefault(bb => bb.ID == l.BuildID);

@@ -127,6 +127,8 @@
 			this.runesMType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesMValue = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.runesLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.runesEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.runesMaxEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.tabBuilds = new System.Windows.Forms.TabPage();
 			this.listView4 = new System.Windows.Forms.ListView();
 			this.buildID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -164,6 +166,8 @@
 			this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
 			this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.in8HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.in16HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
 			this.tsBtnBuildsSave = new System.Windows.Forms.ToolStripButton();
@@ -197,8 +201,7 @@
 			this.cbFillRunes = new System.Windows.Forms.CheckBox();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.runesEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.runesMaxEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.in30SecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
@@ -242,6 +245,7 @@
             this.colMonType,
             this.colMonLevel});
 			this.dataMonsterList.FullRowSelect = true;
+			this.dataMonsterList.HideSelection = false;
 			this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
 			this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
 			this.dataMonsterList.MultiSelect = false;
@@ -1157,6 +1161,7 @@
             this.runesEff,
             this.runesMaxEff});
 			this.dataRuneList.FullRowSelect = true;
+			this.dataRuneList.HideSelection = false;
 			this.dataRuneList.Location = new System.Drawing.Point(0, 25);
 			this.dataRuneList.Margin = new System.Windows.Forms.Padding(2);
 			this.dataRuneList.MultiSelect = false;
@@ -1204,6 +1209,18 @@
 			this.runesLevel.Text = "Level";
 			this.runesLevel.Width = 40;
 			// 
+			// runesEff
+			// 
+			this.runesEff.DisplayIndex = 4;
+			this.runesEff.Text = "Efficiency";
+			this.runesEff.Width = 40;
+			// 
+			// runesMaxEff
+			// 
+			this.runesMaxEff.DisplayIndex = 5;
+			this.runesMaxEff.Text = "Max Eff";
+			this.runesMaxEff.Width = 40;
+			// 
 			// tabBuilds
 			// 
 			this.tabBuilds.Controls.Add(this.listView4);
@@ -1223,6 +1240,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.listView4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.buildID});
+			this.listView4.HideSelection = false;
 			this.listView4.Location = new System.Drawing.Point(2, 23);
 			this.listView4.Margin = new System.Windows.Forms.Padding(2);
 			this.listView4.Name = "listView4";
@@ -1279,6 +1297,7 @@
             this.columnHeader3,
             this.columnHeader4});
 			this.dataCraftList.FullRowSelect = true;
+			this.dataCraftList.HideSelection = false;
 			this.dataCraftList.Location = new System.Drawing.Point(2, 27);
 			this.dataCraftList.Margin = new System.Windows.Forms.Padding(2);
 			this.dataCraftList.MultiSelect = false;
@@ -1335,6 +1354,7 @@
             this.buildPowerCol,
             this.buildTimeCol});
 			this.loadoutList.FullRowSelect = true;
+			this.loadoutList.HideSelection = false;
 			this.loadoutList.Location = new System.Drawing.Point(4, 37);
 			this.loadoutList.Margin = new System.Windows.Forms.Padding(2);
 			this.loadoutList.Name = "loadoutList";
@@ -1558,23 +1578,41 @@
 			// 
 			this.allToolStripMenuItem.Image = global::RuneApp.App.go;
 			this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-			this.allToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+			this.allToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.allToolStripMenuItem.Text = "All";
 			this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
 			// 
 			// resumeToolStripMenuItem
 			// 
+			this.resumeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.in30SecondsToolStripMenuItem,
+            this.in8HoursToolStripMenuItem,
+            this.in16HoursToolStripMenuItem});
 			this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
 			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.resumeToolStripMenuItem.Text = "Resume";
 			this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
+			// 
+			// in8HoursToolStripMenuItem
+			// 
+			this.in8HoursToolStripMenuItem.Name = "in8HoursToolStripMenuItem";
+			this.in8HoursToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.in8HoursToolStripMenuItem.Text = "In 8 hours...";
+			this.in8HoursToolStripMenuItem.Click += new System.EventHandler(this.In8HoursToolStripMenuItem_Click);
+			// 
+			// in16HoursToolStripMenuItem
+			// 
+			this.in16HoursToolStripMenuItem.Name = "in16HoursToolStripMenuItem";
+			this.in16HoursToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.in16HoursToolStripMenuItem.Text = "In 16 hours...";
+			this.in16HoursToolStripMenuItem.Click += new System.EventHandler(this.In16HoursToolStripMenuItem_Click);
 			// 
 			// runToToolStripMenuItem
 			// 
 			this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
 			this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-			this.runToToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
+			this.runToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
 			this.runToToolStripMenuItem.Text = "Run to";
 			this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
 			// 
@@ -1651,6 +1689,7 @@
             this.buildCHTeams});
 			this.buildList.FullRowSelect = true;
 			this.buildList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+			this.buildList.HideSelection = false;
 			this.buildList.Location = new System.Drawing.Point(4, 37);
 			this.buildList.Margin = new System.Windows.Forms.Padding(2);
 			this.buildList.Name = "buildList";
@@ -1922,17 +1961,12 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
-			// runesEff
+			// in30SecondsToolStripMenuItem
 			// 
-			this.runesEff.DisplayIndex = 4;
-			this.runesEff.Text = "Efficiency";
-			this.runesEff.Width = 40;
-			// 
-			// runesMaxEff
-			// 
-			this.runesMaxEff.DisplayIndex = 5;
-			this.runesMaxEff.Text = "Max Eff";
-			this.runesMaxEff.Width = 40;
+			this.in30SecondsToolStripMenuItem.Name = "in30SecondsToolStripMenuItem";
+			this.in30SecondsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.in30SecondsToolStripMenuItem.Text = "In 30 seconds...";
+			this.in30SecondsToolStripMenuItem.Click += new System.EventHandler(this.In30SecondsToolStripMenuItem_Click);
 			// 
 			// Main
 			// 
@@ -2179,6 +2213,9 @@
 		private System.Windows.Forms.ToolStripButton tsBtnSkip;
 		private System.Windows.Forms.ColumnHeader runesEff;
 		private System.Windows.Forms.ColumnHeader runesMaxEff;
+		private System.Windows.Forms.ToolStripMenuItem in8HoursToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem in16HoursToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem in30SecondsToolStripMenuItem;
 	}
 }
 

@@ -63,19 +63,19 @@
 			// runeControl
 			// 
 			this.runeControl.BackColor = System.Drawing.Color.Transparent;
-			this.runeControl.BackImage = global::RuneApp.Runes.bg_normal;
+			this.runeControl.BackImage = global::RuneApp.Resources.Runes.bg_normal;
 			this.runeControl.Coolness = 0;
 			this.runeControl.Gamma = 1F;
 			this.runeControl.Grade = 2;
 			this.runeControl.Location = new System.Drawing.Point(4, 17);
 			this.runeControl.Margin = new System.Windows.Forms.Padding(2);
 			this.runeControl.Name = "runeControl";
-			this.runeControl.SetImage = global::RuneApp.Runes.despair;
+			this.runeControl.SetImage = global::RuneApp.Resources.Runes.despair;
 			this.runeControl.ShowBack = true;
 			this.runeControl.ShowStars = true;
 			this.runeControl.Size = new System.Drawing.Size(58, 58);
-			this.runeControl.SlotImage = global::RuneApp.Runes.rune2;
-			this.runeControl.StarImage = global::RuneApp.Runes.star_unawakened;
+			this.runeControl.SlotImage = global::RuneApp.Resources.Runes.rune2;
+			this.runeControl.StarImage = global::RuneApp.Resources.Runes.star_unawakened;
 			this.runeControl.TabIndex = 11;
 			this.runeControl.Text = "Rune";
 			// 

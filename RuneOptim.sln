@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29209.152
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneApp", "RuneApp\RuneApp.csproj", "{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}"
 EndProject
@@ -261,5 +261,8 @@ Global
 		{B19BB288-149C-48E7-BC93-653DCD3AA67E} = {E39972EE-6A6A-4908-B169-EB0EF27B8E95}
 		{F65EE267-5889-40D1-936D-C0B21F84BC90} = {E39972EE-6A6A-4908-B169-EB0EF27B8E95}
 		{CB79542E-CCA2-45D7-B67C-44B89EB354DD} = {E39972EE-6A6A-4908-B169-EB0EF27B8E95}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C7122391-73A1-4E5B-B657-6C43E9D36487}
 	EndGlobalSection
 EndGlobal

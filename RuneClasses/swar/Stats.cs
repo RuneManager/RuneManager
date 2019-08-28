@@ -222,7 +222,7 @@ namespace RuneOptim.swar {
 		public MonsterDefinitions.MultiplierBase damageFormula = null;
 
 		[JsonIgnore]
-		protected static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
+		protected readonly static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
 
 		[JsonIgnore]
 		private Func<Stats, double> _damageFormula = null;
@@ -524,8 +524,11 @@ namespace RuneOptim.swar {
 						DamageSkillups[4] = value;
 						break;
 					default:
+#if DEBUG
+						throw new NotImplementedException();
+#else
 						break;
-						//throw new NotImplementedException();
+#endif
 				}
 			}
 
@@ -624,13 +627,20 @@ namespace RuneOptim.swar {
 
 		// Perfectly legit operator overloading to compare builds/minimum
 		public static bool operator <(Stats lhs, Stats rhs) {
-			return rhs.GreaterEqual(lhs);
+			return !lhs.GreaterEqual(rhs);
 		}
 
-		public static bool operator >(Stats lhs, Stats rhs) {
+		public static bool operator >=(Stats lhs, Stats rhs) {
 			return lhs.GreaterEqual(rhs);
 		}
 
+		public static bool operator >(Stats lhs, Stats rhs) {
+			return !rhs.GreaterEqual(lhs);
+		}
+
+		public static bool operator <=(Stats lhs, Stats rhs) {
+			return rhs.GreaterEqual(lhs);
+		}
 		/// <summary>
 		/// Compares this to rhs returning if any non-zero attribute on RHS is exceeded by this.
 		/// </summary>
@@ -645,7 +655,7 @@ namespace RuneOptim.swar {
 			return false;
 		}
 
-		public bool CheckMax(double lhs, double rhs) {
+		public static bool CheckMax(double lhs, double rhs) {
 			return rhs != 0 && lhs > rhs;
 		}
 
@@ -695,23 +705,7 @@ namespace RuneOptim.swar {
 		}
 
 		public void SetTo(double v) {
-			/* // TODO: put this back when SetTo is good
-			Accuracy = 0;
-			Attack = 0;
-			CritDamage = 0;
-			CritRate = 0;
-			Defense = 0;
-			Health = 0;
-			Resistance = 0;
-			Speed = 0;
-
-			EffectiveHP = 0;
-			EffectiveHPDefenseBreak = 0;
-			DamagePerSpeed = 0;
-			AverageDamage = 0;
-			MaxDamage = 0;*/
-
-			foreach (var a in Build.statAll) {
+			foreach (var a in Build.StatAll) {
 				this[a] = v;
 			}
 
@@ -719,22 +713,7 @@ namespace RuneOptim.swar {
 		}
 
 		public Stats SetTo(Stats rhs) {
-			/* // TODO: put back when Properties are done
-			Health = rhs.Health;
-			Attack = rhs.Attack;
-			Defense = rhs.Defense;
-			Speed = rhs.Speed;
-			CritRate = rhs.CritRate;
-			CritDamage = rhs.CritDamage;
-			Resistance = rhs.Resistance;
-			Accuracy = rhs.Accuracy;
-			EffectiveHP = rhs.EffectiveHP;
-			EffectiveHPDefenseBreak = rhs.EffectiveHPDefenseBreak;
-			DamagePerSpeed = rhs.DamagePerSpeed;
-			AverageDamage = rhs.AverageDamage;
-			MaxDamage = rhs.MaxDamage;*/
-
-			foreach (var a in Build.statAll) {
+			foreach (var a in Build.StatAll) {
 				this[a] = rhs[a];
 			}
 			for (int i = 0; i < 4; i++) {
@@ -803,14 +782,14 @@ namespace RuneOptim.swar {
 		public static Stats operator /(Stats lhs, Stats rhs) {
 			Stats ret = new Stats(lhs, true);
 
-			foreach (var a in Build.statEnums) {
+			foreach (var a in Build.StatEnums) {
 				if (rhs[a].EqualTo(0))
 					ret[a] = 0;
 				else
 					ret[a] /= rhs[a];
 			}
 
-			foreach (var a in Build.extraEnums) {
+			foreach (var a in Build.ExtraEnums) {
 				if (rhs[a].EqualTo(0))
 					ret[a] = 0;
 				else
@@ -855,7 +834,7 @@ namespace RuneOptim.swar {
 
 		public System.Collections.Generic.IEnumerable<Attr> NonZeroStats {
 			get {
-				foreach (var a in Build.statAll) {
+				foreach (var a in Build.StatAll) {
 					if (!this[a].EqualTo(0))
 						yield return a;
 				}

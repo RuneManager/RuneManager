@@ -31,10 +31,10 @@ namespace RuneApp {
 			loadoutList.ListViewItemSorter = sorter;
 
 			// place controls in a nice grid-like manner
-			foreach (string stat in Build.statNames) {
+			foreach (string stat in Build.StatNames) {
 				loadoutList.Columns.Add(stat).Width = 80;
 			}
-			foreach (string extra in Build.extraNames) {
+			foreach (string extra in Build.ExtraNames) {
 				loadoutList.Columns.Add(extra).Width = 80;
 			}
 			loadoutList.Columns.Add("Skill1").Width = 80;
@@ -46,15 +46,15 @@ namespace RuneApp {
 			building = true;
 			toolStripProgressBar1.Maximum = Program.Settings.TestShow;
 
-			build.loads.CollectionChanged += Loads_CollectionChanged;
+			build.Loads.CollectionChanged += Loads_CollectionChanged;
 
-			foreach (var b in build.loads) {
+			foreach (var b in build.Loads) {
 				loadoutList.Items.Add(renderLoadoutTest(b));
 			}
 
 			statColScore.Stats = build.Sort;
 			build.Sort.OnStatChanged += Sort_OnStatChanged;
-			statColScore.SetSkills(build.mon._SkillList.Count);
+			statColScore.SetSkills(build.Mon._SkillList.Count);
 
 			// Disregard locked, but honor equippedness checking
 			build.BuildPrintTo += Build_BuildPrintTo;
@@ -132,8 +132,8 @@ namespace RuneApp {
 			foreach (var r in m.Current.Runes) {
 				if (r.Level < 12)
 					under12 += 12 - r.Level;
-				if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
-					underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
+				if (build.RunePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0))
+					underSpec += (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
 			}
 
 			li.SubItems.Add(underSpec + "/" + under12);
@@ -167,13 +167,13 @@ namespace RuneApp {
 
 			// TODO: try to only mangle the column which is changing?
 
-			foreach (string stat in Build.statNames) {
+			foreach (string stat in Build.StatNames) {
 				TextBox tb = (TextBox)Controls.Find(stat + "Worth", true).FirstOrDefault();
 				double val;
 				double.TryParse(tb?.Text, out val);
 				build.Sort[stat] = val;
 			}
-			foreach (string extra in Build.extraNames) {
+			foreach (string extra in Build.ExtraNames) {
 				TextBox tb = (TextBox)Controls.Find(extra + "Worth", true).FirstOrDefault();
 				double val;
 				double.TryParse(tb?.Text, out val);
@@ -244,12 +244,12 @@ namespace RuneApp {
 
 				building = true;
 
-				foreach (Attr stat in Build.statAll) {
+				foreach (Attr stat in Build.StatAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && mY.GetStats()[stat] > mN.GetStats()[stat])
 						better.Add(stat);
 				}
 				double totalsort = 0;
-				foreach (var stat in Build.statAll) {
+				foreach (var stat in Build.StatAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && build.Sort[stat] != 0)
 						totalsort += Math.Abs(build.Sort[stat]);
 
@@ -334,7 +334,7 @@ namespace RuneApp {
 		}
 
 		private void Generate_FormClosing(object sender, FormClosingEventArgs e) {
-			build.loads.CollectionChanged -= Loads_CollectionChanged;
+			build.Loads.CollectionChanged -= Loads_CollectionChanged;
 			build.BuildPrintTo -= Build_BuildPrintTo;
 			build.BuildProgTo -= Build_BuildProgTo;
 			build.Sort.OnStatChanged -= Sort_OnStatChanged;
@@ -347,7 +347,7 @@ namespace RuneApp {
 					build.Cancel();
 				else {
 					Program.RunTest(build, (b, res) => {
-						if (b.loads == null) {
+						if (b.Loads == null) {
 							toolStripStatusLabel1.Text = "Error: " + res;
 							return;
 						}

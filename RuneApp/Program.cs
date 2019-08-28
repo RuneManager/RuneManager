@@ -7,8 +7,6 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,94 +24,16 @@ namespace RuneApp {
 		Success = 1,
 	}
 
-	class progWriter : TextWriter {
-		public override Encoding Encoding {
-			get {
-				return Encoding.Default;
-			}
-		}
-
-		public override void WriteLine(string value) {
-#pragma warning disable CS0618 // Type or member is obsolete
-			Program.log.Debug("progWriter: " + value);
-#pragma warning restore CS0618 // Type or member is obsolete
-		}
-	}
-
-	public class lineLogger {
-		private log4net.ILog logger;
-		public lineLogger(log4net.ILog logger) {
-			this.logger = logger;
-		}
-		
-		[DebuggerStepThrough]
-		protected string Bake(string str,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			return System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str;
-		}
-
-		[DebuggerStepThrough]
-		public void Info(string str,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Info(Bake(str, lineNumber, caller, filepath));
-		}
-
-		[DebuggerStepThrough]
-		public void Debug(string str,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Debug(Bake(str, lineNumber, caller, filepath));
-		}
-
-		[DebuggerStepThrough]
-		public void Error(string str,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Error(Bake(str, lineNumber, caller, filepath));
-		}
-
-		[DebuggerStepThrough]
-		public void Error(string str, Exception e,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Error(Bake(str, lineNumber, caller, filepath), e);
-		}
-
-		[DebuggerStepThrough]
-		public void Fatal(string str,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Fatal(Bake(str, lineNumber, caller, filepath));
-		}
-
-		[DebuggerStepThrough]
-		public void Fatal(string str, Exception e,
-			[CallerLineNumber] int lineNumber = 0,
-			[CallerMemberName] string caller = null,
-			[CallerFilePath] string filepath = null) {
-			logger.Fatal(Bake(str, lineNumber, caller, filepath), e);
-		}
-
-	}
-
 	public static class Program {
 		[Obsolete("try using the lineLog")]
 		public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-		private static lineLogger lineLog = null;
-		public static lineLogger LineLog {
+		private static LineLogger lineLog = null;
+		public static LineLogger LineLog {
 			[DebuggerStepThrough] get {
 				if (lineLog == null) {
 #pragma warning disable CS0618 // Type or member is obsolete
-					lineLog = new lineLogger(log);
+					lineLog = new LineLogger(log);
 #pragma warning restore CS0618 // Type or member is obsolete
 				}
 				return lineLog;
@@ -279,17 +199,17 @@ namespace RuneApp {
 								Program.LineLog.Debug("finding " + b.MonId);
 							var mon = Program.data.GetMonster(b.MonId);
 							if (mon != null) {
-								b.mon = mon;
+								b.Mon = mon;
 							}
 							else {
 								var bnum = builds.Count(bu => bu.MonName == b.MonName);
-								b.mon = Program.data.GetMonster(b.MonName, bnum + 1);
+								b.Mon = Program.data.GetMonster(b.MonName, bnum + 1);
 							}
-							b.shrines = Program.data.shrines;
+							b.Shrines = Program.data.shrines;
 						}
 						else {
-							b.mon = new Monster();
-							b.mon.FullName = b.MonName;
+							b.Mon = new Monster();
+							b.Mon.FullName = b.MonName;
 						}
 					}
 					break;
@@ -414,7 +334,7 @@ namespace RuneApp {
 				bstr = bstr.Replace("\"b_res\"", "\"res\"");
 
 				var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
-				foreach (var b in bs.OrderBy(b => b.priority)) {
+				foreach (var b in bs.OrderBy(b => b.Priority)) {
 					builds.Add(b);
 				}
 				foreach (var b in builds.Where(b => b.Type == BuildType.Link)) {
@@ -449,7 +369,7 @@ namespace RuneApp {
 		public static void SanitizeBuilds() {
 			LineLog.Debug("processing builds");
 			int current_pri = 1;
-			foreach (Build b in Program.builds.OrderBy(bu => bu.priority)) {
+			foreach (Build b in Program.builds.OrderBy(bu => bu.Priority)) {
 				int id = b.ID;
 				if (b.ID == 0 || Program.builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID)) {
 					//id = buildList.Items.Count + 1;
@@ -464,12 +384,12 @@ namespace RuneApp {
 					b.ID = id;
 				}
 				if (b.Type == BuildType.Lock)
-					b.priority = 0;
+					b.Priority = 0;
 				else
-					b.priority = current_pri++;
+					b.Priority = current_pri++;
 
 				// make sure bad things are removed
-				foreach (var ftab in b.runeFilters) {
+				foreach (var ftab in b.RuneFilters) {
 					foreach (var filter in ftab.Value) {
 						if (filter.Key == "SPD")
 							filter.Value.Percent = null;
@@ -496,15 +416,15 @@ namespace RuneApp {
 			LineLog.Debug($"Saving builds to {filename}");
 			// TODO: fix this mess
 			foreach (Build bb in builds) {
-				if (bb.mon != null && bb.mon.FullName != "Missingno") {
-					if (!bb.DownloadAwake || (Program.data.GetMonster(bb.mon.FullName) != null && Program.data.GetMonster(bb.mon.FullName).FullName != "Missingno")) {
-						bb.MonName = bb.mon.FullName;
-						bb.MonId = bb.mon.Id;
+				if (bb.Mon != null && bb.Mon.FullName != "Missingno") {
+					if (!bb.DownloadAwake || (Program.data.GetMonster(bb.Mon.FullName) != null && Program.data.GetMonster(bb.Mon.FullName).FullName != "Missingno")) {
+						bb.MonName = bb.Mon.FullName;
+						bb.MonId = bb.Mon.Id;
 					}
 					else {
-						if (Program.data.GetMonster(bb.mon.Id).FullName != "Missingno") {
-							bb.MonId = bb.mon.Id;
-							bb.MonName = Program.data.GetMonster(bb.mon.Id).FullName;
+						if (Program.data.GetMonster(bb.Mon.Id).FullName != "Missingno") {
+							bb.MonId = bb.Mon.Id;
+							bb.MonName = Program.data.GetMonster(bb.Mon.Id).FullName;
 						}
 					}
 				}
@@ -626,15 +546,15 @@ namespace RuneApp {
 		}
 
 		public static void BuildPriority(Build build, int deltaPriority) {
-			build.priority += deltaPriority;
-			var bpri = builds.OrderBy(b => b.priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
+			build.Priority += deltaPriority;
+			var bpri = builds.OrderBy(b => b.Priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
 			int i = 1;
 			foreach (var b in bpri) {
 				if (b.Type == BuildType.Lock) {
-					b.priority = 0;
+					b.Priority = 0;
 				}
 				else
-					b.priority = i++;
+					b.Priority = i++;
 			}
 		}
 
@@ -652,7 +572,7 @@ namespace RuneApp {
 				build.BuildGenerate = Program.Settings.TestGen;
 				build.BuildTake = Program.Settings.TestShow;
 				build.BuildTimeout = Program.Settings.TestTime;
-				build.shrines = Program.data.shrines;
+				build.Shrines = Program.data.shrines;
 				build.BuildDumpBads = false;
 				build.BuildSaveStats = false;
 				build.BuildGoodRunes = false;
@@ -713,7 +633,7 @@ namespace RuneApp {
 				build.BuildGenerate = 0;
 				build.BuildTake = 0;
 				build.BuildTimeout = 0;
-				build.shrines = Program.data.shrines;
+				build.Shrines = Program.data.shrines;
 				build.BuildDumpBads = true;
 				build.BuildSaveStats = saveStats;
 				build.BuildGoodRunes = false;
@@ -762,7 +682,7 @@ namespace RuneApp {
 
 					#region Get the rune diff
 					build.Best.Current.Lock();
-					build.Best.Current.RecountDiff(build.mon.Id);
+					build.Best.Current.RecountDiff(build.Mon.Id);
 					#endregion
 
 					//currentBuild = null;
@@ -810,19 +730,19 @@ namespace RuneApp {
 					/* TODO: put Excel on Program */
 					if (saveStats && build.Type != BuildType.Lock) {
 						BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Excel"));
-						runeSheet.StatsExcelBuild(build, build.mon, build.Best.Current, true);
+						runeSheet.StatsExcelBuild(build, build.Mon, build.Best.Current, true);
 					}
 
 					BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Clean"));
 					// clean up for GC
-					if (build.buildUsage != null)
-						build.buildUsage.loads.Clear();
-					if (build.runeUsage != null) {
-						build.runeUsage.runesGood.Clear();
-						build.runeUsage.runesUsed.Clear();
+					if (build.BuildUsage != null)
+						build.BuildUsage.loads.Clear();
+					if (build.RuneUsage != null) {
+						build.RuneUsage.runesGood.Clear();
+						build.RuneUsage.runesUsed.Clear();
 					}
-					build.runeUsage = null;
-					build.buildUsage = null;
+					build.RuneUsage = null;
+					build.BuildUsage = null;
 					/**/
 					#endregion
 				}
@@ -921,8 +841,8 @@ namespace RuneApp {
 				}
 
 				List<Build> toRun = new List<Build>();
-				foreach (var build in builds.OrderBy(b => b.priority)) {
-					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.priority < runTo))
+				foreach (var build in builds.OrderBy(b => b.Priority)) {
+					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.Priority < runTo))
 						toRun.Add(build);
 				}
 
@@ -1059,7 +979,7 @@ namespace RuneApp {
 			m.Grade = mon.Grade;
 			m.monsterTypeId = mon.monsterTypeId;
 
-			foreach (var attr in Build.statEnums) {
+			foreach (var attr in Build.StatEnums) {
 				m[attr] = mon[attr];
 			}
 
@@ -1136,7 +1056,7 @@ namespace RuneApp {
 		static Dictionary<string, int[]> monPortraitMap = null;
 
 		static byte[] zipData = null;
-		static object fslock = new object();
+		static readonly object fslock = new object();
 
 		public static string GetMonIconName(int monsterTypeId) {
 			if (monPortraitMap == null)

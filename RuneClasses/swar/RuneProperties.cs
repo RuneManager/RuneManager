@@ -113,6 +113,12 @@ namespace RuneOptim.swar {
 			}
 		}
 	}
+	
+	public class RuneChangeEventArgs : EventArgs
+	{
+		public Rune OldRune { get; set; }
+		public Rune NewRune { get; set; }
+	}
 
 	public static class RuneProperties
 	{
@@ -471,7 +477,7 @@ namespace RuneOptim.swar {
 
 		#region stats
 
-		public static Dictionary<RuneSet, string> setUnicode = new Dictionary<RuneSet, string>() {
+		public readonly static Dictionary<RuneSet, string> setUnicode = new Dictionary<RuneSet, string>() {
 			{ RuneSet.Blade, "ᚬ"},
 			{ RuneSet.Despair, "ᛃ" },
 			{ RuneSet.Violent, "ᛒ" },
@@ -489,7 +495,7 @@ namespace RuneOptim.swar {
 		};
 
 
-		private static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
+		private readonly static Dictionary<Attr, int> subMaxes = new Dictionary<Attr, int>()
 		{
 			{Attr.Neg, 1 },
 			{Attr.Null, 1 },
@@ -513,7 +519,7 @@ namespace RuneOptim.swar {
 		private static readonly ValueRange[] percentSubUpgrades = { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 5), new ValueRange(3, 6), new ValueRange(4, 7), new ValueRange(5, 8) };
 		private static readonly ValueRange[] accResSubUpgrades = { new ValueRange(1, 2), new ValueRange(1, 3), new ValueRange(2, 4), new ValueRange(2, 5), new ValueRange(3, 7), new ValueRange(4, 8) };
 
-		private static Dictionary<Attr, ValueRange[]> subUpgrades = new Dictionary<Attr, ValueRange[]>()
+		private readonly static Dictionary<Attr, ValueRange[]> subUpgrades = new Dictionary<Attr, ValueRange[]>()
 		{
 			{Attr.HealthFlat, new ValueRange[] { new ValueRange(15, 60), new ValueRange(30, 105), new ValueRange(45, 165), new ValueRange(60, 225), new ValueRange(90, 300), new ValueRange(135, 375) } },
 			{Attr.AttackFlat, flatSubUpgrades },
@@ -694,8 +700,8 @@ namespace RuneOptim.swar {
 
 	public class RuneMainStatValue
 	{
-		int start;
-		double growth;
+		readonly int start;
+		readonly double growth;
 
 		public RuneMainStatValue(int s, double g)
 		{
@@ -792,7 +798,7 @@ namespace RuneOptim.swar {
 	public class RuneAttr : ListProp<int?>
 	{
 		[ListProperty(0)]
-		public Attr Type = default(Attr);
+		public Attr Type = default;
 
 		[ListProperty(1)]
 		public int BaseValue = -1;

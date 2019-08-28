@@ -112,7 +112,7 @@ namespace RuneApp {
 			sorter.OnColumnClick(0, false);
 			loadoutList.ListViewItemSorter = sorter;
 
-			foreach (Attr stat in Build.statAll) {
+			foreach (Attr stat in Build.StatAll) {
 				loadoutList.Columns.Add(stat.ToShortForm()).Width = 80;
 			}
 
@@ -244,8 +244,8 @@ namespace RuneApp {
 						foreach (var r in b.Current.Runes) {
 							if (r.Level < 12)
 								under12 += 12 - r.Level;
-							if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
-								underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
+							if (build.RunePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0))
+								underSpec += (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
 						}
 
 						li.SubItems.Add(underSpec + "/" + under12);
@@ -307,7 +307,7 @@ namespace RuneApp {
 			double pts = 0;
 			double p;
 			int i = 2;
-			foreach (Attr stat in Build.statAll) {
+			foreach (Attr stat in Build.StatAll) {
 				if (!stat.HasFlag(Attr.ExtraStat)) {
 					string str = Cur[stat].ToString();
 					if (build.Sort[stat] != 0) {
@@ -386,12 +386,12 @@ namespace RuneApp {
 
 				building = true;
 
-				foreach (Attr stat in Build.statAll) {
+				foreach (Attr stat in Build.StatAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && mY.GetStats()[stat] > mN.GetStats()[stat])
 						better.Add(stat);
 				}
 				double totalsort = 0;
-				foreach (var stat in Build.statAll) {
+				foreach (var stat in Build.StatAll) {
 					if (!stat.HasFlag(Attr.ExtraStat) && build.Sort[stat] != 0)
 						totalsort += Math.Abs(build.Sort[stat]);
 
@@ -681,8 +681,8 @@ namespace RuneApp {
 						foreach (var r in b.Current.Runes) {
 							if (r.Level < 12)
 								under12 += 12 - r.Level;
-							if (build.runePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0))
-								underSpec += (build.runePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
+							if (build.RunePrediction.ContainsKey((SlotIndex)r.Slot) && r.Level < (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0))
+								underSpec += (build.RunePrediction[(SlotIndex)r.Slot].Key ?? 0) - r.Level;
 						}
 
 						li.SubItems.Add(underSpec + "/" + under12);

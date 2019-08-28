@@ -184,7 +184,7 @@
 			// 
 			this.tcSPD.BackColor = System.Drawing.Color.Transparent;
 			this.tcSPD.Gamma = 1F;
-			this.tcSPD.Image = global::RuneApp.Icon.icon_duration_speed_up;
+			this.tcSPD.Image = global::RuneApp.Resources.Icon.icon_duration_speed_up;
 			this.tcSPD.Location = new System.Drawing.Point(401, 639);
 			this.tcSPD.Name = "tcSPD";
 			this.tcSPD.ImageScale = 0.5F;
@@ -197,7 +197,7 @@
 			// 
 			this.tcDEF.BackColor = System.Drawing.Color.Transparent;
 			this.tcDEF.Gamma = 1F;
-			this.tcDEF.Image = global::RuneApp.Icon.icon_duration_defence_up;
+			this.tcDEF.Image = global::RuneApp.Resources.Icon.icon_duration_defence_up;
 			this.tcDEF.Location = new System.Drawing.Point(363, 639);
 			this.tcDEF.Name = "tcDEF";
 			this.tcDEF.ImageScale = 0.5F;
@@ -210,7 +210,7 @@
 			// 
 			this.tcATK.BackColor = System.Drawing.Color.Transparent;
 			this.tcATK.Gamma = 1F;
-			this.tcATK.Image = global::RuneApp.Icon.icon_duration_attack_up;
+			this.tcATK.Image = global::RuneApp.Resources.Icon.icon_duration_attack_up;
 			this.tcATK.Location = new System.Drawing.Point(325, 639);
 			this.tcATK.Name = "tcATK";
 			this.tcATK.ImageScale = 0.5F;

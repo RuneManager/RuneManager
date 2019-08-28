@@ -40,7 +40,7 @@ namespace RuneApp {
 				if (build != null) {
 					points = build.ScoreRune(rune, build.GetFakeLevel(rune), false);
 
-					if (rune.Slot % 2 == 0 && build.slotStats[rune.Slot - 1].Any() && !build.slotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
+					if (rune.Slot % 2 == 0 && build.SlotStats[rune.Slot - 1].Any() && !build.SlotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
 						continue;
 				}
 

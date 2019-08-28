@@ -43,7 +43,7 @@ namespace RuneApp {
 				if (templateList == null) {
 					if (File.Exists(global::RuneApp.Properties.Resources.TemplatesJSON)) {
 						var bstr = File.ReadAllText(global::RuneApp.Properties.Resources.TemplatesJSON);
-						templateList = JsonConvert.DeserializeObject<List<Build>>(bstr).OrderBy(t => t.priority).ThenBy(t => t.MonName).ToList();
+						templateList = JsonConvert.DeserializeObject<List<Build>>(bstr).OrderBy(t => t.Priority).ThenBy(t => t.MonName).ToList();
 					}
 					else {
 						Program.LineLog.Error(global::RuneApp.Properties.Resources.TemplatesJSON + " not found?");
@@ -57,16 +57,16 @@ namespace RuneApp {
 
 		public BuildWizard(Build newB) {
 			InitializeComponent();
-			if (newB.mon == null) {
+			if (newB.Mon == null) {
 				MessageBox.Show("Error: Build has no monster!");
 				Program.LineLog.Error("Build has no monster!");
 				this.DialogResult = DialogResult.Abort;
 				this.Close();
 			}
 			build = newB;
-			this.lbPrebuild.Text = "Prebuild Template for " + build.mon.FullName;
+			this.lbPrebuild.Text = "Prebuild Template for " + build.Mon.FullName;
 
-			build.mon.RefreshStats();
+			build.Mon.RefreshStats();
 
 			defTemplate = addTemplate(new Build() { MonName = "<None>" }, prebuildList.Groups[0]);
 
@@ -88,7 +88,7 @@ namespace RuneApp {
 
 		void pullTemplates(IEnumerable<Build> templates, int forceGroup = 0) {
 			// load more
-			foreach (var b in templates.Where(t => t.MonId == 0 || MatchMostlyId((int)t.MonId, build.mon.monsterTypeId))) {
+			foreach (var b in templates.Where(t => t.MonId == 0 || MatchMostlyId((int)t.MonId, build.Mon.monsterTypeId))) {
 				if (b.ID == -1) {
 					try {
 						IEnumerable<Build> temps = null;
@@ -122,7 +122,7 @@ namespace RuneApp {
 								}
 							}
 							if (data != null) {
-								temps = JsonConvert.DeserializeObject<IEnumerable<Build>>(data).OrderBy(t => t.priority).ThenBy(t => t.MonName);
+								temps = JsonConvert.DeserializeObject<IEnumerable<Build>>(data).OrderBy(t => t.Priority).ThenBy(t => t.MonName);
 								foreach (var t in temps) {
 									t.ID = fGroup;
 								}
@@ -171,9 +171,9 @@ namespace RuneApp {
 			try {
 				runeDial.Loadout = null;
 				build.RunesUseLocked = cPreviewLocked.Checked;
-				build.autoRuneSelect = true;
+				build.AutoRuneSelect = true;
 				build.RunesUseEquipped = true;
-				build.autoRuneAmount = 8;
+				build.AutoRuneAmount = 8;
 
 				build.GenRunes(Program.data);
 				if (build.runes.Any(rs => rs.Length > 10))
@@ -189,7 +189,7 @@ namespace RuneApp {
 					// TODO: warning
 				}
 
-				build.autoRuneSelect = false;
+				build.AutoRuneSelect = false;
 			}
 			catch { }
 			finally {
@@ -199,11 +199,11 @@ namespace RuneApp {
 
 		private void BuildWizard_Load(object sender, EventArgs e) {
 			cShowWizard.Checked = Program.Settings.ShowBuildWizard;
-			statBase.Stats = build.mon;
+			statBase.Stats = build.Mon;
 			statGoal.Stats = build.Goal;
 			statScore.Stats = build.Sort;
-			statCurrent.Stats = build.mon.GetStats();
-			statPreview.Stats = new Stats(build.mon.GetStats(), true);
+			statCurrent.Stats = build.Mon.GetStats();
+			statPreview.Stats = new Stats(build.Mon.GetStats(), true);
 			statTotal.Stats = new Stats();
 
 			statPreview.Stats.OnStatChanged += CalcStats_OnStatChanged;
@@ -269,9 +269,9 @@ namespace RuneApp {
 					});
 				build.Goal.SetTo(tb.Goal);
 				build.Sort.SetTo(tb.Sort);
-				for (int i = 0; i < build.slotStats.Length; i++) {
-					build.slotStats[i].Clear();
-					build.slotStats[i].AddRange(tb.slotStats[i]);
+				for (int i = 0; i < build.SlotStats.Length; i++) {
+					build.SlotStats[i].Clear();
+					build.SlotStats[i].AddRange(tb.SlotStats[i]);
 				}
 				build.BuildSets.Clear();
 				build.BuildSets.AddRange(tb.BuildSets);
