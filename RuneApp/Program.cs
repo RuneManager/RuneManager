@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using RuneOptim;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.Management;
 using RuneOptim.swar;
 
@@ -259,6 +259,16 @@ namespace RuneApp {
 #endif
 			{
 				Program.data = JsonConvert.DeserializeObject<Save>(text);
+
+				// TODO: temp fix
+				// this probably is somewhat of a leak, as the loadouts will have references to runes no-longer in the save (because the list was recreated in-place).
+				foreach (var l in Program.loads) {
+					foreach (var rid in l.RuneIDs) {
+						var rr = Program.data.Runes.FirstOrDefault(r => r.Id == rid);
+						if (rr != null)
+							rr.Locked = true;
+					}
+				}
 
 				//var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
 

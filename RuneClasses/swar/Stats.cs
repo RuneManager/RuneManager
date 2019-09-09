@@ -2,7 +2,7 @@
 using System.Linq;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 
 namespace RuneOptim.swar {
 

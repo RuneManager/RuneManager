@@ -173,6 +173,10 @@
     <Compile Include="LoadSaveDialogue.Designer.cs">
       <DependentUpon>LoadSaveDialogue.cs</DependentUpon>
     </Compile>
+    <Compile Include="Main.Builds.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Main.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -181,9 +185,19 @@
     </Compile>
     <Compile Include="InternalServer\Master.cs" />
     <Compile Include="Main.Functions.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Loads.cs">
+      <DependentUpon>Main.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Main.Model.cs">
+      <DependentUpon>Main.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Main.Teams.cs">
+      <DependentUpon>Main.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MonSelect.cs">

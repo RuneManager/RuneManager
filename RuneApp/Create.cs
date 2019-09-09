@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using RuneOptim;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 
 namespace RuneApp {

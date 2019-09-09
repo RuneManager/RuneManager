@@ -1,4 +1,4 @@
-﻿using RuneOptim.BuidProcessing;
+﻿using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using System;
 using System.Collections.Generic;

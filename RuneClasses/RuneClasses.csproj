@@ -49,12 +49,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BuidProcessing\Build.cs" />
-    <Compile Include="BuidProcessing\Enums.cs" />
-    <Compile Include="BuidProcessing\BuildUsage.cs" />
-    <Compile Include="BuidProcessing\PrintToEventArgs.cs" />
-    <Compile Include="BuidProcessing\ProgToEventArgs.cs" />
-    <Compile Include="BuidProcessing\RuneUsage.cs" />
+    <Compile Include="BuildProcessing\Build.cs" />
+    <Compile Include="BuildProcessing\Build.Old.cs" />
+    <Compile Include="BuildProcessing\BuildFallback.cs" />
+    <Compile Include="BuildProcessing\BuildSettings.cs" />
+    <Compile Include="BuildProcessing\Enums.cs" />
+    <Compile Include="BuildProcessing\BuildUsage.cs" />
+    <Compile Include="BuildProcessing\IBuildStrategyDefinition.cs" />
+    <Compile Include="BuildProcessing\PrintToEventArgs.cs" />
+    <Compile Include="BuildProcessing\ProgToEventArgs.cs" />
+    <Compile Include="BuildProcessing\RuneUsage.cs" />
+    <Compile Include="swar\IRune.cs" />
     <Compile Include="swar\Rift.cs" />
     <Compile Include="swar\Attr.cs" />
     <Compile Include="swar\AttrFieldAttribute.cs" />
@@ -77,8 +82,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="swar\Rune.cs" />
-    <Compile Include="swar\RuneProperties.cs" />
-    <Compile Include="BuidProcessing\RuneFilter.cs" />
+    <Compile Include="swar\Rune.Extra.cs" />
+    <Compile Include="swar\Rune.Properties.cs" />
+    <Compile Include="BuildProcessing\RuneFilter.cs" />
     <Compile Include="swar\Save.cs" />
     <Compile Include="swar\StatModEventArgs.cs" />
     <Compile Include="swar\Stats.cs" />

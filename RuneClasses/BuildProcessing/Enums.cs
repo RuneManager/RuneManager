@@ -1,4 +1,4 @@
-﻿namespace RuneOptim.BuidProcessing {
+﻿namespace RuneOptim.BuildProcessing {
 	public enum BuildResult {
 		Success = 0,
 		Failure = 1,

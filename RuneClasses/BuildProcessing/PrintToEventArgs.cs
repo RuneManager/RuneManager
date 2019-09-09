@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace RuneOptim.BuidProcessing {
+namespace RuneOptim.BuildProcessing {
 	public class PrintToEventArgs : EventArgs {
 		public Build build;
 		public string Message;

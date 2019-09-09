@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Http;
 using RuneApp.Resources;
 using RuneOptim;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 
 namespace RuneApp.InternalServer {

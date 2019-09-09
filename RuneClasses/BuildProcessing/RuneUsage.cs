@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using RuneOptim.swar;
 
-namespace RuneOptim.BuidProcessing {
+namespace RuneOptim.BuildProcessing {
 	public class RuneUsage {
 		// the runes legit used 
 		public ConcurrentDictionary<Rune, byte> runesUsed = new ConcurrentDictionary<Rune, byte>();

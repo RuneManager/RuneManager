@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 
 namespace RuneOptim.Tests {
 	[TestClass()]

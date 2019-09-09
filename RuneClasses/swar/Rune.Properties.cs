@@ -9,6 +9,7 @@ using Newtonsoft.Json.Converters;
 namespace RuneOptim.swar {
 	public partial class Rune
 	{
+		
 		public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { RuneSet.Energy, // Health
 			RuneSet.Guard, // Def
 			RuneSet.Swift, // Speed

@@ -12,7 +12,7 @@ using System.Net;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Text;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using RuneOptim.Management;
 
@@ -24,6 +24,7 @@ namespace RuneApp {
 		private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
 
 		bool loading = true;
+		bool isClosing = false;
 
 		public static Help help;
 		public static Irene irene;
@@ -36,20 +37,7 @@ namespace RuneApp {
 		public static RuneDisplay runeDisplay;
 		Monster displayMon;
 
-		bool teamChecking;
-		Build teamBuild;
-		Dictionary<string, List<string>> toolmap = new Dictionary<string, List<string>>() {
-			{ "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
-			{ "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
-			{ "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
-			{ "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA" } },
-
-			{ "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
-			{ "ToA", new List<string> { "ToAN", "ToAH" } }
-		};
-
-		List<string> knownTeams = new List<string>();
-
+		
 		public static Main Instance;
 
 		//public static Configuration config {  get { return Program.config; } }
@@ -61,9 +49,6 @@ namespace RuneApp {
 
 		private static readonly Control[] statCtrls = new Control[37];
 
-		private DateTime resumeTime = DateTime.MinValue;
-
-		private System.Windows.Forms.Timer resumeTimer;
 
 		public Main() {
 			InitializeComponent();

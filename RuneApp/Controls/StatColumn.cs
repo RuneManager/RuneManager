@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 
 namespace RuneApp {

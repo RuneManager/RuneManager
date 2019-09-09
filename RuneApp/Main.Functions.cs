@@ -13,12 +13,14 @@ using System.Windows.Forms;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Text;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using RuneOptim.Management;
 
 namespace RuneApp {
 	public partial class Main {
+
+		// Functions for working with the Swar Save data
 
 		private void loadSaveDialogue(object sender, EventArgs e) {
 			loadSaveDialogue();
@@ -120,77 +122,6 @@ namespace RuneApp {
 			return nli;
 		}
 
-		private void ListViewItemBuild(ListViewItem lvi, Build b) {
-			lvi.Text = b.ID.ToString();
-
-			while (lvi.SubItems.Count < 6)
-				lvi.SubItems.Add("");
-
-			int i = 0;
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.Mon?.FullName ?? b.MonName);
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.Priority.ToString());
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "");
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, (b.Mon?.Id ?? b.MonId).ToString());
-			if (b.Type == BuildType.Lock) {
-				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Locked");
-				lvi.ForeColor = Color.Gray;
-			}
-			else if (b.Type == BuildType.Link) {
-				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Linked");
-				lvi.ForeColor = Color.Teal;
-			}
-			else
-				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, getTeamStr(b));
-
-			lvi.Tag = b;
-
-			if (b.RunePrediction.Any(p => p.Value.Value))
-				lvi.ForeColor = Color.Purple;
-		}
-
-		private string getTeamStr(Build b) {
-			if (b.Teams == null || b.Teams.Count == 0)
-				return "";
-
-			var sz = buildCHTeams.Width;
-			var str = "";
-			for (int i = 0; i < b.Teams.Count; i++) {
-				var sb = new StringBuilder(string.Join(", ", b.Teams.Take(i)));
-				if (!string.IsNullOrWhiteSpace(sb.ToString()))
-					sb.Append(", ");
-				sb.Append(b.Teams.Count - i);
-				var tstr = string.Join(", ", b.Teams.Take(i + 1));
-				if (this.CreateGraphics().MeasureString(tstr + "...", buildList.Font).Width > sz - 10)
-					return sb.ToString();
-				str = tstr;
-			}
-
-			return str;
-		}
-
-		private void tsTeamAdd(ToolStripMenuItem parent, string item) {
-			knownTeams.Add(item);
-			ToolStripMenuItem n = new ToolStripMenuItem(item);
-			parent.DropDownItems.Add(n);
-			n.CheckedChanged += tsTeamHandler;
-			n.CheckOnClick = true;
-
-			if (toolmap[item] != null) {
-				foreach (var smi in toolmap[item]) {
-					if (toolmap.ContainsKey(smi)) {
-						tsTeamAdd(n, smi);
-					}
-					else {
-						ToolStripMenuItem s = new ToolStripMenuItem(smi);
-						s.CheckedChanged += tsTeamHandler;
-						s.CheckOnClick = true;
-						n.DropDownItems.Add(s);
-					}
-				}
-			}
-		}
-
 		private void filterRunesList(Predicate<object> p) {
 			dataRuneList.Items.Clear();
 
@@ -201,20 +132,6 @@ namespace RuneApp {
 			}
 		}
 
-		public void ProgressToList(Build b, string str) {
-			//Program.log.Info("_" + str);
-			this.Invoke((MethodInvoker)delegate {
-				if (!IsDisposed) {
-					var lvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
-					if (lvi == null)
-						return;
-					while (lvi.SubItems.Count < 4)
-						lvi.SubItems.Add("");
-					lvi.SubItems[3].Text = str;
-				}
-			});
-		}
-
 		private DialogResult CheckSaveChanges() {
 			if (!Program.data.isModified)
 				return DialogResult.Yes;
@@ -223,14 +140,6 @@ namespace RuneApp {
 			if (res == DialogResult.Yes)
 				Program.SaveData();
 			return res;
-		}
-
-		private void RegenBuildList() {
-			foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
-				if (lvi.Tag is Build b) {
-					lvi.SubItems[1].Text = b.Priority.ToString();
-				}
-			}
 		}
 
 		public void ShowOptions() {
@@ -421,33 +330,6 @@ namespace RuneApp {
 			}
 		}
 
-		public void RebuildBuildList() {
-			List<ListViewItem> tempMons = null;
-			this.Invoke((MethodInvoker)delegate {
-				tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList();
-				buildList.Items.Clear();
-			});
-
-			var lviList = new List<ListViewItem>();
-
-			foreach (var b in Program.builds) {
-				ListViewItem li = new ListViewItem();
-				this.Invoke((MethodInvoker)delegate {
-					ListViewItemBuild(li, b);
-				});
-				lviList.Add(li);
-				var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.Mon?.Id ?? b.MonId).ToString()));
-				if (lv1li != null) {
-					lv1li.ForeColor = Color.Green;
-				}
-			}
-
-			this.Invoke((MethodInvoker)delegate {
-				buildList.Items.AddRange(lviList.ToArray());
-				buildList.Sort();
-			});
-		}
-
 		public void checkLocked() {
 			if (Program.data?.Runes == null)
 				return;
@@ -459,70 +341,6 @@ namespace RuneApp {
 						li.BackColor = rune.Locked ? Color.Red : Color.Transparent;
 				}
 			});
-		}
-
-		private void RunBuild(ListViewItem pli, bool saveStats = false) {
-			if (pli?.Tag is Build)
-				Program.RunBuild((Build)pli.Tag, saveStats);
-		}
-
-		private void ClearLoadouts() {
-			Program.ClearLoadouts();
-			checkLocked();
-		}
-
-		private bool tsTeamCheck(ToolStripMenuItem t) {
-			bool ret = false;
-			t.Checked = false;
-			t.Image = null;
-			if (teamBuild.Teams.Contains(t.Text)) {
-				t.Checked = true;
-				ret = true;
-			}
-			foreach (ToolStripMenuItem smi in t.DropDownItems) {
-				if (tsTeamCheck(smi)) {
-					t.Image = App.add;
-					ret = true;
-				}
-			}
-			return ret;
-		}
-
-		int GetRel(string first, string second) {
-			if (first == second)
-				return 0;
-
-			string p1 = null;
-			string p2 = null;
-
-			if (toolmap.Keys.Contains(first) && toolmap.Keys.Contains(second))
-				return 1;
-
-			foreach (var k in toolmap) {
-				if (k.Value.Contains(first) && k.Value.Contains(second))
-					return 1;
-				if (k.Value.Contains(first))
-					p1 = k.Key;
-				if (k.Value.Contains(second))
-					p2 = k.Key;
-			}
-
-			if (toolmap.Keys.Contains(first) && toolmap[first].Contains(second))
-				return 1;
-			if (toolmap.Keys.Contains(second) && toolmap[second].Contains(first))
-				return 1;
-
-			if (p2 != null && toolmap[p2].Contains(p1))
-				return 2;
-			if (p1 != null && toolmap[p1].Contains(p2))
-				return 2;
-
-			if (p2 != null && toolmap[p2].Contains(first))
-				return 3;
-			if (p1 != null && toolmap[p1].Contains(second))
-				return 3;
-
-			return -1;
 		}
 
 		private void startResumeTimer(DateTime when) {

@@ -7,7 +7,7 @@ using System.Net;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using RuneOptim;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 
 namespace RuneApp {

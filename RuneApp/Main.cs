@@ -12,7 +12,7 @@ using System.Net;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Text;
-using RuneOptim.BuidProcessing;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using RuneOptim.Management;
 
@@ -20,7 +20,9 @@ namespace RuneApp {
 
 
 	public partial class Main : Form {
-		
+		// Here we keep all the WinForm callbacks, because of the way the Designer works
+		// TODO: empty the logic into functions, instead of inside the callbacks
+
 		private void Main_Load(object sender, EventArgs e) {
 
 			#region Watch collections and try loading
@@ -718,6 +720,7 @@ namespace RuneApp {
 		}
 
 		private void Main_FormClosing(object sender, FormClosingEventArgs e) {
+			this.isClosing = true;
 			LineLog.Info("Closing...");
 			if (CheckSaveChanges() == DialogResult.Cancel) {
 				e.Cancel = true;

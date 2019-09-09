@@ -1,7 +1,7 @@
 ﻿using RuneOptim.swar;
 using System.Collections.Generic;
 
-namespace RuneOptim.BuidProcessing {
+namespace RuneOptim.BuildProcessing {
 	public class BuildUsage {
 		public int failed = 0;
 		public int passed = 0;

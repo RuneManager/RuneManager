@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace RuneOptim.BuidProcessing {
+namespace RuneOptim.BuildProcessing {
 	// Per-stat filter
 	public class RuneFilter {
 		[JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
