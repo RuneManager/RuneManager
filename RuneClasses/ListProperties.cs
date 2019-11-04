@@ -7,7 +7,7 @@ namespace RuneOptim {
 
 	public class OnSetEventArgs<T> {
 		public int i = -1;
-		public T val = default;
+		public T val = default(T);
 	}
 
 	public abstract class ListProp<T>
