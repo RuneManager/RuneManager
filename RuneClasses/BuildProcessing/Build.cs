@@ -1,16 +1,14 @@
 ﻿#define BUILD_PRECHECK_BUILDS
 //#define BUILD_PRECHECK_BUILDS_DEBUG
 
+using Newtonsoft.Json;
+using RuneOptim.Management;
+using RuneOptim.swar;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
-using RuneOptim.swar;
-using RuneOptim.Management;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace RuneOptim.BuildProcessing {
 
@@ -29,6 +27,16 @@ namespace RuneOptim.BuildProcessing {
 		public static readonly Attr[] ExtraEnums = { Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
 		public static readonly Attr[] StatAll = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy, Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
 
+		[JsonIgnore]
+		public IBuildRunner runner;
+
+		[JsonIgnore]
+		private TaskCompletionSource<IBuildRunner> tcs = new TaskCompletionSource<IBuildRunner>();
+
+		[JsonIgnore]
+		public Task<IBuildRunner> startedBuild => tcs.Task;
+
+		public double lastScore = float.MinValue;
 
 		public Build() {
 			// for all 6 slots, init the list
@@ -129,6 +137,9 @@ namespace RuneOptim.BuildProcessing {
 
 		[JsonIgnore]
 		public bool IgnoreLess5 { get; set; } = false;
+
+		[JsonProperty]
+		public string BuildStrategy { get; set; }
 
 		[Obsolete("Wrap this in a method")]
 		public event EventHandler<PrintToEventArgs> BuildPrintTo;
@@ -454,16 +465,46 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
-		public double ScoreStat(Stats current, Attr attr) {
-			return ScoreStat(current, attr, out _);
+
+		public double ScoreStat(Stats current, Attr stat) {
+			if (current == null)
+				return 0;
+			double vv = current[stat];
+
+			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+				vv = 100;
+			if (Sort[stat] != 0) {
+				var tg = Threshold[stat];
+				var gg = Goal[stat];
+				if (tg != 0 && tg < vv)
+					vv = tg;
+				if (vv > gg && gg > 0)
+					vv = (vv - gg) / 2 + gg;
+				vv /= Sort[stat];
+				return vv;
+			}
+			return 0;
 		}
 
-		public double ScoreExtra(Stats current, Attr attr) {
-			return ScoreExtra(current, attr, out _);
-		}
 
-		public double ScoreSkill(Stats current, int j) {
-			return ScoreSkill(current, j, out _);
+		public double ScoreStat(Stats current, Attr stat, Stats outvals) {
+			if (current == null)
+				return 0;
+			double vv = current[stat];
+			double v2 = 0;
+
+			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+				vv = 100;
+			if (Sort[stat] != 0) {
+				v2 = Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]);
+				if (v2 > Goal[stat] && Goal[stat] > 0)
+					v2 = (v2 - Goal[stat]) / 2 + Goal[stat];
+				v2 /= Sort[stat];
+				if (outvals != null)
+					outvals[stat] = v2;
+			}
+
+			return v2;
 		}
 
 		public double ScoreStat(Stats current, Attr stat, out string str, Stats outvals = null) {
@@ -489,6 +530,44 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+
+		public double ScoreExtra(Stats current, Attr stat) {
+			if (current == null)
+				return 0;
+			double vv = current.ExtraValue(stat);
+
+			if (Sort.ExtraGet(stat) != 0) {
+				var tg = Threshold.ExtraGet(stat);
+				var gg = Goal.ExtraGet(stat);
+				if (tg != 0 && tg < vv)
+					vv = tg;
+				if (vv > gg && gg > 0)
+					vv = (vv - gg) / 2 + gg;
+				vv /= Sort.ExtraGet(stat);
+				return vv;
+			}
+			return 0;
+		}
+
+		public double ScoreExtra(Stats current, Attr stat, Stats outvals) {
+			if (current == null)
+				return 0;
+			double vv = current.ExtraValue(stat);
+			double v2 = 0;
+
+			if (Sort.ExtraGet(stat) != 0) {
+				var tg = Threshold.ExtraGet(stat);
+				var gg = Goal.ExtraGet(stat);
+				v2 = tg.EqualTo(0) ? vv : Math.Min(vv, tg);
+				if (v2 > gg && gg > 0)
+					v2 = (v2 - gg) / 2 + gg;
+				v2 /= Sort.ExtraGet(stat);
+				if (outvals != null)
+					outvals.ExtraSet(stat, v2);
+			}
+			return v2;
+		}
+
 		public double ScoreExtra(Stats current, Attr stat, out string str, Stats outvals = null) {
 			str = "";
 			if (current == null)
@@ -498,14 +577,53 @@ namespace RuneOptim.BuildProcessing {
 
 			str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 			if (Sort.ExtraGet(stat) != 0) {
-				v2 = Threshold.ExtraGet(stat).EqualTo(0) ? vv : Math.Min(vv, Threshold.ExtraGet(stat));
-				if (v2 > Goal.ExtraGet(stat) && Goal.ExtraGet(stat) > 0)
-					v2 = (v2 - Goal.ExtraGet(stat)) / 2 + Goal.ExtraGet(stat);
+				var tg = Threshold.ExtraGet(stat);
+				var gg = Goal.ExtraGet(stat);
+				v2 = tg.EqualTo(0) ? vv : Math.Min(vv, tg);
+				if (v2 > gg && gg > 0)
+					v2 = (v2 - gg) / 2 + gg;
 				v2 /= Sort.ExtraGet(stat);
 				if (outvals != null)
 					outvals.ExtraSet(stat, v2);
 				str = v2.ToString("0.#") + " (" + vv + ")";
 			}
+			return v2;
+		}
+
+		public double ScoreSkill(Stats current, int j) {
+			if (current == null)
+				return 0;
+			double vv = current.GetSkillDamage(Attr.AverageDamage, j);
+
+			if (Sort.DamageSkillups[j] != 0) {
+				var tg = Threshold.DamageSkillups[j];
+				var gg = Goal.DamageSkillups[j];
+				if (tg != 0 && tg < vv)
+					vv = tg;
+				if (vv > gg && gg > 0)
+					vv = (vv - gg) / 2 + gg;
+				vv /= Sort.DamageSkillups[j];
+				return vv;
+			}
+			return 0;
+		}
+
+
+		public double ScoreSkill(Stats current, int j, Stats outvals) {
+			if (current == null)
+				return 0;
+			double vv = current.GetSkillDamage(Attr.AverageDamage, j);
+			double v2 = 0;
+
+			if (Sort.DamageSkillups[j] != 0) {
+				v2 = Threshold.DamageSkillups[j].EqualTo(0) ? vv : Math.Min(vv, Threshold.DamageSkillups[j]);
+				if (v2 > Goal.DamageSkillups[j] && Goal.DamageSkillups[j] > 0)
+					v2 = (v2 - Goal.DamageSkillups[j]) / 2 + Goal.DamageSkillups[j];
+				v2 /= Sort.DamageSkillups[j];
+				if (outvals != null)
+					outvals.DamageSkillups[j] = v2;
+			}
+
 			return v2;
 		}
 
@@ -530,8 +648,54 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		public double LastScore(Stats current ) {
+			if (lastScore == float.MinValue)
+				CalcScore(current);
+			return lastScore;
+		}
+
+		public double LastScore(Stats current, Stats outvals) {
+			if (lastScore == float.MinValue)
+				CalcScore(current, outvals);
+			return lastScore;
+		}
+
 		// build the scoring function
-		public double CalcScore(Stats current, Stats outvals = null, Action<string, int> writeTo = null) {
+		public double CalcScore(Stats current, Action<string, int> writeTo) {
+			if (current == null)
+				return 0;
+
+			string str;
+			double pts = 0;
+			// dodgy hack for indexing in Generate ListView
+
+			// TODO: instead of -Goal, make everything >Goal /2
+			int i = 2;
+			foreach (Attr stat in StatEnums) {
+				pts += ScoreStat(current, stat, out str);
+				writeTo?.Invoke(str, i);
+				i++;
+			}
+
+			foreach (Attr stat in ExtraEnums) {
+				pts += ScoreExtra(current, stat, out str);
+				writeTo?.Invoke(str, i);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (current.SkillFunc[j] != null) {
+					pts += ScoreSkill(current, j, out str);
+					writeTo?.Invoke(str, i);
+					i++;
+				}
+			}
+			lastScore = pts;
+			return pts;
+		}
+
+		// build the scoring function
+		public double CalcScore(Stats current, Action<string, int> writeTo, Stats outvals) {
 			if (current == null)
 				return 0;
 			if (outvals != null)
@@ -562,6 +726,142 @@ namespace RuneOptim.BuildProcessing {
 					i++;
 				}
 			}
+			lastScore = pts;
+			return pts;
+		}
+
+		public double CalcScore(Rune rune, Monster current, Stats avg = null) {
+			if (rune == null)
+				return 0;
+			if (avg == null)
+				avg = new Stats();
+			double pts = 0;
+
+			Stats s = current;
+			Monster t = new Monster(current, false);
+
+			t.ApplyRune(rune, 7);
+
+			var a = (t.GetStats() + avg) - s;
+			current.SkillFunc.CopyTo(a.SkillFunc, 0);
+
+
+			int i = 2;
+			foreach (Attr stat in StatEnums) {
+				pts += ScoreStat(a, stat);
+				i++;
+			}
+
+			foreach (Attr stat in ExtraEnums) {
+				pts += ScoreExtra(a, stat);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (a.SkillFunc[j] != null) {
+					pts += ScoreSkill(a, j);
+					i++;
+				}
+			}
+			return pts;
+
+		}
+
+		public double CalcScore(Rune rune, Monster current, ref Stats outvals) {
+			if (rune == null)
+				return 0;
+			if (outvals != null)
+				outvals.SetTo(0);
+			double pts = 0;
+
+			Stats s = current;
+			Monster t = new Monster(current, false);
+
+			t.ApplyRune(rune, 7);
+			
+			var a = t.GetStats() - s;
+			current.SkillFunc.CopyTo(a.SkillFunc, 0);
+
+
+			int i = 2;
+			foreach (Attr stat in StatEnums) {
+				pts += ScoreStat(a, stat, outvals);
+				i++;
+			}
+
+			foreach (Attr stat in ExtraEnums) {
+				pts += ScoreExtra(a, stat, outvals);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (a.SkillFunc[j] != null) {
+					pts += ScoreSkill(a, j, outvals);
+					i++;
+				}
+			}
+			return pts;
+
+		}
+
+		public double CalcScore(Stats current) {
+			if (current == null)
+				return 0;
+
+			double pts = 0;
+			// dodgy hack for indexing in Generate ListView
+
+			// TODO: instead of -Goal, make everything >Goal /2
+			int i = 2;
+			foreach (Attr stat in StatEnums) {
+				pts += ScoreStat(current, stat);
+				i++;
+			}
+
+			foreach (Attr stat in ExtraEnums) {
+				pts += ScoreExtra(current, stat);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (current.SkillFunc[j] != null) {
+					pts += ScoreSkill(current, j);
+					i++;
+				}
+			}
+			lastScore = pts;
+			return pts;
+		}
+
+		// build the scoring function
+		public double CalcScore(Stats current, Stats outvals) {
+			if (current == null)
+				return 0;
+			if (outvals != null)
+				outvals.SetTo(0);
+
+			double pts = 0;
+			// dodgy hack for indexing in Generate ListView
+
+			// TODO: instead of -Goal, make everything >Goal /2
+			int i = 2;
+			foreach (Attr stat in StatEnums) {
+				pts += ScoreStat(current, stat, outvals);
+				i++;
+			}
+
+			foreach (Attr stat in ExtraEnums) {
+				pts += ScoreExtra(current, stat, outvals);
+				i++;
+			}
+
+			for (int j = 0; j < 4; j++) {
+				if (current.SkillFunc[j] != null) {
+					pts += ScoreSkill(current, j, outvals);
+					i++;
+				}
+			}
+			lastScore = pts;
 			return pts;
 		}
 
@@ -602,7 +902,7 @@ namespace RuneOptim.BuildProcessing {
 			return num;
 		}
 
-		void getPrediction(int?[] slotFakes, bool[] slotPred) {
+		public void getPrediction(int?[] slotFakes, bool[] slotPred) {
 			// crank the rune prediction
 			for (int i = 0; i < 6; i++) {
 				int? raiseTo = 0;

@@ -4,15 +4,15 @@ using System.Runtime.CompilerServices;
 namespace RuneOptim.BuildProcessing {
 	public class ProgToEventArgs : EventArgs {
 		public Build build;
-		public int Progress;
+		public long Progress;
 		public double Percent;
 
 		public string File;
 		public string Caller;
 		public int Line;
 
-		protected ProgToEventArgs(Build b, double d, int p) { build = b; Percent = d; Progress = p; }
-		public static ProgToEventArgs GetEvent(Build b, double d, int p,
+		protected ProgToEventArgs(Build b, double d, long p) { build = b; Percent = d; Progress = p; }
+		public static ProgToEventArgs GetEvent(Build b, double d, long p,
 			[CallerFilePath] string file = null,
 			[CallerMemberName] string caller = null,
 			[CallerLineNumber] int line = 0) {

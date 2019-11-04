@@ -5,6 +5,7 @@ namespace RuneOptim.BuildProcessing {
 	public class PrintToEventArgs : EventArgs {
 		public Build build;
 		public string Message;
+		public long Order;
 
 		public string File;
 		public string Caller;
