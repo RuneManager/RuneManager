@@ -1,8 +1,11 @@
-﻿using System;
+﻿//#define FOR_THREADS
+
+using System;
 using System.Linq;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using RuneOptim.BuildProcessing;
+using System.Collections.Generic;
 
 namespace RuneOptim.swar {
 
@@ -159,7 +162,7 @@ namespace RuneOptim.swar {
 			//rhs._skillsFormula.CopyTo(_skillsFormula, 0);
 			//rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
 			_skillsFormula = rhs._skillsFormula;
-			DamageSkillups = rhs.DamageSkillups;
+			//DamageSkillups = rhs.DamageSkillups.ToArray();
 			ExtraCritRate = rhs.ExtraCritRate;
 
 			SkillupDamage = rhs.SkillupDamage;
@@ -170,6 +173,9 @@ namespace RuneOptim.swar {
 				DamagePerSpeed = rhs.DamagePerSpeed;
 				AverageDamage = rhs.AverageDamage;
 				MaxDamage = rhs.MaxDamage;
+				// danger zone
+				DamageSkillups = rhs.DamageSkillups;
+				nonZero = rhs.NonZeroStats.ToArray();
 
 				//OnStatChanged += rhs.OnStatChanged;
 				/*foreach (var target in rhs.OnStatChanged.GetInvocationList())
@@ -179,6 +185,15 @@ namespace RuneOptim.swar {
 								  typeof(EventHandler<StatModEventArgs>), this, mi.Name);
 					OnStatChanged += (EventHandler<StatModEventArgs>)del;
 				}*/
+			}
+			else {
+#if FOR_THREADS
+				DamageSkillups = rhs.DamageSkillups.ToArray();
+				nonZero = rhs.nonZero.ToArray();
+#else
+				DamageSkillups = rhs.DamageSkillups;
+				nonZero = rhs.nonZero;
+#endif
 			}
 		}
 
@@ -225,10 +240,10 @@ namespace RuneOptim.swar {
 		protected readonly static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
 
 		[JsonIgnore]
-		private Func<Stats, double> _damageFormula = null;
+		protected Func<Stats, double> _damageFormula = null;
 
 		[JsonIgnore]
-		private Func<Stats, double>[] _skillsFormula = null;
+		protected Func<Stats, double>[] _skillsFormula = null;
 
 		[JsonIgnore]
 		protected Func<Stats, double>[] _SkillsFormula {
@@ -240,16 +255,22 @@ namespace RuneOptim.swar {
 		}
 
 		[JsonIgnore]
-		private Expression __form = null;
+		protected Expression __form = null;
 
 		[JsonIgnore]
 		public Func<Stats, double> DamageFormula {
 			get {
-				if (_damageFormula == null && damageFormula != null) {
-					__form = damageFormula.AsExpression(statType);
-					_damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
+				if (_damageFormula == null) {
+					BakeDamageFormula();
 				}
 				return _damageFormula;
+			}
+		}
+
+		public void BakeDamageFormula() {
+			if (_damageFormula == null && damageFormula != null) {
+				__form = damageFormula.AsExpression(statType);
+				_damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
 			}
 		}
 
@@ -655,6 +676,15 @@ namespace RuneOptim.swar {
 			return false;
 		}
 
+		public bool AnyExceedCached(Stats rhs) {
+			foreach (var a in rhs.NonZeroCached) {
+				if (this[a] > rhs[a])
+					return true;
+			}
+
+			return false;
+		}
+
 		public static bool CheckMax(double lhs, double rhs) {
 			return rhs != 0 && lhs > rhs;
 		}
@@ -832,9 +862,20 @@ namespace RuneOptim.swar {
 			return ret;
 		}
 
-		public System.Collections.Generic.IEnumerable<Attr> NonZeroStats {
+		[JsonIgnore]
+		Attr[] nonZero = null;
+
+		public IEnumerable<Attr> NonZeroCached {
 			get {
-				foreach (var a in Build.StatAll) {
+				if (nonZero == null)
+					nonZero = NonZeroStats.ToArray();
+				return nonZero;
+			}
+		}
+
+		public IEnumerable<Attr> NonZeroStats {
+			get {
+				foreach (Attr a in Build.StatAll) {
 					if (!this[a].EqualTo(0))
 						yield return a;
 				}

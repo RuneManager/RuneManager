@@ -197,6 +197,9 @@ namespace RuneOptim.swar {
 						if (mon.Name == null) {
 							mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
 						}
+						if (mon.Name == null) {
+							mon.Name = "MissingNo";
+						}
 						// Add the runes contained in the Monsters JSON definition to the Rune pool
 						foreach (var r in mon.Runes) {
 							if (!Runes.Any(ru => ru.Id == r.Id))

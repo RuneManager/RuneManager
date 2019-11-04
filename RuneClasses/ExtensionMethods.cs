@@ -44,7 +44,7 @@ namespace RuneOptim {
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
 			if (CurrentSeverity >= sev) {
-				logTo.WriteLine(System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str);
+				logTo?.WriteLine(System.IO.Path.GetFileNameWithoutExtension(filepath) + "." + caller + "@" + lineNumber + ": " + str);
 			}
 		}
 
@@ -83,6 +83,38 @@ namespace RuneOptim {
 				lhs.Add(t);
 		}
 
+		public static double StdDev<T>(this IEnumerable<T> values, Func<T, double> selector) {
+			double ret = 0;
+			int count = values.Count();
+			if (count > 1) {
+				//Compute the Average
+				double avg = values.Select(selector).Average();
+
+				//Perform the Sum of (value-avg)^2
+				double sum = values.Select(selector).Sum(d => (d - avg) * (d - avg));
+
+				//Put it all together
+				ret = Math.Sqrt(sum / count);
+			}
+			return ret;
+		}
+
+		public static double StdDev<T>(this IEnumerable<T> values, out double average, Func<T, double> selector) {
+			double ret = 0;
+			average = 0;
+			int count = values.Count();
+			if (count > 1) {
+				//Compute the Average
+				average = values.Select(selector).Average();
+				var avg = average;
+				//Perform the Sum of (value-avg)^2
+				double sum = values.Select(selector).Sum(d => (d - avg) * (d - avg));
+
+				//Put it all together
+				ret = Math.Sqrt(sum / count);
+			}
+			return ret;
+		}
 		/// <summary>
 		/// Early false if enumerable Count exceeds count.
 		/// </summary>

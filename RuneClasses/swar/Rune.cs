@@ -7,15 +7,48 @@ using RuneOptim.BuildProcessing;
 
 namespace RuneOptim.swar {
 
+
+	public class RuneSetConverter : JsonConverter {
+		public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer) {
+			var date = (RuneSet)value;
+
+			var i = Enum.GetValues(typeof(RuneSet)).OfType<RuneSet>().ToList().IndexOf(date) - 2;
+
+			writer.WriteValue(i.ToString());
+		}
+
+		public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
+			if (reader.Value is int i) {
+				return (RuneSet)(1 << (i - 1));
+			}
+			else if (reader.Value is Int64 l) {
+				return (RuneSet)(1 << (int)(l - 1));
+			}
+			else {
+				throw new Exception();
+			}
+
+		}
+
+		public override bool CanConvert(Type objectType) {
+			return objectType == typeof(RuneSet);
+		}
+
+	}
+
 	public partial class Rune : RuneLink {
 		#region JSON Props
 
 		[JsonProperty("set_id")]
+		[JsonConverter(typeof(RuneSetConverter))]
 		public RuneSet Set;
 
 		[JsonProperty("class")]
 		public int Grade;
-
+		
+		/// <summary>
+		/// The 1-index slot number
+		/// </summary>
 		[JsonProperty("slot_no")]
 		public int Slot;
 
@@ -239,9 +272,10 @@ namespace RuneOptim.swar {
 		// Number of sets
 		public static readonly int SetCount = Enum.GetNames(typeof(RuneSet)).Length;
 
+		// todo: consider hashSet.Contains
 		// Number of runes required for set to be complete
 		public static int SetRequired(RuneSet set) {
-			if (set == RuneSet.Swift || set == RuneSet.Fatal || set == RuneSet.Violent || set == RuneSet.Vampire || set == RuneSet.Despair || set == RuneSet.Rage)
+			if ((set & RuneSet.Set4) == set)
 				return 4;
 			// Not a 4 set => is a 2 set
 			return 2;

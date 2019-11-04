@@ -280,7 +280,7 @@ namespace RuneOptim.swar {
 				data = File.ReadAllText(fpath);
 			}
 			if (string.IsNullOrWhiteSpace(data))
-				return default;
+				return default(T);
 			lock (objLock) {
 				apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
 				return (T)apiObjs[location];

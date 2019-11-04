@@ -30,7 +30,7 @@ namespace RuneOptim.swar {
 			get {
 				if (IsHomunculus)
 					return HomunculusName;
-				return (awakened == 1 ? "" : Element.ToString() + " ") + name;
+				return (awakened == 1 ? "" : Element.ToString() + " ") + Name;
 			}
 			set {
 				name = value;
@@ -121,7 +121,16 @@ namespace RuneOptim.swar {
 
 		[JsonConverter(typeof(RuneLoadConverter))]
 		[JsonProperty("runes")]
-		public Rune[] Runes = new Rune[0];
+		private Rune[] runes;
+
+		public Rune[] Runes {
+			get {
+				return runes ?? (runes = new Rune[0]);
+			}
+			set {
+				runes = value;
+			}
+		}
 
 		public int priority = 0;
 
@@ -219,36 +228,48 @@ namespace RuneOptim.swar {
 					_skilllist = _skilllist.Concat(rhs._skilllist).ToList();
 			}
 			else if (rhs._skilllist != null) {
-				_skilllist = rhs._skilllist.ToList();
+				// todo: do we *need* the copy?
+				if (loadout)
+					_skilllist = rhs._skilllist;
+				else
+					_skilllist = rhs._skilllist.ToList();
 			}
+
 			priority = rhs.priority;
 			downloaded = rhs.downloaded;
 			inStorage = rhs.inStorage;
 
 			if (loadout) {
-				Current = new Loadout(rhs.Current);
+				Current = new Loadout(rhs.Current, rhs.Current.FakeLevel, rhs.Current.PredictSubs);
 			}
+			else {
+				curStats = new Stats();
+			}
+
 		}
 
 		// put this rune on the current build
 		public Rune ApplyRune(Rune rune, int checkOn = 2) {
 			var old = Current.AddRune(rune, checkOn);
 			changeStats = true;
-			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { NewRune = rune, OldRune = old });
+			if (!Current.TempLoad)
+				OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { NewRune = rune, OldRune = old });
 			return old;
 		}
 
 		public Rune RemoveRune(int slot) {
 			var r = Current.RemoveRune(slot);
 			changeStats = true;
-			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { OldRune = r });
+			if (!Current.TempLoad)
+				OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { OldRune = r });
 			return r;
 		}
 
 		public void RefreshStats() {
 			changeStats = true;
 			GetStats();
-			OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { });
+			if (!Current.TempLoad)
+				OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { });
 		}
 
 		private static MonsterStat[] skillList = null;

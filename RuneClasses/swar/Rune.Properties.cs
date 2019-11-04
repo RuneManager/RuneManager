@@ -725,6 +725,7 @@ namespace RuneOptim.swar {
 	}
 
 	// Enums up Runesets
+	[Flags]
 	[JsonConverter(typeof(StringEnumConverter))]
 	public enum RuneSet
 	{
@@ -734,38 +735,40 @@ namespace RuneOptim.swar {
 		[EnumMember(Value = "")]
 		Null = 0, // No set
 
-		Energy, // Health
-		Guard, // Def
-		Swift, // Speed
-		Blade, // CRate
-		Rage, // CDmg
-		Focus, // Acc
-		Endure, // Res
-		Fatal, // Attack
+		Energy			= 1 << 0, // Health
+		Guard			= 1 << 1, // Def
+		Swift			= 1 << 2, // Speed
+		Blade			= 1 << 3, // CRate
+		Rage			= 1 << 4, // CDmg
+		Focus			= 1 << 5, // Acc
+		Endure			= 1 << 6, // Res
+		Fatal			= 1 << 7, // Attack
 
-		__unknown9,
+		__unknown9		= 1 << 8,
 
 		// Here be magic
-		Despair,
-		Vampire,
+		Despair			= 1 << 9,
+		Vampire			= 1 << 10,
 
-		__unknown12,
+		__unknown12		= 1 << 11,
 
-		Violent,
-		Nemesis,
-		Will,
-		Shield,
-		Revenge,
-		Destroy,
+		Violent			= 1 << 12,
+		Nemesis			= 1 << 13,
+		Will			= 1 << 14,
+		Shield			= 1 << 15,
+		Revenge			= 1 << 16,
+		Destroy			= 1 << 17,
 
 		// Ally sets
-		Fight,
-		Determination,
-		Enhance,
-		Accuracy,
-		Tolerance,
+		Fight			= 1 << 18,
+		Determination	= 1 << 19,
+		Enhance			= 1 << 20,
+		Accuracy		= 1 << 21,
+		Tolerance		= 1 << 22,
 
-		Broken
+		Broken			= 1 << 23,
+
+		Set4 = Swift | Rage | Fatal | Despair | Vampire | Violent,
 	}
 
 	[JsonConverter(typeof(StringEnumConverter))]
@@ -799,7 +802,7 @@ namespace RuneOptim.swar {
 	public class RuneAttr : ListProp<int?>
 	{
 		[ListProperty(0)]
-		public Attr Type = default;
+		public Attr Type = default(Attr);
 
 		[ListProperty(1)]
 		public int BaseValue = -1;
