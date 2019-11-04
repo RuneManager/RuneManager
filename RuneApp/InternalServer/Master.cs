@@ -41,8 +41,18 @@ namespace RuneApp.InternalServer {
 		/// Dispatches a thread to listen for the incoming Remote App connection
 		/// </summary>
 		public void Start() {
+			
 			try {
 				try {
+
+					//if (!NetAclChecker.HasFirewall("WebSocketMulti", true, true, true, 80))
+					//	NetAclChecker.AddFirewall("WebSocketMulti", true, true, true, 80);
+					//if (!NetAclChecker.HasFirewall("WebSocketMulti", true, true, true, 81))
+					//	NetAclChecker.AddFirewall("WebSocketMulti", true, true, true, 81);
+
+					NetAclChecker.AddAddress($"http://*:7676/");
+
+
 					listener = new HttpListener();
 					listener.Prefixes.Add("http://*:7676/");
 					listener.Start();

@@ -15,6 +15,8 @@ using System.Text;
 using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using RuneOptim.Management;
+using System.ComponentModel;
+using System.Collections.Concurrent;
 
 namespace RuneApp {
 
@@ -22,6 +24,8 @@ namespace RuneApp {
 	public partial class Main : Form {
 		// Here we keep all the WinForm callbacks, because of the way the Designer works
 		// TODO: empty the logic into functions, instead of inside the callbacks
+
+		BlockingCollection<EventArgs> blockCol = new BlockingCollection<EventArgs>();
 
 		private void Main_Load(object sender, EventArgs e) {
 
@@ -38,6 +42,7 @@ namespace RuneApp {
 			dataMonsterList.Items.Add("Loading...");
 
 			Task.Run(() => {
+				// TODO: this is slow during profiling
 #if !DEBUG
 				try {
 #endif
@@ -131,14 +136,25 @@ namespace RuneApp {
 
 				RebuildBuildList();
 				Program.builds.CollectionChanged += Builds_CollectionChanged;
-			
+
 			});
 			#endregion
 
-			buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
+			//buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
 			LineLog.Debug("Preparing teams");
 
+			this.FormClosing += (a, b) => {
+				blockCol.CompleteAdding();
+			};
+			backgroundWorker1.WorkerReportsProgress = true;
+			backgroundWorker1.DoWork += Main_DoWork;
+			backgroundWorker1.ProgressChanged += Main_ProgChanged;
+
+			//backgroundWorker1.RunWorkerAsync();
+			timer1.Tick += Timer1_Tick;
+			timer1.Interval = 5;
+			timer1.Start();
 
 			tsTeamAdd(teamToolStripMenuItem, "PvE");
 			tsTeamAdd(teamToolStripMenuItem, "Dungeon");
@@ -164,11 +180,67 @@ namespace RuneApp {
 			buildList.Sort();
 		}
 
+		private void Timer1_Tick(object sender, EventArgs e) {
+			/*if (lastProg != null) {
+				toolStripBuildStatus.Text = "Build Status: " + lastProg.Progress;
+				//lastProg = null;
+			}
+			if (lastPrint != null) {
+				ProgressToList(lastPrint.build, lastPrint.Message);
+				//lastPrint = null;
+			}*/
+
+			if (Program.CurrentBuild?.runner is IBuildRunner br) {
+				toolStripBuildStatus.Text = $"Build Status: {br.Good:N0} ~ {br.Completed:N0} - {br.Skipped:N0}";
+				ProgressToList(Program.CurrentBuild, ((double)br.Completed / (double)br.Expected).ToString("P2"));
+			}
+			else if (Program.CurrentBuild != null && Program.CurrentBuild.IsRunning) {
+				toolStripBuildStatus.Text = $"Build Status: {(Program.CurrentBuild.BuildUsage?.passed ?? 0):N0} ~ {Program.CurrentBuild.count:N0} - {Program.CurrentBuild.skipped:N0}";
+				ProgressToList(Program.CurrentBuild, ((double)Program.CurrentBuild.count / (double)Program.CurrentBuild.total).ToString("P2"));
+			}
+		}
+
+		ProgToEventArgs lastProg;
+		PrintToEventArgs lastPrint;
+
+		private void Main_ProgChanged(object a, ProgressChangedEventArgs b) {
+			if (b.UserState is ProgToEventArgs e2) {
+				toolStripBuildStatus.Text = "Build Status: " + e2.Progress;
+				ProgressToList(e2.build, e2.Percent.ToString("P2"));
+			}
+			else if (b.UserState is PrintToEventArgs e3) {
+				ProgressToList(e3.build, e3.Message);
+			}
+		}
+
+		private void Main_DoWork(object a, DoWorkEventArgs b) {
+			foreach (var w in blockCol.GetConsumingEnumerable()) {
+				backgroundWorker1.ReportProgress(1, w);
+			}
+		}
+
 		private void Program_BuildsProgressTo(object sender, ProgToEventArgs e) {
-			ProgressToList(e.build, e.Percent.ToString("P2"));
-			this.Invoke((MethodInvoker)delegate {
-				toolStripBuildStatus.Text = "Build Status: " + e.Progress;
+			//ProgressToList(e.build, e.Percent.ToString("P2"));
+			//backgroundWorker1.RunWorkerAsync(e);
+			//blockCol.Add(e);
+			if (lastProg == null || e.Progress >= lastProg.Progress)
+				lastProg = e;
+			//Application.DoEvents();
+			if (!this.IsDisposed)
+				this.Invoke((MethodInvoker)delegate {
+					toolStripBuildStatus.Text = "Build Status: " + e.Progress;
 			});
+		}
+
+		private void Program_BuildsPrintTo(object sender, PrintToEventArgs e) {
+			LineLog.Debug(e.Message, e.Line, e.Caller, e.File);
+			//if (!blockCol.IsAddingCompleted)
+			//	blockCol.Add(e);
+			if (lastPrint == null || e.build != lastPrint.build || e.Order >= lastPrint.Order)
+				lastPrint = e;
+			//Application.DoEvents();
+			//backgroundWorker1.RunWorkerAsync(e);
+			ProgressToList(e.build, e.Message);
 		}
 
 		private void Runes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
@@ -195,11 +267,6 @@ namespace RuneApp {
 			}
 		}
 
-		private void Program_BuildsPrintTo(object sender, PrintToEventArgs e) {
-			LineLog.Debug(e.Message, e.Line, e.Caller, e.File);
-			ProgressToList(e.build, e.Message);
-		}
-
 		private void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
 			switch (e.Action) {
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
@@ -212,6 +279,14 @@ namespace RuneApp {
 						checkLocked();
 						Invoke((MethodInvoker)delegate {
 							ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
+
+							var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bi => (bi.Tag as Build).ID == l.BuildID);
+							if (bli != null) {
+								var ahh = bli.SubItems[3].Text;
+								if (ahh == "" || ahh == "!") {
+									bli.SubItems[3].Text = "Loaded";
+								}
+							}
 
 							ListViewItemLoad(nli, l);
 							if (!loadoutList.Items.Contains(nli))
@@ -401,8 +476,10 @@ namespace RuneApp {
 		}
 
 		private void monstertab_list_select(object sender, EventArgs e) {
-			if (dataMonsterList?.FocusedItem?.Tag is Monster mon)
+			if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
 				ShowMon(mon);
+				lastFocused = null;
+			}
 		}
 
 		private void exitToolStripMenuItem_Click(object sender, EventArgs e) {
@@ -418,6 +495,14 @@ namespace RuneApp {
 			else {
 				runeEquipped.Hide();
 			}
+		}
+
+		private void runeDial1_LoadoutChanged(object sender, Loadout l) {
+			if (runeDial.RuneSelected == 0)
+				return;
+
+			var r = l.Runes[runeDial.RuneSelected - 1];
+			runeEquipped.SetRune(r);
 		}
 
 		private void lbCloseEquipped_Click(object sender, EventArgs e) {
@@ -449,7 +534,7 @@ namespace RuneApp {
 			((ListView)sender).Sort();
 		}
 
-		private void toolStripButton1_Click(object sender, EventArgs e) {
+		private void tsbIncreasePriority_Click(object sender, EventArgs e) {
 			if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
 				int maxPri = Program.data.Monsters.Max(x => x.priority);
 				if (mon.priority == 0) {
@@ -471,7 +556,7 @@ namespace RuneApp {
 			}
 		}
 
-		private void toolStripButton2_Click(object sender, EventArgs e) {
+		private void tsbDecreasePriority_Click(object sender, EventArgs e) {
 			if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
 				int maxPri = Program.data.Monsters.Max(x => x.priority);
 				if (mon.priority == 0) {
@@ -564,8 +649,8 @@ namespace RuneApp {
 
 					}
 				}
+				lastFocused = loadoutList.FocusedItem;
 			}
-			lastFocused = loadoutList.FocusedItem;
 
 			int cost = 0;
 			foreach (ListViewItem li in loadoutList.SelectedItems) {
@@ -730,7 +815,7 @@ namespace RuneApp {
 			Program.SaveBuilds();
 		}
 
-		private void toolStripButton15_Click(object sender, EventArgs e) {
+		private void tsbUnequipAll_Click(object sender, EventArgs e) {
 			if (Program.data == null)
 				return;
 
@@ -753,7 +838,7 @@ namespace RuneApp {
 				}
 		}
 
-		private void toolStripButton14_Click(object sender, EventArgs e) {
+		private void tsbReloadSave_Click(object sender, EventArgs e) {
 			if (File.Exists(Program.Settings.SaveLocation)) {
 				Program.LoadSave(Program.Settings.SaveLocation);
 				RebuildLists();
@@ -977,6 +1062,15 @@ namespace RuneApp {
 			bool doColor = buildList.SelectedItems.Count == 1;
 			var b1 = doColor ? buildList.SelectedItems[0].Tag as Build : null;
 
+			if (b1 != null) {
+				var llvi = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout)?.BuildID == b1.ID);
+				if (llvi != null) {
+					loadoutList.SelectedItems.Clear();
+					llvi.Selected = true;
+					llvi.Focused = true;
+				}
+			}
+
 			foreach (ListViewItem li in buildList.Items) {
 				li.BackColor = Color.White;
 				if (Program.Settings.ColorTeams && b1 != null && b1.Teams.Count > 0) {
@@ -1029,7 +1123,7 @@ namespace RuneApp {
 			checkLocked();
 		}
 
-		private void pictureBox1_DoubleClick(object sender, EventArgs e) {
+		private void runeDial1_DoubleClick(object sender, EventArgs e) {
 			if (runeDisplay == null || runeDisplay.IsDisposed)
 				runeDisplay = new RuneDisplay();
 			if (!runeDisplay.Visible) {
@@ -1042,6 +1136,10 @@ namespace RuneApp {
 			}
 			if (displayMon != null)
 				runeDisplay.UpdateLoad(displayMon.Current);
+			if (loadoutList.SelectedItems.Count == 1) {
+				var ll = loadoutList.SelectedItems[0].Tag as Loadout;
+				runeDisplay.UpdateLoad(ll);
+			}
 		}
 
 		private void findGoodRunes_CheckedChanged(object sender, EventArgs e) {

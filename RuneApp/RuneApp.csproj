@@ -106,6 +106,8 @@
     <Compile Include="BuildWizard.Designer.cs">
       <DependentUpon>BuildWizard.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ControlHolder.cs" />
+    <Compile Include="Controls\ControlMap.cs" />
     <Compile Include="Controls\RichTextBoxEx.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -114,6 +116,10 @@
     </Compile>
     <Compile Include="Create.Designer.cs">
       <DependentUpon>Create.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Create.Functions.cs">
+      <DependentUpon>Create.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Generate.cs">
       <SubType>Form</SubType>
@@ -144,6 +150,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>InternalServer.resx</DependentUpon>
     </Compile>
+    <Compile Include="InternalServer\NetAclChecker.cs" />
     <Compile Include="InternalServer\PageRenderers\ApiRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\CssRenderer.cs" />
     <Compile Include="InternalServer\PageRenderers\LoadsRenderer.cs" />
@@ -168,6 +175,9 @@
     </Compile>
     <Compile Include="Irene.Designer.cs">
       <DependentUpon>Irene.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LeaderType.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="LineLogger.cs" />
     <Compile Include="LoadSaveDialogue.cs">

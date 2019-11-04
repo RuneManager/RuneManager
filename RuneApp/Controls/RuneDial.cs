@@ -33,7 +33,7 @@ namespace RuneApp {
 
 		public Loadout Loadout {
 			get { return load; }
-			set { load = value; refreshControls(); }
+			set { load = value; refreshControls(); LoadChanged?.Invoke(this, value); }
 		}
 		RuneControl[] runes;
 
@@ -43,6 +43,11 @@ namespace RuneApp {
 		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
 		public event EventHandler DialDoubleClick;
 
+		[Browsable(true), EditorBrowsable(EditorBrowsableState.Always)]
+		public event EventHandler<Loadout> LoadChanged;
+
+		public int RuneSelected = 0;
+
 		public RuneDial() {
 			InitializeComponent();
 			runes = new RuneControl[] { runeControl1, runeControl2, runeControl3, runeControl4, runeControl5, runeControl6 };
@@ -50,6 +55,7 @@ namespace RuneApp {
 		}
 
 		public void ResetRuneClicked() {
+			RuneSelected = 0;
 			foreach (RuneControl t in runes) {
 				t.Gamma = 1;
 				t.Refresh();
@@ -64,6 +70,7 @@ namespace RuneApp {
 			tc.Refresh();
 
 			var ind = runes.ToList().IndexOf(tc) + 1;
+			RuneSelected = ind;
 			if (alwaysShowBases || (ind > 0 && tc.Tag != null)) {
 				RuneClick?.Invoke(sender, new RuneClickEventArgs(ind, (Rune)tc.Tag));
 			}

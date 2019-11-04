@@ -152,17 +152,12 @@ namespace RuneApp {
 				attr.SetGamma(gamma);
 
 				int squarish = Math.Max(_imageSlot.Width, _imageSlot.Height);
-				//squarish = (int)(squarish * 1.25);
 
 				if (renderBack)
 					e.Graphics.DrawImage(_imageBack,
 						new Rectangle((Width / 2) - (squarish / 2), (Height / 2) - (squarish / 2), squarish, squarish),
 						new Rectangle(0, 0, _imageBack.Width, _imageBack.Height), GraphicsUnit.Pixel);
-				//e.Graphics.DrawImage(_imageBack, (Width / 2) - (_imageBack.Width / 2), (Height / 2) - (_imageBack.Height / 2));
 
-				//e.Graphics.DrawImage(_image, (Width / 2) - (_image.Width / 2), (Height / 2) - (_image.Height / 2));
-
-				//Point[] dest = new Point[]{ new Point(top, left), new Point(top, right), new Point(bottom, right)};
 				e.Graphics.DrawImage(_imageSlot,
 					new Rectangle((Width / 2) - (_imageSlot.Width / 2), (Height / 2) - (_imageSlot.Height / 2), _imageSlot.Width, _imageSlot.Height),
 					0, 0, _imageSlot.Width, _imageSlot.Height,
@@ -172,7 +167,6 @@ namespace RuneApp {
 
 				if (coolness != 0) {
 					// https://www.w3schools.com/colors/colors_converter.asp
-					// var qq = document.getElementById("rgb01").innerHTML; qq = qq.substring(4, qq.length-1).split(","); for (var i in qq) { console.log(qq[i].trim()/255-0.8);}
 
 					float[] colour = new float[] { 0.13f, 0.76f, 0.32f, 0, 1 };
 
@@ -182,7 +176,6 @@ namespace RuneApp {
 						colour = new float[] { 0.93f, 0.55f, 0.99f, 0, 1 };
 					else if (coolness == 4)
 						colour = new float[] { 0.98f, 0.68f, 0.48f, 0, 1 };
-
 					float[][] ptsArray =
 					{
 						new float[] { colour[0], 0, 0, 0, 0},
@@ -229,7 +222,7 @@ namespace RuneApp {
 			refresher.Stop();
 		}
 
-		readonly Bitmap[] runeSlotImages =
+		static readonly Bitmap[] runeSlotImages =
 		{
 			null,
 			Resources.Runes.rune1,
@@ -242,7 +235,7 @@ namespace RuneApp {
 			Resources.Runes.grindstone_common,
 		};
 
-		readonly Bitmap[] runeRarityImages =
+		static readonly Bitmap[] runeRarityImages =
 		{
 			Resources.Runes.bg_normal,
 			Resources.Runes.bg_magic,
@@ -251,7 +244,7 @@ namespace RuneApp {
 			Resources.Runes.bg_legend,
 		};
 
-		readonly System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap> runeSetImages = new System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap>()
+		static readonly System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap> runeSetImages = new System.Collections.Generic.Dictionary<RuneOptim.swar.RuneSet, Bitmap>()
 		{
 			{ RuneOptim.swar.RuneSet.Null, null },
 			{ RuneOptim.swar.RuneSet.Blade, Resources.Runes.blade },

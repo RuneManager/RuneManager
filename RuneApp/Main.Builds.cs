@@ -42,7 +42,10 @@ namespace RuneApp {
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.Mon?.FullName ?? b.MonName);
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.Priority.ToString());
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, b.ID.ToString());
-			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "");
+			var bs = "";
+			if (b.BuildStrategy == null || b.BuildStrategy.Contains("Bad"))
+				bs = "!";
+			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, bs);
 			lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, (b.Mon?.Id ?? b.MonId).ToString());
 			if (b.Type == BuildType.Lock) {
 				lvi.SubItems[i++] = new ListViewItem.ListViewSubItem(lvi, "Locked");
@@ -57,21 +60,26 @@ namespace RuneApp {
 
 			lvi.Tag = b;
 
+			
+
 			if (b.RunePrediction.Any(p => p.Value.Value))
 				lvi.ForeColor = Color.Purple;
 		}
+
+		ListViewItem lastLvi;
 
 		public void ProgressToList(Build b, string str) {
 			if (isClosing) return;
 			//Program.log.Info("_" + str);
 			this.Invoke((MethodInvoker)delegate {
 				if (!IsDisposed) {
-					var lvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
-					if (lvi == null)
+					if (lastLvi == null || (lastLvi.Tag as Build)?.ID != b.ID)
+						lastLvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
+					if (lastLvi == null)
 						return;
-					while (lvi.SubItems.Count < 4)
-						lvi.SubItems.Add("");
-					lvi.SubItems[3].Text = str;
+					while (lastLvi.SubItems.Count < 4)
+						lastLvi.SubItems.Add("");
+					lastLvi.SubItems[3].Text = str;
 				}
 			});
 		}

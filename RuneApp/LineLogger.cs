@@ -22,7 +22,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Info(Bake(str, lineNumber, caller, filepath));
+			logger?.Info(Bake(str, lineNumber, caller, filepath));
 		}
 
 		[DebuggerStepThrough]
@@ -30,7 +30,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Debug(Bake(str, lineNumber, caller, filepath));
+			logger?.Debug(Bake(str, lineNumber, caller, filepath));
 		}
 
 		[DebuggerStepThrough]
@@ -38,7 +38,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Error(Bake(str, lineNumber, caller, filepath));
+			logger?.Error(Bake(str, lineNumber, caller, filepath));
 		}
 
 		[DebuggerStepThrough]
@@ -46,7 +46,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Error(Bake(str, lineNumber, caller, filepath), e);
+			logger?.Error(Bake(str, lineNumber, caller, filepath), e);
 		}
 
 		[DebuggerStepThrough]
@@ -54,7 +54,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Fatal(Bake(str, lineNumber, caller, filepath));
+			logger?.Fatal(Bake(str, lineNumber, caller, filepath));
 		}
 
 		[DebuggerStepThrough]
@@ -62,7 +62,7 @@ namespace RuneApp {
 			[CallerLineNumber] int lineNumber = 0,
 			[CallerMemberName] string caller = null,
 			[CallerFilePath] string filepath = null) {
-			logger.Fatal(Bake(str, lineNumber, caller, filepath), e);
+			logger?.Fatal(Bake(str, lineNumber, caller, filepath), e);
 		}
 
 	}

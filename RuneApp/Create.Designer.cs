@@ -28,17 +28,19 @@
         /// </summary>
         private void InitializeComponent()
         {
-			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup3 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup4 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup5 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup6 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup7 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup8 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
-			System.Windows.Forms.ListViewGroup listViewGroup9 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup46 = new System.Windows.Forms.ListViewGroup("Required", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup47 = new System.Windows.Forms.ListViewGroup("Included", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup48 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup49 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup50 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup51 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup52 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup53 = new System.Windows.Forms.ListViewGroup("Include", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup54 = new System.Windows.Forms.ListViewGroup("Excluded", System.Windows.Forms.HorizontalAlignment.Left);
 			this.monLabel = new System.Windows.Forms.Label();
 			this.groupBox1 = new System.Windows.Forms.GroupBox();
+			this.btnCancel = new System.Windows.Forms.Button();
+			this.cbBuildStrat = new System.Windows.Forms.ComboBox();
 			this.tcSPD = new RuneApp.TransparentControl();
 			this.tcDEF = new RuneApp.TransparentControl();
 			this.tcATK = new RuneApp.TransparentControl();
@@ -68,7 +70,7 @@
 			this.btnPerms = new System.Windows.Forms.Button();
 			this.testBuildButton = new System.Windows.Forms.Button();
 			this.label14 = new System.Windows.Forms.Label();
-			this.button2 = new System.Windows.Forms.Button();
+			this.btnSave = new System.Windows.Forms.Button();
 			this.label16 = new System.Windows.Forms.Label();
 			this.label18 = new System.Windows.Forms.Label();
 			this.label17 = new System.Windows.Forms.Label();
@@ -130,6 +132,8 @@
 			this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+			this.groupBox1.Controls.Add(this.btnCancel);
+			this.groupBox1.Controls.Add(this.cbBuildStrat);
 			this.groupBox1.Controls.Add(this.tcSPD);
 			this.groupBox1.Controls.Add(this.tcDEF);
 			this.groupBox1.Controls.Add(this.tcATK);
@@ -159,7 +163,7 @@
 			this.groupBox1.Controls.Add(this.btnPerms);
 			this.groupBox1.Controls.Add(this.testBuildButton);
 			this.groupBox1.Controls.Add(this.label14);
-			this.groupBox1.Controls.Add(this.button2);
+			this.groupBox1.Controls.Add(this.btnSave);
 			this.groupBox1.Controls.Add(this.label16);
 			this.groupBox1.Controls.Add(this.label18);
 			this.groupBox1.Controls.Add(this.label17);
@@ -180,14 +184,38 @@
 			this.groupBox1.TabStop = false;
 			this.groupBox1.Text = "Stats";
 			// 
+			// btnCancel
+			// 
+			this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+			this.btnCancel.Location = new System.Drawing.Point(440, 666);
+			this.btnCancel.Name = "btnCancel";
+			this.btnCancel.Size = new System.Drawing.Size(40, 23);
+			this.btnCancel.TabIndex = 99;
+			this.btnCancel.Text = "NVM";
+			this.btnCancel.UseVisualStyleBackColor = true;
+			this.btnCancel.Click += new System.EventHandler(this.BtnCancel_Click);
+			// 
+			// cbBuildStrat
+			// 
+			this.cbBuildStrat.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.cbBuildStrat.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawFixed;
+			this.cbBuildStrat.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+			this.cbBuildStrat.FormattingEnabled = true;
+			this.cbBuildStrat.Location = new System.Drawing.Point(262, 697);
+			this.cbBuildStrat.Name = "cbBuildStrat";
+			this.cbBuildStrat.Size = new System.Drawing.Size(121, 21);
+			this.cbBuildStrat.TabIndex = 98;
+			this.cbBuildStrat.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.CbBuildStrat_DrawItem);
+			this.cbBuildStrat.SelectedIndexChanged += new System.EventHandler(this.CbBuildStrat_SelectedIndexChanged);
+			// 
 			// tcSPD
 			// 
 			this.tcSPD.BackColor = System.Drawing.Color.Transparent;
 			this.tcSPD.Gamma = 1F;
 			this.tcSPD.Image = global::RuneApp.Resources.Icon.icon_duration_speed_up;
+			this.tcSPD.ImageScale = 0.5F;
 			this.tcSPD.Location = new System.Drawing.Point(401, 639);
 			this.tcSPD.Name = "tcSPD";
-			this.tcSPD.ImageScale = 0.5F;
 			this.tcSPD.Size = new System.Drawing.Size(32, 32);
 			this.tcSPD.TabIndex = 97;
 			this.tcSPD.Text = "transparentControl1";
@@ -198,9 +226,9 @@
 			this.tcDEF.BackColor = System.Drawing.Color.Transparent;
 			this.tcDEF.Gamma = 1F;
 			this.tcDEF.Image = global::RuneApp.Resources.Icon.icon_duration_defence_up;
+			this.tcDEF.ImageScale = 0.5F;
 			this.tcDEF.Location = new System.Drawing.Point(363, 639);
 			this.tcDEF.Name = "tcDEF";
-			this.tcDEF.ImageScale = 0.5F;
 			this.tcDEF.Size = new System.Drawing.Size(32, 32);
 			this.tcDEF.TabIndex = 97;
 			this.tcDEF.Text = "transparentControl1";
@@ -211,9 +239,9 @@
 			this.tcATK.BackColor = System.Drawing.Color.Transparent;
 			this.tcATK.Gamma = 1F;
 			this.tcATK.Image = global::RuneApp.Resources.Icon.icon_duration_attack_up;
+			this.tcATK.ImageScale = 0.5F;
 			this.tcATK.Location = new System.Drawing.Point(325, 639);
 			this.tcATK.Name = "tcATK";
-			this.tcATK.ImageScale = 0.5F;
 			this.tcATK.Size = new System.Drawing.Size(32, 32);
 			this.tcATK.TabIndex = 97;
 			this.tcATK.Text = "transparentControl1";
@@ -525,16 +553,16 @@
 			this.label14.TabIndex = 75;
 			this.label14.Text = "Worth";
 			// 
-			// button2
+			// btnSave
 			// 
-			this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.button2.Location = new System.Drawing.Point(405, 695);
-			this.button2.Name = "button2";
-			this.button2.Size = new System.Drawing.Size(75, 23);
-			this.button2.TabIndex = 20;
-			this.button2.Text = "Save";
-			this.button2.UseVisualStyleBackColor = true;
-			this.button2.Click += new System.EventHandler(this.button2_Click);
+			this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.btnSave.Location = new System.Drawing.Point(405, 695);
+			this.btnSave.Name = "btnSave";
+			this.btnSave.Size = new System.Drawing.Size(75, 23);
+			this.btnSave.TabIndex = 20;
+			this.btnSave.Text = "Save";
+			this.btnSave.UseVisualStyleBackColor = true;
+			this.btnSave.Click += new System.EventHandler(this.button2_Click);
 			// 
 			// label16
 			// 
@@ -659,16 +687,17 @@
 			this.setList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
 			this.setList.FullRowSelect = true;
-			listViewGroup1.Header = "Required";
-			listViewGroup1.Name = "listViewGroup3";
-			listViewGroup2.Header = "Included";
-			listViewGroup2.Name = "listViewGroup1";
-			listViewGroup3.Header = "Excluded";
-			listViewGroup3.Name = "listViewGroup2";
+			listViewGroup46.Header = "Required";
+			listViewGroup46.Name = "listViewGroup3";
+			listViewGroup47.Header = "Included";
+			listViewGroup47.Name = "listViewGroup1";
+			listViewGroup48.Header = "Excluded";
+			listViewGroup48.Name = "listViewGroup2";
 			this.setList.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup1,
-            listViewGroup2,
-            listViewGroup3});
+            listViewGroup46,
+            listViewGroup47,
+            listViewGroup48});
+			this.setList.HideSelection = false;
 			this.setList.Location = new System.Drawing.Point(6, 44);
 			this.setList.Name = "setList";
 			this.setList.Size = new System.Drawing.Size(111, 644);
@@ -804,13 +833,14 @@
 			// 
 			this.priStat2.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-			listViewGroup4.Header = "Include";
-			listViewGroup4.Name = "listViewGroup1";
-			listViewGroup5.Header = "Excluded";
-			listViewGroup5.Name = "listViewGroup2";
+			listViewGroup49.Header = "Include";
+			listViewGroup49.Name = "listViewGroup1";
+			listViewGroup50.Header = "Excluded";
+			listViewGroup50.Name = "listViewGroup2";
 			this.priStat2.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup4,
-            listViewGroup5});
+            listViewGroup49,
+            listViewGroup50});
+			this.priStat2.HideSelection = false;
 			this.priStat2.Location = new System.Drawing.Point(3, 241);
 			this.priStat2.Name = "priStat2";
 			this.priStat2.Size = new System.Drawing.Size(123, 256);
@@ -840,13 +870,14 @@
 			// 
 			this.priStat4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader3});
-			listViewGroup6.Header = "Include";
-			listViewGroup6.Name = "listViewGroup1";
-			listViewGroup7.Header = "Excluded";
-			listViewGroup7.Name = "listViewGroup2";
+			listViewGroup51.Header = "Include";
+			listViewGroup51.Name = "listViewGroup1";
+			listViewGroup52.Header = "Excluded";
+			listViewGroup52.Name = "listViewGroup2";
 			this.priStat4.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup6,
-            listViewGroup7});
+            listViewGroup51,
+            listViewGroup52});
+			this.priStat4.HideSelection = false;
 			this.priStat4.Location = new System.Drawing.Point(3, 241);
 			this.priStat4.Name = "priStat4";
 			this.priStat4.Size = new System.Drawing.Size(123, 256);
@@ -876,13 +907,14 @@
 			// 
 			this.priStat6.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader4});
-			listViewGroup8.Header = "Include";
-			listViewGroup8.Name = "listViewGroup1";
-			listViewGroup9.Header = "Excluded";
-			listViewGroup9.Name = "listViewGroup2";
+			listViewGroup53.Header = "Include";
+			listViewGroup53.Name = "listViewGroup1";
+			listViewGroup54.Header = "Excluded";
+			listViewGroup54.Name = "listViewGroup2";
 			this.priStat6.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
-            listViewGroup8,
-            listViewGroup9});
+            listViewGroup53,
+            listViewGroup54});
+			this.priStat6.HideSelection = false;
 			this.priStat6.Location = new System.Drawing.Point(3, 241);
 			this.priStat6.Name = "priStat6";
 			this.priStat6.Size = new System.Drawing.Size(123, 256);
@@ -948,8 +980,10 @@
 			// 
 			// Create
 			// 
+			this.AcceptButton = this.btnSave;
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+			this.CancelButton = this.btnCancel;
 			this.ClientSize = new System.Drawing.Size(1060, 730);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
@@ -1011,7 +1045,7 @@
         private System.Windows.Forms.TabPage tab5;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Button testBuildButton;
         private System.Windows.Forms.ColumnHeader columnHeader2;
@@ -1049,5 +1083,7 @@
 		private TransparentControl tcATK;
 		private TransparentControl tcSPD;
 		private TransparentControl tcDEF;
+		private System.Windows.Forms.ComboBox cbBuildStrat;
+		private System.Windows.Forms.Button btnCancel;
 	}
 }

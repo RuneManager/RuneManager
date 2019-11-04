@@ -107,16 +107,16 @@
 			this.runeDial = new RuneApp.RuneDial();
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.tabMonsters = new System.Windows.Forms.TabPage();
-			this.toolStrip2 = new System.Windows.Forms.ToolStrip();
-			this.toolStripButton1 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton2 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton7 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton14 = new System.Windows.Forms.ToolStripButton();
-			this.toolStripButton15 = new System.Windows.Forms.ToolStripButton();
+			this.tsMonTab = new System.Windows.Forms.ToolStrip();
+			this.tsbIncreasePriority = new System.Windows.Forms.ToolStripButton();
+			this.tsbDecreasePriority = new System.Windows.Forms.ToolStripButton();
+			this.tsbCreateBuild = new System.Windows.Forms.ToolStripButton();
+			this.tsbReloadSave = new System.Windows.Forms.ToolStripButton();
+			this.tsbUnequipAll = new System.Windows.Forms.ToolStripButton();
 			this.unequipMonsterButton = new System.Windows.Forms.ToolStripButton();
 			this.tsBtnLockMon = new System.Windows.Forms.ToolStripButton();
 			this.tabRunes = new System.Windows.Forms.TabPage();
-			this.toolStrip3 = new System.Windows.Forms.ToolStrip();
+			this.tsRuneTab = new System.Windows.Forms.ToolStrip();
 			this.RuneTab_UnfilterButton = new System.Windows.Forms.ToolStripButton();
 			this.RuneTab_LockButton = new System.Windows.Forms.ToolStripButton();
 			this.RuneTab_SaveButton = new System.Windows.Forms.ToolStripButton();
@@ -136,11 +136,11 @@
 			this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
 			this.tabCrafts = new System.Windows.Forms.TabPage();
 			this.dataCraftList = new System.Windows.Forms.ListView();
-			this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.chCraftId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.chCraftSet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.chCraftAttr = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.chCraftGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.chCraftType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
 			this.toolStrip7 = new System.Windows.Forms.ToolStrip();
 			this.loadoutList = new System.Windows.Forms.ListView();
 			this.buildNameCol = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -166,6 +166,7 @@
 			this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
 			this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.in30SecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.in8HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.in16HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -201,16 +202,17 @@
 			this.cbFillRunes = new System.Windows.Forms.CheckBox();
 			this.runeInventory = new RuneApp.RuneBox();
 			this.runeEquipped = new RuneApp.RuneBox();
-			this.in30SecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
+			this.timer1 = new System.Windows.Forms.Timer(this.components);
 			this.statusStrip1.SuspendLayout();
 			this.menuStrip1.SuspendLayout();
 			this.groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.monImage)).BeginInit();
 			this.tabControl1.SuspendLayout();
 			this.tabMonsters.SuspendLayout();
-			this.toolStrip2.SuspendLayout();
+			this.tsMonTab.SuspendLayout();
 			this.tabRunes.SuspendLayout();
-			this.toolStrip3.SuspendLayout();
+			this.tsRuneTab.SuspendLayout();
 			this.tabBuilds.SuspendLayout();
 			this.toolStrip5.SuspendLayout();
 			this.tabCrafts.SuspendLayout();
@@ -971,8 +973,9 @@
 			this.runeDial.Size = new System.Drawing.Size(225, 188);
 			this.runeDial.TabIndex = 51;
 			this.runeDial.RuneClick += new System.EventHandler<RuneApp.RuneClickEventArgs>(this.runeDial_RuneClick);
-			this.runeDial.DialDoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
-			this.runeDial.DoubleClick += new System.EventHandler(this.pictureBox1_DoubleClick);
+			this.runeDial.DialDoubleClick += new System.EventHandler(this.runeDial1_DoubleClick);
+			this.runeDial.LoadChanged += new System.EventHandler<RuneOptim.Management.Loadout>(this.runeDial1_LoadoutChanged);
+			this.runeDial.DoubleClick += new System.EventHandler(this.runeDial1_DoubleClick);
 			// 
 			// tabControl1
 			// 
@@ -992,7 +995,7 @@
 			// 
 			// tabMonsters
 			// 
-			this.tabMonsters.Controls.Add(this.toolStrip2);
+			this.tabMonsters.Controls.Add(this.tsMonTab);
 			this.tabMonsters.Controls.Add(this.dataMonsterList);
 			this.tabMonsters.Location = new System.Drawing.Point(4, 22);
 			this.tabMonsters.Margin = new System.Windows.Forms.Padding(2);
@@ -1003,71 +1006,71 @@
 			this.tabMonsters.Text = "Monsters";
 			this.tabMonsters.UseVisualStyleBackColor = true;
 			// 
-			// toolStrip2
+			// tsMonTab
 			// 
-			this.toolStrip2.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripButton1,
-            this.toolStripButton2,
-            this.toolStripButton7,
-            this.toolStripButton14,
-            this.toolStripButton15,
+			this.tsMonTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsbIncreasePriority,
+            this.tsbDecreasePriority,
+            this.tsbCreateBuild,
+            this.tsbReloadSave,
+            this.tsbUnequipAll,
             this.unequipMonsterButton,
             this.tsBtnLockMon});
-			this.toolStrip2.Location = new System.Drawing.Point(2, 2);
-			this.toolStrip2.Name = "toolStrip2";
-			this.toolStrip2.Size = new System.Drawing.Size(240, 25);
-			this.toolStrip2.TabIndex = 1;
-			this.toolStrip2.Text = "toolStrip2";
+			this.tsMonTab.Location = new System.Drawing.Point(2, 2);
+			this.tsMonTab.Name = "tsMonTab";
+			this.tsMonTab.Size = new System.Drawing.Size(240, 25);
+			this.tsMonTab.TabIndex = 1;
+			this.tsMonTab.Text = "tsMonTab";
 			// 
-			// toolStripButton1
+			// tsbIncreasePriority
 			// 
-			this.toolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton1.Image = global::RuneApp.App.up;
-			this.toolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton1.Name = "toolStripButton1";
-			this.toolStripButton1.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton1.Text = "Increase Priority";
-			this.toolStripButton1.Click += new System.EventHandler(this.toolStripButton1_Click);
+			this.tsbIncreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsbIncreasePriority.Image = global::RuneApp.App.up;
+			this.tsbIncreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbIncreasePriority.Name = "tsbIncreasePriority";
+			this.tsbIncreasePriority.Size = new System.Drawing.Size(23, 22);
+			this.tsbIncreasePriority.Text = "Increase Priority";
+			this.tsbIncreasePriority.Click += new System.EventHandler(this.tsbIncreasePriority_Click);
 			// 
-			// toolStripButton2
+			// tsbDecreasePriority
 			// 
-			this.toolStripButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton2.Image = global::RuneApp.App.down;
-			this.toolStripButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton2.Name = "toolStripButton2";
-			this.toolStripButton2.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton2.Text = "Decrease Priority";
-			this.toolStripButton2.Click += new System.EventHandler(this.toolStripButton2_Click);
+			this.tsbDecreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsbDecreasePriority.Image = global::RuneApp.App.down;
+			this.tsbDecreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbDecreasePriority.Name = "tsbDecreasePriority";
+			this.tsbDecreasePriority.Size = new System.Drawing.Size(23, 22);
+			this.tsbDecreasePriority.Text = "Decrease Priority";
+			this.tsbDecreasePriority.Click += new System.EventHandler(this.tsbDecreasePriority_Click);
 			// 
-			// toolStripButton7
+			// tsbCreateBuild
 			// 
-			this.toolStripButton7.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton7.Image = global::RuneApp.App.add;
-			this.toolStripButton7.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton7.Name = "toolStripButton7";
-			this.toolStripButton7.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton7.Text = "Create Build";
-			this.toolStripButton7.Click += new System.EventHandler(this.toolStripButton7_Click);
+			this.tsbCreateBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsbCreateBuild.Image = global::RuneApp.App.add;
+			this.tsbCreateBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbCreateBuild.Name = "tsbCreateBuild";
+			this.tsbCreateBuild.Size = new System.Drawing.Size(23, 22);
+			this.tsbCreateBuild.Text = "Create Build";
+			this.tsbCreateBuild.Click += new System.EventHandler(this.toolStripButton7_Click);
 			// 
-			// toolStripButton14
+			// tsbReloadSave
 			// 
-			this.toolStripButton14.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton14.Image = global::RuneApp.App.refresh;
-			this.toolStripButton14.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton14.Name = "toolStripButton14";
-			this.toolStripButton14.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton14.Text = "Reload Save";
-			this.toolStripButton14.Click += new System.EventHandler(this.toolStripButton14_Click);
+			this.tsbReloadSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsbReloadSave.Image = global::RuneApp.App.refresh;
+			this.tsbReloadSave.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbReloadSave.Name = "tsbReloadSave";
+			this.tsbReloadSave.Size = new System.Drawing.Size(23, 22);
+			this.tsbReloadSave.Text = "Reload Save";
+			this.tsbReloadSave.Click += new System.EventHandler(this.tsbReloadSave_Click);
 			// 
-			// toolStripButton15
+			// tsbUnequipAll
 			// 
-			this.toolStripButton15.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-			this.toolStripButton15.Image = global::RuneApp.App.broken;
-			this.toolStripButton15.ImageTransparentColor = System.Drawing.Color.Magenta;
-			this.toolStripButton15.Name = "toolStripButton15";
-			this.toolStripButton15.Size = new System.Drawing.Size(23, 22);
-			this.toolStripButton15.Text = "Unequip All";
-			this.toolStripButton15.Click += new System.EventHandler(this.toolStripButton15_Click);
+			this.tsbUnequipAll.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+			this.tsbUnequipAll.Image = global::RuneApp.App.broken;
+			this.tsbUnequipAll.ImageTransparentColor = System.Drawing.Color.Magenta;
+			this.tsbUnequipAll.Name = "tsbUnequipAll";
+			this.tsbUnequipAll.Size = new System.Drawing.Size(23, 22);
+			this.tsbUnequipAll.Text = "Unequip All";
+			this.tsbUnequipAll.Click += new System.EventHandler(this.tsbUnequipAll_Click);
 			// 
 			// unequipMonsterButton
 			// 
@@ -1092,7 +1095,7 @@
 			// 
 			// tabRunes
 			// 
-			this.tabRunes.Controls.Add(this.toolStrip3);
+			this.tabRunes.Controls.Add(this.tsRuneTab);
 			this.tabRunes.Controls.Add(this.dataRuneList);
 			this.tabRunes.Location = new System.Drawing.Point(4, 22);
 			this.tabRunes.Margin = new System.Windows.Forms.Padding(2);
@@ -1103,17 +1106,17 @@
 			this.tabRunes.Text = "Runes";
 			this.tabRunes.UseVisualStyleBackColor = true;
 			// 
-			// toolStrip3
+			// tsRuneTab
 			// 
-			this.toolStrip3.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+			this.tsRuneTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.RuneTab_UnfilterButton,
             this.RuneTab_LockButton,
             this.RuneTab_SaveButton});
-			this.toolStrip3.Location = new System.Drawing.Point(2, 2);
-			this.toolStrip3.Name = "toolStrip3";
-			this.toolStrip3.Size = new System.Drawing.Size(240, 25);
-			this.toolStrip3.TabIndex = 2;
-			this.toolStrip3.Text = "toolStrip3";
+			this.tsRuneTab.Location = new System.Drawing.Point(2, 2);
+			this.tsRuneTab.Name = "tsRuneTab";
+			this.tsRuneTab.Size = new System.Drawing.Size(240, 25);
+			this.tsRuneTab.TabIndex = 2;
+			this.tsRuneTab.Text = "tsRuneTab";
 			// 
 			// RuneTab_UnfilterButton
 			// 
@@ -1291,11 +1294,11 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
 			this.dataCraftList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader5,
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4});
+            this.chCraftId,
+            this.chCraftSet,
+            this.chCraftAttr,
+            this.chCraftGrade,
+            this.chCraftType});
 			this.dataCraftList.FullRowSelect = true;
 			this.dataCraftList.HideSelection = false;
 			this.dataCraftList.Location = new System.Drawing.Point(2, 27);
@@ -1310,27 +1313,27 @@
 			this.dataCraftList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
 			this.dataCraftList.SelectedIndexChanged += new System.EventHandler(this.crafttab_list_select);
 			// 
-			// columnHeader5
+			// chCraftId
 			// 
-			this.columnHeader5.Text = "Id";
-			this.columnHeader5.Width = 0;
+			this.chCraftId.Text = "Id";
+			this.chCraftId.Width = 0;
 			// 
-			// columnHeader1
+			// chCraftSet
 			// 
-			this.columnHeader1.Text = "Set";
-			this.columnHeader1.Width = 55;
+			this.chCraftSet.Text = "Set";
+			this.chCraftSet.Width = 55;
 			// 
-			// columnHeader2
+			// chCraftAttr
 			// 
-			this.columnHeader2.Text = "Attribute";
+			this.chCraftAttr.Text = "Attribute";
 			// 
-			// columnHeader3
+			// chCraftGrade
 			// 
-			this.columnHeader3.Text = "Grade";
+			this.chCraftGrade.Text = "Grade";
 			// 
-			// columnHeader4
+			// chCraftType
 			// 
-			this.columnHeader4.Text = "Type";
+			this.chCraftType.Text = "Type";
 			// 
 			// toolStrip7
 			// 
@@ -1578,7 +1581,7 @@
 			// 
 			this.allToolStripMenuItem.Image = global::RuneApp.App.go;
 			this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-			this.allToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.allToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.allToolStripMenuItem.Text = "All";
 			this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
 			// 
@@ -1590,21 +1593,28 @@
             this.in16HoursToolStripMenuItem});
 			this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
 			this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.resumeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.resumeToolStripMenuItem.Text = "Resume";
 			this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
+			// 
+			// in30SecondsToolStripMenuItem
+			// 
+			this.in30SecondsToolStripMenuItem.Name = "in30SecondsToolStripMenuItem";
+			this.in30SecondsToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
+			this.in30SecondsToolStripMenuItem.Text = "In 30 seconds...";
+			this.in30SecondsToolStripMenuItem.Click += new System.EventHandler(this.In30SecondsToolStripMenuItem_Click);
 			// 
 			// in8HoursToolStripMenuItem
 			// 
 			this.in8HoursToolStripMenuItem.Name = "in8HoursToolStripMenuItem";
-			this.in8HoursToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.in8HoursToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
 			this.in8HoursToolStripMenuItem.Text = "In 8 hours...";
 			this.in8HoursToolStripMenuItem.Click += new System.EventHandler(this.In8HoursToolStripMenuItem_Click);
 			// 
 			// in16HoursToolStripMenuItem
 			// 
 			this.in16HoursToolStripMenuItem.Name = "in16HoursToolStripMenuItem";
-			this.in16HoursToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.in16HoursToolStripMenuItem.Size = new System.Drawing.Size(154, 22);
 			this.in16HoursToolStripMenuItem.Text = "In 16 hours...";
 			this.in16HoursToolStripMenuItem.Click += new System.EventHandler(this.In16HoursToolStripMenuItem_Click);
 			// 
@@ -1612,7 +1622,7 @@
 			// 
 			this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
 			this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-			this.runToToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+			this.runToToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
 			this.runToToolStripMenuItem.Text = "Run to";
 			this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
 			// 
@@ -1698,6 +1708,7 @@
 			this.buildList.UseCompatibleStateImageBehavior = false;
 			this.buildList.View = System.Windows.Forms.View.Details;
 			this.buildList.ColumnWidthChanging += new System.Windows.Forms.ColumnWidthChangingEventHandler(this.buildList_ColumnWidthChanging);
+			this.buildList.SelectedIndexChanged += new System.EventHandler(this.buildList_SelectedIndexChanged);
 			this.buildList.DoubleClick += new System.EventHandler(this.buildList_DoubleClick);
 			this.buildList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.buildList_MouseClick);
 			// 
@@ -1858,12 +1869,12 @@
 			this.menu_buildlist.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.teamToolStripMenuItem});
 			this.menu_buildlist.Name = "menu_buildlist";
-			this.menu_buildlist.Size = new System.Drawing.Size(105, 26);
+			this.menu_buildlist.Size = new System.Drawing.Size(103, 26);
 			// 
 			// teamToolStripMenuItem
 			// 
 			this.teamToolStripMenuItem.Name = "teamToolStripMenuItem";
-			this.teamToolStripMenuItem.Size = new System.Drawing.Size(104, 22);
+			this.teamToolStripMenuItem.Size = new System.Drawing.Size(102, 22);
 			this.teamToolStripMenuItem.Text = "Team";
 			// 
 			// findGoodRunes
@@ -1961,13 +1972,6 @@
 			this.runeEquipped.Visible = false;
 			this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
 			// 
-			// in30SecondsToolStripMenuItem
-			// 
-			this.in30SecondsToolStripMenuItem.Name = "in30SecondsToolStripMenuItem";
-			this.in30SecondsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-			this.in30SecondsToolStripMenuItem.Text = "In 30 seconds...";
-			this.in30SecondsToolStripMenuItem.Click += new System.EventHandler(this.In30SecondsToolStripMenuItem_Click);
-			// 
 			// Main
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2004,12 +2008,12 @@
 			this.tabControl1.ResumeLayout(false);
 			this.tabMonsters.ResumeLayout(false);
 			this.tabMonsters.PerformLayout();
-			this.toolStrip2.ResumeLayout(false);
-			this.toolStrip2.PerformLayout();
+			this.tsMonTab.ResumeLayout(false);
+			this.tsMonTab.PerformLayout();
 			this.tabRunes.ResumeLayout(false);
 			this.tabRunes.PerformLayout();
-			this.toolStrip3.ResumeLayout(false);
-			this.toolStrip3.PerformLayout();
+			this.tsRuneTab.ResumeLayout(false);
+			this.tsRuneTab.PerformLayout();
 			this.tabBuilds.ResumeLayout(false);
 			this.tabBuilds.PerformLayout();
 			this.toolStrip5.ResumeLayout(false);
@@ -2098,10 +2102,10 @@
         private System.Windows.Forms.ColumnHeader runesGrade;
         private System.Windows.Forms.ColumnHeader runesMType;
         private System.Windows.Forms.ColumnHeader runesMValue;
-        private System.Windows.Forms.ToolStrip toolStrip2;
-        private System.Windows.Forms.ToolStripButton toolStripButton1;
-        private System.Windows.Forms.ToolStripButton toolStripButton2;
-        private System.Windows.Forms.ToolStrip toolStrip3;
+        private System.Windows.Forms.ToolStrip tsMonTab;
+        private System.Windows.Forms.ToolStripButton tsbIncreasePriority;
+        private System.Windows.Forms.ToolStripButton tsbDecreasePriority;
+        private System.Windows.Forms.ToolStrip tsRuneTab;
         private System.Windows.Forms.ToolStripButton RuneTab_UnfilterButton;
         private System.Windows.Forms.ListView loadoutList;
         private System.Windows.Forms.TabPage tabBuilds;
@@ -2117,7 +2121,7 @@
         private System.Windows.Forms.Label statName;
         private System.Windows.Forms.ColumnHeader buildNameCol;
         private System.Windows.Forms.ColumnHeader buildIDCol;
-        private System.Windows.Forms.ToolStripButton toolStripButton7;
+        private System.Windows.Forms.ToolStripButton tsbCreateBuild;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsMoveUp;
@@ -2134,8 +2138,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsUnlock;
 		private System.Windows.Forms.ToolStripButton tsBtnLoadsRemove;
-        private System.Windows.Forms.ToolStripButton toolStripButton14;
-        private System.Windows.Forms.ToolStripButton toolStripButton15;
+        private System.Windows.Forms.ToolStripButton tsbReloadSave;
+        private System.Windows.Forms.ToolStripButton tsbUnequipAll;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsMoveDown;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.CheckBox useRunesCheck;
@@ -2189,12 +2193,12 @@
 		private System.Windows.Forms.ColumnHeader colMonID;
 		private System.Windows.Forms.TabPage tabCrafts;
 		private System.Windows.Forms.ListView dataCraftList;
-		private System.Windows.Forms.ColumnHeader columnHeader1;
+		private System.Windows.Forms.ColumnHeader chCraftSet;
 		private System.Windows.Forms.ToolStrip toolStrip7;
-		private System.Windows.Forms.ColumnHeader columnHeader2;
-		private System.Windows.Forms.ColumnHeader columnHeader3;
-		private System.Windows.Forms.ColumnHeader columnHeader4;
-		private System.Windows.Forms.ColumnHeader columnHeader5;
+		private System.Windows.Forms.ColumnHeader chCraftAttr;
+		private System.Windows.Forms.ColumnHeader chCraftGrade;
+		private System.Windows.Forms.ColumnHeader chCraftType;
+		private System.Windows.Forms.ColumnHeader chCraftId;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripCopyright;
 		private System.Windows.Forms.ToolStripStatusLabel toolStripSpacer;
 		private System.Windows.Forms.ColumnHeader runesLevel;
@@ -2216,6 +2220,8 @@
 		private System.Windows.Forms.ToolStripMenuItem in8HoursToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem in16HoursToolStripMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem in30SecondsToolStripMenuItem;
+		private System.ComponentModel.BackgroundWorker backgroundWorker1;
+		private System.Windows.Forms.Timer timer1;
 	}
 }
 

@@ -4,6 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace RuneApp {
@@ -137,7 +139,7 @@ namespace RuneApp {
 			}
 
 			li.SubItems.Add(underSpec + "/" + under12);
-			double pts = build.CalcScore(Cur, null, (str, i) => { li.SubItems.Add(str); });
+			double pts = build.CalcScore(Cur, (str, i) => { li.SubItems.Add(str); });
 			m.score = pts;
 
 			// put the sum points into the first item
@@ -203,7 +205,7 @@ namespace RuneApp {
 			Monster load = (Monster)li.Tag;
 			var Cur = load.GetStats();
 
-			double pts = build.CalcScore(Cur, null, (str, num) => { li.SubItems[num].Text = str; });
+			double pts = build.CalcScore(Cur, (str, num) => { li.SubItems[num].Text = str; });
 
 			li.SubItems[0].Text = pts.ToString("0.##");
 
@@ -340,7 +342,7 @@ namespace RuneApp {
 			build.Sort.OnStatChanged -= Sort_OnStatChanged;
 		}
 
-		private void btn_runtest_Click(object sender, EventArgs e) {
+		private async void btn_runtest_Click(object sender, EventArgs e) {
 			this.toolStripStatusLabel1.Text = "Generating...";
 			try {
 				if (build.IsRunning)
@@ -359,11 +361,20 @@ namespace RuneApp {
 							});
 						}
 					});
+
+					var runner = await build.startedBuild;
+
+					if (runner != null) {
+						while (build.IsRunning) {
+							toolStripStatusLabel1.Text = "Generating " + runner.Good + " @ " + ((runner.Good + runner.Completed) / ((float)runner.Expected)).ToString("P") + " builds...";
+							await Task.Delay(100);
+						}
+					}
 				}
 			}
 			catch (Exception ex) {
-				Program.LineLog.Error("Error running tests: " + ex.GetType() + ": " + ex.Message);
-				MessageBox.Show("Error running tests: " + ex.GetType() + ": " + ex.Message);
+				Program.LineLog.Error("Error running tests: " + ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
+				MessageBox.Show("Error running tests: " + ex.GetType() + ": " + ex.Message + Environment.NewLine + ex.StackTrace);
 			}
 		}
 

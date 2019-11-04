@@ -32,9 +32,12 @@ namespace RuneApp {
 		public static LineLogger LineLog {
 			[DebuggerStepThrough] get {
 				if (lineLog == null) {
+					var prof = Environment.GetEnvironmentVariable("DIAGHUB_SESSION_ID");
+					var prof2 = Environment.GetEnvironmentVariable("COR_ENABLE_PROFILING");
 #pragma warning disable CS0618 // Type or member is obsolete
-					lineLog = new LineLogger(log);
+					lineLog = new LineLogger((string.IsNullOrWhiteSpace(prof) && string.IsNullOrWhiteSpace(prof2)) ? log : null);
 #pragma warning restore CS0618 // Type or member is obsolete
+
 				}
 				return lineLog;
 			}
@@ -86,6 +89,7 @@ namespace RuneApp {
 
 		private static bool isRunning = false;
 		private static Build currentBuild = null;
+		public static Build CurrentBuild => currentBuild;
 		private static Task runTask = null;
 		private static CancellationToken runToken;
 		private static CancellationTokenSource runSource = null;
@@ -138,12 +142,55 @@ namespace RuneApp {
 
 			RuneLog.logTo = new progWriter();
 
+
+			if (false && Environment.MachineName == "SAMS-COMP") {
+				Process Proc = Process.GetCurrentProcess();
+				long AffinityMask = (long)Proc.ProcessorAffinity;
+				AffinityMask &= 0x000F; // use only any of the first 4 available processors
+				Proc.ProcessorAffinity = (IntPtr)AffinityMask;
+
+				//ProcessThread Thread = Proc.Threads[0];
+				//AffinityMask = 1 << 5; // use only the second processor, despite availability
+				//Thread.ProcessorAffinity = (IntPtr)AffinityMask;
+			}
+
+			var prof = Environment.GetEnvironmentVariable("DIAGHUB_SESSION_ID");
+
+			var prof2 = Environment.GetEnvironmentVariable("COR_ENABLE_PROFILING");
+
+			Application.ThreadException += Application_ThreadException;
+			AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+			TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
+
+			//MessageBox.Show(prof + "|" + prof2, "");
+
+			if (!string.IsNullOrWhiteSpace(prof) || !string.IsNullOrWhiteSpace(prof2)) {
+				RuneLog.logTo = null;
+				//lineLog = null;
+			}
+
 			// TODO: find a better place to put this
 			LoadGoals();
 
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 			Application.Run(new Main());
+		}
+
+		private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Error");
+		}
+
+		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
+			if (e.ExceptionObject is Exception exception)
+				MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace , "Error");
+			else
+				MessageBox.Show(e.ExceptionObject?.ToString() , "Error");
+		}
+
+		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e) {
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Error");
 		}
 
 		static string lastPrint = null;
@@ -279,6 +326,8 @@ namespace RuneApp {
 
 				if (File.Exists("shrine_overwrite.json")) {
 					Program.data.shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
+					foreach (var m in data.Monsters)
+						m.Current.Shrines = data.shrines;
 				}
 			}
 #if !DEBUG
@@ -599,21 +648,27 @@ namespace RuneApp {
 
 		public static void StopBuild() {
 			runSource?.Cancel();
+			if (currentBuild.runner != null) {
+				currentBuild.runner.Cancel();
+			}
 		}
 
 		public static void RunBuild(Build build, bool saveStats = false) {
 			if (Program.data == null)
 				return;
 
+
 			if (currentBuild != null) {
 				if (runTask != null && runTask.Status != TaskStatus.Running)
 					throw new Exception("Already running builds!");
 				else {
 					runSource.Cancel();
+					if (currentBuild.runner != null) {
+						currentBuild.runner.Cancel();
+					}
 					return;
 				}
 			}
-
 
 			runSource = new CancellationTokenSource();
 			runToken = runSource.Token;
@@ -628,6 +683,7 @@ namespace RuneApp {
 					LineLog.Info("Build is null");
 					return;
 				}
+				// TODO: show this somewhere
 				if (currentBuild != null)
 					throw new InvalidOperationException("Already running a build");
 				if (build.IsRunning)
@@ -711,7 +767,9 @@ namespace RuneApp {
 					var dmonbf = dmon.Current.Buffs;
 					dmon.Current.Buffs = build.Best.Current.Buffs;
 
-					build.Best.Current.DeltaPoints = build.CalcScore(build.Best.Current.GetStats(build.Best)) - build.CalcScore(dmon.GetStats());
+					var ds = build.CalcScore(dmon.GetStats());
+					var cs = build.CalcScore(build.Best.Current.GetStats(build.Best));
+					build.Best.Current.DeltaPoints = cs - ds;
 
 					dmon.Current.Leader = dmonld;
 					dmon.Current.Shrines = dmonsh;
