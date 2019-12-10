@@ -1,0 +1,49 @@
+﻿.rune-container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+.rune-box {
+	display: inline-flex;
+	flex-direction: column;
+	border: 1px solid black;
+	border-radius: 5pt;
+	margin: 1pt;
+	padding: 1pt;
+	min-width: 11em;
+	min-height: 8.7em;
+}
+.rune-icon {
+	text-align: center;
+	vertical-align: middle;
+	background-position-x: center;
+	background-position-y: center;
+	background-repeat: no-repeat;
+}
+.rune-icon-back {
+	display: inline-block;
+	background-size: 100%;
+}
+.rune-icon-body {
+	background-size: 100%;
+}
+.rune-icon-set {
+	background-size: 55%;
+	height: 3em;
+	width: 3em;
+}
+.rune-box-right {
+	display: inline-block;
+	vertical-align: middle;
+}
+.rune-innate {
+	font-style: italic;
+}
+.rune-monster-name {
+	text-align: right;
+}
+.star {
+	position: relative;
+	height: 0.7em;
+}

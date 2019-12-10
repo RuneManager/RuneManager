@@ -7,11 +7,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("RuneManager")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Skibisky")]
 [assembly: AssemblyProduct("RuneManager")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+[assembly: log4net.Config.XmlConfigurator(Watch = true)]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -30,4 +31,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyInformationalVersion("0.3.0.0")]
+// TODO: This annoys Settings
+//[assembly: AssemblyVersion("0.5.*")]
+[assembly: AssemblyInformationalVersion("0.7.1")]

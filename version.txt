@@ -1,9 +1,5 @@
-0.3.0.0
+0.6.5
 https://github.com/Skibisky/RuneManager/releases/latest
-You can now try to check for second-best runes!
-Will run each build multiple times.
-Can stash loadouts for view later!
-A big runedial for easy viewing, click the mon face.
-0.2.2.0 - Faster!
-AutoSelectRunes - use magic to pick the best ~15 runes per slot.
-Test timeout is configurable (0 = off, default = 20)
+No longer crashes loading Ancient Runes / 2nd Awakenings.
+0.6.4: Goal calc now halves points over goal, delta loadout points fixed
+Skip button and ignore changes less than 5 percent option.

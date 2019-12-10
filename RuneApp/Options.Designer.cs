@@ -29,13 +29,21 @@
         private void InitializeComponent()
         {
 			this.tabPage1 = new System.Windows.Forms.TabPage();
+			this.cIgnore5Less = new System.Windows.Forms.CheckBox();
+			this.cWatchSave = new System.Windows.Forms.CheckBox();
 			this.cOtherStats = new System.Windows.Forms.CheckBox();
+			this.label6 = new System.Windows.Forms.Label();
+			this.gTestTime = new System.Windows.Forms.TextBox();
 			this.label5 = new System.Windows.Forms.Label();
 			this.gTestShow = new System.Windows.Forms.TextBox();
 			this.label4 = new System.Windows.Forms.Label();
 			this.gTestRun = new System.Windows.Forms.TextBox();
+			this.cInternalServer = new System.Windows.Forms.CheckBox();
+			this.cHelpStart = new System.Windows.Forms.CheckBox();
 			this.cOtherUpdate = new System.Windows.Forms.CheckBox();
 			this.label3 = new System.Windows.Forms.Label();
+			this.cIreneStart = new System.Windows.Forms.CheckBox();
+			this.cBuildWizard = new System.Windows.Forms.CheckBox();
 			this.cColorTeams = new System.Windows.Forms.CheckBox();
 			this.cDisplayGray = new System.Windows.Forms.CheckBox();
 			this.cDisplaySplit = new System.Windows.Forms.CheckBox();
@@ -45,14 +53,14 @@
 			this.tabControl1 = new System.Windows.Forms.TabControl();
 			this.button1 = new System.Windows.Forms.Button();
 			this.btnHelp = new System.Windows.Forms.Button();
-			this.gTestTime = new System.Windows.Forms.TextBox();
-			this.label6 = new System.Windows.Forms.Label();
 			this.tabPage1.SuspendLayout();
 			this.tabControl1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tabPage1
 			// 
+			this.tabPage1.Controls.Add(this.cIgnore5Less);
+			this.tabPage1.Controls.Add(this.cWatchSave);
 			this.tabPage1.Controls.Add(this.cOtherStats);
 			this.tabPage1.Controls.Add(this.label6);
 			this.tabPage1.Controls.Add(this.gTestTime);
@@ -60,8 +68,12 @@
 			this.tabPage1.Controls.Add(this.gTestShow);
 			this.tabPage1.Controls.Add(this.label4);
 			this.tabPage1.Controls.Add(this.gTestRun);
+			this.tabPage1.Controls.Add(this.cInternalServer);
+			this.tabPage1.Controls.Add(this.cHelpStart);
 			this.tabPage1.Controls.Add(this.cOtherUpdate);
 			this.tabPage1.Controls.Add(this.label3);
+			this.tabPage1.Controls.Add(this.cIreneStart);
+			this.tabPage1.Controls.Add(this.cBuildWizard);
 			this.tabPage1.Controls.Add(this.cColorTeams);
 			this.tabPage1.Controls.Add(this.cDisplayGray);
 			this.tabPage1.Controls.Add(this.cDisplaySplit);
@@ -76,16 +88,55 @@
 			this.tabPage1.Text = "General";
 			this.tabPage1.UseVisualStyleBackColor = true;
 			// 
+			// cIgnore5Less
+			// 
+			this.cIgnore5Less.AutoSize = true;
+			this.cIgnore5Less.Location = new System.Drawing.Point(9, 119);
+			this.cIgnore5Less.Name = "cIgnore5Less";
+			this.cIgnore5Less.Size = new System.Drawing.Size(142, 17);
+			this.cIgnore5Less.TabIndex = 10;
+			this.cIgnore5Less.Text = "Ignore builds < 5% better";
+			this.cIgnore5Less.UseVisualStyleBackColor = true;
+			this.cIgnore5Less.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
+			// cWatchSave
+			// 
+			this.cWatchSave.AutoSize = true;
+			this.cWatchSave.Location = new System.Drawing.Point(465, 111);
+			this.cWatchSave.Name = "cWatchSave";
+			this.cWatchSave.Size = new System.Drawing.Size(102, 17);
+			this.cWatchSave.TabIndex = 9;
+			this.cWatchSave.Text = "Watch Save file";
+			this.cWatchSave.UseVisualStyleBackColor = true;
+			// 
 			// cOtherStats
 			// 
 			this.cOtherStats.AutoSize = true;
 			this.cOtherStats.Location = new System.Drawing.Point(465, 42);
 			this.cOtherStats.Name = "cOtherStats";
-			this.cOtherStats.Size = new System.Drawing.Size(160, 17);
+			this.cOtherStats.Size = new System.Drawing.Size(121, 17);
 			this.cOtherStats.TabIndex = 6;
-			this.cOtherStats.Text = "Disable runestats generation";
+			this.cOtherStats.Text = "Generate Runestats";
 			this.cOtherStats.UseVisualStyleBackColor = true;
 			this.cOtherStats.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
+			// label6
+			// 
+			this.label6.AutoSize = true;
+			this.label6.Location = new System.Drawing.Point(62, 96);
+			this.label6.Name = "label6";
+			this.label6.Size = new System.Drawing.Size(85, 13);
+			this.label6.TabIndex = 5;
+			this.label6.Text = "Seconds to Test";
+			// 
+			// gTestTime
+			// 
+			this.gTestTime.Location = new System.Drawing.Point(6, 93);
+			this.gTestTime.Name = "gTestTime";
+			this.gTestTime.Size = new System.Drawing.Size(50, 20);
+			this.gTestTime.TabIndex = 4;
+			this.gTestTime.Text = "20";
+			this.gTestTime.TextChanged += new System.EventHandler(this.num_TextChanged);
 			// 
 			// label5
 			// 
@@ -123,14 +174,36 @@
 			this.gTestRun.Text = "5000";
 			this.gTestRun.TextChanged += new System.EventHandler(this.num_TextChanged);
 			// 
+			// cInternalServer
+			// 
+			this.cInternalServer.AutoSize = true;
+			this.cInternalServer.Location = new System.Drawing.Point(465, 88);
+			this.cInternalServer.Name = "cInternalServer";
+			this.cInternalServer.Size = new System.Drawing.Size(115, 17);
+			this.cInternalServer.TabIndex = 3;
+			this.cInternalServer.Text = "Run internal server";
+			this.cInternalServer.UseVisualStyleBackColor = true;
+			this.cInternalServer.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
+			// cHelpStart
+			// 
+			this.cHelpStart.AutoSize = true;
+			this.cHelpStart.Location = new System.Drawing.Point(465, 65);
+			this.cHelpStart.Name = "cHelpStart";
+			this.cHelpStart.Size = new System.Drawing.Size(114, 17);
+			this.cHelpStart.TabIndex = 3;
+			this.cHelpStart.Text = "Show help on start";
+			this.cHelpStart.UseVisualStyleBackColor = true;
+			this.cHelpStart.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
 			// cOtherUpdate
 			// 
 			this.cOtherUpdate.AutoSize = true;
 			this.cOtherUpdate.Location = new System.Drawing.Point(465, 19);
 			this.cOtherUpdate.Name = "cOtherUpdate";
-			this.cOtherUpdate.Size = new System.Drawing.Size(130, 17);
+			this.cOtherUpdate.Size = new System.Drawing.Size(115, 17);
 			this.cOtherUpdate.TabIndex = 3;
-			this.cOtherUpdate.Text = "Disable update check";
+			this.cOtherUpdate.Text = "Check for Updates";
 			this.cOtherUpdate.UseVisualStyleBackColor = true;
 			this.cOtherUpdate.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
 			// 
@@ -142,6 +215,28 @@
 			this.label3.Size = new System.Drawing.Size(33, 13);
 			this.label3.TabIndex = 2;
 			this.label3.Text = "Other";
+			// 
+			// cIreneStart
+			// 
+			this.cIreneStart.AutoSize = true;
+			this.cIreneStart.Location = new System.Drawing.Point(246, 111);
+			this.cIreneStart.Name = "cIreneStart";
+			this.cIreneStart.Size = new System.Drawing.Size(118, 17);
+			this.cIreneStart.TabIndex = 1;
+			this.cIreneStart.Text = "Show Irene on start";
+			this.cIreneStart.UseVisualStyleBackColor = true;
+			this.cIreneStart.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
+			// 
+			// cBuildWizard
+			// 
+			this.cBuildWizard.AutoSize = true;
+			this.cBuildWizard.Location = new System.Drawing.Point(246, 88);
+			this.cBuildWizard.Name = "cBuildWizard";
+			this.cBuildWizard.Size = new System.Drawing.Size(115, 17);
+			this.cBuildWizard.TabIndex = 1;
+			this.cBuildWizard.Text = "Show Build Wizard";
+			this.cBuildWizard.UseVisualStyleBackColor = true;
+			this.cBuildWizard.CheckedChanged += new System.EventHandler(this.check_CheckedChanged);
 			// 
 			// cColorTeams
 			// 
@@ -231,31 +326,13 @@
 			// btnHelp
 			// 
 			this.btnHelp.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-			this.btnHelp.Location = new System.Drawing.Point(569, 355);
+			this.btnHelp.Location = new System.Drawing.Point(12, 355);
 			this.btnHelp.Name = "btnHelp";
 			this.btnHelp.Size = new System.Drawing.Size(45, 23);
 			this.btnHelp.TabIndex = 90;
 			this.btnHelp.Text = "Help?";
 			this.btnHelp.UseVisualStyleBackColor = true;
 			this.btnHelp.Click += new System.EventHandler(this.btnHelp_Click);
-			// 
-			// gTestTime
-			// 
-			this.gTestTime.Location = new System.Drawing.Point(6, 93);
-			this.gTestTime.Name = "gTestTime";
-			this.gTestTime.Size = new System.Drawing.Size(50, 20);
-			this.gTestTime.TabIndex = 4;
-			this.gTestTime.Text = "20";
-			this.gTestTime.TextChanged += new System.EventHandler(this.num_TextChanged);
-			// 
-			// label6
-			// 
-			this.label6.AutoSize = true;
-			this.label6.Location = new System.Drawing.Point(62, 96);
-			this.label6.Name = "label6";
-			this.label6.Size = new System.Drawing.Size(85, 13);
-			this.label6.TabIndex = 5;
-			this.label6.Text = "Seconds to Test";
 			// 
 			// Options
 			// 
@@ -265,7 +342,9 @@
 			this.Controls.Add(this.btnHelp);
 			this.Controls.Add(this.button1);
 			this.Controls.Add(this.tabControl1);
+			this.Icon = global::RuneApp.App.Icon;
 			this.Name = "Options";
+			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
 			this.Text = "Options";
 			this.tabPage1.ResumeLayout(false);
 			this.tabPage1.PerformLayout();
@@ -295,5 +374,11 @@
         private System.Windows.Forms.CheckBox cColorTeams;
 		private System.Windows.Forms.Label label6;
 		private System.Windows.Forms.TextBox gTestTime;
+        private System.Windows.Forms.CheckBox cHelpStart;
+		private System.Windows.Forms.CheckBox cInternalServer;
+		private System.Windows.Forms.CheckBox cBuildWizard;
+		private System.Windows.Forms.CheckBox cWatchSave;
+		private System.Windows.Forms.CheckBox cIreneStart;
+		private System.Windows.Forms.CheckBox cIgnore5Less;
 	}
 }

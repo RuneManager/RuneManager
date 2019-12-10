@@ -238,3 +238,11 @@ _Pvt_Extensions
 # Custom
 /*.zip
 RuneOptim/*.json
+RunePlugin/JsonReference/
+
+# but not this one bespoke line of MSBuild ILMerge
+# we first need to unignore the package dir, but ignore everything in it, to then unignore the build dir of it
+!**/packages/MSBuild.ILMerge.Task.*/
+**/packages/MSBuild.ILMerge.Task.*/*
+!**/packages/MSBuild.ILMerge.Task.*/build/
+Build/

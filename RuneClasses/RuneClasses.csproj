@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RuneOptim</RootNamespace>
     <AssemblyName>RuneClasses</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -29,11 +30,20 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
@@ -44,22 +54,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Build.cs" />
-    <Compile Include="Craft.cs" />
-    <Compile Include="Deco.cs" />
+    <Compile Include="BuildProcessing\Build.cs" />
+    <Compile Include="BuildProcessing\Build.Old.cs" />
+    <Compile Include="BuildProcessing\BuildBitMatcher.cs" />
+    <Compile Include="BuildProcessing\BuildBitMatcherBaseRunner.cs" />
+    <Compile Include="BuildProcessing\BuildBrokenFast.cs" />
+    <Compile Include="BuildProcessing\BuildFallback.cs" />
+    <Compile Include="BuildProcessing\BuildFast.cs" />
+    <Compile Include="BuildProcessing\BuildFlatScore.cs" />
+    <Compile Include="BuildProcessing\BuildFourSetBrokenFast.cs" />
+    <Compile Include="BuildProcessing\BuildOriginalBad.cs" />
+    <Compile Include="BuildProcessing\BuildRunner.cs" />
+    <Compile Include="BuildProcessing\BuildSetDropper.cs" />
+    <Compile Include="BuildProcessing\BuildSettings.cs" />
+    <Compile Include="BuildProcessing\BuildTieBreakerFast.cs" />
+    <Compile Include="BuildProcessing\Enums.cs" />
+    <Compile Include="BuildProcessing\BuildUsage.cs" />
+    <Compile Include="BuildProcessing\IBuildRunner.cs" />
+    <Compile Include="BuildProcessing\IBuildStrategyDefinition.cs" />
+    <Compile Include="BuildProcessing\PrintToEventArgs.cs" />
+    <Compile Include="BuildProcessing\ProgToEventArgs.cs" />
+    <Compile Include="BuildProcessing\RuneUsage.cs" />
+    <Compile Include="Management\ILoadout.cs" />
+    <Compile Include="swar\IRune.cs" />
+    <Compile Include="swar\Rift.cs" />
+    <Compile Include="swar\Attr.cs" />
+    <Compile Include="swar\AttrFieldAttribute.cs" />
+    <Compile Include="swar\AttributeCategory.cs" />
+    <Compile Include="swar\Building.cs" />
+    <Compile Include="swar\Craft.cs" />
+    <Compile Include="swar\Deco.cs" />
     <Compile Include="ExtensionMethods.cs" />
-    <Compile Include="Loadout.cs" />
-    <Compile Include="Monster.cs" />
-    <Compile Include="MonsterStat.cs" />
+    <Compile Include="Management\Goals.cs" />
+    <Compile Include="swar\InventoryItem.cs" />
+    <Compile Include="ListProperties.cs" />
+    <Compile Include="Management\Loadout.cs" />
+    <Compile Include="swar\Monster.cs" />
+    <Compile Include="swar\MonsterStat.cs" />
+    <Compile Include="swar\MultiplierBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Rune.cs" />
-    <Compile Include="RuneStat.cs" />
-    <Compile Include="RuneFilter.cs" />
-    <Compile Include="Save.cs" />
-    <Compile Include="Stats.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="swar\Rune.cs" />
+    <Compile Include="swar\Rune.Extra.cs" />
+    <Compile Include="swar\Rune.Properties.cs" />
+    <Compile Include="BuildProcessing\RuneFilter.cs" />
+    <Compile Include="swar\Save.cs" />
+    <Compile Include="swar\StatModEventArgs.cs" />
+    <Compile Include="swar\Stats.cs" />
+    <Compile Include="swar\WizardInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="data\skills.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\monsters.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="data\basestats.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

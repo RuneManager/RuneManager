@@ -1,0 +1,52 @@
+﻿[
+	{
+		"MonId": 19811,
+		"version": 1,
+		"MonName": "Lapis",
+		"priority": 0,
+		"AllowBroken": true,
+		"Sort": {
+			"con": 0.0,
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 6.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 1100.0,
+			"fake_dps": 0.0,
+			"fake_avd": 270.0,
+			"fake_mxd": 0.0
+		},
+		"Minimum": {
+			"hp": 0.0,
+			"atk": 0.0,
+			"def": 0.0,
+			"spd": 144.0,
+			"critical_rate": 0.0,
+			"critical_damage": 0.0,
+			"resist": 0.0,
+			"accuracy": 0.0,
+			"skillup_damage": [ 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 ],
+			"fake_ehp": 0.0,
+			"fake_ehpdb": 0.0,
+			"fake_dps": 0.0,
+			"fake_avd": 0.0,
+			"fake_mxd": 0.0
+		},
+		"slotStats": [
+			[ ],
+			[ "SPDflat" ],
+			[ ],
+			[ "CRperc", "CDperc" ],
+			[ ],
+			[ "ATKperc", "HPperc" ]
+		],
+		"BuildSets": [ "Vampire", "Revenge" ],
+		"autoRuneSelect": true
+	}
+]

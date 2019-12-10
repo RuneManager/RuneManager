@@ -1,12 +1,15 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Linq;
+using System.Timers;
+using System.Diagnostics;
+using RuneOptim.swar;
+using RuneOptim.Management;
 
-namespace RuneOptim.Tests
-{
-    [TestClass()]
+namespace RuneOptim.Tests {
+	[TestClass()]
     public class LoadoutTests
     {
-        
+
         [TestMethod()]
         public void LockTest()
         {
@@ -119,6 +122,47 @@ namespace RuneOptim.Tests
             Assert.AreEqual(statsComp.MaxDamage, statRhs.MaxDamage);
             Assert.AreEqual(statsComp.AverageDamage, statRhs.AverageDamage);
             Assert.AreEqual(statsComp.DamagePerSpeed, statRhs.DamagePerSpeed);
+        }
+
+        [TestMethod()]
+        public void SpeedBranch()
+        {
+            Stopwatch sw = new Stopwatch();
+
+
+            System.Random r = new System.Random();
+
+            sw.Start();
+            int c = 0;
+            for (int i = 0; i < 1000 * 1000 * 1000; i++)
+            {
+                c += func1(r.Next(1) == 0, r.Next(3));
+            }
+            sw.Stop();
+            long t1 = sw.ElapsedMilliseconds;
+
+            sw.Restart();
+            c = 0;
+            for (int i = 0; i < 1000 * 1000 * 1000; i++)
+            {
+                c += func2(r.Next(1) == 0, r.Next(3));
+            }
+            sw.Stop();
+            long t2 = sw.ElapsedMilliseconds;
+
+            Assert.Inconclusive(t1 + " " + t2);
+        }
+
+        int[] test = { 3, 5, 1, 7, 2, 8 };
+
+        public int func1(bool b, int i)
+        {
+            if (b) return test[i + 3];
+            return test[i];
+        }
+        public int func2(bool b, int i)
+        {
+            return test[b ? i + 3 : i];
         }
     }
 }

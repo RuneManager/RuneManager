@@ -1,0 +1,3 @@
+[submodule "RuneService/TrotiNet"]
+	path = RuneService/TrotiNet
+	url = https://github.com/aeshirey/TrotiNet

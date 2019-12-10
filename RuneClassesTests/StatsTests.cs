@@ -1,8 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using RuneOptim.swar;
 
-namespace RuneOptim.Tests
-{
-    [TestClass()]
+namespace RuneOptim.Tests {
+	[TestClass()]
     public class StatsTests
     {
         [TestMethod()]
@@ -32,7 +33,7 @@ namespace RuneOptim.Tests
         {
             var stat1 = TestData.statsFull();
             var stat2 = new Stats();
-            stat1.SetZero();
+            stat1.SetTo(0);
             Assert.AreEqual(stat2, stat2);
         }
 
@@ -121,14 +122,14 @@ namespace RuneOptim.Tests
         public void NonZeroTest()
         {
             var stats = new Stats();
-            Assert.IsFalse(stats.NonZero());
+            Assert.IsFalse(stats.IsNonZero);
         }
 
         [TestMethod()]
         public void FirstNonZeroTest()
         {
             var stat = new Stats();
-            Assert.AreEqual(Attr.Null, stat.FirstNonZero());
+            Assert.AreEqual(Attr.Null, stat.NonZeroStats.FirstOrDefault());
         }
     }
 }
