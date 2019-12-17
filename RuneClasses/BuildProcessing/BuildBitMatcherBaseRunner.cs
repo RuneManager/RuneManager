@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace RuneOptim.BuildProcessing {
-
 	public class BuildBitMatcherBaseRunner : BuildRunner<bool> {
 		public static int NumberOfSetBits(int i) {
 			i = i - ((i >> 1) & 0x55555555);
@@ -53,6 +52,13 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
+		/// <summary>
+		/// Find all the pairs of 2 and sets of 4 that fit together to make a build.
+		/// Yield-returns because it can be too big to fit into memory.
+		/// </summary>
+		/// <param name="b2"></param>
+		/// <param name="b4"></param>
+		/// <returns></returns>
 		public IEnumerable<LoadBits> getMatches(IEnumerable<BitLoad> b2, IEnumerable<BitLoad> b4) {
 
 			foreach (var b_2 in b2) {
@@ -66,10 +72,13 @@ namespace RuneOptim.BuildProcessing {
 			if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => Rune.SetRequired(se) == 4))
 				doTwos = true;
 
+			// try to get 3 sets of 2s
 			if (doTwos) {
-				var qrhad = b2.GroupBy(k => k.bit).ToArray();
+				var group2s = b2.GroupBy(k => k.bit).ToArray();
+				if (group2s.Length < 3)
+					yield break;
 
-				foreach (var thar in CombinationsRosettaWoRecursion(qrhad, 3)) {
+				foreach (var thar in CombinationsRosettaWoRecursion(group2s, 3)) {
 					if ((thar[0].Key | thar[1].Key | thar[2].Key) == 63) {
 						foreach (var a in thar[0]) {
 							foreach (var b in thar[1]) {
@@ -115,16 +124,37 @@ namespace RuneOptim.BuildProcessing {
 
 			foreach (var gb in sets) {
 				var ii = Rune.SetRequired(gb.Key);
-				foreach (var rc in CombinationsRosettaWoRecursion<Rune>(gb.ToArray(), ii)) {
+				var gba = gb.ToArray();
+				if (gba.Length < ii)
+					continue;
+				this.total += PermutationsAndCombinations.nCr(gba.Length, ii);
+
+				// yield-return sort-of works in parallel
+				Parallel.ForEach(CombinationsRosettaWoRecursion<Rune>(gba, ii), () => new HashSet<BitLoad>(), (rc, i, a) => {
 					var bl = new BitLoad(gb.Key);
 					bl.Runes = rc;
 					foreach (var r in rc) {
 						bl.bit |= 1 << (r.Slot - 1);
 					}
-					if (NumberOfSetBits(bl.bit) == ii)
-						bLoads.Add(bl);
+					if (NumberOfSetBits(bl.bit) == ii) {
+						a.Add(bl);
+						this.plus++;
+					}
+					else
+						this.kill++;
+					return a;
+				}, hs => {
+					lock (bLoads) {
+						foreach (var r in hs)
+							bLoads.Add(r);
+					}
 				}
+				);
 			}
+			
+			this.total = 0;
+			this.kill = 0;
+			this.plus = 0;
 
 			twos = bLoads.Where(b => Rune.SetRequired(b.Set) == 2).ToArray();
 			fours = bLoads.Where(b => Rune.SetRequired(b.Set) == 4).ToArray();
@@ -148,9 +178,12 @@ namespace RuneOptim.BuildProcessing {
 
 				var qrhad = b2.GroupBy(k => k.bit).ToArray();
 
-				foreach (var thar in CombinationsRosettaWoRecursion(qrhad, 3)) {
-					if ((thar[0].Key | thar[1].Key | thar[2].Key) == 63)
-						skip += thar[0].Count() * thar[1].Count() * thar[2].Count();
+				if (qrhad.Length >= 3) {
+
+					foreach (var thar in CombinationsRosettaWoRecursion(qrhad, 3)) {
+						if ((thar[0].Key | thar[1].Key | thar[2].Key) == 63)
+							skip += thar[0].Count() * thar[1].Count() * thar[2].Count();
+					}
 				}
 			}
 
@@ -253,6 +286,9 @@ namespace RuneOptim.BuildProcessing {
 
 	}
 
+	/// <summary>
+	/// Turn the slots the given runes into a bitmask
+	/// </summary>
 	public class BitLoad {
 		public int bit;
 
@@ -281,7 +317,10 @@ namespace RuneOptim.BuildProcessing {
 		}
 
 	}
-
+	
+	/// <summary>
+	/// A set of runes which bitmask is 111111 => 63
+	/// </summary>
 	public class LoadBits {
 		public BitLoad a;
 		public BitLoad b;

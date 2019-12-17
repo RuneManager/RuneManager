@@ -124,6 +124,7 @@ namespace MonsterDefinitions {
 		DiceAverage,
 
 		[SkillAttr("DICE_MIN")]
+		[SkillAttr("TARGET_ALIVE_CNT")]
 		DiceAverageTwoMin,
 	}
 
@@ -401,7 +402,8 @@ namespace MonsterDefinitions {
 					}
 					else {
 						var tstr = jvalue.ToObject<string>();
-						value.key = GetStatAttrValue(tstr);
+						if (tstr != "CEIL")
+							value.key = GetStatAttrValue(tstr);
 					}
 				}
 				multiGroup.props.Add(value);

@@ -72,6 +72,7 @@
     <Compile Include="BuildProcessing\BuildUsage.cs" />
     <Compile Include="BuildProcessing\IBuildRunner.cs" />
     <Compile Include="BuildProcessing\IBuildStrategyDefinition.cs" />
+    <Compile Include="BuildProcessing\PermutationsAndCombinations.cs" />
     <Compile Include="BuildProcessing\PrintToEventArgs.cs" />
     <Compile Include="BuildProcessing\ProgToEventArgs.cs" />
     <Compile Include="BuildProcessing\RuneUsage.cs" />
