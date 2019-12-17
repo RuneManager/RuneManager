@@ -66,6 +66,53 @@ namespace RuneOptim.BuildProcessing {
 		[JsonIgnore]
 		private readonly object bestLock = new object();
 
+		public class RuneConfig
+		{
+			public Monster Mon;
+			public bool IncludeAllOverride;
+			public bool UseEquipped;
+			public bool OnlyFillEmpty;
+			public bool UseLocked;
+			public List<ulong> GlobalBannedRuneIds;
+			public List<ulong> LocalBannedRuneIds;
+			public ObservableCollection<RuneSet> RequiredSets;
+			public ObservableCollection<RuneSet> BuildSets;
+		}
+
+		public ParallelQuery<Rune> FilterRunes(ObservableCollection<Rune> runes, RuneConfig config)
+		{
+			// todo: less .ToArray-ing
+			ParallelQuery<Rune> rsGlobal = runes.AsParallel();
+
+			// if not saving stats, cull unusable here
+			if (!config.IncludeAllOverride)
+			{
+				// Only using 'inventory' or runes on mon
+				// also, include runes which have been unequipped (should only look above)
+				if (!config.UseEquipped || config.OnlyFillEmpty)
+					rsGlobal = rsGlobal.Where(r => r.IsUnassigned || r.AssignedId == config.Mon.Id || r.Swapped);
+				// only if the rune isn't currently locked for another purpose
+				if (!config.UseLocked)
+					rsGlobal = rsGlobal.Where(r => !r.Locked);
+				rsGlobal = rsGlobal.Where(r => !config.GlobalBannedRuneIds.Any(b => b == r.Id) && !config.LocalBannedRuneIds.Any(b => b == r.Id));
+			}
+
+			// TODO: consider extracting sets logic and only passing in a final list of sets
+			if ((config.BuildSets.Any() || config.RequiredSets.Any()) && config.BuildSets.All(s => Rune.SetRequired(s) == 4) && config.RequiredSets.All(s => Rune.SetRequired(s) == 4))
+			{
+				// if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
+				rsGlobal = rsGlobal.Where(r => config.BuildSets.Contains(r.Set) || config.RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
+			}
+			else if (BuildSets.Any() || RequiredSets.Any())
+			{
+				rsGlobal = rsGlobal.Where(r => config.BuildSets.Contains(r.Set) || config.RequiredSets.Contains(r.Set));
+				// Only runes which we've included
+			}
+
+			return rsGlobal;
+
+		}
+
 		/// <summary>
 		/// Fills the instance with acceptable runes from save
 		/// </summary>
@@ -100,29 +147,18 @@ namespace RuneOptim.BuildProcessing {
 					return;
 				}
 
-				// todo: less .ToArray-ing
-				ParallelQuery<Rune> rsGlobal = save.Runes.AsParallel();
-
-				// if not saving stats, cull unusable here
-				if (!BuildSaveStats) {
-					// Only using 'inventory' or runes on mon
-					// also, include runes which have been unequipped (should only look above)
-					if (!RunesUseEquipped || RunesOnlyFillEmpty)
-						rsGlobal = rsGlobal.Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped);
-					// only if the rune isn't currently locked for another purpose
-					if (!RunesUseLocked)
-						rsGlobal = rsGlobal.Where(r => !r.Locked);
-					rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !BannedRunesTemp.Any(b => b == r.Id));
-				}
-
-				if ((BuildSets.Any() || RequiredSets.Any()) && BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4)) {
-					// if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
-					rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
-				}
-				else if (BuildSets.Any() || RequiredSets.Any()) {
-					rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
-					// Only runes which we've included
-				}
+				RuneConfig runeConfig = new RuneConfig {
+					Mon = Mon,
+					IncludeAllOverride = BuildSaveStats,
+					UseEquipped = RunesUseEquipped,
+					OnlyFillEmpty = RunesOnlyFillEmpty,
+					UseLocked = RunesUseLocked,
+					GlobalBannedRuneIds = BannedRuneId,
+					LocalBannedRuneIds = BannedRunesTemp,
+					BuildSets = BuildSets,
+					RequiredSets = RequiredSets
+				};
+				ParallelQuery<Rune> rsGlobal = FilterRunes(save.Runes, runeConfig);
 
 				if (BuildSaveStats) {
 					foreach (Rune r in rsGlobal) {
