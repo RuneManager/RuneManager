@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuildBattleExporter", "plug
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiegeBattleStats", "plugins\SiegeBattleStats\SiegeBattleStats.csproj", "{CB79542E-CCA2-45D7-B67C-44B89EB354DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneAppTest", "RuneAppTest\RuneAppTest.csproj", "{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -247,6 +249,18 @@ Global
 		{CB79542E-CCA2-45D7-B67C-44B89EB354DD}.Release|x64.Build.0 = Release|Any CPU
 		{CB79542E-CCA2-45D7-B67C-44B89EB354DD}.Release|x86.ActiveCfg = Release|Any CPU
 		{CB79542E-CCA2-45D7-B67C-44B89EB354DD}.Release|x86.Build.0 = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|x64.Build.0 = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Debug|x86.Build.0 = Debug|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|x64.ActiveCfg = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|x64.Build.0 = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|x86.ActiveCfg = Release|Any CPU
+		{2A7E7A0F-46F1-452C-8EF1-0B0D97AC3278}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
