@@ -16,13 +16,18 @@ namespace RuneOptim.BuildProcessing {
 
 		// stuff that is being phased out in favour of BuildStrategies
 
-		// if currently running
+		/// <summary>
+		/// if currently running
+		/// </summary>
 		[JsonIgnore]
 		private bool isRunning = false;
 
 		[JsonIgnore]
 		private readonly object isRunLock = new object();
 
+		/// <summary>
+		/// 'thread-safe' check/set
+		/// </summary>
 		[JsonIgnore]
 		public bool IsRunning {
 			get {
@@ -37,6 +42,9 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
+		/// <summary>
+		/// Get if running without lock
+		/// </summary>
 		[JsonIgnore]
 		public bool IsRunning_Unsafe {
 			get {
@@ -156,7 +164,12 @@ namespace RuneOptim.BuildProcessing {
 
 					}
 				}
+
+				// clean out runes which won't make complete sets
 				cleanBroken();
+
+				// clean out runes which won't pass the minimum
+				cleanMinimum();
 
 				if (AutoRuneSelect) {
 					// TODO: triple pass: start at needed for min, but each pass reduce the requirements by the average of the chosen runes for that pass, increase it by build scoring
@@ -276,6 +289,11 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
+		/// <summary>
+		/// Generate the builds, but only on the given runes
+		/// </summary>
+		/// <param name="runes"></param>
+		/// <returns></returns>
 		[Obsolete]
 		public Monster GenBuild(params Rune[] runes) {
 			if (runes.Length != 6)

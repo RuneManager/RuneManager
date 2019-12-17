@@ -13,8 +13,10 @@ using System.Threading.Tasks;
 namespace RuneOptim.BuildProcessing {
 
 
-	// The heavy lifter
-	// Contains most of the data needed to outline build requirements
+	/// <summary>
+	/// Contains most of the data needed to outline build requirements.
+	/// The heavy lifter, trying to move logic out of it :S
+	/// </summary>
 	public partial class Build {
 		// allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
 		// TODO: have another go at it
@@ -27,15 +29,24 @@ namespace RuneOptim.BuildProcessing {
 		public static readonly Attr[] ExtraEnums = { Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
 		public static readonly Attr[] StatAll = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy, Attr.EffectiveHP, Attr.EffectiveHPDefenseBreak, Attr.DamagePerSpeed, Attr.AverageDamage, Attr.MaxDamage };
 
+		/// <summary>
+		/// Current running build strategy, ask it for progress?
+		/// </summary>
 		[JsonIgnore]
 		public IBuildRunner runner;
 
 		[JsonIgnore]
 		private TaskCompletionSource<IBuildRunner> tcs = new TaskCompletionSource<IBuildRunner>();
 
+		/// <summary>
+		/// awaitable for when the build actually starts running
+		/// </summary>
 		[JsonIgnore]
 		public Task<IBuildRunner> startedBuild => tcs.Task;
 
+		/// <summary>
+		/// Store the score of the last run in here for loading?
+		/// </summary>
 		public double lastScore = float.MinValue;
 
 		public Build() {
@@ -102,6 +113,7 @@ namespace RuneOptim.BuildProcessing {
 		[JsonIgnore]
 		public Monster Mon { get; set; }
 
+		#region Rune-build time properties
 		[JsonIgnore]
 		public int BuildGenerate { get; set; } = 0;
 
@@ -137,6 +149,7 @@ namespace RuneOptim.BuildProcessing {
 
 		[JsonIgnore]
 		public bool IgnoreLess5 { get; set; } = false;
+		#endregion
 
 		[JsonProperty]
 		public string BuildStrategy { get; set; }
@@ -171,6 +184,9 @@ namespace RuneOptim.BuildProcessing {
 		[JsonProperty("extra_crit_rate")]
 		private int extraCritRate = 0;
 
+		/// <summary>
+		/// Extra crit rate from Ele Advantage/Passive
+		/// </summary>
 		[JsonIgnore]
 		public int ExtraCritRate {
 			get {
@@ -188,8 +204,11 @@ namespace RuneOptim.BuildProcessing {
 		public bool ShouldSerializeExtraCritRate() {
 			return extraCritRate > 0;
 		}
-		// Magical (and probably bad) tree structure for rune slot stat filters
-		// tab, stat, FILTER
+
+		/// <summary>
+		/// Magical (and probably bad) tree structure for rune slot stat filters.
+		/// Tab -> Stat -> FILTER
+		/// </summary>
 		[JsonProperty("runeFilters")]
 		[JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
 		public Dictionary<SlotIndex, Dictionary<string, RuneFilter>> RuneFilters { get; set; } = new Dictionary<SlotIndex, Dictionary<string, RuneFilter>>();
@@ -213,9 +232,11 @@ namespace RuneOptim.BuildProcessing {
 			return RuneFilters.Count > 0;
 		}
 
-		// For when you want to map 2 pieces of info to a key, just be *really* lazy
-		// Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value
-		// tab, TYPE, test
+		/// <summary>
+		/// For when you want to map 2 pieces of info to a key, just be *really* lazy.
+		/// Contains the scoring type (OR, AND, SUM) and the[(>= SUM] value.
+		/// Tab -> TYPE -> Test
+		/// </summary>
 		[JsonProperty("runeScoring")]
 		[JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
 		public Dictionary<SlotIndex, KeyValuePair<FilterType, double?>> RuneScoring { get; set; } = new Dictionary<SlotIndex, KeyValuePair<FilterType, double?>>();
@@ -231,9 +252,11 @@ namespace RuneOptim.BuildProcessing {
 			return RuneScoring.Count > 0;
 		}
 
-		// if to raise the runes level, and use the appropriate main stat value.
-		// also, attempt to give weight to unassigned powerup bonuses
-		// tab, RAISE, magic
+		/// <summary>
+		/// if to raise the runes level, and use the appropriate main stat value.
+		/// also, attempt to give weight to unassigned powerup bonuses.
+		/// Tab -> RAISE -> Magic.
+		/// </summary>
 		[JsonProperty("runePrediction")]
 		[JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
 		public Dictionary<SlotIndex, KeyValuePair<int?, bool>> RunePrediction { get; set; } = new Dictionary<SlotIndex, KeyValuePair<int?, bool>>();
@@ -249,11 +272,16 @@ namespace RuneOptim.BuildProcessing {
 			return RunePrediction.Count > 0;
 		}
 
+		/// <summary>
+		/// If to allow broken sets on this Monster.
+		/// </summary>
 		[JsonProperty("AllowBroken")]
 		public bool AllowBroken { get; set; } = false;
 
-		// how much each stat is worth (0 = useless)
-		// eg. 300 hp is worth 1 speed
+		/// <summary>
+		/// How much each stat is worth (0 = useless)
+		/// eg. 300 hp is worth 1 speed
+		/// </summary>
 		[JsonProperty("Sort")]
 		public Stats Sort { get; set; } = new Stats();
 
@@ -261,7 +289,9 @@ namespace RuneOptim.BuildProcessing {
 			return Sort.IsNonZero;
 		}
 
-		// resulting build must have every set in this collection
+		/// <summary>
+		/// Resulting build must have every set in this collection.
+		/// </summary>
 		[JsonProperty("RequiredSets")]
 		public ObservableCollection<RuneSet> RequiredSets { get; set; } = new ObservableCollection<RuneSet>();
 
@@ -269,19 +299,27 @@ namespace RuneOptim.BuildProcessing {
 			return RequiredSets.Count > 0;
 		}
 
-		// builds *must* have *all* of these stats
+		/// <summary>
+		/// Builds *must* have *all* of these stat values or higher.
+		/// </summary>
 		[JsonProperty("Minimum")]
 		public Stats Minimum { get; set; } = new Stats();
 
-		// builds *mustn't* exceed *any* of these stats
+		/// <summary>
+		/// Builds *mustn't* exceed *any* of these stats.
+		/// </summary>
 		[JsonProperty("Maximum")]
 		public Stats Maximum { get; set; } = new Stats();
 
-		// individual stats exceeding these values are capped
+		/// <summary>
+		/// Individual stats exceeding these values are capped.
+		/// </summary>
 		[JsonProperty("Threshold")]
 		public Stats Threshold { get; set; } = new Stats();
 
-		// builds with individual stats below these values are penalised as not good enough
+		/// <summary>
+		/// Individual stats above these values have reduced weight to encourage 'balanced' builds.
+		/// </summary>
 		[JsonProperty("Goal")]
 		public Stats Goal { get; set; } = new Stats();
 
@@ -303,15 +341,20 @@ namespace RuneOptim.BuildProcessing {
 
 		[JsonProperty]
 		public List<string> Teams { get; set; } = new List<string>();
+
 		public bool ShouldSerializeTeams() {
 			return Teams.Count > 0;
 		}
 
-		// Which primary stat types are allowed per slot (should be 2,4,6 only)
+		/// <summary>
+		/// Which primary stat types are allowed per slot (should be 2,4,6 only)
+		/// </summary>
 		[JsonProperty("slotStats")]
 		public List<string>[] SlotStats { get; set; } = new List<string>[6];
 
-		// Sets to consider using
+		/// <summary>
+		/// Sets to consider using.
+		/// </summary>
 		[JsonProperty("BuildSets")]
 		public ObservableCollection<RuneSet> BuildSets { get; set; } = new ObservableCollection<RuneSet>();
 
@@ -331,7 +374,10 @@ namespace RuneOptim.BuildProcessing {
 			return AutoRuneAmount != AutoRuneAmountDefault;
 		}
 
-		// magically find good runes to use in the build
+		/// <summary>
+		/// Magically find good runes to use in the build.
+		/// This will use Minimum and Score as a heuristic to pick the runes.
+		/// </summary>
 		[JsonProperty("autoRuneSelect")]
 		public bool AutoRuneSelect { get; set; } = false;
 
@@ -339,7 +385,10 @@ namespace RuneOptim.BuildProcessing {
 			return AutoRuneSelect;
 		}
 
-		// magically scale Minimum with Sort while the build is running
+		/// <summary>
+		/// Magically scale Minimum with Sort while the build is running.
+		/// NOT YET IMPLEMENTED.
+		/// </summary>
 		[JsonProperty("autoAdjust")]
 		public bool AutoAdjust { get; set; } = false;
 
@@ -357,28 +406,35 @@ namespace RuneOptim.BuildProcessing {
 		[JsonIgnore]
 		public List<ulong> BannedRunesTemp { get; set; } = new List<ulong>();
 
-		/// ---------------
+		// ----------------
 
-		// These should be generated at runtime, do not store externally
-
-		// The best loadouts
+		/// <summary>
+		/// The best loadouts.
+		///  These should be generated at runtime, do not store externally
+		/// </summary>
 		[JsonIgnore]
 		public readonly ObservableCollection<Monster> Loads = new ObservableCollection<Monster>();
 
-		// The best loadout in loads
+		/// <summary>
+		/// The best loadout in loads
+		/// </summary>
 		[JsonIgnore]
 		public Monster Best { get; set; } = null;
 
-		// The runes to be used to generate builds
+		/// <summary>
+		/// The runes to be used to generate builds
+		/// </summary>
 		[JsonIgnore]
 		public Rune[][] runes { get; set; } = new Rune[6][];
 
 		[JsonIgnore]
 		public Craft[] grinds { get; set; }
 
-		/// ----------------
+		// ----------------
 
-		// How to sort the stats
+		/// <summary>
+		/// How to sort the stats
+		/// </summary>
 		[JsonIgnore]
 		public Func<Stats, int> sortFunc { get; set; }
 
@@ -395,7 +451,9 @@ namespace RuneOptim.BuildProcessing {
 			return Leader.IsNonZero;
 		}
 
-		// Seems to out-of-mem if too many
+		/// <summary>
+		/// Start dropping stored builds here. Seems to out-of-mem if too many
+		/// </summary>
 		private static readonly int MaxBuilds32 = 500000;
 
 		public int LinkId { get; set; }
@@ -465,7 +523,12 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
-
+		/// <summary>
+		/// Use the builds score function to return the score contribution for a single Attribute.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <returns></returns>
 		public double ScoreStat(Stats current, Attr stat) {
 			if (current == null)
 				return 0;
@@ -486,7 +549,14 @@ namespace RuneOptim.BuildProcessing {
 			return 0;
 		}
 
-
+		/// <summary>
+		/// Overload for providing breakdown, but with the null check path taking out.
+		/// Gotta save ops.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreStat(Stats current, Attr stat, Stats outvals) {
 			if (current == null)
 				return 0;
@@ -507,8 +577,16 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		/// <summary>
+		/// Overload that provides a nice string.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <param name="str"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreStat(Stats current, Attr stat, out string str, Stats outvals = null) {
-			str = "";
+			str = string.Empty;
 			if (current == null)
 				return 0;
 			double vv = current[stat];
@@ -516,7 +594,6 @@ namespace RuneOptim.BuildProcessing {
 
 			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
 				vv = 100;
-			str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
 			if (Sort[stat] != 0) {
 				v2 = Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]);
 				if (v2 > Goal[stat] && Goal[stat] > 0)
@@ -526,11 +603,19 @@ namespace RuneOptim.BuildProcessing {
 					outvals[stat] = v2;
 				str = v2.ToString("0.#") + " (" + current[stat] + ")";
 			}
+			else {
+				str = vv.ToString(System.Globalization.CultureInfo.CurrentUICulture);
+			}
 
 			return v2;
 		}
 
-
+		/// <summary>
+		/// Use the builds score function to return the score contribution for a single Extra.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <returns></returns>
 		public double ScoreExtra(Stats current, Attr stat) {
 			if (current == null)
 				return 0;
@@ -549,6 +634,13 @@ namespace RuneOptim.BuildProcessing {
 			return 0;
 		}
 
+		/// <summary>
+		/// Overload that takes the branching null-check op out
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreExtra(Stats current, Attr stat, Stats outvals) {
 			if (current == null)
 				return 0;
@@ -568,6 +660,14 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		/// <summary>
+		/// Overload that outputs a nice string.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="stat"></param>
+		/// <param name="str"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreExtra(Stats current, Attr stat, out string str, Stats outvals = null) {
 			str = "";
 			if (current == null)
@@ -590,6 +690,12 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		/// <summary>
+		/// Use the builds score function to return the score contribution for a single skill.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="j"></param>
+		/// <returns></returns>
 		public double ScoreSkill(Stats current, int j) {
 			if (current == null)
 				return 0;
@@ -608,7 +714,13 @@ namespace RuneOptim.BuildProcessing {
 			return 0;
 		}
 
-
+		/// <summary>
+		/// Overload that reduces the branching op count in critical loops
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="j"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreSkill(Stats current, int j, Stats outvals) {
 			if (current == null)
 				return 0;
@@ -627,6 +739,14 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		/// <summary>
+		/// Overload that provides a nice string
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="j"></param>
+		/// <param name="str"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double ScoreSkill(Stats current, int j, out string str, Stats outvals = null) {
 			str = "";
 			if (current == null)
@@ -648,19 +768,35 @@ namespace RuneOptim.BuildProcessing {
 			return v2;
 		}
 
+		/// <summary>
+		/// Calculate and cache the score
+		/// </summary>
+		/// <param name="current"></param>
+		/// <returns></returns>
 		public double LastScore(Stats current ) {
 			if (lastScore == float.MinValue)
 				CalcScore(current);
 			return lastScore;
 		}
 
+		/// <summary>
+		/// Overload that will calc score providing a breakdown
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double LastScore(Stats current, Stats outvals) {
 			if (lastScore == float.MinValue)
 				CalcScore(current, outvals);
 			return lastScore;
 		}
 
-		// build the scoring function
+		/// <summary>
+		/// Use the scoring function on the given Stats, writing string out.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="writeTo"></param>
+		/// <returns></returns>
 		public double CalcScore(Stats current, Action<string, int> writeTo) {
 			if (current == null)
 				return 0;
@@ -669,7 +805,6 @@ namespace RuneOptim.BuildProcessing {
 			double pts = 0;
 			// dodgy hack for indexing in Generate ListView
 
-			// TODO: instead of -Goal, make everything >Goal /2
 			int i = 2;
 			foreach (Attr stat in StatEnums) {
 				pts += ScoreStat(current, stat, out str);
@@ -694,7 +829,13 @@ namespace RuneOptim.BuildProcessing {
 			return pts;
 		}
 
-		// build the scoring function
+		/// <summary>
+		/// Run the scoring function on given stats, providing formatted strings and a breakdown.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="writeTo"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double CalcScore(Stats current, Action<string, int> writeTo, Stats outvals) {
 			if (current == null)
 				return 0;
@@ -730,6 +871,13 @@ namespace RuneOptim.BuildProcessing {
 			return pts;
 		}
 
+		/// <summary>
+		/// Use the scoring function to evaluate a Rune on a Monster given a guess of the average stats of the other runes.
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <param name="current"></param>
+		/// <param name="avg"></param>
+		/// <returns></returns>
 		public double CalcScore(Rune rune, Monster current, Stats avg = null) {
 			if (rune == null)
 				return 0;
@@ -767,6 +915,13 @@ namespace RuneOptim.BuildProcessing {
 
 		}
 
+		/// <summary>
+		/// Calculate the score of a rune applied to a monster, providing a breakdown.
+		/// </summary>
+		/// <param name="rune"></param>
+		/// <param name="current"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double CalcScore(Rune rune, Monster current, ref Stats outvals) {
 			if (rune == null)
 				return 0;
@@ -781,7 +936,6 @@ namespace RuneOptim.BuildProcessing {
 			
 			var a = t.GetStats() - s;
 			current.SkillFunc.CopyTo(a.SkillFunc, 0);
-
 
 			int i = 2;
 			foreach (Attr stat in StatEnums) {
@@ -804,6 +958,11 @@ namespace RuneOptim.BuildProcessing {
 
 		}
 
+		/// <summary>
+		/// Score the given set of stats.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <returns></returns>
 		public double CalcScore(Stats current) {
 			if (current == null)
 				return 0;
@@ -833,7 +992,12 @@ namespace RuneOptim.BuildProcessing {
 			return pts;
 		}
 
-		// build the scoring function
+		/// <summary>
+		/// Score the given stats, providing a breakdown.
+		/// </summary>
+		/// <param name="current"></param>
+		/// <param name="outvals"></param>
+		/// <returns></returns>
 		public double CalcScore(Stats current, Stats outvals) {
 			if (current == null)
 				return 0;
@@ -865,6 +1029,11 @@ namespace RuneOptim.BuildProcessing {
 			return pts;
 		}
 
+		/// <summary>
+		/// Downgrade the includedness of a RuneSet.
+		/// If a set is Included -> Uninclude. Required -> Included.
+		/// </summary>
+		/// <param name="set"></param>
 		public void ToggleIncludedSet(RuneSet set) {
 			if (BuildSets.Contains(set)) {
 				BuildSets.Remove(set);
@@ -875,6 +1044,12 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
+		/// <summary>
+		/// Cycle the requiredness of a set.
+		/// Eg. 0 -> 1 -> 2 -> 3 -> 0.
+		/// </summary>
+		/// <param name="set"></param>
+		/// <returns></returns>
 		public int AddRequiredSet(RuneSet set) {
 			if (BuildSets.Contains(set)) {
 				BuildSets.Remove(set);
@@ -887,12 +1062,21 @@ namespace RuneOptim.BuildProcessing {
 			return RequiredSets.Count(s => s == set);
 		}
 
+		/// <summary>
+		/// Ensure that this rune is included (ignored if Required).
+		/// </summary>
+		/// <param name="set"></param>
 		public void AddIncludedSet(RuneSet set) {
 			if (RequiredSets.Any(s => s == set) || BuildSets.Any(s => s == set))
 				return;
 			BuildSets.Add(set);
 		}
 
+		/// <summary>
+		/// Remove any count of this RuneSet from being required.
+		/// </summary>
+		/// <param name="set"></param>
+		/// <returns></returns>
 		public int RemoveRequiredSet(RuneSet set) {
 			int num = 0;
 			while (RequiredSets.Any(s => s == set)) {
@@ -902,6 +1086,11 @@ namespace RuneOptim.BuildProcessing {
 			return num;
 		}
 
+		/// <summary>
+		/// Fills in the given arrays based on the builds configuration, including fallthrough from Global > Odd/Even > Slot#.
+		/// </summary>
+		/// <param name="slotFakes"></param>
+		/// <param name="slotPred"></param>
 		public void getPrediction(int?[] slotFakes, bool[] slotPred) {
 			// crank the rune prediction
 			for (int i = 0; i < 6; i++) {
@@ -935,6 +1124,15 @@ namespace RuneOptim.BuildProcessing {
 		}
 
 		//Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, 
+
+		/// <summary>
+		/// Go through all the Global|Odd/Even|Slot# filters and create the dominant functions.
+		/// </summary>
+		/// <param name="slot"></param>
+		/// <param name="rFlat"></param>
+		/// <param name="rPerc"></param>
+		/// <param name="rTest"></param>
+		/// <returns></returns>
 		public bool RunFilters(int slot, out Stats rFlat, out Stats rPerc, out Stats rTest) {
 			bool hasFilter = false;
 			rFlat = new Stats();
@@ -990,6 +1188,11 @@ namespace RuneOptim.BuildProcessing {
 			return hasFilter;
 		}
 
+		/// <summary>
+		/// Check the heirarchy for what FakeLevel this Rune should be.
+		/// </summary>
+		/// <param name="r"></param>
+		/// <returns></returns>
 		public int GetFakeLevel(Rune r) {
 			int? pred = RunePrediction.ContainsKey(SlotIndex.Global) ? RunePrediction[SlotIndex.Global].Key : null;
 
@@ -1010,6 +1213,13 @@ namespace RuneOptim.BuildProcessing {
 			return pred ?? 0;
 		}
 
+		/// <summary>
+		/// Run the RuneScoring function on a Rune with fakeness and prediction.
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="raiseTo"></param>
+		/// <param name="predictSubs"></param>
+		/// <returns></returns>
 		public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false) {
 			FilterType and = LoadFilters(r.Slot, out _);
 			if (RunFilters(r.Slot, out Stats rFlat, out Stats rPerc, out Stats rTest)) {
@@ -1026,6 +1236,12 @@ namespace RuneOptim.BuildProcessing {
 			return 0;
 		}
 
+		/// <summary>
+		/// Determine the FilterType for a slot via the heirarchy and return the testValue.
+		/// </summary>
+		/// <param name="slot"></param>
+		/// <param name="testVal"></param>
+		/// <returns></returns>
 		public FilterType LoadFilters(int slot, out double? testVal) {
 			// which tab we pulled the filter from
 			testVal = null;
@@ -1073,6 +1289,13 @@ namespace RuneOptim.BuildProcessing {
 			return and;
 		}
 
+		/// <summary>
+		/// Generate the RuneScoring function for the given slot.
+		/// </summary>
+		/// <param name="slot"></param>
+		/// <param name="raiseTo"></param>
+		/// <param name="predictSubs"></param>
+		/// <returns></returns>
 		public Predicate<Rune> MakeRuneScoring(int slot, int raiseTo = 0, bool predictSubs = false) {
 			// the value to test SUM against
 			FilterType and = LoadFilters(slot, out double? testVal);
@@ -1112,7 +1335,12 @@ namespace RuneOptim.BuildProcessing {
 			return r => false;
 		}
 
-		// Try to determine the subs required to meet the minimum. Will guess Evens by: Slot, Health%, Attack%, Defense%
+		/// <summary>
+		/// Try to determine the subs required to meet the minimum. Will guess Evens by: Slot, Health%, Attack%, Defense%
+		/// </summary>
+		/// <param name="slotFakes"></param>
+		/// <param name="slotPred"></param>
+		/// <returns></returns>
 		public Stats NeededForMin(int?[] slotFakes, bool[] slotPred) {
 			foreach (var rs in runes) {
 				if (rs.Length <= 0)
@@ -1207,6 +1435,10 @@ namespace RuneOptim.BuildProcessing {
 			return ret;
 		}
 
+		/// <summary>
+		/// Uses the ManageStats to find runes which almost came close to being picked.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<Rune> GetPowerupRunes() {
 			if (!Loads.Any())
 				return new Rune[] { };
@@ -1224,9 +1456,174 @@ namespace RuneOptim.BuildProcessing {
 			return Loads.SelectMany(b => b.Current.Runes.Where(r => Math.Max(12, r.Level) < r.Rarity * 3 || r.Level < 12 || r.Level < GetFakeLevel(r))).Distinct();
 		}
 
-		// Make sure that for each set type, there are enough slots with runes in them
-		// Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4
-		// for each included set
+		/// <summary>
+		/// Return the best increase of <paramref name="attr"/> of the subset of RuneSets <paramref name="ofThese"/>
+		/// </summary>
+		/// <param name="attr"></param>
+		/// <param name="ofThese"></param>
+		/// <returns>Percentage stat increase</returns>
+		public static double BestEffect(Attr attr, IEnumerable<RuneSet> ofThese = null) {
+			switch (attr) {
+				case Attr.HealthFlat:
+				case Attr.HealthPercent:
+					if (ofThese == null || ofThese.Contains(RuneSet.Energy))
+						return 15 * 3;
+					if (ofThese.Contains(RuneSet.Enhance))
+						return 8 * 3;
+					break;
+				case Attr.AttackFlat:
+				case Attr.AttackPercent:
+					if (ofThese == null || ofThese.Contains(RuneSet.Fatal))
+						return 35;
+					if (ofThese.Contains(RuneSet.Fight))
+						return 8 * 3;
+					break;
+				case Attr.DefenseFlat:
+				case Attr.DefensePercent:
+					if (ofThese == null || ofThese.Contains(RuneSet.Guard))
+						return 15 * 3;
+					if (ofThese.Contains(RuneSet.Determination))
+						return 8 * 3;
+					break;
+				case Attr.SpeedPercent:
+				case Attr.Speed:
+					if (ofThese == null || ofThese.Contains(RuneSet.Swift))
+						return 25;
+					break;
+				case Attr.CritRate:
+					if (ofThese == null || ofThese.Contains(RuneSet.Blade))
+						return 12 * 3;
+					break;
+				case Attr.CritDamage:
+					if (ofThese == null || ofThese.Contains(RuneSet.Rage))
+						return 40;
+					break;
+				case Attr.Resistance:
+					if (ofThese == null || ofThese.Contains(RuneSet.Endure))
+						return 20 * 3;
+					if (ofThese.Contains(RuneSet.Tolerance))
+						return 10 * 3;
+					break;
+				case Attr.Accuracy:
+					if (ofThese == null || ofThese.Contains(RuneSet.Focus))
+						return 20 * 3;
+					if (ofThese.Contains(RuneSet.Accuracy))
+						return 10 * 3;
+					break;
+			}
+			return 0;
+		}
+
+		/// <summary>
+		/// This will work through runes[][] to remove runes which would <i>never</i> be able to meet the minimum requirements.
+		/// </summary>
+		private void cleanMinimum() {
+
+			if (Minimum == null || !Minimum.IsNonZero) {
+				return;
+			}
+
+			int?[] fake = new int?[6];
+			bool[] pred = new bool[6];
+
+			getPrediction(fake, pred);
+
+			var hasSets = runes.SelectMany(r => r).Select(r => r.Set).Distinct();
+
+			bool removedOne = true;
+			while (removedOne) {
+				// we haven't removed any on this pass
+				removedOne = false;
+
+				// go through each non-zero stat
+				foreach( var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed }) {
+
+					if (Minimum[attr].EqualTo(0))
+						continue;
+
+					var bb = Mon[attr];
+
+					for (int i = 0; i < 6; i++) {
+						// start the counting at the best runeset bonus we could get
+						double totEff = bb * (1 + BestEffect(attr, hasSets) * 0.01f) ;
+
+						for (int j = 0; j < 6; j++) {
+							if (i == j)
+								continue;
+
+							double maxEff = 0;
+
+							double eff = 0;
+							foreach (var u in runes[j]) {
+								var p = u[attr, fake[j] ?? 0, pred[j]];
+								var f = u[attr - 1, fake[j] ?? 0, pred[j]];
+								if (attr == Attr.Speed) {
+									f = p;
+									p = 0;
+								}
+								eff = bb * ( p * 0.01) + f;
+
+								if (eff > maxEff) {
+									maxEff = eff;
+								}
+							}
+							totEff += maxEff;
+						}
+
+						// pick the runes which really won't make the cut
+						var garbo = runes[i].Where(r => bb * ( 0.01 * (r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }))) + r[attr - 1, fake[i] ?? 0, pred[i]] + totEff < Minimum[attr]).ToArray();
+
+						if (garbo.Length > 0)
+							removedOne = true;
+
+						runes[i] = runes[i].Except(garbo).ToArray();
+					}
+				}
+
+				foreach (var attr in new Attr[] {  Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
+
+					if (Minimum[attr].EqualTo(0))
+						continue;
+
+					var bb = Mon[attr];
+
+					for (int i = 0; i < 6; i++) {
+						double totEff = bb + BestEffect(attr, hasSets);
+
+						for (int j = 0; j < 6; j++) {
+							if (i == j)
+								continue;
+
+							double maxEff = 0;
+
+							double eff = 0;
+							foreach (var u in runes[j]) {
+								var f = u[attr, fake[j] ?? 0, pred[j]];
+								eff = bb + f;
+
+								if (eff > maxEff) {
+									maxEff = eff;
+								}
+							}
+							totEff += maxEff;
+						}
+
+						var garbo = runes[i].Where(r => bb + r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }) + totEff < Minimum[attr]).ToArray();
+
+						if (garbo.Length > 0)
+							removedOne = true;
+
+						runes[i] = runes[i].Except(garbo).ToArray();
+					}
+				}
+			}
+		}
+
+		/// <summary>
+		/// Make sure that for each set type, there are enough slots with runes in them
+		/// Eg. if only 1,4,5 have Violent, remove all violent runes because you need 4
+		/// for each included set
+		/// </summary>
 		private void cleanBroken() {
 			if (!AllowBroken) {
 				var used = runes[0].Concat(runes[1]).Concat(runes[2]).Concat(runes[3]).Concat(runes[4]).Concat(runes[5]).Select(r => r.Set).Distinct();
@@ -1249,7 +1646,13 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
-		// assumes Stat A/D/H are percent
+		/// <summary>
+		/// Checks how many of the stat scores in s are met or exceeded by r. 
+		/// Assumes Stat A/D/H are percent
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="s"></param>
+		/// <returns></returns>
 		private int runeHasStats(Rune r, Stats s) {
 			int ret = 0;
 
@@ -1274,7 +1677,14 @@ namespace RuneOptim.BuildProcessing {
 			return ret;
 		}
 
-		// assumes Stat A/D/H are percent
+		/// <summary>
+		/// Returns the sum of how much the rune fufills the Stat requirement.
+		/// Eg. if the stat has 10% ATK & 20% HP, and the rune only has 5% ATK, it will return 0.5.
+		/// Assumes Stat A/D/H are percent
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="s"></param>
+		/// <returns></returns>
 		private double runeVsStats(Rune r, Stats s) {
 			double ret = 0;
 
