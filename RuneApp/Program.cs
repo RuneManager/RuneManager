@@ -179,18 +179,18 @@ namespace RuneApp {
 		}
 
 		private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
-			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Error");
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Task Error");
 		}
 
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
 			if (e.ExceptionObject is Exception exception)
-				MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace , "Error");
+				MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace , "Domain Error");
 			else
 				MessageBox.Show(e.ExceptionObject?.ToString() , "Error");
 		}
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e) {
-			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Error");
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Thread Error");
 		}
 
 		static string lastPrint = null;

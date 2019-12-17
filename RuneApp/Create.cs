@@ -345,10 +345,10 @@ namespace RuneApp {
 
 					string stat = Build.StatNames[i];
 					if (i < 3) {
-						if (bl.Contains(stat + "flat"))
+						if (bl.Contains(stat + "flat") || bl.Count == 0)
 							lv.Items.Find(stat + "flat", true).FirstOrDefault().Group = lv.Groups[0];
 
-						if (bl.Contains(stat + "perc") || build.New)
+						if (bl.Contains(stat + "perc") || bl.Count == 0)
 							lv.Items.Find(stat + "perc", true).FirstOrDefault().Group = lv.Groups[0];
 					}
 					else {
@@ -359,7 +359,7 @@ namespace RuneApp {
 						if (j == 2 && (stat != "ACC" && stat != "RES"))
 							continue;
 
-						if (bl.Contains(stat + (stat == "SPD" ? "flat" : "perc")) || build.New)
+						if (bl.Contains(stat + (stat == "SPD" ? "flat" : "perc")) || bl.Count == 0)
 							lv.Items.Find(stat + (stat == "SPD" ? "flat" : "perc"), true).FirstOrDefault().Group = lv.Groups[0];
 					}
 				}
