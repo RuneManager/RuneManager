@@ -1315,6 +1315,8 @@ namespace RuneOptim.BuildProcessing {
 			// no filter data = use all
 			// Set the test based on the type found
 			switch (and) {
+				case FilterType.None:
+					return r => true;
 				case FilterType.Or:
 					return r => r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs);
 				case FilterType.And:

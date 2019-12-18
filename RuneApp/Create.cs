@@ -590,6 +590,7 @@ namespace RuneApp {
 				var ss = (RuneSet)sl.Tag;
 				if (build.RequiredSets.Contains(ss)) {
 					build.RemoveRequiredSet(ss);
+					build.AddIncludedSet(ss);
 				}
 				else if (build.BuildSets.Contains(ss)) {
 					build.ToggleIncludedSet(ss);
