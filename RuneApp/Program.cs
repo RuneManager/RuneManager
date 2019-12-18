@@ -464,7 +464,16 @@ namespace RuneApp {
 							b.Threshold = b.Maximum;
 							b.Maximum = new Stats();
 							break;
-
+						case 1:
+							foreach (var tabN in b.RuneScoring.Keys.ToArray()) {
+								var tab = b.RuneScoring[tabN];
+								if (tab.Type == FilterType.SumN) {
+									tab.Count = (int?)(tab.Value);
+									tab.Value = null;
+									b.RuneScoring[tabN] = tab;
+								}
+							}
+							break;
 					}
 					b.VERSIONNUM++;
 				}

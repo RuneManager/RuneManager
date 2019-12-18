@@ -215,10 +215,17 @@ namespace RuneOptim.BuildProcessing {
 							Predicate<Rune> slotTest = MakeRuneScoring(i + 1, slotFakes[i] ?? 0, slotPred[i]);
 
 							runes[i] = runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
-							if (LoadFilters(i + 1, out double? n) == FilterType.SumN) {
+							var filt = LoadFilters(i + 1);
+							if (filt.Count != null) {
 
-								var rr = runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r.Take(Math.Max(2, (int)((n ?? 30) * 0.25))));
-								runes[i] = rr.Concat(runes[i].AsParallel().Where(r => !RequiredSets.Contains(r.Set)).Take((int)(n ?? 30) - rr.Count())).ToArray();
+								var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
+								var perc = RequiredSets.Count / (float)tSets;
+								var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
+
+								var rr = runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
+
+								var incLoad = (filt.Count ?? AutoRuneAmount) - rr.Count();
+								runes[i] = rr.Concat(runes[i].AsParallel().Where(r => !RequiredSets.Contains(r.Set)).Take(incLoad)).ToArray();
 
 								// TODO: pick 20% per required set
 								// Then fill remaining with the best from included

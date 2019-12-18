@@ -34,7 +34,7 @@ namespace RuneApp {
 				filterJoin.Size = new Size(72, 21);
 				FilterType filter = FilterType.None;
 				if (build.RuneScoring.ContainsKey(tabIndexes[t]))
-					filter = build.RuneScoring[tabIndexes[t]].Key;
+					filter = build.RuneScoring[tabIndexes[t]].Type;
 				filterJoin.SelectedItem = filter;
 
 				filterJoin.SelectionChangeCommitted += filterJoin_SelectedIndexChanged;
@@ -112,6 +112,15 @@ namespace RuneApp {
 				x += colWidth;
 
 				page.Controls.MakeControl<Label>(tab, "Check", x, y, 60, 14);
+
+				x = predX;
+				y += rowHeight;
+
+				page.Controls.MakeControl<Label>(tab, "countT", x - 13, y, 55, 20, "Pick Top");
+				x += colWidth;
+
+				textBox = page.Controls.MakeControl<TextBox>(tab, "count", x, y - 2);
+				textBox.TextChanged += global_TextChanged;
 
 				x = predX;
 				y += rowHeight + 8;
@@ -436,20 +445,25 @@ namespace RuneApp {
 				if (!build.RuneScoring.ContainsKey(tabdex) && build.RuneFilters.ContainsKey(tabdex)) {
 					// if there is a non-zero
 					if (build.RuneFilters[tabdex].Any(r => r.Value.NonZero)) {
-						build.RuneScoring.Add(tabdex, new KeyValuePair<FilterType, double?>(FilterType.None, null));
+						build.RuneScoring.Add(tabdex, new Build.RuneScoreFilter());
 					}
 				}
 				if (build.RuneScoring.ContainsKey(tabdex)) {
 					var kv = build.RuneScoring[tabdex];
 					var ctrlTest = Controls.Find(tab + "test", true).FirstOrDefault();
+					var ctrlCount = Controls.Find(tab + "count", true).FirstOrDefault();
 
 					//if (!string.IsNullOrWhiteSpace(ctrlTest?.Text))
 					double? testVal = null;
+					int? count = null;
 					double tempval;
 					if (double.TryParse(ctrlTest?.Text, out tempval))
 						testVal = tempval;
 
-					build.RuneScoring[tabdex] = new KeyValuePair<FilterType, double?>(kv.Key, testVal);
+					if (double.TryParse(ctrlCount?.Text, out tempval))
+						count = (int)tempval;
+
+					build.RuneScoring[tabdex] = new Build.RuneScoreFilter(kv.Type, testVal, count);
 
 				}
 				TextBox tb = (TextBox)Controls.Find(tab + "raise", true).FirstOrDefault();
@@ -804,7 +818,7 @@ namespace RuneApp {
 			}
 
 			var kv = build.RuneScoring[tabdex];
-			FilterType scoring = kv.Key;
+			FilterType scoring = kv.Type;
 			if (scoring == FilterType.And)
 				res = true;
 
@@ -839,7 +853,7 @@ namespace RuneApp {
 
 			foreach (var tbf in build.RuneFilters) {
 				if (build.RuneScoring.ContainsKey(tbf.Key)) {
-					FilterType and = build.RuneScoring[tbf.Key].Key;
+					FilterType and = build.RuneScoring[tbf.Key].Type;
 					double sum = 0;
 
 					foreach (var rbf in tbf.Value) {

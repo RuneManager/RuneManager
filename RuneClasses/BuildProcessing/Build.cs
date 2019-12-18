@@ -239,13 +239,44 @@ namespace RuneOptim.BuildProcessing {
 		/// </summary>
 		[JsonProperty("runeScoring")]
 		[JsonConverter(typeof(DictionaryWithSpecialEnumKeyConverter))]
-		public Dictionary<SlotIndex, KeyValuePair<FilterType, double?>> RuneScoring { get; set; } = new Dictionary<SlotIndex, KeyValuePair<FilterType, double?>>();
+		public Dictionary<SlotIndex, RuneScoreFilter> RuneScoring { get; set; } = new Dictionary<SlotIndex, RuneScoreFilter>();
+
+		public struct RuneScoreFilter {
+			[Obsolete("Used for upgrading JSON files")]
+			public FilterType Key { set => Type = value; }
+
+			public FilterType Type;
+			public double? Value;
+			public int? Count;
+
+			public RuneScoreFilter(FilterType t = FilterType.None, double? v = null, int? c = null) {
+				Type = t;
+				Value = v;
+				Count = c;
+			}
+
+			public override bool Equals(object obj) {
+				if (obj is null || !(obj is RuneScoreFilter rhs))
+					return base.Equals(obj);
+				return this == rhs;
+			}
+
+			public static bool operator ==(RuneScoreFilter lhs, RuneScoreFilter rhs) {
+				return lhs.Count == rhs.Count && lhs.Type == rhs.Type && lhs.Value == rhs.Value;
+			}
+
+
+			public static bool operator !=(RuneScoreFilter lhs, RuneScoreFilter rhs) {
+				return !(lhs == rhs);
+			}
+		}
 
 		public bool ShouldSerializeRuneScoring() {
-			Dictionary<SlotIndex, KeyValuePair<FilterType, double?>> nscore = new Dictionary<SlotIndex, KeyValuePair<FilterType, double?>>();
+			Dictionary<SlotIndex, RuneScoreFilter> nscore = new Dictionary<SlotIndex, RuneScoreFilter>();
+			// filter out all the "default" values
 			foreach (var tabPair in RuneScoring) {
-				if (tabPair.Value.Key != 0 || tabPair.Value.Value != null)
-					nscore.Add(tabPair.Key, new KeyValuePair<FilterType, double?>(tabPair.Value.Key, tabPair.Value.Value));
+				if (tabPair.Value.Type != 0 || tabPair.Value.Value != null || tabPair.Value.Count != null)
+					nscore.Add(tabPair.Key, new RuneScoreFilter(tabPair.Value.Type, tabPair.Value.Value, tabPair.Value.Count));
 			}
 			RuneScoring = nscore;
 
@@ -500,7 +531,7 @@ namespace RuneOptim.BuildProcessing {
 			}
 
 			foreach (var kv in rhs.RuneScoring) {
-				RuneScoring[kv.Key] = new KeyValuePair<FilterType, double?>(kv.Value.Key, kv.Value.Value);
+				RuneScoring[kv.Key] = new RuneScoreFilter(kv.Value.Type, kv.Value.Value, kv.Value.Count);
 			}
 
 			for (int i = 0; i < SlotStats.Length; i++) {
@@ -1227,9 +1258,9 @@ namespace RuneOptim.BuildProcessing {
 		/// <param name="predictSubs"></param>
 		/// <returns></returns>
 		public double ScoreRune(Rune r, int raiseTo = 0, bool predictSubs = false) {
-			FilterType and = LoadFilters(r.Slot, out _);
+			RuneScoreFilter filt = LoadFilters(r.Slot);
 			if (RunFilters(r.Slot, out Stats rFlat, out Stats rPerc, out Stats rTest)) {
-				switch (and) {
+				switch (filt.Type) {
 					case FilterType.Or:
 						return r.Or(rFlat, rPerc, rTest, raiseTo, predictSubs) ? 1 : 0;
 					case FilterType.And:
@@ -1248,10 +1279,9 @@ namespace RuneOptim.BuildProcessing {
 		/// <param name="slot"></param>
 		/// <param name="testVal"></param>
 		/// <returns></returns>
-		public FilterType LoadFilters(int slot, out double? testVal) {
+		public RuneScoreFilter LoadFilters(int slot) {
+			RuneScoreFilter filt = new RuneScoreFilter();
 			// which tab we pulled the filter from
-			testVal = null;
-			FilterType and = 0;
 
 			// TODO: check what inheriting SUM (eg. Odd and 3) does
 			// TODO: check what inheriting AND/OR then SUM (or visa versa)
@@ -1259,40 +1289,46 @@ namespace RuneOptim.BuildProcessing {
 			// find the most significant operatand of joining checks
 			if (RuneScoring.ContainsKey(SlotIndex.Global)) {
 				var kv = RuneScoring[SlotIndex.Global];
-				if (kv.Key != FilterType.None) {
-					if (RuneFilters.ContainsKey(SlotIndex.Global) || kv.Key == FilterType.SumN)
-						and = kv.Key;
+				if (kv.Type != FilterType.None) {
+					if (RuneFilters.ContainsKey(SlotIndex.Global) || kv.Type == FilterType.SumN)
+						filt.Type = kv.Type;
 					if (kv.Value != null) {
-						testVal = kv.Value;
+						filt.Value = kv.Value;
 					}
+					if (kv.Count != null)
+						filt.Count = kv.Count;
 				}
 			}
 			// is it and odd or even slot?
 			var tmk = slot % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd;
 			if (RuneScoring.ContainsKey(tmk)) {
 				var kv = RuneScoring[tmk];
-				if (kv.Key != FilterType.None) {
-					if (RuneFilters.ContainsKey(tmk) || kv.Key == FilterType.SumN)
-						and = kv.Key;
+				if (kv.Type != FilterType.None) {
+					if (RuneFilters.ContainsKey(tmk) || kv.Type == FilterType.SumN)
+						filt.Type = kv.Type;
 					if (kv.Value != null) {
-						testVal = kv.Value;
+						filt.Value = kv.Value;
 					}
+					if (kv.Count != null)
+						filt.Count = kv.Count;
 				}
 			}
 			// turn the 0-5 to a 1-6
 			tmk = (SlotIndex)slot;
 			if (RuneScoring.ContainsKey(tmk)) {
 				var kv = RuneScoring[tmk];
-				if (kv.Key != FilterType.None) {
-					if (RuneFilters.ContainsKey(tmk) || kv.Key == FilterType.SumN)
-						and = kv.Key;
+				if (kv.Type != FilterType.None) {
+					if (RuneFilters.ContainsKey(tmk) || kv.Type == FilterType.SumN)
+						filt.Type = kv.Type;
 					if (kv.Value != null) {
-						testVal = kv.Value;
+						filt.Value = kv.Value;
 					}
+					if (kv.Count != null)
+						filt.Count = kv.Count;
 				}
 			}
 
-			return and;
+			return filt;
 		}
 
 		/// <summary>
@@ -1304,7 +1340,7 @@ namespace RuneOptim.BuildProcessing {
 		/// <returns></returns>
 		public Predicate<Rune> MakeRuneScoring(int slot, int raiseTo = 0, bool predictSubs = false) {
 			// the value to test SUM against
-			FilterType and = LoadFilters(slot, out double? testVal);
+			RuneScoreFilter filt = LoadFilters(slot);
 
 			// this means that runes won't get in unless they meet at least 1 criteria
 			// if an operand was found, ensure the tab contains filter data
@@ -1314,7 +1350,7 @@ namespace RuneOptim.BuildProcessing {
 
 			// no filter data = use all
 			// Set the test based on the type found
-			switch (and) {
+			switch (filt.Type) {
 				case FilterType.None:
 					return r => true;
 				case FilterType.Or:
@@ -1322,22 +1358,14 @@ namespace RuneOptim.BuildProcessing {
 				case FilterType.And:
 					return r => r.And(rFlat, rPerc, rTest, raiseTo, predictSubs);
 				case FilterType.Sum:
-					return r => {
-						if (!System.Diagnostics.Debugger.IsAttached)
-							RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
-						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
-						if (!System.Diagnostics.Debugger.IsAttached)
-							RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
-						return vv >= testVal;
-					};
 				case FilterType.SumN:
 					return r => {
 						if (!System.Diagnostics.Debugger.IsAttached)
 							RuneLog.Debug("[" + slot + "] Checking " + r.Id + " {");
 						var vv = r.Test(rFlat, rPerc, raiseTo, predictSubs);
 						if (!System.Diagnostics.Debugger.IsAttached)
-							RuneLog.Debug("\t\t" + vv + " against " + testVal + "}" + (vv >= testVal));
-						return true;
+							RuneLog.Debug("\t\t" + vv + " against " + filt.Value + "}" + (vv >= filt.Value));
+						return filt.Value == null || vv >= filt.Value;
 					};
 			}
 			return r => false;

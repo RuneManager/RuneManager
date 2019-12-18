@@ -15,7 +15,7 @@ namespace RuneApp {
 		public Build build = null;
 
 		// controls builds version numbers
-		public static readonly int VERSIONNUM = 1;
+		public static readonly int VERSIONNUM = 2;
 
 		// Keep track of the runeset groups for speed swaps
 		private ListViewGroup rsInc;
@@ -252,15 +252,20 @@ namespace RuneApp {
 			ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
 			if (ctrl != null) ctrl.Enabled = RuneSumFilterEnabled((FilterType)box.SelectedItem);
 
+			int count = 30;
 			double? test = null;
 			double temp;
 			ctrl = tab.Controls.Find(tabName + "test", false).FirstOrDefault();
 			if (double.TryParse(ctrl?.Text, out temp))
 				test = temp;
 
+			ctrl = tab.Controls.Find(tabName + "count", false).FirstOrDefault();
+			if (double.TryParse(ctrl?.Text, out temp))
+				count = (int)temp;
+
 			if (!build.RuneScoring.ContainsKey(ExtensionMethods.GetIndex(tabName)))
-				build.RuneScoring.Add(ExtensionMethods.GetIndex(tabName), new KeyValuePair<FilterType, double?>((FilterType)box.SelectedItem, test));
-			build.RuneScoring[ExtensionMethods.GetIndex(tabName)] = new KeyValuePair<FilterType, double?>((FilterType)box.SelectedItem, test);
+				build.RuneScoring.Add(ExtensionMethods.GetIndex(tabName), new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count));
+			build.RuneScoring[ExtensionMethods.GetIndex(tabName)] = new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count);
 
 			// TODO: trim the ZERO nodes on the tree
 
@@ -412,7 +417,7 @@ namespace RuneApp {
 				// find that box
 				ComboBox box = (ComboBox)ctab.Controls.Find(ctab.Tag + "join", true).FirstOrDefault();
 				// manually kajigger it
-				box.SelectedItem = tab.Value.Key;
+				box.SelectedItem = tab.Value.Type;
 				Control ctrl;
 				foreach (var stat in Build.StatNames) {
 					foreach (var type in new string[] { "flat", "perc" }) {
@@ -431,6 +436,11 @@ namespace RuneApp {
 				var tb = (TextBox)ctab.Controls.Find(ctab.Tag + "test", true).FirstOrDefault();
 				if (tab.Value.Value != 0)
 					tb.Text = tab.Value.Value.ToString();
+
+
+				tb = (TextBox)ctab.Controls.Find(ctab.Tag + "count", true).FirstOrDefault();
+				if (tab.Value.Count != 0)
+					tb.Text = tab.Value.Count.ToString();
 			}
 
 			checkBuffAtk.Checked = build.Buffs.Attack;

@@ -402,7 +402,7 @@ namespace RuneApp {
 
 				var rf = build.RuneFilters.ContainsKey((SlotIndex)slot) ? build.RuneFilters[(SlotIndex)slot] : null;
 
-				var btest = build.RuneScoring.ContainsKey((SlotIndex)slot) ? build.RuneScoring[(SlotIndex)slot] : new KeyValuePair<FilterType, double?>(FilterType.None, null);
+				var btest = build.RuneScoring.ContainsKey((SlotIndex)slot) ? build.RuneScoring[(SlotIndex)slot] : new Build.RuneScoreFilter();
 				double? test = btest.Value;
 				bool isTestInherited = false;
 				string testForm = null;
