@@ -250,7 +250,7 @@ namespace RuneOptim.swar {
 		readonly static object lockSlow = new object();
 
 		public static T AskSWApi<T>(string location, bool refetch = false) {
-			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache") + ".json";
+			var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache").Replace("?", "_") + ".json";
 			var data = "";
 			lock (objLock) {
 				if (apiObjs.ContainsKey(location)) {
