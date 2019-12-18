@@ -534,7 +534,9 @@ namespace RuneOptim.BuildProcessing {
 				return 0;
 			double vv = current[stat];
 
-			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+			if (vv > 85 && (stat == Attr.Accuracy))
+				vv = 85; 
+			if (vv > 100 && (stat == Attr.CritRate || stat == Attr.Resistance))
 				vv = 100;
 			if (Sort[stat] != 0) {
 				var tg = Threshold[stat];
@@ -563,7 +565,9 @@ namespace RuneOptim.BuildProcessing {
 			double vv = current[stat];
 			double v2 = 0;
 
-			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+			if (vv > 85 && (stat == Attr.Accuracy))
+				vv = 85;
+			if (vv > 100 && (stat == Attr.CritRate || stat == Attr.Resistance))
 				vv = 100;
 			if (Sort[stat] != 0) {
 				v2 = Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]);
@@ -592,7 +596,9 @@ namespace RuneOptim.BuildProcessing {
 			double vv = current[stat];
 			double v2 = 0;
 
-			if (vv > 100 && (stat == Attr.Accuracy || stat == Attr.CritRate || stat == Attr.Resistance))
+			if (vv > 85 && (stat == Attr.Accuracy))
+				vv = 85;
+			if (vv > 100 && (stat == Attr.CritRate || stat == Attr.Resistance))
 				vv = 100;
 			if (Sort[stat] != 0) {
 				v2 = Threshold[stat].EqualTo(0) ? vv : Math.Min(vv, Threshold[stat]);
