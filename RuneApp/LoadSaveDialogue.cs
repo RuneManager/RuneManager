@@ -69,7 +69,7 @@ namespace RuneApp {
 			if (File.Exists("save.json"))
 				radSave.Enabled = true;
 
-			localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
+			localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
 
 			bool isLocal = false;
 
@@ -122,7 +122,7 @@ namespace RuneApp {
 			using (OpenFileDialog openFileDialog = new OpenFileDialog())
 			{
 				openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-				openFileDialog.Filter = "SWarFarm JSON|*-swarfarm.json|JSON Data|*.json|All Files|*.*";
+				openFileDialog.Filter = "JSON Data|*.json|SWarFarm JSON|*-swarfarm.json|All Files|*.*";
 				openFileDialog.Multiselect = false;
 				if (openFileDialog.ShowDialog() == DialogResult.OK)
 				{

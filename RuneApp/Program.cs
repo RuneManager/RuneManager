@@ -274,7 +274,7 @@ namespace RuneApp {
 		/// Checks the Working directory for a supported save file
 		/// </summary>
 		public static LoadSaveResult FindSave() {
-			string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*-swarfarm.json");
+			string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
 			if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation)) {
 				return LoadSave(Program.Settings.SaveLocation);
 			}
