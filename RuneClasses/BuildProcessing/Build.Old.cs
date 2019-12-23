@@ -472,46 +472,7 @@ namespace RuneOptim.BuildProcessing {
 
 				var type = types.FirstOrDefault(t => t.AssemblyQualifiedName.Contains(BuildStrategy));
 				if (type != null) {
-					var def = (IBuildStrategyDefinition)Activator.CreateInstance(type);
-					runner = null;
-					try {
-						runner = def.GetRunner();
-						// TODO: fixme
-						var settings = new BuildSettings() {
-							AllowBroken = AllowBroken,
-							BuildDumpBads = BuildDumpBads,
-							BuildGenerate = BuildGenerate,
-							BuildGoodRunes = BuildGoodRunes,
-							BuildSaveStats = BuildSaveStats,
-							BuildTake = BuildTake,
-							BuildTimeout = BuildTimeout,
-							IgnoreLess5 = IgnoreLess5,
-							RunesDropHalfSetStat = RunesDropHalfSetStat,
-							RunesOnlyFillEmpty = RunesOnlyFillEmpty,
-							RunesUseEquipped = RunesUseEquipped,
-							RunesUseLocked = RunesUseLocked,
-							Shrines = Shrines
-						};
-
-						if (runner != null) {
-							runner.Setup(this, settings);
-							tcs.TrySetResult(runner);
-							this.Best = runner.Run(runes.SelectMany(r => r)).Result;
-
-							return BuildResult.Success;
-						}
-					}
-					catch (Exception ex) {
-						tcs.TrySetException(ex);
-						IsRunning = false;
-						return BuildResult.Failure;
-					}
-					finally {
-						tcs = new TaskCompletionSource<IBuildRunner>();
-						IsRunning = false;
-						runner?.TearDown();
-						runner = null;
-					}
+					RunStrategy();
 				}
 			}
 

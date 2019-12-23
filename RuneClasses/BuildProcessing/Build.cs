@@ -551,6 +551,85 @@ namespace RuneOptim.BuildProcessing {
 			}
 		}
 
+		/// <summary>
+		/// Warning: Synchronous, uses the builds current settings.
+		/// </summary>
+		/// <returns></returns>
+		public BuildResult RunStrategy() {
+			return RunStrategy(new BuildSettings() {
+				AllowBroken = AllowBroken,
+				BuildDumpBads = BuildDumpBads,
+				BuildGenerate = BuildGenerate,
+				BuildGoodRunes = BuildGoodRunes,
+				BuildSaveStats = BuildSaveStats,
+				BuildTake = BuildTake,
+				BuildTimeout = BuildTimeout,
+				IgnoreLess5 = IgnoreLess5,
+				RunesDropHalfSetStat = RunesDropHalfSetStat,
+				RunesOnlyFillEmpty = RunesOnlyFillEmpty,
+				RunesUseEquipped = RunesUseEquipped,
+				RunesUseLocked = RunesUseLocked,
+				Shrines = Shrines
+			});
+		}
+
+		/// <summary>
+		/// Warning: Synchronous
+		/// </summary>
+		/// <param name="settings"></param>
+		/// <returns></returns>
+		public BuildResult RunStrategy(BuildSettings settings) {
+			// TODO: put in the old prerun checks
+
+			if (!string.IsNullOrWhiteSpace(BuildStrategy)) {
+
+				var types = AppDomain.CurrentDomain.GetAssemblies().SelectMany(asm => asm.GetTypes().Where(t => typeof(IBuildStrategyDefinition).IsAssignableFrom(t)));
+
+				var type = types.FirstOrDefault(t => t.AssemblyQualifiedName.Contains(BuildStrategy));
+				if (type != null) {
+					RunUsingStrategy(type, settings);
+				}
+			}
+
+			return BuildResult.Failure;
+
+		}
+
+		public BuildResult RunUsingStrategy<T>(BuildSettings settings) where T : IBuildStrategyDefinition {
+			return RunUsingStrategy(typeof(T), settings);
+		}
+
+		public BuildResult RunUsingStrategy(Type strategy, BuildSettings settings) {
+			var def = (IBuildStrategyDefinition)Activator.CreateInstance(strategy);
+			runner = null;
+			try {
+				runner = def.GetRunner();
+				// TODO: fixme
+
+				if (runner != null) {
+					runner.Setup(this, settings);
+					tcs.TrySetResult(runner);
+					this.Best = runner.Run(runes.SelectMany(r => r)).Result;
+
+					return BuildResult.Success;
+				}
+				return BuildResult.Failure;
+			}
+			catch (Exception ex) {
+				tcs.TrySetException(ex);
+				IsRunning = false;
+				return BuildResult.Failure;
+			}
+			finally {
+				tcs = new TaskCompletionSource<IBuildRunner>();
+				IsRunning = false;
+				runner?.TearDown();
+				runner = null;
+			}
+
+		}
+
+
 		public void BanEmTemp(params ulong[] brunes) {
 			BannedRunesTemp.Clear();
 			foreach (var r in brunes) {
