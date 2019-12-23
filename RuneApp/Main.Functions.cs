@@ -168,20 +168,31 @@ namespace RuneApp {
 
 		private void ShowMon(Monster mon) {
 			displayMon = mon;
-			var cur = mon.GetStats();
+			if (mon != null) {
+				var cur = mon.GetStats();
 
-			statName.Text = mon.FullName;
-			statID.Text = mon.Id.ToString();
-			statLevel.Text = mon.level.ToString();
+				statName.Text = mon.FullName;
+				statID.Text = mon.Id.ToString();
+				statLevel.Text = mon.level.ToString();
 
-			ShowStats(cur, mon);
-			ShowLoadout(mon.Current);
+				ShowStats(cur, mon);
+				ShowLoadout(mon.Current);
 
-			var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.monsterTypeId) + ".png";
-			if (File.Exists(fname))
-				monImage.ImageLocation = fname;
-			else
+				var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.monsterTypeId) + ".png";
+				if (File.Exists(fname))
+					monImage.ImageLocation = fname;
+				else
+					monImage.Image = RuneApp.InternalServer.InternalServer.mon_spot;
+			}
+			else {
+				statName.Text = "";
+				statID.Text = "";
+				statLevel.Text = "";
+				ShowStats(null, null);
+				ShowLoadout(null);
 				monImage.Image = RuneApp.InternalServer.InternalServer.mon_spot;
+
+			}
 		}
 
 		private void ShowLoadout(Loadout l) {
@@ -195,85 +206,125 @@ namespace RuneApp {
 			foreach (Attr a in new Attr[] { Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
 				if (statCtrls[(int)a] == null)
 					statCtrls[(int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Base", false).FirstOrDefault();
-				statCtrls[(int)a].Text = mon[a] + (((int)a) > 8 ? "%" : "");
+
+				if (mon == null)
+					statCtrls[(int)a].Text = "";
+				else
+					statCtrls[(int)a].Text = mon[a] + (((int)a) > 8 ? "%" : "");
 
 				if (statCtrls[12 + (int)a] == null)
 					statCtrls[12 + (int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Total", false).FirstOrDefault();
-				statCtrls[12 + (int)a].Text = cur[a] + (((int)a) > 8 ? "%" : "");
+
+				if (cur == null)
+					statCtrls[12 + (int)a].Text = "";
+				else
+					statCtrls[12 + (int)a].Text = cur[a] + (((int)a) > 8 ? "%" : "");
 
 				if (statCtrls[24 + (int)a] == null)
 					statCtrls[24 + (int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Bonus", false).FirstOrDefault();
-				statCtrls[24 + (int)a].Text = "+" + (cur[a] - mon[a]);
+
+				if (cur == null)
+					statCtrls[24 + (int)a].Text = "";
+				else
+					statCtrls[24 + (int)a].Text = "+" + (cur[a] - mon[a]);
 			}
 		}
 
 		private void ShowDiff(Stats old, Stats load, Build build = null) {
 			foreach (Attr stat in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed }) {
 				string sstat = stat.ToShortForm();
-				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
-				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
-				string pts = (load[stat] - old[stat]).ToString();
-				if (build != null && !build.Sort[stat].EqualTo(0)) {
-					var left = build.ScoreStat(load, stat);
-					var right = build.ScoreStat(old, stat);
-					pts += " (" + (left - right).ToString("0.##") + ")";
+				if (old != null && load != null) {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString();
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString();
+					string pts = (load[stat] - old[stat]).ToString();
+					if (build != null && !build.Sort[stat].EqualTo(0)) {
+						var left = build.ScoreStat(load, stat);
+						var right = build.ScoreStat(old, stat);
+						pts += " (" + (left - right).ToString("0.##") + ")";
+					}
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 				}
-				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
+				else {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = "";
+				}
 			}
 
 			foreach (Attr stat in new Attr[] { Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
 				string sstat = stat.ToShortForm();
-				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
-				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
-				var before = old[stat];
-				var after = load[stat];
-				if (stat != Attr.CritDamage) {
-					before = Math.Min(100, before);
-					after = Math.Min(100, after);
+				if (old != null && load != null) {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old[stat].ToString() + "%";
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load[stat].ToString() + "%";
+					var before = old[stat];
+					var after = load[stat];
+					if (stat != Attr.CritDamage) {
+						before = Math.Min(100, before);
+						after = Math.Min(100, after);
+					}
+					string pts = (after - before).ToString();
+					if (build != null && !build.Sort[stat].EqualTo(0)) {
+						var left = build.ScoreStat(load, stat);
+						var right = build.ScoreStat(old, stat);
+						pts += " (" + (left - right).ToString("0.##") + ")";
+					}
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 				}
-				string pts = (after - before).ToString();
-				if (build != null && !build.Sort[stat].EqualTo(0)) {
-					var left = build.ScoreStat(load, stat);
-					var right = build.ScoreStat(old, stat);
-					pts += " (" + (left - right).ToString("0.##") + ")";
+				else {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = "";
 				}
-				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 			}
 
 			foreach (Attr extra in Build.ExtraEnums) {
 				string sstat = extra.ToShortForm();
-				groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString("0");
-				groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString("0");
-				string pts = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString("0");
-				if (build != null && !build.Sort.ExtraGet(extra).EqualTo(0)) {
-					var aa = load.ExtraValue(extra);
-					var cc = old.ExtraValue(extra);
-					Console.WriteLine("" + aa + ", " + cc);
-					var ss = build.Sort.ExtraGet(extra);
+				if (old != null && load != null) {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = old.ExtraValue(extra).ToString("0");
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = load.ExtraValue(extra).ToString("0");
+					string pts = (load.ExtraValue(extra) - old.ExtraValue(extra)).ToString("0");
+					if (build != null && !build.Sort.ExtraGet(extra).EqualTo(0)) {
+						var aa = load.ExtraValue(extra);
+						var cc = old.ExtraValue(extra);
+						Console.WriteLine("" + aa + ", " + cc);
+						var ss = build.Sort.ExtraGet(extra);
 
-					var left = build.ScoreExtra(load, extra);
-					var right = build.ScoreExtra(old, extra);
+						var left = build.ScoreExtra(load, extra);
+						var right = build.ScoreExtra(old, extra);
 
-					pts += " (" + (left - right).ToString("0.##") + ")";
+						pts += " (" + (left - right).ToString("0.##") + ")";
+					}
+
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
 				}
-
-				groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = pts;
+				else {
+					groupBox1.Controls.Find(sstat + "compBefore", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compAfter", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(sstat + "compDiff", false).FirstOrDefault().Text = "";
+				}
 
 			}
 
 			for (int i = 0; i < 4; i++) {
 				var stat = "Skill" + (i + 1);
-				groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
-				groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
-				string pts = (load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)).ToString("0.##");
-				if (build != null && !build.Sort.DamageSkillups[i].EqualTo(0)) {
+				if (old != null && load != null) {
+					groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = old.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
+					groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = load.GetSkillDamage(Attr.AverageDamage, i).ToString("0.##");
+					string pts = (load.GetSkillDamage(Attr.AverageDamage, i) - old.GetSkillDamage(Attr.AverageDamage, i)).ToString("0.##");
+					if (build != null && !build.Sort.DamageSkillups[i].EqualTo(0)) {
 
-					var left = build.ScoreSkill(load, i);
-					var right = build.ScoreSkill(old, i);
+						var left = build.ScoreSkill(load, i);
+						var right = build.ScoreSkill(old, i);
 
-					pts += " (" + (left - right).ToString("0.##") + ")";
+						pts += " (" + (left - right).ToString("0.##") + ")";
+					}
+					groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
 				}
-				groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = pts;
+				else {
+					groupBox1.Controls.Find(stat + "compBefore", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(stat + "compAfter", false).FirstOrDefault().Text = "";
+					groupBox1.Controls.Find(stat + "compDiff", false).FirstOrDefault().Text = "";
+				}
 			}
 		}
 

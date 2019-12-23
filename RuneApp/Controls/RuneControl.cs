@@ -127,8 +127,11 @@ namespace RuneApp {
 
 		public void SetRune(RuneOptim.swar.Rune rune) {
 			Tag = rune;
-			if (rune == null)
+			if (rune == null) {
+				_imageSlot = null;
+				Refresh();
 				return;
+			}
 
 			grade = rune.Grade;
 

@@ -15,24 +15,37 @@ namespace RuneApp {
 		}
 
 		public void UpdateLoad(Loadout load) {
-			UpdateRunes(load.Runes);
-			UpdateSets(load.Sets, !load.SetsFull);
+			if (load != null) {
+				UpdateRunes(load.Runes);
+				UpdateSets(load.Sets, !load.SetsFull);
+			}
+			else {
+				UpdateRunes();
+				UpdateSets();
+			}
 			runeDial.Loadout = load;
 		}
 
-		public void UpdateRunes(Rune[] rs) {
+		public void UpdateRunes(Rune[] rs = null) {
 			runeDial.UpdateRunes(rs);
 
-			foreach (var r in rs) {
-				if (r != null) {
-					int i = r.Slot - 1;
-					runeBoxes[i].SetRune(r);
-					runeBoxes[i].AllowGrind = false;
+			if (rs == null) {
+				foreach (var rb in runeBoxes) {
+					rb.SetRune(null);
+				}
+			}
+			else {
+				foreach (var r in rs) {
+					if (r != null) {
+						int i = r.Slot - 1;
+						runeBoxes[i].SetRune(r);
+						runeBoxes[i].AllowGrind = false;
+					}
 				}
 			}
 		}
 
-		public void UpdateSets(RuneSet[] sets, bool broken) {
+		public void UpdateSets(RuneSet[] sets = null, bool broken = false) {
 			runeDial.UpdateSets(sets, broken);
 		}
 	}

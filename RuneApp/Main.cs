@@ -651,6 +651,11 @@ namespace RuneApp {
 				}
 				lastFocused = loadoutList.FocusedItem;
 			}
+			else {
+				ShowMon(null);
+				ShowLoadout(null);
+				ShowDiff(null, null);
+			}
 
 			int cost = 0;
 			foreach (ListViewItem li in loadoutList.SelectedItems) {

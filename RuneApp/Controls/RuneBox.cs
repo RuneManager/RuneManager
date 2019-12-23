@@ -16,6 +16,7 @@ namespace RuneApp {
 		public RuneBox() {
 			InitializeComponent();
 			subs = new[] { lb1, lb2, lb3, lb4 };
+			SetRune(null);
 		}
 
 		public ulong RuneId { get; set; }
@@ -31,6 +32,25 @@ namespace RuneApp {
 		Label[] subs = null;
 
 		public void SetRune(Rune rune) {
+			if (rune == null) {
+
+				lbMain.Text = "";
+				lbInnate.Text = "";
+
+				for (int i = 0; i < 4; i++) {
+					subs[i].Text = "";
+				}
+
+				lbLevel.Text = "";
+				lbMon.Text = "";
+				RuneId = 0;
+				runeControl.Visible = false;
+				btnGrind.Visible = false;
+				this.rune = null;
+				return;
+			}
+
+
 			lbMain.Text = Rune.StringIt(rune.Main.Type, rune.Main.Value);
 			lbInnate.Text = Rune.StringIt(rune.Innate.Type, rune.Innate.Value);
 
@@ -42,6 +62,7 @@ namespace RuneApp {
 			lbLevel.Text = rune.Level.ToString();
 			lbMon.Text = "[" + rune.Id + "] " + rune.AssignedName;
 			RuneId = rune.Id;
+			runeControl.Visible = true;
 			runeControl.SetRune(rune);
 			btnGrind.Visible = true;
 			this.rune = rune;
