@@ -74,14 +74,18 @@ namespace RuneOptim.BuildProcessing {
 			var dstats = cstats - bstats;
 			// percentage of each stat buffed
 			var astats = dstats / bstats;
-			foreach (Attr a in StatEnums) {
-				if (astats[a] > 0.1) {
-					Minimum[a] = Math.Floor(bstats[a] * (1 + astats[a] * 0.8));
+
+			// TODO: template?
+			if (false) {
+				foreach (Attr a in StatEnums) {
+					if (astats[a] > 0.1) {
+						Minimum[a] = Math.Floor(bstats[a] * (1 + astats[a] * 0.8));
+					}
 				}
-			}
-			foreach (var s in Mon.Current.Sets) {
-				if (s != RuneSet.Null && RuneProperties.MagicalSets.Contains(s)) {
-					RequiredSets.Add(s);
+				foreach (var s in Mon.Current.Sets) {
+					if (s != RuneSet.Null && RuneProperties.MagicalSets.Contains(s)) {
+						RequiredSets.Add(s);
+					}
 				}
 			}
 		}
