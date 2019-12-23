@@ -687,7 +687,20 @@ namespace RuneApp {
 		}
 
 		private static void runBuild(Build build, bool saveStats = false) {
-			try {
+			runBuild(build, Program.data, new BuildSettings() {
+				BuildSaveStats = saveStats,
+				RunesUseEquipped = Program.Settings.UseEquipped,
+				Shrines = Program.data.shrines,
+				RunesOnlyFillEmpty = Program.fillRunes,
+				RunesDropHalfSetStat = Program.goFast,
+				IgnoreLess5 = Program.Settings.IgnoreLess5,
+				BuildDumpBads = true,
+			});
+		}
+
+		// TODO: pull more of the App-dependant stuff out
+		private static void runBuild(Build build, Save data, BuildSettings bSettings) {
+				try {
 				if (build == null) {
 					LineLog.Info("Build is null");
 					return;
@@ -702,25 +715,27 @@ namespace RuneApp {
 				LineLog.Info("Starting watch " + build.ID + " " + build.MonName);
 
 				Stopwatch buildTime = Stopwatch.StartNew();
+				
+				// TODO: get builds to use the settings directly
+				build.RunesUseEquipped = bSettings.RunesUseEquipped;
+				build.RunesUseLocked = bSettings.RunesUseLocked;
+				build.BuildGenerate = bSettings.BuildGenerate;
+				build.BuildTake = bSettings.BuildTake;
+				build.BuildTimeout = bSettings.BuildTimeout;
+				build.Shrines = bSettings.Shrines;
+				build.BuildDumpBads = bSettings.BuildDumpBads;
+				build.BuildSaveStats = bSettings.BuildSaveStats;
+				build.BuildGoodRunes = bSettings.BuildGoodRunes;
+				build.RunesOnlyFillEmpty = bSettings.RunesOnlyFillEmpty;
+				build.RunesDropHalfSetStat = bSettings.RunesDropHalfSetStat;
+				build.IgnoreLess5 = bSettings.IgnoreLess5;
 
-				build.RunesUseEquipped = Program.Settings.UseEquipped;
-				build.RunesUseLocked = false;
-				build.BuildGenerate = 0;
-				build.BuildTake = 0;
-				build.BuildTimeout = 0;
-				build.Shrines = Program.data.shrines;
-				build.BuildDumpBads = true;
-				build.BuildSaveStats = saveStats;
-				build.BuildGoodRunes = false;
-				build.RunesOnlyFillEmpty = Program.fillRunes;
-				build.RunesDropHalfSetStat = Program.goFast;
-				build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
 				BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Runes..."));
 				if (build.Type == BuildType.Link) {
 					build.CopyFrom(build.LinkBuild);
 				}
-				build.GenRunes(Program.data);
+				build.GenRunes(data);
 
 				#region Check enough runes
 				string nR = "";
@@ -789,7 +804,7 @@ namespace RuneApp {
 					loads.Add(build.Best.Current);
 
 					// if we are on the hunt of good runes.
-					if (goodRunes && saveStats && build.Type != BuildType.Lock) {
+					if (goodRunes && bSettings.BuildSaveStats && build.Type != BuildType.Lock) {
 						var theBest = build.Best;
 						int count = 0;
 						// we must progressively ban more runes from the build to find second-place runes.
@@ -805,7 +820,7 @@ namespace RuneApp {
 					#region Save Build stats
 
 					/* TODO: put Excel on Program */
-					if (saveStats && build.Type != BuildType.Lock) {
+					if (bSettings.BuildSaveStats && build.Type != BuildType.Lock) {
 						BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Excel"));
 						runeSheet.StatsExcelBuild(build, build.Mon, build.Best.Current, true);
 					}
