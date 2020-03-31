@@ -1,5 +1,6 @@
-0.6.5
+0.6.9
 https://github.com/Skibisky/RuneManager/releases/latest
-No longer crashes loading Ancient Runes / 2nd Awakenings.
-0.6.4: Goal calc now halves points over goal, delta loadout points fixed
-Skip button and ignore changes less than 5 percent option.
+Updated stats/multipliers.
+0.6.8: Bunch of changes and fixes from Github issues.
+0.6.7: 2nd Awakening mons, Build Strategies
+0.6.6: Added Rune efficiency to list.
