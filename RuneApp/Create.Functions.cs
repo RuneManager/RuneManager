@@ -24,21 +24,23 @@ namespace RuneApp {
 				page.Controls.MakeControl<Label>(tab, "divprompt", 6, 6, 140, 14, "Divide stats into points");
 				page.Controls.MakeControl<Label>(tab, "inhprompt", 60, 14, 134, 6, "Inherited");
 				page.Controls.MakeControl<Label>(tab, "curprompt", 60, 14, 214, 6, "Current");
-
-				ComboBox filterJoin = new ComboBox();
-				filterJoin.DropDownStyle = ComboBoxStyle.DropDownList;
-				filterJoin.FormattingEnabled = true;
-				filterJoin.Items.AddRange(Enum.GetValues(typeof(FilterType)).OfType<FilterType>().OrderBy(f => f).OfType<object>().ToArray());
-				filterJoin.Location = new Point(298, 6);
-				filterJoin.Name = tab + "join";
-				filterJoin.Size = new Size(72, 21);
+				
 				FilterType filter = FilterType.None;
 				if (build.RuneScoring.ContainsKey(tabIndexes[t]))
 					filter = build.RuneScoring[tabIndexes[t]].Type;
-				filterJoin.SelectedItem = filter;
+
+				ComboBox filterJoin = new ComboBox {
+					DropDownStyle = ComboBoxStyle.DropDownList,
+					FormattingEnabled = true,
+					Location = new Point(298, 6),
+					Name = tab + "join",
+					Size = new Size(72, 21),
+					Tag = tab,
+					SelectedItem = filter
+				};
 
 				filterJoin.SelectionChangeCommitted += filterJoin_SelectedIndexChanged;
-				filterJoin.Tag = tab;
+				filterJoin.Items.AddRange(Enum.GetValues(typeof(FilterType)).OfType<FilterType>().OrderBy(f => f).OfType<object>().ToArray());
 				page.Controls.Add(filterJoin);
 
 
@@ -56,10 +58,7 @@ namespace RuneApp {
 						foreach (var type in new string[] { "flat", "perc" }) {
 							if (first) {
 								label = page.Controls.MakeControl<Label>(tab + pref, type, x, 25, 45, 16, pref + type);
-								if (type == "flat")
-									label.Text = "Flat";
-								if (type == "perc")
-									label.Text = "Percent";
+								label.Text = type == "flat" ? "Flat" : "Percent";
 							}
 
 							if (type == "perc" && stat == "SPD") {
@@ -71,7 +70,7 @@ namespace RuneApp {
 								continue;
 							}
 
-							if (pref == "") {
+							if (string.IsNullOrWhiteSpace(pref)) {
 								textBox = page.Controls.MakeControl<TextBox>(tab + pref + stat, type, x, y - 2);
 								textBox.TextChanged += global_TextChanged;
 							}
@@ -198,43 +197,7 @@ namespace RuneApp {
 
 		private TabPage GetTab(string tabName) {
 			// figure out which tab it's on
-			int tabId;
-			if (!int.TryParse(tabName, out tabId)) {
-				switch (tabName) {
-					case "g":
-					case "Global":
-						tabId = 0;
-						break;
-					case "e":
-					case "Even":
-						tabId = -2;
-						break;
-					case "o":
-					case "Odd":
-						tabId = -1;
-						break;
-					case "One":
-						tabId = 1;
-						break;
-					case "Two":
-						tabId = 2;
-						break;
-					case "Three":
-						tabId = 3;
-						break;
-					case "Four":
-						tabId = 4;
-						break;
-					case "Five":
-						tabId = 5;
-						break;
-					case "Six":
-						tabId = 6;
-						break;
-					default:
-						throw new ArgumentException($"{tabName} is invalid as a tabName");
-				}
-			}
+			int tabId = GetTabId(tabName);
 
 			TabPage tab = null;
 			if (tabId <= 0)
@@ -246,6 +209,37 @@ namespace RuneApp {
 					tab = tabControl1.TabPages[6 + tabId / 2];
 			}
 			return tab;
+		}
+
+		private static int GetTabId(string tabName) {
+			if (int.TryParse(tabName, out int tabId))
+				return tabId;
+
+			switch (tabName) {
+				case "g":
+				case "Global":
+					return 0;
+				case "e":
+				case "Even":
+					return -2;
+				case "o":
+				case "Odd":
+					return -1;
+				case "One":
+					return 1;
+				case "Two":
+					return 2;
+				case "Three":
+					return 3;
+				case "Four":
+					return 4;
+				case "Five":
+					return 5;
+				case "Six":
+					return 6;
+				default:
+					throw new ArgumentException($"{tabName} is invalid as a tabName");
+			}
 		}
 
 		private bool RuneAttributeFilterEnabled(FilterType and) {
@@ -280,108 +274,61 @@ namespace RuneApp {
 			statLevel.Text = mon.level.ToString();
 
 			// read a bunch of numbers
-			foreach (var stat in Build.StatNames) {
-				var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
-				ctrlBase.Text = mon[stat].ToString();
-
-				var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
-				var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-
-				ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
-
-				//var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-				Ctrls.Box[stat + "Current"].Text = cur[stat].ToString();
-
-				var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
-
-				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-
-				var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
-
-				//var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+			foreach (var stat in Build.StatEnums) {
+				statRows[stat].Base.Text = mon[stat].ToString();
+				statRows[stat].Min.Tag = new KeyValuePair<Label, Label>(statRows[stat].Base, statRows[stat].Bonus);
+				statRows[stat].Current.Text = cur[stat].ToString();
 
 				if (build.Minimum[stat] > 0)
-					ctrlTotal.Text = build.Minimum[stat].ToString();
+					statRows[stat].Min.Text = build.Minimum[stat].ToString();
 				if (!build.Goal[stat].EqualTo(0))
-					ctrlGoal.Text = build.Goal[stat].ToString();
+					statRows[stat].Goal.Text = build.Goal[stat].ToString();
 				if (!build.Sort[stat].EqualTo(0))
-					ctrlWorth.Text = build.Sort[stat].ToString();
+					statRows[stat].Worth.Text = build.Sort[stat].ToString();
 				if (!build.Maximum[stat].EqualTo(0))
-					Ctrls.Box[stat + "Max"].Text = build.Maximum[stat].ToString();
+					statRows[stat].Max.Text = build.Maximum[stat].ToString();
 				if (!build.Threshold[stat].EqualTo(0))
-					ctrlThresh.Text = build.Threshold[stat].ToString();
-
+					statRows[stat].Thresh.Text = build.Threshold[stat].ToString();
 			}
 
-			foreach (var extra in Build.ExtraNames) {
-				var ctrlBase = (Label)groupBox1.Controls.Find(extra + "Base", true).FirstOrDefault();
-				ctrlBase.Text = mon.ExtraValue(extra).ToString();
-
-				var ctrlBonus = (Label)groupBox1.Controls.Find(extra + "Bonus", true).FirstOrDefault();
-				var ctrlTotal = (TextBox)groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
-
-				ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
-
-				var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
-				ctrlCurrent.Text = cur.ExtraValue(extra).ToString();
-
-				var ctrlGoal = groupBox1.Controls.Find(extra + "Goal", true).FirstOrDefault();
-
-				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-
-				var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
-
-				var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
+			foreach (var extra in Build.ExtraEnums) {
+				statRows[extra].Base.Text = mon.ExtraValue(extra).ToString();
+				statRows[extra].Min.Tag = new KeyValuePair<Label, Label>(statRows[extra].Base, statRows[extra].Bonus);
+				statRows[extra].Current.Text = cur.ExtraValue(extra).ToString();
 
 				if (build.Minimum.ExtraGet(extra) > 0)
-					ctrlTotal.Text = build.Minimum.ExtraGet(extra).ToString();
+					statRows[extra].Min.Text = build.Minimum.ExtraGet(extra).ToString();
 				if (!build.Goal.ExtraGet(extra).EqualTo(0))
-					ctrlGoal.Text = build.Goal.ExtraGet(extra).ToString();
+					statRows[extra].Goal.Text = build.Goal.ExtraGet(extra).ToString();
 				if (!build.Sort.ExtraGet(extra).EqualTo(0))
-					ctrlWorth.Text = build.Sort.ExtraGet(extra).ToString();
+					statRows[extra].Worth.Text = build.Sort.ExtraGet(extra).ToString();
 				if (!build.Maximum.ExtraGet(extra).EqualTo(0))
-					ctrlMax.Text = build.Maximum.ExtraGet(extra).ToString();
+					statRows[extra].Max.Text = build.Maximum.ExtraGet(extra).ToString();
 				if (!build.Threshold.ExtraGet(extra).EqualTo(0))
-					ctrlThresh.Text = build.Threshold.ExtraGet(extra).ToString();
+					statRows[extra].Thresh.Text = build.Threshold.ExtraGet(extra).ToString();
 			}
+
 			for (int i = 0; i < 4; i++) {
 				if (build?.Mon?.SkillFunc?[i] != null) {
-					//var ff = build.mon.SkillFunc[i];
-					string stat = "Skill" + i;
 					Attr aaa = Attr.Skill1 + i;
 
-					double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
-					double cc = build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
+					double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i);
+					double cc = build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i);
 
-					var ctrlBase = (Label)groupBox1.Controls.Find(stat + "Base", true).FirstOrDefault();
-					ctrlBase.Text = aa.ToString();
-					var ctrlBonus = (Label)groupBox1.Controls.Find(stat + "Bonus", true).FirstOrDefault();
-					var ctrlTotal = (TextBox)groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-
-					ctrlTotal.Tag = new KeyValuePair<Label, Label>(ctrlBase, ctrlBonus);
-
-					var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-					ctrlCurrent.Text = cc.ToString();
-
-					var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
-
-					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-
-					var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
-
-					var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
+					statRows[aaa].Base.Text = aa.ToString();
+					statRows[aaa].Min.Tag = new KeyValuePair<Label, Label>(statRows[aaa].Base, statRows[aaa].Bonus);
+					statRows[aaa].Current.Text = cc.ToString();
 
 					if (build.Minimum.DamageSkillups[i] > 0)
-						ctrlTotal.Text = build.Minimum.DamageSkillups[i].ToString();
+						statRows[aaa].Min.Text = build.Minimum.DamageSkillups[i].ToString();
 					if (!build.Goal.DamageSkillups[i].EqualTo(0))
-						ctrlGoal.Text = build.Goal.DamageSkillups[i].ToString();
+						statRows[aaa].Goal.Text = build.Goal.DamageSkillups[i].ToString();
 					if (!build.Sort.DamageSkillups[i].EqualTo(0))
-						ctrlWorth.Text = build.Sort.DamageSkillups[i].ToString();
+						statRows[aaa].Worth.Text = build.Sort.DamageSkillups[i].ToString();
 					if (!build.Maximum.DamageSkillups[i].EqualTo(0))
-						ctrlMax.Text = build.Maximum.DamageSkillups[i].ToString();
+						statRows[aaa].Max.Text = build.Maximum.DamageSkillups[i].ToString();
 					if (!build.Threshold.DamageSkillups[i].EqualTo(0))
-						ctrlThresh.Text = build.Threshold.DamageSkillups[i].ToString();
-
+						statRows[aaa].Thresh.Text = build.Threshold.DamageSkillups[i].ToString();
 				}
 			}
 		}
@@ -442,12 +389,14 @@ namespace RuneApp {
 				foreach (string stat in Build.StatNames) {
 					UpdateStat(tab, stat);
 				}
+
 				if (!build.RuneScoring.ContainsKey(tabdex) && build.RuneFilters.ContainsKey(tabdex)) {
 					// if there is a non-zero
 					if (build.RuneFilters[tabdex].Any(r => r.Value.NonZero)) {
 						build.RuneScoring.Add(tabdex, new Build.RuneScoreFilter());
 					}
 				}
+
 				if (build.RuneScoring.ContainsKey(tabdex)) {
 					var kv = build.RuneScoring[tabdex];
 					var ctrlTest = Controls.Find(tab + "test", true).FirstOrDefault();
@@ -456,8 +405,7 @@ namespace RuneApp {
 					//if (!string.IsNullOrWhiteSpace(ctrlTest?.Text))
 					double? testVal = null;
 					int? count = null;
-					double tempval;
-					if (double.TryParse(ctrlTest?.Text, out tempval))
+					if (double.TryParse(ctrlTest?.Text, out double tempval))
 						testVal = tempval;
 
 					if (double.TryParse(ctrlCount?.Text, out tempval))
@@ -466,122 +414,115 @@ namespace RuneApp {
 					build.RuneScoring[tabdex] = new Build.RuneScoreFilter(kv.Type, testVal, count);
 
 				}
+
 				TextBox tb = (TextBox)Controls.Find(tab + "raise", true).FirstOrDefault();
 				int raiseLevel;
 				if (!int.TryParse(tb.Text, out raiseLevel))
 					raiseLevel = -1;
 				CheckBox cb = (CheckBox)Controls.Find(tab + "bonus", true).FirstOrDefault();
 
-				if (raiseLevel == -1 && !cb.Checked) {
+				if (raiseLevel == -1 && !cb.Checked)
 					build.RunePrediction.Remove(tabdex);
-				}
 				else
 					build.RunePrediction[tabdex] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
 
-				if (build.RunePrediction.ContainsKey(tabdex)) {
-					var kv = build.RunePrediction[tabdex];
-					var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
-					ctrlRaise.Text = kv.Key.ToString();
-					var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
-					ctrlPred.Text = (kv.Value ? "T" : "F");
-
-				}
-
-			}
-			foreach (string stat in Build.StatNames) {
-				double val;
-				double total;
-				var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
-				if (double.TryParse(ctrlTotal.Text, out val))
-					total = val;
-				build.Minimum[stat] = val;
-
-				var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
-				double goal = 0;
-				if (double.TryParse(ctrlGoal.Text, out val))
-					goal = val;
-				build.Goal[stat] = val;
-
-				var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-				double worth = 0;
-				if (double.TryParse(ctrlWorth.Text, out val))
-					worth = val;
-				build.Sort[stat] = val;
-
-				var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
-				double max = 0;
-				if (double.TryParse(ctrlMax.Text, out val))
-					max = val;
-				build.Maximum[stat] = val;
-
-				//var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
-				double thr = 0;
-				if (double.TryParse(Ctrls.Box[stat + "Thresh"].Text, out val))
-					thr = val;
-				build.Threshold[stat] = val;
-
-				var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
-				double current = 0;
-				if (double.TryParse(ctrlCurrent.Text, out val))
-					current = val;
-				var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
-				if (worth != 0 && current != 0) {
-					double pts = current;
-					if (goal > 0 && current > goal)
-						pts = (current - goal) / 2 + goal;
-					if (max != 0)
-						pts = Math.Min(max, current);
-					ctrlWorthPts.Text = (pts / worth).ToString("0.##");
-				}
+				build.getPrediction(tabdex, out int? raise, out bool pred);
+				var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
+				ctrlRaise.Text = raise?.ToString();
+				var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
+				ctrlPred.Text = (pred ? "T" : "F");
 			}
 
-			foreach (string extra in Build.ExtraNames) {
-				var ctrlTotal = groupBox1.Controls.Find(extra + "Total", true).FirstOrDefault();
-				double val;
-				double total = 0;
-				if (double.TryParse(ctrlTotal.Text, out val))
-					total = val;
-				build.Minimum.ExtraSet(extra, val);
+			foreach (var stat in Build.StatEnums) {
+				double.TryParse(statRows[stat].Min.Text, out double min);
+				build.Minimum[stat] = min;
 
-				var ctrlGoal = groupBox1.Controls.Find(extra + "Goal", true).FirstOrDefault();
-				double goal = 0;
-				if (double.TryParse(ctrlGoal.Text, out val))
-					goal = val;
-				build.Goal.ExtraSet(extra, val);
+				double.TryParse(statRows[stat].Goal.Text, out double goal);
+				build.Goal[stat] = goal;
 
-				var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-				double worth = 0;
-				if (double.TryParse(ctrlWorth.Text, out val))
-					worth = val;
-				build.Sort.ExtraSet(extra, val);
+				double.TryParse(statRows[stat].Worth.Text, out double worth);
+				build.Sort[stat] = worth;
 
-				var ctrlMax = groupBox1.Controls.Find(extra + "Max", true).FirstOrDefault();
-				double max = 0;
-				if (double.TryParse(ctrlMax.Text, out val))
-					max = val;
-				build.Maximum.ExtraSet(extra, val);
+				double.TryParse(statRows[stat].Max.Text, out double max);
+				build.Maximum[stat] = max;
 
-				var ctrlThresh = groupBox1.Controls.Find(extra + "Thresh", true).FirstOrDefault();
-				double thr = 0;
-				if (double.TryParse(ctrlThresh.Text, out val))
-					thr = val;
-				build.Threshold.ExtraSet(extra, val);
+				double.TryParse(statRows[stat].Thresh.Text, out double thr);
+				build.Threshold[stat] = thr;
 
-				var ctrlCurrent = groupBox1.Controls.Find(extra + "Current", true).FirstOrDefault();
-				double current = 0;
-				if (double.TryParse(ctrlCurrent.Text, out val))
-					current = val;
-				var ctrlWorthPts = groupBox1.Controls.Find(extra + "CurrentPts", true).FirstOrDefault();
-				if (worth != 0 && current != 0) {
-					double pts = current;
-					if (goal > 0 && current > goal)
-						pts = (current - goal) / 2 + goal;
-					if (max != 0)
-						pts = Math.Min(max, current);
-					ctrlWorthPts.Text = (pts / worth).ToString("0.##");
+				if (min > max && !string.IsNullOrWhiteSpace(statRows[stat].Max.Text)) {
+					statRows[stat].Min.BackColor = Color.Red;
+					statRows[stat].Max.BackColor = Color.Red;
 				}
 				else {
-					ctrlWorthPts.Text = "";
+					statRows[stat].Min.BackColor = SystemColors.Window;
+					statRows[stat].Max.BackColor = SystemColors.Window;
+				}
+				
+				if (thr > 0 && worth == 0) {
+					statRows[stat].Thresh.BackColor = Color.Yellow;
+					statRows[stat].Worth.BackColor = Color.Yellow;
+				}
+				else if(goal > 0 && worth == 0) {
+					statRows[stat].Goal.BackColor = Color.Yellow;
+					statRows[stat].Worth.BackColor = Color.Yellow;
+				}
+				else {
+					statRows[stat].Goal.BackColor = SystemColors.Window;
+					statRows[stat].Thresh.BackColor = SystemColors.Window;
+					statRows[stat].Worth.BackColor = SystemColors.Window;
+				}
+
+				double.TryParse(statRows[stat].Current.Text, out double current);
+				if (worth != 0 && current != 0) {
+					double pts = current;
+					if (goal > 0 && current > goal)
+						pts = (current - goal) / 2 + goal;
+					if (max != 0)
+						pts = Math.Min(max, current);
+					statRows[stat].CurrentPts.Text = (pts / worth).ToString("0.##");
+				}
+			}
+
+			foreach (var extra in Build.ExtraEnums) {
+				double val;
+				double total = 0;
+				if (double.TryParse(statRows[extra].Min.Text, out val))
+					total = val;
+				build.Minimum.ExtraSet(extra, total);
+
+				double goal = 0;
+				if (double.TryParse(statRows[extra].Goal.Text, out val))
+					goal = val;
+				build.Goal.ExtraSet(extra, goal);
+
+				double worth = 0;
+				if (double.TryParse(statRows[extra].Worth.Text, out val))
+					worth = val;
+				build.Sort.ExtraSet(extra, worth);
+
+				double max = 0;
+				if (double.TryParse(statRows[extra].Max.Text, out val))
+					max = val;
+				build.Maximum.ExtraSet(extra, max);
+
+				double thr = 0;
+				if (double.TryParse(statRows[extra].Thresh.Text, out val))
+					thr = val;
+				build.Threshold.ExtraSet(extra, thr);
+
+				double current = 0;
+				if (double.TryParse(statRows[extra].Current.Text, out val))
+					current = val;
+				if (worth != 0 && current != 0) {
+					double pts = current;
+					if (goal > 0 && current > goal)
+						pts = (current - goal) / 2 + goal;
+					if (max != 0)
+						pts = Math.Min(max, current);
+					statRows[extra].CurrentPts.Text = (pts / worth).ToString("0.##");
+				}
+				else {
+					statRows[extra].CurrentPts.Text = "";
 				}
 			}
 
@@ -591,52 +532,45 @@ namespace RuneApp {
 					string stat = "Skill" + i;
 					Attr aaa = Attr.Skill1 + i;
 
-					var ctrlTotal = groupBox1.Controls.Find(stat + "Total", true).FirstOrDefault();
 					double val;
 					double total = 0;
-					if (double.TryParse(ctrlTotal.Text, out val))
+					if (double.TryParse(statRows[aaa].Min.Text, out val))
 						total = val;
-					build.Minimum.ExtraSet(aaa, val);
+					build.Minimum.ExtraSet(aaa, total);
 
-					var ctrlGoal = groupBox1.Controls.Find(stat + "Goal", true).FirstOrDefault();
 					double goal = 0;
-					if (double.TryParse(ctrlGoal.Text, out val))
+					if (double.TryParse(statRows[aaa].Goal.Text, out val))
 						goal = val;
-					build.Goal.ExtraSet(aaa, val);
+					build.Goal.ExtraSet(aaa, goal);
 
-					var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
 					double worth = 0;
-					if (double.TryParse(ctrlWorth.Text, out val))
+					if (double.TryParse(statRows[aaa].Worth.Text, out val))
 						worth = val;
-					build.Sort.ExtraSet(aaa, val);
+					build.Sort.ExtraSet(aaa, worth);
 
-					var ctrlMax = groupBox1.Controls.Find(stat + "Max", true).FirstOrDefault();
 					double max = 0;
-					if (double.TryParse(ctrlMax.Text, out val))
+					if (double.TryParse(statRows[aaa].Max.Text, out val))
 						max = val;
-					build.Maximum.ExtraSet(aaa, val);
+					build.Maximum.ExtraSet(aaa, max);
 
-					var ctrlThresh = groupBox1.Controls.Find(stat + "Thresh", true).FirstOrDefault();
 					double thr = 0;
-					if (double.TryParse(ctrlThresh.Text, out val))
+					if (double.TryParse(statRows[aaa].Thresh.Text, out val))
 						thr = val;
-					build.Threshold.ExtraSet(aaa, val);
+					build.Threshold.ExtraSet(aaa, thr);
 
-					var ctrlCurrent = groupBox1.Controls.Find(stat + "Current", true).FirstOrDefault();
 					double current = 0;
-					if (double.TryParse(ctrlCurrent.Text, out val))
+					if (double.TryParse(statRows[aaa].Current.Text, out val))
 						current = val;
-					var ctrlWorthPts = groupBox1.Controls.Find(stat + "CurrentPts", true).FirstOrDefault();
 					if (worth != 0 && current != 0) {
 						double pts = current;
 						if (goal > 0 && current > goal)
 							pts = (current - goal) / 2 + goal;
 						if (max != 0)
 							pts = Math.Min(max, current);
-						ctrlWorthPts.Text = (pts / worth).ToString("0.##");
+						statRows[aaa].CurrentPts.Text = (pts / worth).ToString("0.##");
 					}
 					else {
-						ctrlWorthPts.Text = "";
+						statRows[aaa].CurrentPts.Text = "";
 					}
 				}
 			}
@@ -911,13 +845,10 @@ namespace RuneApp {
 			}
 
 			if (!build.Sort.IsNonZero) {
-				var ctrl = groupBox1.Controls.Find("SPDWorth", false).FirstOrDefault();
-				if (ctrl != null) {
-					tooltipNoSorting.IsBalloon = true;
-					tooltipNoSorting.Show(string.Empty, ctrl);
-					tooltipNoSorting.Show("Enter a value somewhere, please.\nLike 1 or 3.14", ctrl, 0);
-					return true;
-				}
+				tooltipNoSorting.IsBalloon = true;
+				tooltipNoSorting.Show(string.Empty, statRows[Attr.Speed].Worth);
+				tooltipNoSorting.Show("Enter a value somewhere, please.\nLike 1 or 3.14", statRows[Attr.Speed].Worth, 0);
+				return true;
 			}
 
 			return false;

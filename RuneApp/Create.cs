@@ -44,16 +44,26 @@ namespace RuneApp {
 			}
 		}
 
-		ControlMap Ctrls;
+		class StatRow {
+			public Label Label;
+			public Label Base;
+			public Label Bonus;
+			public TextBox Min;
+			public Label Current;
+			public TextBox Goal;
+			public TextBox Worth;
+			public Label CurrentPts;
+			public TextBox Thresh;
+			public TextBox Max;
+		}
 
+		Dictionary<Attr, StatRow> statRows = new Dictionary<Attr, StatRow>();
 
 		public Create(Build bb) {
 			InitializeComponent();
 
 			SuspendLayout();
 			groupBox1.SuspendLayout();
-			Ctrls = new ControlMap(this);
-			Ctrls.Box = new ControlHolder<Control>(this.groupBox1);
 
 			this.SetDoubleBuffered();
 			// when show, check we have stuff
@@ -92,7 +102,7 @@ namespace RuneApp {
 			tBtnSetLess.Tag = 0;
 			addAttrsToEvens();
 
-			Control textBox;
+			//Control textBox;
 
 			// make a grid for the monsters base, min/max stats and the scoring
 
@@ -113,47 +123,48 @@ namespace RuneApp {
 
 			#region Statbox
 			foreach (var attr in comb) {
+				statRows[attr] = new StatRow();
 				string strStat = attr.ToShortForm();
 				x = 4;
-				groupBox1.Controls.MakeControl<Label>(strStat, "Label", x, y, 50, 20, strStat);
+				statRows[attr].Label = groupBox1.Controls.MakeControl<Label>(strStat, "Label", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(strStat, "Base", x, y, 50, 20, strStat);
+				statRows[attr].Base = groupBox1.Controls.MakeControl<Label>(strStat, "Base", x, y, 50, 20, strStat);
 				dlCheckX = x;
 				x += colWidth;
-
-				groupBox1.Controls.MakeControl<Label>(strStat, "Bonus", x, y, 50, 20, strStat);
+				
+				statRows[attr].Bonus = groupBox1.Controls.MakeControl<Label>(strStat, "Bonus", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Total", x, y, 40, 20);
-				textBox.TextChanged += global_TextChanged;
-				textBox.TextChanged += Total_TextChanged;
+				statRows[attr].Min = groupBox1.Controls.MakeControl<TextBox>(strStat, "Total", x, y, 40, 20);
+				statRows[attr].Min.TextChanged += global_TextChanged;
+				statRows[attr].Min.TextChanged += Total_TextChanged;
 				dlBtnX = x;
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(strStat, "Current", x, y, 50, 20, strStat);
+				statRows[attr].Current = groupBox1.Controls.MakeControl<Label>(strStat, "Current", x, y, 50, 20, strStat);
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Goal", x, y, 40, 20);
-				textBox.TextChanged += global_TextChanged;
+				statRows[attr].Goal = groupBox1.Controls.MakeControl<TextBox>(strStat, "Goal", x, y, 40, 20);
+				statRows[attr].Goal.TextChanged += global_TextChanged;
 				x += colWidth;
 
 
 				genX = x;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Worth", x, y, 40, 20);
-				textBox.TextChanged += global_TextChanged;
+				statRows[attr].Worth = groupBox1.Controls.MakeControl<TextBox>(strStat, "Worth", x, y, 40, 20);
+				statRows[attr].Worth.TextChanged += global_TextChanged;
 				x += colWidth;
 
-				groupBox1.Controls.MakeControl<Label>(strStat, "CurrentPts", x, y, (int)(50 * 0.8), 20, strStat);
+				statRows[attr].CurrentPts = groupBox1.Controls.MakeControl<Label>(strStat, "CurrentPts", x, y, (int)(50 * 0.8), 20, strStat);
 				x += (int)(colWidth * 0.8);
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Thresh", x, y, 40, 20);
-				textBox.TextChanged += global_TextChanged;
+				statRows[attr].Thresh = groupBox1.Controls.MakeControl<TextBox>(strStat, "Thresh", x, y, 40, 20);
+				statRows[attr].Thresh.TextChanged += global_TextChanged;
 				x += colWidth;
 
-				textBox = groupBox1.Controls.MakeControl<TextBox>(strStat, "Max", x, y, 40, 20);
-				textBox.TextChanged += global_TextChanged;
+				statRows[attr].Max = groupBox1.Controls.MakeControl<TextBox>(strStat, "Max", x, y, 40, 20);
+				statRows[attr].Max.TextChanged += global_TextChanged;
 
 				y += rowHeight;
 			}
@@ -163,48 +174,50 @@ namespace RuneApp {
 
 			for (int i = 0; i < 4; i++) {
 				if (build?.Mon?.SkillFunc?[i] != null) {
+					statRows[Attr.Skill1 + i] = new StatRow();
+
 					//var ff = build.mon.SkillFunc[i]; build.mon.GetSkillDamage(Attr.AverageDamage, i);
 					string stat = "Skill" + i;
 					x = 4;
-					groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i + 1));
+					statRows[Attr.Skill1 + i].Label = groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i + 1));
 					x += colWidth;
 
 					double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
 					double cc = build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
 
-					groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, aa.ToString());
+					statRows[Attr.Skill1 + i].Base = groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, aa.ToString());
 					x += colWidth;
 
-					groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, (cc - aa).ToString());
+					statRows[Attr.Skill1 + i].Bonus = groupBox1.Controls.MakeControl<Label>(stat, "Bonus", x, y, 50, 20, (cc - aa).ToString());
 					x += colWidth;
 
-					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
-					textBox.TextChanged += global_TextChanged;
-					textBox.TextChanged += Total_TextChanged;
+					statRows[Attr.Skill1 + i].Min = groupBox1.Controls.MakeControl<TextBox>(stat, "Total", x, y, 40, 20);
+					statRows[Attr.Skill1 + i].Min.TextChanged += global_TextChanged;
+					statRows[Attr.Skill1 + i].Min.TextChanged += Total_TextChanged;
 					x += colWidth;
 
-					groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, cc.ToString());
+					statRows[Attr.Skill1 + i].Current = groupBox1.Controls.MakeControl<Label>(stat, "Current", x, y, 50, 20, cc.ToString());
 					x += colWidth;
 
-					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Goal", x, y, 40, 20);
-					textBox.TextChanged += global_TextChanged;
+					statRows[Attr.Skill1 + i].Goal = groupBox1.Controls.MakeControl<TextBox>(stat, "Goal", x, y, 40, 20);
+					statRows[Attr.Skill1 + i].Goal.TextChanged += global_TextChanged;
 					x += colWidth;
 
 					genX = x;
 
-					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
-					textBox.TextChanged += global_TextChanged;
+					statRows[Attr.Skill1 + i].Worth = groupBox1.Controls.MakeControl<TextBox>(stat, "Worth", x, y, 40, 20);
+					statRows[Attr.Skill1 + i].Worth.TextChanged += global_TextChanged;
 					x += colWidth;
 
-					groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, "0");
+					statRows[Attr.Skill1 + i].CurrentPts = groupBox1.Controls.MakeControl<Label>(stat, "CurrentPts", x, y, (int)(50 * 0.8), 20, "0");
 					x += (int)(colWidth * 0.8);
 
-					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
-					textBox.TextChanged += global_TextChanged;
+					statRows[Attr.Skill1 + i].Thresh = groupBox1.Controls.MakeControl<TextBox>(stat, "Thresh", x, y, 40, 20);
+					statRows[Attr.Skill1 + i].Thresh.TextChanged += global_TextChanged;
 					x += colWidth;
 
-					textBox = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
-					textBox.TextChanged += global_TextChanged;
+					statRows[Attr.Skill1 + i].Max = groupBox1.Controls.MakeControl<TextBox>(stat, "Max", x, y, 40, 20);
+					statRows[Attr.Skill1 + i].Max.TextChanged += global_TextChanged;
 
 					y += rowHeight;
 				}
@@ -402,6 +415,7 @@ namespace RuneApp {
 					}
 				}
 			}
+
 			foreach (var tab in build.RunePrediction) {
 				TabPage ctab = GetTab(tab.Key.ToString());
 				TextBox tb = (TextBox)ctab.Controls.Find(ctab.Tag + "raise", true).FirstOrDefault();
@@ -855,58 +869,36 @@ namespace RuneApp {
 				var res = ff.ShowDialog();
 				if (res == DialogResult.OK) {
 					loading = true;
-					foreach (var stat in Build.StatNames) {
-						var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						ctrlWorth.Text = build.Sort[stat] != 0 ? build.Sort[stat].ToString() : "";
+					foreach (var stat in Build.StatEnums) {
+						statRows[stat].Worth.Text = build.Sort[stat] != 0 ? build.Sort[stat].ToString() : "";
 					}
-					foreach (var extra in Build.ExtraNames) {
-						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						ctrlWorth.Text = build.Sort.ExtraGet(extra) != 0 ? build.Sort.ExtraGet(extra).ToString() : "";
+					foreach (var extra in Build.ExtraEnums) {
+						statRows[extra].Worth.Text = build.Sort.ExtraGet(extra) != 0 ? build.Sort.ExtraGet(extra).ToString() : "";
 					}
 					for (int i = 0; i < 4; i++) {
-						var ctrlWorth = groupBox1.Controls.Find("Skill" + i + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						ctrlWorth.Text = build.Sort.DamageSkillups[i] != 0 ? build.Sort.DamageSkillups[i].ToString() : "";
+						if (build?.Mon?.SkillFunc?[i] != null) {
+							var skilla = Attr.Skill1 + i;
+							statRows[skilla].Worth.Text = build.Sort.DamageSkillups[i] != 0 ? build.Sort.DamageSkillups[i].ToString() : "";
+						}
 					}
 					loading = false;
 				}
 				else {
-					foreach (var stat in Build.StatNames) {
-						var ctrlWorth = groupBox1.Controls.Find(stat + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						double val;
-						double.TryParse(ctrlWorth.Text, out val);
+					double val;
+					foreach (var stat in Build.StatEnums) {
+						double.TryParse(statRows[stat].Worth.Text, out val);
 						build.Sort[stat] = val;
 					}
-
-					foreach (var extra in Build.ExtraNames) {
-						var ctrlWorth = groupBox1.Controls.Find(extra + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						double val;
-						double.TryParse(ctrlWorth.Text, out val);
+					foreach (var extra in Build.ExtraEnums) {
+						double.TryParse(statRows[extra].Worth.Text, out val);
 						build.Sort.ExtraSet(extra, val);
 					}
-
 					for (int i = 0; i < 4; i++) {
-						var ctrlWorth = groupBox1.Controls.Find("Skill" + i + "Worth", true).FirstOrDefault();
-						if (ctrlWorth == null)
-							continue;
-
-						double val;
-						double.TryParse(ctrlWorth.Text, out val);
-						build.Sort.DamageSkillupsSet(i, val);
+						if (build?.Mon?.SkillFunc?[i] != null) {
+							var skilla = Attr.Skill1 + i;
+							double.TryParse(statRows[skilla].Worth.Text, out val);
+							build.Sort.DamageSkillupsSet(i, val);
+						}
 					}
 
 				}
