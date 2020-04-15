@@ -669,7 +669,11 @@ namespace RuneApp {
 		}
 
 		private void tsBtnLoadsClear_Click(object sender, EventArgs e) {
-			ClearLoadouts();
+			var total = TimeSpan.FromMilliseconds(Program.loads.Sum(l => l.Time));
+			if (MessageBox.Show("Delete *all* loadouts?\r\nThey took " + total.ToString(@"hh\:mm\:ss") + " to generate." , "Warning", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes) {
+				ClearLoadouts();
+
+			}
 		}
 
 		private void toolStripButton7_Click(object sender, EventArgs e) {
