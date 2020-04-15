@@ -103,6 +103,7 @@
     <Compile Include="swar\Rune.Extra.cs" />
     <Compile Include="swar\Rune.Properties.cs" />
     <Compile Include="BuildProcessing\RuneFilter.cs" />
+    <Compile Include="swar\RuneProxy.cs" />
     <Compile Include="swar\Save.cs" />
     <Compile Include="swar\StatModEventArgs.cs" />
     <Compile Include="swar\Stats.cs" />

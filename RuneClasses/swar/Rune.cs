@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Collections.Concurrent;
 using RuneOptim.BuildProcessing;
+using System.Diagnostics;
 
 namespace RuneOptim.swar {
 
@@ -36,7 +37,9 @@ namespace RuneOptim.swar {
 
 	}
 
+	[DebuggerTypeProxy(typeof(RuneProxy))]
 	public partial class Rune : RuneLink {
+
 		#region JSON Props
 
 		[JsonProperty("set_id")]
@@ -124,6 +127,7 @@ namespace RuneOptim.swar {
 		public int[] DefensePercent = new int[32];
 
 		[JsonIgnore]
+		[DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
 		public int[] Speed = new int[32];
 
 		[JsonIgnore]
