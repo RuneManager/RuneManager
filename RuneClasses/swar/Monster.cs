@@ -179,6 +179,17 @@ namespace RuneOptim.swar {
 
 		public event EventHandler<RuneChangeEventArgs> OnRunesChanged;
 
+		public int GameSpeedBonus { get {
+				double speed = 0;
+				if (Current != null) {
+					speed += Math.Ceiling(Speed * Current.speedPercentCache / 100f);
+					speed += Current.Speed;
+				}
+
+				return (int)speed;
+			}
+		}
+
 		public int SwapCost(Loadout l) {
 			int cost = 0;
 			for (int i = 0; i < 6; i++) {
