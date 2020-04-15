@@ -934,7 +934,7 @@ namespace RuneApp {
 
 				List<Build> toRun = new List<Build>();
 				foreach (var build in builds.OrderBy(b => b.Priority)) {
-					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.Priority < runTo))
+					if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.Priority <= runTo))
 						toRun.Add(build);
 				}
 
