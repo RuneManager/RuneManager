@@ -202,7 +202,7 @@ namespace RuneApp {
 				runeDisplay.UpdateLoad(l);
 		}
 
-		private void ShowStats(Stats cur, Stats mon) {
+		private void ShowStats(Stats cur, Monster mon) {
 			foreach (Attr a in new Attr[] { Attr.HealthFlat, Attr.AttackFlat, Attr.DefenseFlat, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
 				if (statCtrls[(int)a] == null)
 					statCtrls[(int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Base", false).FirstOrDefault();
@@ -223,10 +223,12 @@ namespace RuneApp {
 				if (statCtrls[24 + (int)a] == null)
 					statCtrls[24 + (int)a] = groupBox1.Controls.Find(a.ToShortForm() + "Bonus", false).FirstOrDefault();
 
-				if (cur == null)
+				if (cur == null || mon == null)
 					statCtrls[24 + (int)a].Text = "";
-				else
+				else if (a != Attr.Speed)
 					statCtrls[24 + (int)a].Text = "+" + (cur[a] - mon[a]);
+				else
+					statCtrls[24 + (int)a].Text = "+" + (cur[a] - mon[a]) + " (" + mon.GameSpeedBonus + ")";
 			}
 		}
 

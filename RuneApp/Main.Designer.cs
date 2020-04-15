@@ -770,7 +770,7 @@
 			// SPDTotal
 			// 
 			this.SPDTotal.AutoSize = true;
-			this.SPDTotal.Location = new System.Drawing.Point(146, 110);
+			this.SPDTotal.Location = new System.Drawing.Point(173, 110);
 			this.SPDTotal.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.SPDTotal.Name = "SPDTotal";
 			this.SPDTotal.Size = new System.Drawing.Size(13, 13);
@@ -802,7 +802,7 @@
 			// DEFTotal
 			// 
 			this.DEFTotal.AutoSize = true;
-			this.DEFTotal.Location = new System.Drawing.Point(146, 97);
+			this.DEFTotal.Location = new System.Drawing.Point(173, 97);
 			this.DEFTotal.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.DEFTotal.Name = "DEFTotal";
 			this.DEFTotal.Size = new System.Drawing.Size(13, 13);
@@ -834,7 +834,7 @@
 			// ATKTotal
 			// 
 			this.ATKTotal.AutoSize = true;
-			this.ATKTotal.Location = new System.Drawing.Point(146, 83);
+			this.ATKTotal.Location = new System.Drawing.Point(173, 83);
 			this.ATKTotal.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.ATKTotal.Name = "ATKTotal";
 			this.ATKTotal.Size = new System.Drawing.Size(13, 13);
@@ -876,7 +876,7 @@
 			// HPTotal
 			// 
 			this.HPTotal.AutoSize = true;
-			this.HPTotal.Location = new System.Drawing.Point(146, 69);
+			this.HPTotal.Location = new System.Drawing.Point(173, 69);
 			this.HPTotal.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
 			this.HPTotal.Name = "HPTotal";
 			this.HPTotal.Size = new System.Drawing.Size(13, 13);
