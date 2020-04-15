@@ -453,9 +453,14 @@ namespace RuneApp {
 					statRows[stat].Min.BackColor = Color.Red;
 					statRows[stat].Max.BackColor = Color.Red;
 				}
+				else if (min > thr && !string.IsNullOrWhiteSpace(statRows[stat].Thresh.Text)) {
+					statRows[stat].Min.BackColor = Color.Yellow;
+					statRows[stat].Thresh.BackColor = Color.Yellow;
+				}
 				else {
 					statRows[stat].Min.BackColor = SystemColors.Window;
 					statRows[stat].Max.BackColor = SystemColors.Window;
+					statRows[stat].Thresh.BackColor = SystemColors.Window;
 				}
 				
 				if (thr > 0 && worth == 0) {
