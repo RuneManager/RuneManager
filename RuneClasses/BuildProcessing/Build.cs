@@ -1214,33 +1214,51 @@ namespace RuneOptim.BuildProcessing {
 		public void getPrediction(int?[] slotFakes, bool[] slotPred) {
 			// crank the rune prediction
 			for (int i = 0; i < 6; i++) {
-				int? raiseTo = 0;
-				bool predictSubs = false;
 
-				// find the largest number to raise to
-				// if any along the tree say to predict, do it
-				if (RunePrediction.ContainsKey(SlotIndex.Global)) {
-					int? glevel = RunePrediction[SlotIndex.Global].Key;
-					if (glevel > raiseTo)
-						raiseTo = glevel;
-					predictSubs |= RunePrediction[SlotIndex.Global].Value;
-				}
-				if (RunePrediction.ContainsKey(i % 2 == 0 ? SlotIndex.Odd : SlotIndex.Even)) {
-					int? mlevel = RunePrediction[i % 2 == 0 ? SlotIndex.Odd : SlotIndex.Even].Key;
-					if (mlevel > raiseTo)
-						raiseTo = mlevel;
-					predictSubs |= RunePrediction[i % 2 == 0 ? SlotIndex.Odd : SlotIndex.Even].Value;
-				}
-				if (RunePrediction.ContainsKey((SlotIndex)(i + 1))) {
-					int? slevel = RunePrediction[(SlotIndex)(i + 1)].Key;
-					if (slevel > raiseTo)
-						raiseTo = slevel;
-					predictSubs |= RunePrediction[(SlotIndex)(i + 1)].Value;
-				}
+				getPrediction((SlotIndex)(i + 1), out int? raiseTo, out bool predictSubs);
 
 				slotFakes[i] = raiseTo;
 				slotPred[i] = predictSubs;
 			}
+		}
+
+		public void getPrediction(SlotIndex ind, out int? raiseTo, out bool predictSubs) {
+			raiseTo = null;
+			predictSubs = false;
+
+			int i = (int)ind;
+
+			// find the largest number to raise to
+			// if any along the tree say to predict, do it
+			if (RunePrediction.ContainsKey(SlotIndex.Global)) {
+				int? glevel = RunePrediction[SlotIndex.Global].Key;
+				if (raiseTo == null || glevel > raiseTo)
+					raiseTo = glevel;
+				predictSubs |= RunePrediction[SlotIndex.Global].Value;
+			}
+			if (i < 0) {
+				if (RunePrediction.ContainsKey((-i) % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd)) {
+					int? mlevel = RunePrediction[(-i) % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd].Key;
+					if (raiseTo == null || mlevel > raiseTo)
+						raiseTo = mlevel;
+					predictSubs |= RunePrediction[(-i) % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd].Value;
+				}
+			}
+			else {
+				if(RunePrediction.ContainsKey(i % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd)) {
+					int? mlevel = RunePrediction[i % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd].Key;
+					if (raiseTo == null || mlevel > raiseTo)
+						raiseTo = mlevel;
+					predictSubs |= RunePrediction[i % 2 == 0 ? SlotIndex.Even : SlotIndex.Odd].Value;
+				}
+				if (RunePrediction.ContainsKey((SlotIndex)(i + 1))) {
+					int? slevel = RunePrediction[(SlotIndex)(i + 1)].Key;
+					if (raiseTo == null || slevel > raiseTo)
+						raiseTo = slevel;
+					predictSubs |= RunePrediction[(SlotIndex)(i + 1)].Value;
+				}
+			}
+
 		}
 
 		//Dictionary<string, RuneFilter> rfS, Dictionary<string, RuneFilter> rfM, Dictionary<string, RuneFilter> rfG, 
