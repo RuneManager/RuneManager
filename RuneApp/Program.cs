@@ -651,6 +651,9 @@ namespace RuneApp {
 		}
 
 		public static void StopBuild() {
+			// no build selected, no build running
+			if (currentBuild == null)
+				return;
 			runSource?.Cancel();
 			if (currentBuild.runner != null) {
 				currentBuild.runner.Cancel();
