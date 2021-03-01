@@ -501,8 +501,12 @@ namespace RuneApp {
 			if (runeDial.RuneSelected == 0)
 				return;
 
-			var r = l.Runes[runeDial.RuneSelected - 1];
-			runeEquipped.SetRune(r);
+			if (l == null) {
+				runeEquipped.SetRune(null);
+            } else {
+				var r = l.Runes[runeDial.RuneSelected - 1];
+				runeEquipped.SetRune(r);
+			}
 		}
 
 		private void lbCloseEquipped_Click(object sender, EventArgs e) {
