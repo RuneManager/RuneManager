@@ -735,6 +735,11 @@ namespace RuneApp {
 				if (build.Type == BuildType.Link) {
 					build.CopyFrom(build.LinkBuild);
 				}
+				
+				// unlock current build (if present)
+				if (build.Mon?.Current != null) 
+					build.Mon?.Current.Unlock();
+				
 				build.GenRunes(data);
 
 				#region Check enough runes
