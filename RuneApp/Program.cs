@@ -222,9 +222,7 @@ namespace RuneApp {
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 					foreach (var l in e.OldItems.OfType<Loadout>()) {
-						foreach (Rune r in l.Runes.Where(r => r != null)) {
-							r.Locked = false;
-						}
+						l.Unlock();
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
@@ -571,10 +569,7 @@ namespace RuneApp {
 
 		internal static void ClearLoadouts() {
 			foreach (Loadout l in loads) {
-				foreach (Rune r in l.Runes) {
-					if (r != null)
-						r.Locked = false;
-				}
+				l.Unlock();
 			}
 			loads.Clear();
 		}
