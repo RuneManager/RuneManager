@@ -83,6 +83,19 @@ namespace SWFarmLoader {
 					monsters.Add(mm);
 				}
 				);
+
+				SortedDictionary<int, string> monstersJSON = new SortedDictionary<int, string>();
+				foreach (var mon in monsters.OrderBy(m => m.monsterTypeId)) {
+					if(mon.monsterTypeId % 100 == 1)
+                    {
+						monstersJSON.Add(mon.monsterTypeId / 100, mon.name);
+                    } else if (mon.monsterTypeId % 100 / 10 == 0) {
+						// duplicate so skip
+                    } else
+                    {
+						monstersJSON.Add(mon.monsterTypeId, mon.name);
+					}
+				};
 				/*
 				File.WriteAllText("mons2.cs", $@"using RuneOptim;
 
@@ -110,6 +123,7 @@ namespace RuneOptim.Monsters {{
 }}");
 */
 				File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.monsterTypeId), Formatting.Indented));
+				File.WriteAllText("monsters.json", JsonConvert.SerializeObject(monstersJSON, Formatting.Indented));
 			}
 			catch (Exception e) {
 				Console.WriteLine(e.GetType() + ": " + e.Message);
