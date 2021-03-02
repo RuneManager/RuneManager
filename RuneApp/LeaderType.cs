@@ -6,10 +6,13 @@ namespace RuneApp {
 
 		private readonly LeaderType[] leadTypes = {
 			new LeaderType(Attr.Null),
-			new LeaderType(Attr.Speed).AddRange(new int[] { 0, 10, 13, 15, 16, 19, 23, 24, 28, 30, 33 }),
-			new LeaderType(Attr.HealthPercent).AddRange(new int[] { 0, 15, 17, 18, 21, 25, 30, 33, 44, 50 }),
-			new LeaderType(Attr.AttackPercent).AddRange(new int[] { 0, 15, 18, 20, 21, 22, 25, 30, 33, 35, 38, 40, 44, 50 }),
-			new LeaderType(Attr.Resistance).AddRange(new int[] { 0, 20, 26, 28, 30, 33, 38, 40, 41, 48, 50, 55 }),
+			new LeaderType(Attr.Speed).AddRange(new int[] { 0, 10, 15, 16, 17, 19, 23, 24, 28, 30, 33 }),
+			new LeaderType(Attr.HealthPercent).AddRange(new int[] { 0, 15, 17, 18, 21, 22, 25, 30, 33, 38, 40, 44, 50 }),
+			new LeaderType(Attr.DefensePercent).AddRange(new int[] { 0, 20, 21, 22, 25, 27, 30, 33, 40, 44, 50 }),
+			new LeaderType(Attr.AttackPercent).AddRange(new int[] { 0, 15, 18, 20, 21, 22, 25, 28, 30, 33, 35, 38, 40, 44, 50 }),
+			new LeaderType(Attr.Resistance).AddRange(new int[] { 0, 15, 20, 25, 26, 28, 30, 33, 38, 40, 41, 48, 50, 55 }),
+			new LeaderType(Attr.CritRate).AddRange(new int[] { 0, 10, 15, 16, 17, 19, 23, 24, 28, 33, 38 }),
+			new LeaderType(Attr.CritDamage).AddRange(new int[] { 0, 25 }),
 		};
 
 		public class LeaderType {
