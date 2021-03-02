@@ -310,11 +310,20 @@ namespace RuneApp {
 				// TODO: temp fix
 				// this probably is somewhat of a leak, as the loadouts will have references to runes no-longer in the save (because the list was recreated in-place).
 				foreach (var l in Program.loads) {
-					foreach (var rid in l.RuneIDs) {
-						var rr = Program.data.Runes.FirstOrDefault(r => r.Id == rid);
+					for (int i = 0; i < 6; i++) {
+						if (l.Runes[i] == null)
+							continue;
+						var rr = Program.data.Runes.FirstOrDefault(r => r.Id == l.Runes[i].Id);
 						if (rr != null)
-							rr.Locked = true;
+                        {
+							l.Runes[i] = rr;
+						} else
+                        {
+							l.Runes[i].AssignedId = 0;
+							l.Runes[i].AssignedName = "RUNE MISSING";
+                        }
 					}
+					l.Lock();
 				}
 
 				//var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
