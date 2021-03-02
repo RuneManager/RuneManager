@@ -855,6 +855,7 @@ namespace RuneApp {
 			if (File.Exists(Program.Settings.SaveLocation)) {
 				Program.LoadSave(Program.Settings.SaveLocation);
 				RebuildLists();
+				refreshLoadouts();
 			}
 		}
 

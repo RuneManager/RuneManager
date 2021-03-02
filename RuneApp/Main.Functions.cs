@@ -382,6 +382,18 @@ namespace RuneApp {
 				dataRuneList.Sort();
 			}
 		}
+		public void refreshLoadouts()
+		{
+			foreach (ListViewItem item in loadoutList.Items)
+			{
+				Loadout load = (Loadout)item.Tag;
+
+				var monid = ulong.Parse(item.SubItems[2].Text);
+
+				load.RecountDiff(monid);
+				ListViewItemLoad(item, load);
+			}
+		}
 
 		public void checkLocked() {
 			if (Program.data?.Runes == null)
