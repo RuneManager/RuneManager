@@ -1021,10 +1021,7 @@ namespace RuneApp {
 		private void tsBtnLoadsLock_Click(object sender, EventArgs e) {
 			foreach (ListViewItem li in loadoutList.SelectedItems) {
 				Loadout l = (Loadout)li.Tag;
-
-				foreach (Rune r in l.Runes) {
-					r.Locked = true;
-				}
+				l.Lock();
 				checkLocked();
 			}
 		}
@@ -1323,9 +1320,7 @@ namespace RuneApp {
 						Buffs = build.Buffs,
 						Element = build.Mon.Element,
 					});
-					foreach (var r in build.Mon.Current.Runes.Where(r => r != null)) {
-						r.Locked = true;
-					}
+					build.Mon.Current.Lock();
 					checkLocked();
 				}
 			}

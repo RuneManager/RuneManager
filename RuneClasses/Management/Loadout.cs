@@ -328,6 +328,14 @@ namespace RuneOptim.Management {
 					r.Locked = true;
 			}
 		}
+		public void Unlock()
+		{
+			foreach (Rune r in runes)
+			{
+				if (r != null)
+					r.Locked = false;
+			}
+		}
 
 		#region AttrGetters
 

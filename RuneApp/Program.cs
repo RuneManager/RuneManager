@@ -222,9 +222,7 @@ namespace RuneApp {
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
 					foreach (var l in e.OldItems.OfType<Loadout>()) {
-						foreach (Rune r in l.Runes.Where(r => r != null)) {
-							r.Locked = false;
-						}
+						l.Unlock();
 					}
 					break;
 				case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
@@ -571,10 +569,7 @@ namespace RuneApp {
 
 		internal static void ClearLoadouts() {
 			foreach (Loadout l in loads) {
-				foreach (Rune r in l.Runes) {
-					if (r != null)
-						r.Locked = false;
-				}
+				l.Unlock();
 			}
 			loads.Clear();
 		}
@@ -735,6 +730,11 @@ namespace RuneApp {
 				if (build.Type == BuildType.Link) {
 					build.CopyFrom(build.LinkBuild);
 				}
+				
+				// unlock current build (if present)
+				if (build.Mon?.Current != null) 
+					build.Mon?.Current.Unlock();
+				
 				build.GenRunes(data);
 
 				#region Check enough runes
