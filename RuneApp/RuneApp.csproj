@@ -106,6 +106,7 @@
     <Compile Include="BuildWizard.Designer.cs">
       <DependentUpon>BuildWizard.cs</DependentUpon>
     </Compile>
+    <Compile Include="BuildPlan.cs" />
     <Compile Include="Controls\ControlHolder.cs" />
     <Compile Include="Controls\ControlMap.cs" />
     <Compile Include="Controls\RichTextBoxEx.cs">
