@@ -1153,15 +1153,6 @@ namespace RuneApp {
 			}
 		}
 
-		private void findGoodRunes_CheckedChanged(object sender, EventArgs e) {
-			if (findGoodRunes.Checked && MessageBox.Show("This runs each test multiple times.\r\nThat means leaving it overnight or something.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
-				goodRunes = true;
-			}
-			else
-				findGoodRunes.Checked = false;
-			goodRunes = findGoodRunes.Checked;
-		}
-
 		private void tsBtnFindSpeed_Click(object sender, EventArgs e) {
 			foreach (var li in buildList.Items.OfType<ListViewItem>()) {
 				if (li.Tag is Build b) {
@@ -1204,15 +1195,6 @@ namespace RuneApp {
 
 		private void btnRefreshSave_Click(object sender, EventArgs e) {
 			Program.LoadSave(Program.Settings.SaveLocation);
-		}
-
-		private void buildList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e) {
-			if (e.ColumnIndex == buildCHTeams.Index) {
-				foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
-					if (lvi.SubItems.Count > buildCHTeams.Index)
-						lvi.SubItems[buildCHTeams.Index].Text = getTeamStr(lvi.Tag as Build);
-				}
-			}
 		}
 
 		private void tsBtnLockMon_Click(object sender, EventArgs e) {
@@ -1306,14 +1288,6 @@ namespace RuneApp {
 			Program.BuildPriority(bb, 1);
 		}
 
-		private void cbGoFast_CheckedChanged(object sender, EventArgs e) {
-			goFast = cbGoFast.Checked;
-		}
-
-		private void cbFillRunes_CheckedChanged(object sender, EventArgs e) {
-			fillRunes = cbFillRunes.Checked;
-		}
-
 		private void tsBtnSkip_Click(object sender, EventArgs e) {
 			if (buildList.SelectedItems.Count > 0) {
 				var build = buildList.SelectedItems[0].Tag as Build;
@@ -1382,6 +1356,25 @@ namespace RuneApp {
 				tsmi.Checked = false;
 			}
 		}
-	}
+
+        private void tsMonTab_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+
+        }
+
+        private void splitContainer2_Panel1_Paint(object sender, PaintEventArgs e)
+        {
+			        }
+
+        private void groupBox2_Enter(object sender, EventArgs e)
+        {
+
+        }
+
+        private void runeDial_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
 
 }
