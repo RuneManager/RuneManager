@@ -15,7 +15,7 @@ namespace RuneApp {
         public Build build = null;
 
         // controls builds version numbers
-        public static readonly int VERSIONNUM = 2;
+        public static readonly int VERSIONNUM = 3;
 
         // Keep track of the runeset groups for speed swaps
         private ListViewGroup rsInc;
@@ -1055,7 +1055,10 @@ namespace RuneApp {
 
         private void extraCritBox_SelectedIndexChanged(object sender, EventArgs e) {
             // TODO: uncheese
+            var mon = build.Mon;
             build.ExtraCritRate = extraCritBox.SelectedIndex * 15;
+            mon.ExtraCritRate = build.ExtraCritRate;
+            refreshStats(mon, mon.GetStats());
         }
 
         private void checkBuffAtk_CheckedChanged(object sender, EventArgs e) {

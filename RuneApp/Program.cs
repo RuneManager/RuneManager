@@ -481,6 +481,9 @@ namespace RuneApp {
                                 }
                             }
                             break;
+                        case 2:
+                            b.AutoRuneAmount = Build.AutoRuneAmountDefault;
+                            break;
                     }
                     b.VERSIONNUM++;
                 }

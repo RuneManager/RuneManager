@@ -176,6 +176,7 @@ namespace RuneApp {
                 build.AutoRuneAmount = 8;
 
                 build.GenRunes(Program.data);
+
                 if (build.runes.Any(rs => rs.Length > 10))
                     return;
                 var res = build.GenBuilds();
@@ -189,6 +190,7 @@ namespace RuneApp {
                     // TODO: warning
                 }
 
+                build.AutoRuneAmount = Build.AutoRuneAmountDefault;
                 build.AutoRuneSelect = false;
             }
             catch { }

@@ -216,10 +216,17 @@ namespace RuneOptim.BuildProcessing {
 
                             runes[i] = runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
                             var filt = LoadFilters(i + 1);
-                            if (filt.Count != null) {
+                            if (filt.Count != null || filt.Type == FilterType.SumN) {
 
                                 var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
-                                var perc = RequiredSets.Count / (float)tSets;
+                                var reqWeight = RequiredSets.Count;
+                                // if we only counted required sets, but no 2-size sets
+                                if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.SetRequired(s) == 2)) {
+                                    reqWeight += 1;
+                                    reqWeight *= 2;
+                                    tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.SetRequired(s) == 2).Count();
+                                }
+                                var perc = reqWeight / (float)tSets;
                                 var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
 
                                 var rr = runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
