@@ -70,6 +70,11 @@ namespace RuneApp {
             }
         }
 
+        public static bool HasActiveBuild
+        {
+            get { return currentBuild != null; }
+        }
+
         private static bool DoesSettingExist(string settingName) {
             return Properties.Settings.Default.Properties.OfType<SettingsProperty>().Any(prop => prop.Name == settingName);
         }
@@ -179,18 +184,18 @@ namespace RuneApp {
         }
 
         private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
-            MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Task Error");
+            MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace, "Task Error");
         }
 
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
             if (e.ExceptionObject is Exception exception)
-                MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace , "Domain Error");
+                MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace, "Domain Error");
             else
-                MessageBox.Show(e.ExceptionObject?.ToString() , "Error");
+                MessageBox.Show(e.ExceptionObject?.ToString(), "Error");
         }
 
         private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e) {
-            MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Thread Error");
+            MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace, "Thread Error");
         }
 
         static string lastPrint = null;
@@ -674,7 +679,7 @@ namespace RuneApp {
 
         public static void StopBuild() {
             // no build selected, no build running
-            if (currentBuild == null)
+            if (!HasActiveBuild)
                 return;
             runSource?.Cancel();
             if (currentBuild.runner != null) {
@@ -687,15 +692,11 @@ namespace RuneApp {
                 return;
 
 
-            if (currentBuild != null) {
+            if (HasActiveBuild) {
                 if (runTask != null && runTask.Status != TaskStatus.Running)
                     throw new Exception("Already running builds!");
                 else {
-                    runSource.Cancel();
-                    if (currentBuild.runner != null) {
-                        currentBuild.runner.Cancel();
-                    }
-                    return;
+                    StopBuild();
                 }
             }
 
@@ -726,7 +727,7 @@ namespace RuneApp {
                     return;
                 }
                 // TODO: show this somewhere
-                if (currentBuild != null)
+                if (HasActiveBuild)
                     throw new InvalidOperationException("Already running a build");
                 if (build.IsRunning)
                     throw new InvalidOperationException("This build is already running");
@@ -925,11 +926,11 @@ namespace RuneApp {
 
         public static void RunBuilds(bool skipLoaded, int runTo = -1) {
             if (Program.data == null)
-                return;
+                MessageBox.Show("Data not found.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
             if (isRunning) {
                 if (runTask != null && runTask.Status != TaskStatus.Running)
-                    throw new Exception("Already running builds!");
+                    throw new Exception("Build task already being prepared!");
                 else {
                     runSource.Cancel();
                     return;
@@ -1018,6 +1019,7 @@ namespace RuneApp {
             }
             catch (Exception e) {
                 MessageBox.Show(e.Message + Environment.NewLine + e.StackTrace, e.GetType().ToString());
+                isRunning = false;
             }
         }
 

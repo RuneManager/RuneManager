@@ -534,7 +534,7 @@ namespace RuneApp {
             ((ListView)sender).Sort();
         }
 
-        private void tsbIncreasePriority_Click(object sender, EventArgs e) {
+        private void tsBtnMonMoveUp_Click(object sender, EventArgs e) {
             if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
                 int maxPri = Program.data.Monsters.Max(x => x.priority);
                 if (mon.priority == 0) {
@@ -556,7 +556,7 @@ namespace RuneApp {
             }
         }
 
-        private void tsbDecreasePriority_Click(object sender, EventArgs e) {
+        private void tsBtnMonMoveDown_Click(object sender, EventArgs e) {
             if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
                 int maxPri = Program.data.Monsters.Max(x => x.priority);
                 if (mon.priority == 0) {
@@ -676,7 +676,7 @@ namespace RuneApp {
             }
         }
 
-        private void toolStripButton7_Click(object sender, EventArgs e) {
+        private void tsBtnMonMakeBuild_Click(object sender, EventArgs e) {
             if (dataMonsterList.SelectedItems.Count <= 0) return;
             if (!(dataMonsterList.SelectedItems[0].Tag is Monster mon))
                 return;
@@ -759,12 +759,17 @@ namespace RuneApp {
 
         private void tsBtnBuildsRunOne_Click(object sender, EventArgs e) {
             var lis = buildList.SelectedItems;
-            if (lis.Count > 0) {
+            if (lis.Count == 0)
+                MessageBox.Show("Please select a build to run.", "No Build Selected", MessageBoxButtons.OK);
+            else if (Program.HasActiveBuild)
+                Program.StopBuild();
+            else if (resumeTimer != null)
+                stopResumeTimer();
+            else
+            {
                 var li = lis[0];
                 RunBuild(li, Program.Settings.MakeStats);
-            }
-            else {
-                Program.StopBuild();
+                tsBtnBuildsRun.DropDown.Close();
             }
         }
 
@@ -808,7 +813,12 @@ namespace RuneApp {
         }
 
         private void tsBtnBuildsRunAll_Click(object sender, EventArgs e) {
-            Program.RunBuilds(false, -1);
+            if (Program.HasActiveBuild)
+                Program.StopBuild();
+            else if (resumeTimer != null)
+                stopResumeTimer();
+            else
+                Program.RunBuilds(true, -1);
         }
 
         private void Main_FormClosing(object sender, FormClosingEventArgs e) {
@@ -846,7 +856,11 @@ namespace RuneApp {
         }
 
         private void tsbReloadSave_Click(object sender, EventArgs e) {
-            if (File.Exists(Program.Settings.SaveLocation)) {
+            if (Program.HasActiveBuild)
+            {
+                MessageBox.Show("Cannot refresh file data while builds are running to avoid corruption.  Pleast stop the running build and try again.", "Error", MessageBoxButtons.OK);
+            }
+            else if (File.Exists(Program.Settings.SaveLocation)) {
                 Program.LoadSave(Program.Settings.SaveLocation);
                 RebuildLists();
                 refreshLoadouts();
@@ -1025,20 +1039,20 @@ namespace RuneApp {
             }
         }
 
-        private void tsBtnBuildsResume_Click(object sender, EventArgs e) {
-            Program.RunBuilds(true, -1);
-            tsBtnBuildsRunOne.DropDown.Close();
-        }
-
         private void tsBtnBuildsRunUpTo_Click(object sender, EventArgs e) {
-            int selected = -1;
-            if (buildList.SelectedItems.Count > 0)
-                selected = (buildList.SelectedItems[0].Tag as Build).Priority;
-            Program.RunBuilds(true, selected);
+            if (buildList.SelectedItems.Count == 0)
+                MessageBox.Show("Please select a monster to run to.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            else if (Program.HasActiveBuild)
+                Program.StopBuild();
+            else if (resumeTimer != null)
+                stopResumeTimer();
+            else
+            {
+                var selected = (buildList.SelectedItems[0].Tag as Build).Priority;
+                Program.RunBuilds(true, selected);
+                tsBtnBuildsRun.DropDown.Close();
+            }
         }
-
-        
-
 
         private void buildList_MouseClick(object sender, MouseEventArgs e) {
             if (e.Button == MouseButtons.Right) {
@@ -1342,39 +1356,25 @@ namespace RuneApp {
 
         // TODO: abstract this code into TSMI tags, check/uncheck all.
         private void In8HoursToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (!(sender is ToolStripMenuItem tsmi)) return;
-            if (resumeTimer == null) {
-                startResumeTimer(DateTime.Now.AddHours(8));
-                tsmi.Checked = true;
-            }
-            else {
-                stopResumeTimer();
-                tsmi.Checked = false;
-            }
+            delayedRun(8, 0, 0);
         }
 
         private void In16HoursToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (!(sender is ToolStripMenuItem tsmi)) return;
-            if (resumeTimer == null) {
-                startResumeTimer(DateTime.Now.AddHours(16));
-                tsmi.Checked = true;
-            }
-            else {
-                stopResumeTimer();
-                tsmi.Checked = false;
-            }
+            delayedRun(16, 0, 0);
         }
 
         private void In30SecondsToolStripMenuItem_Click(object sender, EventArgs e) {
-            if (!(sender is ToolStripMenuItem tsmi)) return;
-            if (resumeTimer == null) {
-                startResumeTimer(DateTime.Now.AddSeconds(30));
-                tsmi.Checked = true;
-            }
-            else {
+            delayedRun(0, 0, 30);
+        }
+
+        private void delayedRun(int hours, int minutes, int seconds)
+        {
+            if (Program.HasActiveBuild)
+                Program.StopBuild();
+            else if (resumeTimer != null)
                 stopResumeTimer();
-                tsmi.Checked = false;
-            }
+            else
+                startResumeTimer(DateTime.Now.AddHours(hours).AddMinutes(minutes).AddSeconds(seconds));
         }
     }
 

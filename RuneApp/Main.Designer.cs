@@ -108,9 +108,9 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabMonsters = new System.Windows.Forms.TabPage();
             this.tsMonTab = new System.Windows.Forms.ToolStrip();
-            this.tsbIncreasePriority = new System.Windows.Forms.ToolStripButton();
-            this.tsbDecreasePriority = new System.Windows.Forms.ToolStripButton();
-            this.tsbCreateBuild = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMoveUp = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMoveDown = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMakeBuild = new System.Windows.Forms.ToolStripButton();
             this.tsbReloadSave = new System.Windows.Forms.ToolStripButton();
             this.tsbUnequipAll = new System.Windows.Forms.ToolStripButton();
             this.unequipMonsterButton = new System.Windows.Forms.ToolStripButton();
@@ -163,13 +163,14 @@
             this.tsBtnBuildsMoveDown = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsBtnBuildsRemove = new System.Windows.Forms.ToolStripButton();
-            this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
-            this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsBtnBuildsRun = new System.Windows.Forms.ToolStripSplitButton();
+            this.bldRunAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunDelay = new System.Windows.Forms.ToolStripMenuItem();
             this.in30SecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.in8HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.in16HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunTo = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunOne = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsBtnBuildsSave = new System.Windows.Forms.ToolStripButton();
             this.tsBtnBuildsUnlock = new System.Windows.Forms.ToolStripButton();
@@ -259,7 +260,7 @@
             this.dataMonsterList.View = System.Windows.Forms.View.Details;
             this.dataMonsterList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
             this.dataMonsterList.SelectedIndexChanged += new System.EventHandler(this.monstertab_list_select);
-            this.dataMonsterList.DoubleClick += new System.EventHandler(this.toolStripButton7_Click);
+            this.dataMonsterList.DoubleClick += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
             // 
             // colMonName
             // 
@@ -1011,9 +1012,9 @@
             // tsMonTab
             // 
             this.tsMonTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsbIncreasePriority,
-            this.tsbDecreasePriority,
-            this.tsbCreateBuild,
+            this.tsBtnMonMoveUp,
+            this.tsBtnMonMoveDown,
+            this.tsBtnMonMakeBuild,
             this.tsbReloadSave,
             this.tsbUnequipAll,
             this.unequipMonsterButton,
@@ -1024,35 +1025,35 @@
             this.tsMonTab.TabIndex = 1;
             this.tsMonTab.Text = "tsMonTab";
             // 
-            // tsbIncreasePriority
+            // tsBtnMonMoveUp
             // 
-            this.tsbIncreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbIncreasePriority.Image = global::RuneApp.App.up;
-            this.tsbIncreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbIncreasePriority.Name = "tsbIncreasePriority";
-            this.tsbIncreasePriority.Size = new System.Drawing.Size(23, 22);
-            this.tsbIncreasePriority.Text = "Increase Priority";
-            this.tsbIncreasePriority.Click += new System.EventHandler(this.tsbIncreasePriority_Click);
+            this.tsBtnMonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMoveUp.Image = global::RuneApp.App.up;
+            this.tsBtnMonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMoveUp.Name = "tsBtnMonMoveUp";
+            this.tsBtnMonMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnMonMoveUp.Text = "Increase Priority";
+            this.tsBtnMonMoveUp.Click += new System.EventHandler(this.tsBtnMonMoveUp_Click);
             // 
-            // tsbDecreasePriority
+            // tsBtnMonMoveDown
             // 
-            this.tsbDecreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbDecreasePriority.Image = global::RuneApp.App.down;
-            this.tsbDecreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbDecreasePriority.Name = "tsbDecreasePriority";
-            this.tsbDecreasePriority.Size = new System.Drawing.Size(23, 22);
-            this.tsbDecreasePriority.Text = "Decrease Priority";
-            this.tsbDecreasePriority.Click += new System.EventHandler(this.tsbDecreasePriority_Click);
+            this.tsBtnMonMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMoveDown.Image = global::RuneApp.App.down;
+            this.tsBtnMonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMoveDown.Name = "tsBtnMonMoveDown";
+            this.tsBtnMonMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnMonMoveDown.Text = "Decrease Priority";
+            this.tsBtnMonMoveDown.Click += new System.EventHandler(this.tsBtnMonMoveDown_Click);
             // 
-            // tsbCreateBuild
+            // tsBtnMonMakeBuild
             // 
-            this.tsbCreateBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbCreateBuild.Image = global::RuneApp.App.add;
-            this.tsbCreateBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbCreateBuild.Name = "tsbCreateBuild";
-            this.tsbCreateBuild.Size = new System.Drawing.Size(23, 22);
-            this.tsbCreateBuild.Text = "Create Build";
-            this.tsbCreateBuild.Click += new System.EventHandler(this.toolStripButton7_Click);
+            this.tsBtnMonMakeBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMakeBuild.Image = global::RuneApp.App.add;
+            this.tsBtnMonMakeBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMakeBuild.Name = "tsBtnMonMakeBuild";
+            this.tsBtnMonMakeBuild.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnMonMakeBuild.Text = "Create Build";
+            this.tsBtnMonMakeBuild.Click += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
             // 
             // tsbReloadSave
             // 
@@ -1517,7 +1518,7 @@
             this.tsBtnBuildsMoveDown,
             this.toolStripSeparator2,
             this.tsBtnBuildsRemove,
-            this.tsBtnBuildsRunOne,
+            this.tsBtnBuildsRun,
             this.toolStripSeparator1,
             this.tsBtnBuildsSave,
             this.tsBtnBuildsUnlock,
@@ -1565,39 +1566,39 @@
             this.tsBtnBuildsRemove.Text = "Remove Build";
             this.tsBtnBuildsRemove.Click += new System.EventHandler(this.tsBtnBuildsRemove_Click);
             // 
-            // tsBtnBuildsRunOne
+            // tsBtnBuildsRun
             // 
-            this.tsBtnBuildsRunOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsBtnBuildsRunOne.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.allToolStripMenuItem,
-            this.resumeToolStripMenuItem,
-            this.runToToolStripMenuItem});
-            this.tsBtnBuildsRunOne.Image = global::RuneApp.App.right;
-            this.tsBtnBuildsRunOne.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsBtnBuildsRunOne.Name = "tsBtnBuildsRunOne";
-            this.tsBtnBuildsRunOne.Size = new System.Drawing.Size(32, 22);
-            this.tsBtnBuildsRunOne.Text = "Run Builds";
-            this.tsBtnBuildsRunOne.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
+            this.tsBtnBuildsRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnBuildsRun.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bldRunAll,
+            this.bldRunDelay,
+            this.bldRunTo,
+            this.bldRunOne});
+            this.tsBtnBuildsRun.Image = global::RuneApp.App.go;
+            this.tsBtnBuildsRun.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnBuildsRun.Name = "tsBtnBuildsRun";
+            this.tsBtnBuildsRun.Size = new System.Drawing.Size(32, 22);
+            this.tsBtnBuildsRun.Text = "Run Builds";
+            this.tsBtnBuildsRun.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
             // 
-            // allToolStripMenuItem
+            // bldRunAll
             // 
-            this.allToolStripMenuItem.Image = global::RuneApp.App.go;
-            this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-            this.allToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.allToolStripMenuItem.Text = "All";
-            this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
+            this.bldRunAll.Image = global::RuneApp.App.go;
+            this.bldRunAll.Name = "bldRunAll";
+            this.bldRunAll.Size = new System.Drawing.Size(116, 22);
+            this.bldRunAll.Text = "All";
+            this.bldRunAll.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
             // 
-            // resumeToolStripMenuItem
+            // bldRunDelay
             // 
-            this.resumeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bldRunDelay.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.in30SecondsToolStripMenuItem,
             this.in8HoursToolStripMenuItem,
             this.in16HoursToolStripMenuItem});
-            this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
-            this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-            this.resumeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.resumeToolStripMenuItem.Text = "Resume";
-            this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
+            this.bldRunDelay.Image = global::RuneApp.App.resume;
+            this.bldRunDelay.Name = "bldRunDelay";
+            this.bldRunDelay.Size = new System.Drawing.Size(116, 22);
+            this.bldRunDelay.Text = "All (on delay)";
             // 
             // in30SecondsToolStripMenuItem
             // 
@@ -1620,13 +1621,21 @@
             this.in16HoursToolStripMenuItem.Text = "In 16 hours...";
             this.in16HoursToolStripMenuItem.Click += new System.EventHandler(this.In16HoursToolStripMenuItem_Click);
             // 
-            // runToToolStripMenuItem
+            // bldRunTo
             // 
-            this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
-            this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-            this.runToToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.runToToolStripMenuItem.Text = "Run to";
-            this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
+            this.bldRunTo.Image = global::RuneApp.App.upto;
+            this.bldRunTo.Name = "bldRunTo";
+            this.bldRunTo.Size = new System.Drawing.Size(116, 22);
+            this.bldRunTo.Text = "Run to Mon";
+            this.bldRunTo.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
+            // 
+            // bldRunOne
+            // 
+            this.bldRunOne.Image = global::RuneApp.App.right;
+            this.bldRunOne.Name = "bldRunOne";
+            this.bldRunOne.Size = new System.Drawing.Size(144, 22);
+            this.bldRunOne.Text = "Selected";
+            this.bldRunOne.Click += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
             // 
             // toolStripSeparator1
             // 
@@ -1678,7 +1687,7 @@
             // tsBtnSkip
             // 
             this.tsBtnSkip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsBtnSkip.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnSkip.Image")));
+            this.tsBtnSkip.Image = global::RuneApp.App.monToBox;
             this.tsBtnSkip.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnSkip.Name = "tsBtnSkip";
             this.tsBtnSkip.Size = new System.Drawing.Size(23, 22);
@@ -2115,8 +2124,8 @@
         private System.Windows.Forms.ColumnHeader runesMType;
         private System.Windows.Forms.ColumnHeader runesMValue;
         private System.Windows.Forms.ToolStrip tsMonTab;
-        private System.Windows.Forms.ToolStripButton tsbIncreasePriority;
-        private System.Windows.Forms.ToolStripButton tsbDecreasePriority;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMoveUp;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMoveDown;
         private System.Windows.Forms.ToolStrip tsRuneTab;
         private System.Windows.Forms.ToolStripButton RuneTab_UnfilterButton;
         private System.Windows.Forms.ListView loadoutList;
@@ -2133,7 +2142,7 @@
         private System.Windows.Forms.Label statName;
         private System.Windows.Forms.ColumnHeader buildNameCol;
         private System.Windows.Forms.ColumnHeader buildIDCol;
-        private System.Windows.Forms.ToolStripButton tsbCreateBuild;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMakeBuild;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsMoveUp;
@@ -2218,10 +2227,10 @@
         private System.Windows.Forms.ColumnHeader colMonLevel;
         private System.Windows.Forms.PictureBox monImage;
         private System.Windows.Forms.ToolStripButton tsBtnLockMon;
-        private System.Windows.Forms.ToolStripSplitButton tsBtnBuildsRunOne;
-        private System.Windows.Forms.ToolStripMenuItem resumeToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem runToToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSplitButton tsBtnBuildsRun;
+        private System.Windows.Forms.ToolStripMenuItem bldRunDelay;
+        private System.Windows.Forms.ToolStripMenuItem bldRunTo;
+        private System.Windows.Forms.ToolStripMenuItem bldRunAll;
         private System.Windows.Forms.ToolStripButton tsBtnLink;
         private System.Windows.Forms.CheckBox cbGoFast;
         private System.Windows.Forms.CheckBox cbFillRunes;
@@ -2235,6 +2244,7 @@
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btnRuneDial;
+        private System.Windows.Forms.ToolStripMenuItem bldRunOne;
     }
 }
 
