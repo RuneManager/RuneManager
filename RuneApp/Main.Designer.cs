@@ -108,9 +108,9 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabMonsters = new System.Windows.Forms.TabPage();
             this.tsMonTab = new System.Windows.Forms.ToolStrip();
-            this.tsbIncreasePriority = new System.Windows.Forms.ToolStripButton();
-            this.tsbDecreasePriority = new System.Windows.Forms.ToolStripButton();
-            this.tsbCreateBuild = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMoveUp = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMoveDown = new System.Windows.Forms.ToolStripButton();
+            this.tsBtnMonMakeBuild = new System.Windows.Forms.ToolStripButton();
             this.tsbReloadSave = new System.Windows.Forms.ToolStripButton();
             this.tsbUnequipAll = new System.Windows.Forms.ToolStripButton();
             this.unequipMonsterButton = new System.Windows.Forms.ToolStripButton();
@@ -163,13 +163,14 @@
             this.tsBtnBuildsMoveDown = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsBtnBuildsRemove = new System.Windows.Forms.ToolStripButton();
-            this.tsBtnBuildsRunOne = new System.Windows.Forms.ToolStripSplitButton();
-            this.allToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.resumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsBtnBuildsRun = new System.Windows.Forms.ToolStripSplitButton();
+            this.bldRunAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunDelay = new System.Windows.Forms.ToolStripMenuItem();
             this.in30SecondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.in8HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.in16HoursToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.runToToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunTo = new System.Windows.Forms.ToolStripMenuItem();
+            this.bldRunOne = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.tsBtnBuildsSave = new System.Windows.Forms.ToolStripButton();
             this.tsBtnBuildsUnlock = new System.Windows.Forms.ToolStripButton();
@@ -252,13 +253,13 @@
             this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
             this.dataMonsterList.MultiSelect = false;
             this.dataMonsterList.Name = "dataMonsterList";
-            this.dataMonsterList.Size = new System.Drawing.Size(242, 603);
+            this.dataMonsterList.Size = new System.Drawing.Size(241, 603);
             this.dataMonsterList.TabIndex = 0;
             this.dataMonsterList.UseCompatibleStateImageBehavior = false;
             this.dataMonsterList.View = System.Windows.Forms.View.Details;
             this.dataMonsterList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
             this.dataMonsterList.SelectedIndexChanged += new System.EventHandler(this.monstertab_list_select);
-            this.dataMonsterList.DoubleClick += new System.EventHandler(this.toolStripButton7_Click);
+            this.dataMonsterList.DoubleClick += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
             // 
             // colMonName
             // 
@@ -297,6 +298,7 @@
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel2,
@@ -346,6 +348,7 @@
             // 
             // toolStrip1
             // 
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Location = new System.Drawing.Point(0, 24);
             this.toolStrip1.Name = "toolStrip1";
             this.toolStrip1.Size = new System.Drawing.Size(1350, 25);
@@ -354,6 +357,7 @@
             // 
             // menuStrip1
             // 
+            this.menuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.shrinesToolStripMenuItem,
@@ -969,6 +973,7 @@
             // 
             this.runeDial.Loadout = null;
             this.runeDial.Location = new System.Drawing.Point(8, 201);
+            this.runeDial.Margin = new System.Windows.Forms.Padding(4);
             this.runeDial.Name = "runeDial";
             this.runeDial.Size = new System.Drawing.Size(225, 188);
             this.runeDial.TabIndex = 51;
@@ -990,7 +995,7 @@
             this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(252, 648);
+            this.tabControl1.Size = new System.Drawing.Size(251, 648);
             this.tabControl1.TabIndex = 10;
             // 
             // tabMonsters
@@ -1001,56 +1006,57 @@
             this.tabMonsters.Margin = new System.Windows.Forms.Padding(2);
             this.tabMonsters.Name = "tabMonsters";
             this.tabMonsters.Padding = new System.Windows.Forms.Padding(2);
-            this.tabMonsters.Size = new System.Drawing.Size(244, 622);
+            this.tabMonsters.Size = new System.Drawing.Size(243, 622);
             this.tabMonsters.TabIndex = 0;
             this.tabMonsters.Text = "Monsters";
             this.tabMonsters.UseVisualStyleBackColor = true;
             // 
             // tsMonTab
             // 
+            this.tsMonTab.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.tsMonTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsbIncreasePriority,
-            this.tsbDecreasePriority,
-            this.tsbCreateBuild,
+            this.tsBtnMonMoveUp,
+            this.tsBtnMonMoveDown,
+            this.tsBtnMonMakeBuild,
             this.tsbReloadSave,
             this.tsbUnequipAll,
             this.unequipMonsterButton,
             this.tsBtnLockMon});
             this.tsMonTab.Location = new System.Drawing.Point(2, 2);
             this.tsMonTab.Name = "tsMonTab";
-            this.tsMonTab.Size = new System.Drawing.Size(240, 25);
+            this.tsMonTab.Size = new System.Drawing.Size(239, 27);
             this.tsMonTab.TabIndex = 1;
             this.tsMonTab.Text = "tsMonTab";
             // 
-            // tsbIncreasePriority
+            // tsBtnMonMoveUp
             // 
-            this.tsbIncreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbIncreasePriority.Image = global::RuneApp.App.up;
-            this.tsbIncreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbIncreasePriority.Name = "tsbIncreasePriority";
-            this.tsbIncreasePriority.Size = new System.Drawing.Size(23, 22);
-            this.tsbIncreasePriority.Text = "Increase Priority";
-            this.tsbIncreasePriority.Click += new System.EventHandler(this.tsbIncreasePriority_Click);
+            this.tsBtnMonMoveUp.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMoveUp.Image = global::RuneApp.App.up;
+            this.tsBtnMonMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMoveUp.Name = "tsBtnMonMoveUp";
+            this.tsBtnMonMoveUp.Size = new System.Drawing.Size(24, 24);
+            this.tsBtnMonMoveUp.Text = "Increase Priority";
+            this.tsBtnMonMoveUp.Click += new System.EventHandler(this.tsBtnMonMoveUp_Click);
             // 
-            // tsbDecreasePriority
+            // tsBtnMonMoveDown
             // 
-            this.tsbDecreasePriority.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbDecreasePriority.Image = global::RuneApp.App.down;
-            this.tsbDecreasePriority.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbDecreasePriority.Name = "tsbDecreasePriority";
-            this.tsbDecreasePriority.Size = new System.Drawing.Size(23, 22);
-            this.tsbDecreasePriority.Text = "Decrease Priority";
-            this.tsbDecreasePriority.Click += new System.EventHandler(this.tsbDecreasePriority_Click);
+            this.tsBtnMonMoveDown.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMoveDown.Image = global::RuneApp.App.down;
+            this.tsBtnMonMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMoveDown.Name = "tsBtnMonMoveDown";
+            this.tsBtnMonMoveDown.Size = new System.Drawing.Size(24, 24);
+            this.tsBtnMonMoveDown.Text = "Decrease Priority";
+            this.tsBtnMonMoveDown.Click += new System.EventHandler(this.tsBtnMonMoveDown_Click);
             // 
-            // tsbCreateBuild
+            // tsBtnMonMakeBuild
             // 
-            this.tsbCreateBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbCreateBuild.Image = global::RuneApp.App.add;
-            this.tsbCreateBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbCreateBuild.Name = "tsbCreateBuild";
-            this.tsbCreateBuild.Size = new System.Drawing.Size(23, 22);
-            this.tsbCreateBuild.Text = "Create Build";
-            this.tsbCreateBuild.Click += new System.EventHandler(this.toolStripButton7_Click);
+            this.tsBtnMonMakeBuild.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnMonMakeBuild.Image = global::RuneApp.App.add;
+            this.tsBtnMonMakeBuild.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnMonMakeBuild.Name = "tsBtnMonMakeBuild";
+            this.tsBtnMonMakeBuild.Size = new System.Drawing.Size(24, 24);
+            this.tsBtnMonMakeBuild.Text = "Create Build";
+            this.tsBtnMonMakeBuild.Click += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
             // 
             // tsbReloadSave
             // 
@@ -1058,7 +1064,7 @@
             this.tsbReloadSave.Image = global::RuneApp.App.refresh;
             this.tsbReloadSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbReloadSave.Name = "tsbReloadSave";
-            this.tsbReloadSave.Size = new System.Drawing.Size(23, 22);
+            this.tsbReloadSave.Size = new System.Drawing.Size(24, 24);
             this.tsbReloadSave.Text = "Reload Save";
             this.tsbReloadSave.Click += new System.EventHandler(this.tsbReloadSave_Click);
             // 
@@ -1068,7 +1074,7 @@
             this.tsbUnequipAll.Image = global::RuneApp.App.broken;
             this.tsbUnequipAll.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUnequipAll.Name = "tsbUnequipAll";
-            this.tsbUnequipAll.Size = new System.Drawing.Size(23, 22);
+            this.tsbUnequipAll.Size = new System.Drawing.Size(24, 24);
             this.tsbUnequipAll.Text = "Unequip All";
             this.tsbUnequipAll.Click += new System.EventHandler(this.tsbUnequipAll_Click);
             // 
@@ -1078,7 +1084,7 @@
             this.unequipMonsterButton.Image = global::RuneApp.App.fromMon;
             this.unequipMonsterButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.unequipMonsterButton.Name = "unequipMonsterButton";
-            this.unequipMonsterButton.Size = new System.Drawing.Size(23, 22);
+            this.unequipMonsterButton.Size = new System.Drawing.Size(24, 24);
             this.unequipMonsterButton.Text = "Unequip Selected";
             this.unequipMonsterButton.Click += new System.EventHandler(this.unequipMonsterButton_Click);
             // 
@@ -1088,7 +1094,7 @@
             this.tsBtnLockMon.Image = global::RuneApp.App.locked;
             this.tsBtnLockMon.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLockMon.Name = "tsBtnLockMon";
-            this.tsBtnLockMon.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLockMon.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLockMon.Text = "Lock this Monster";
             this.tsBtnLockMon.ToolTipText = "Lock this Monster";
             this.tsBtnLockMon.Click += new System.EventHandler(this.tsBtnLockMon_Click);
@@ -1101,20 +1107,21 @@
             this.tabRunes.Margin = new System.Windows.Forms.Padding(2);
             this.tabRunes.Name = "tabRunes";
             this.tabRunes.Padding = new System.Windows.Forms.Padding(2);
-            this.tabRunes.Size = new System.Drawing.Size(244, 622);
+            this.tabRunes.Size = new System.Drawing.Size(243, 622);
             this.tabRunes.TabIndex = 1;
             this.tabRunes.Text = "Runes";
             this.tabRunes.UseVisualStyleBackColor = true;
             // 
             // tsRuneTab
             // 
+            this.tsRuneTab.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.tsRuneTab.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.RuneTab_UnfilterButton,
             this.RuneTab_LockButton,
             this.RuneTab_SaveButton});
             this.tsRuneTab.Location = new System.Drawing.Point(2, 2);
             this.tsRuneTab.Name = "tsRuneTab";
-            this.tsRuneTab.Size = new System.Drawing.Size(240, 25);
+            this.tsRuneTab.Size = new System.Drawing.Size(239, 27);
             this.tsRuneTab.TabIndex = 2;
             this.tsRuneTab.Text = "tsRuneTab";
             // 
@@ -1124,7 +1131,7 @@
             this.RuneTab_UnfilterButton.Image = global::RuneApp.App.refresh;
             this.RuneTab_UnfilterButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RuneTab_UnfilterButton.Name = "RuneTab_UnfilterButton";
-            this.RuneTab_UnfilterButton.Size = new System.Drawing.Size(23, 22);
+            this.RuneTab_UnfilterButton.Size = new System.Drawing.Size(24, 24);
             this.RuneTab_UnfilterButton.Text = "Reset Filter";
             this.RuneTab_UnfilterButton.Click += new System.EventHandler(this.runetab_clearfilter);
             // 
@@ -1134,7 +1141,7 @@
             this.RuneTab_LockButton.Image = global::RuneApp.App.whole;
             this.RuneTab_LockButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RuneTab_LockButton.Name = "RuneTab_LockButton";
-            this.RuneTab_LockButton.Size = new System.Drawing.Size(23, 22);
+            this.RuneTab_LockButton.Size = new System.Drawing.Size(24, 24);
             this.RuneTab_LockButton.Text = "Toggle Locked";
             this.RuneTab_LockButton.Click += new System.EventHandler(this.runelistSwapLocked);
             // 
@@ -1144,7 +1151,7 @@
             this.RuneTab_SaveButton.Image = global::RuneApp.App.save;
             this.RuneTab_SaveButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.RuneTab_SaveButton.Name = "RuneTab_SaveButton";
-            this.RuneTab_SaveButton.Size = new System.Drawing.Size(23, 22);
+            this.RuneTab_SaveButton.Size = new System.Drawing.Size(24, 24);
             this.RuneTab_SaveButton.Text = "Save save.json";
             this.RuneTab_SaveButton.Click += new System.EventHandler(this.runetab_savebutton_click);
             // 
@@ -1169,7 +1176,7 @@
             this.dataRuneList.Margin = new System.Windows.Forms.Padding(2);
             this.dataRuneList.MultiSelect = false;
             this.dataRuneList.Name = "dataRuneList";
-            this.dataRuneList.Size = new System.Drawing.Size(245, 601);
+            this.dataRuneList.Size = new System.Drawing.Size(244, 600);
             this.dataRuneList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.dataRuneList.TabIndex = 1;
             this.dataRuneList.UseCompatibleStateImageBehavior = false;
@@ -1231,7 +1238,7 @@
             this.tabBuilds.Location = new System.Drawing.Point(4, 22);
             this.tabBuilds.Margin = new System.Windows.Forms.Padding(2);
             this.tabBuilds.Name = "tabBuilds";
-            this.tabBuilds.Size = new System.Drawing.Size(244, 622);
+            this.tabBuilds.Size = new System.Drawing.Size(243, 622);
             this.tabBuilds.TabIndex = 2;
             this.tabBuilds.Text = "Builds";
             this.tabBuilds.UseVisualStyleBackColor = true;
@@ -1247,7 +1254,7 @@
             this.listView4.Location = new System.Drawing.Point(2, 23);
             this.listView4.Margin = new System.Windows.Forms.Padding(2);
             this.listView4.Name = "listView4";
-            this.listView4.Size = new System.Drawing.Size(192, 600);
+            this.listView4.Size = new System.Drawing.Size(191, 600);
             this.listView4.TabIndex = 1;
             this.listView4.UseCompatibleStateImageBehavior = false;
             this.listView4.View = System.Windows.Forms.View.Details;
@@ -1259,11 +1266,12 @@
             // 
             // toolStrip5
             // 
+            this.toolStrip5.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip5.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripButton5});
             this.toolStrip5.Location = new System.Drawing.Point(0, 0);
             this.toolStrip5.Name = "toolStrip5";
-            this.toolStrip5.Size = new System.Drawing.Size(244, 25);
+            this.toolStrip5.Size = new System.Drawing.Size(243, 27);
             this.toolStrip5.TabIndex = 0;
             this.toolStrip5.Text = "Do Nothing";
             // 
@@ -1273,7 +1281,7 @@
             this.toolStripButton5.Image = ((System.Drawing.Image)(resources.GetObject("toolStripButton5.Image")));
             this.toolStripButton5.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripButton5.Name = "toolStripButton5";
-            this.toolStripButton5.Size = new System.Drawing.Size(23, 22);
+            this.toolStripButton5.Size = new System.Drawing.Size(24, 24);
             this.toolStripButton5.Text = "Use Build";
             // 
             // tabCrafts
@@ -1282,7 +1290,7 @@
             this.tabCrafts.Controls.Add(this.toolStrip7);
             this.tabCrafts.Location = new System.Drawing.Point(4, 22);
             this.tabCrafts.Name = "tabCrafts";
-            this.tabCrafts.Size = new System.Drawing.Size(244, 622);
+            this.tabCrafts.Size = new System.Drawing.Size(243, 622);
             this.tabCrafts.TabIndex = 3;
             this.tabCrafts.Text = "Crafts";
             this.tabCrafts.UseVisualStyleBackColor = true;
@@ -1305,7 +1313,7 @@
             this.dataCraftList.Margin = new System.Windows.Forms.Padding(2);
             this.dataCraftList.MultiSelect = false;
             this.dataCraftList.Name = "dataCraftList";
-            this.dataCraftList.Size = new System.Drawing.Size(240, 593);
+            this.dataCraftList.Size = new System.Drawing.Size(239, 592);
             this.dataCraftList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.dataCraftList.TabIndex = 2;
             this.dataCraftList.UseCompatibleStateImageBehavior = false;
@@ -1337,9 +1345,10 @@
             // 
             // toolStrip7
             // 
+            this.toolStrip7.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip7.Location = new System.Drawing.Point(0, 0);
             this.toolStrip7.Name = "toolStrip7";
-            this.toolStrip7.Size = new System.Drawing.Size(244, 25);
+            this.toolStrip7.Size = new System.Drawing.Size(243, 25);
             this.toolStrip7.TabIndex = 0;
             this.toolStrip7.Text = "toolStrip7";
             // 
@@ -1361,7 +1370,7 @@
             this.loadoutList.Location = new System.Drawing.Point(4, 37);
             this.loadoutList.Margin = new System.Windows.Forms.Padding(2);
             this.loadoutList.Name = "loadoutList";
-            this.loadoutList.Size = new System.Drawing.Size(282, 601);
+            this.loadoutList.Size = new System.Drawing.Size(277, 601);
             this.loadoutList.TabIndex = 12;
             this.loadoutList.UseCompatibleStateImageBehavior = false;
             this.loadoutList.View = System.Windows.Forms.View.Details;
@@ -1412,13 +1421,14 @@
             this.groupBox2.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox2.Size = new System.Drawing.Size(290, 642);
+            this.groupBox2.Size = new System.Drawing.Size(285, 642);
             this.groupBox2.TabIndex = 14;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Loadouts";
             // 
             // toolStrip4
             // 
+            this.toolStrip4.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip4.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsBtnLoadsRemove,
             this.tsBtnLoadsClear,
@@ -1428,7 +1438,7 @@
             this.tsBtnLoadsLoad});
             this.toolStrip4.Location = new System.Drawing.Point(2, 15);
             this.toolStrip4.Name = "toolStrip4";
-            this.toolStrip4.Size = new System.Drawing.Size(286, 25);
+            this.toolStrip4.Size = new System.Drawing.Size(281, 27);
             this.toolStrip4.TabIndex = 13;
             this.toolStrip4.Text = "toolStrip4";
             // 
@@ -1438,7 +1448,7 @@
             this.tsBtnLoadsRemove.Image = global::RuneApp.App.subtract;
             this.tsBtnLoadsRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLoadsRemove.Name = "tsBtnLoadsRemove";
-            this.tsBtnLoadsRemove.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLoadsRemove.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLoadsRemove.Text = "Remove Loadout";
             this.tsBtnLoadsRemove.Click += new System.EventHandler(this.tsBtnLoadsRemove_Click);
             // 
@@ -1448,7 +1458,7 @@
             this.tsBtnLoadsClear.Image = global::RuneApp.App.refresh;
             this.tsBtnLoadsClear.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLoadsClear.Name = "tsBtnLoadsClear";
-            this.tsBtnLoadsClear.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLoadsClear.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLoadsClear.Text = "Remove All";
             this.tsBtnLoadsClear.Click += new System.EventHandler(this.tsBtnLoadsClear_Click);
             // 
@@ -1458,7 +1468,7 @@
             this.tsBtnLoadsLock.Image = global::RuneApp.App.whole;
             this.tsBtnLoadsLock.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLoadsLock.Name = "tsBtnLoadsLock";
-            this.tsBtnLoadsLock.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLoadsLock.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLoadsLock.Text = "Lock Runes";
             this.tsBtnLoadsLock.Click += new System.EventHandler(this.tsBtnLoadsLock_Click);
             // 
@@ -1468,7 +1478,7 @@
             this.tsBtnRuneStats.Image = global::RuneApp.App.save;
             this.tsBtnRuneStats.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnRuneStats.Name = "tsBtnRuneStats";
-            this.tsBtnRuneStats.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnRuneStats.Size = new System.Drawing.Size(24, 24);
             this.tsBtnRuneStats.Text = "Write Runes to Xlsx";
             this.tsBtnRuneStats.Click += new System.EventHandler(this.tsBtnRuneStats_Click);
             // 
@@ -1478,7 +1488,7 @@
             this.tsBtnLoadsSave.Image = global::RuneApp.App.monToBox;
             this.tsBtnLoadsSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLoadsSave.Name = "tsBtnLoadsSave";
-            this.tsBtnLoadsSave.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLoadsSave.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLoadsSave.Text = "Export Loadouts";
             this.tsBtnLoadsSave.Click += new System.EventHandler(this.tsBtnLoadsSave_Click);
             // 
@@ -1488,7 +1498,7 @@
             this.tsBtnLoadsLoad.Image = global::RuneApp.App.boxToMon;
             this.tsBtnLoadsLoad.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLoadsLoad.Name = "tsBtnLoadsLoad";
-            this.tsBtnLoadsLoad.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLoadsLoad.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLoadsLoad.Text = "Import Loadouts";
             this.tsBtnLoadsLoad.Click += new System.EventHandler(this.tsBtnLoadsLoad_Click);
             // 
@@ -1503,19 +1513,20 @@
             this.groupBox3.Margin = new System.Windows.Forms.Padding(2);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Padding = new System.Windows.Forms.Padding(2);
-            this.groupBox3.Size = new System.Drawing.Size(299, 642);
+            this.groupBox3.Size = new System.Drawing.Size(294, 642);
             this.groupBox3.TabIndex = 15;
             this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Builds";
             // 
             // toolStrip6
             // 
+            this.toolStrip6.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip6.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsBtnBuildsMoveUp,
             this.tsBtnBuildsMoveDown,
             this.toolStripSeparator2,
             this.tsBtnBuildsRemove,
-            this.tsBtnBuildsRunOne,
+            this.tsBtnBuildsRun,
             this.toolStripSeparator1,
             this.tsBtnBuildsSave,
             this.tsBtnBuildsUnlock,
@@ -1524,7 +1535,7 @@
             this.tsBtnSkip});
             this.toolStrip6.Location = new System.Drawing.Point(2, 15);
             this.toolStrip6.Name = "toolStrip6";
-            this.toolStrip6.Size = new System.Drawing.Size(295, 25);
+            this.toolStrip6.Size = new System.Drawing.Size(290, 27);
             this.toolStrip6.TabIndex = 13;
             this.toolStrip6.Text = "toolStrip6";
             // 
@@ -1534,7 +1545,7 @@
             this.tsBtnBuildsMoveUp.Image = global::RuneApp.App.up;
             this.tsBtnBuildsMoveUp.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnBuildsMoveUp.Name = "tsBtnBuildsMoveUp";
-            this.tsBtnBuildsMoveUp.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnBuildsMoveUp.Size = new System.Drawing.Size(24, 24);
             this.tsBtnBuildsMoveUp.Text = "Move Up";
             this.tsBtnBuildsMoveUp.Click += new System.EventHandler(this.tsBtnBuildsMoveUp_Click);
             // 
@@ -1544,14 +1555,14 @@
             this.tsBtnBuildsMoveDown.Image = global::RuneApp.App.down;
             this.tsBtnBuildsMoveDown.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnBuildsMoveDown.Name = "tsBtnBuildsMoveDown";
-            this.tsBtnBuildsMoveDown.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnBuildsMoveDown.Size = new System.Drawing.Size(24, 24);
             this.tsBtnBuildsMoveDown.Text = "Move Down";
             this.tsBtnBuildsMoveDown.Click += new System.EventHandler(this.tsBtnBuildsMoveDown_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
             // 
             // tsBtnBuildsRemove
             // 
@@ -1559,43 +1570,43 @@
             this.tsBtnBuildsRemove.Image = global::RuneApp.App.subtract;
             this.tsBtnBuildsRemove.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnBuildsRemove.Name = "tsBtnBuildsRemove";
-            this.tsBtnBuildsRemove.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnBuildsRemove.Size = new System.Drawing.Size(24, 24);
             this.tsBtnBuildsRemove.Text = "Remove Build";
             this.tsBtnBuildsRemove.Click += new System.EventHandler(this.tsBtnBuildsRemove_Click);
             // 
-            // tsBtnBuildsRunOne
+            // tsBtnBuildsRun
             // 
-            this.tsBtnBuildsRunOne.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsBtnBuildsRunOne.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.allToolStripMenuItem,
-            this.resumeToolStripMenuItem,
-            this.runToToolStripMenuItem});
-            this.tsBtnBuildsRunOne.Image = global::RuneApp.App.right;
-            this.tsBtnBuildsRunOne.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsBtnBuildsRunOne.Name = "tsBtnBuildsRunOne";
-            this.tsBtnBuildsRunOne.Size = new System.Drawing.Size(32, 22);
-            this.tsBtnBuildsRunOne.Text = "Run Builds";
-            this.tsBtnBuildsRunOne.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
+            this.tsBtnBuildsRun.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.tsBtnBuildsRun.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bldRunAll,
+            this.bldRunDelay,
+            this.bldRunTo,
+            this.bldRunOne});
+            this.tsBtnBuildsRun.Image = global::RuneApp.App.go;
+            this.tsBtnBuildsRun.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsBtnBuildsRun.Name = "tsBtnBuildsRun";
+            this.tsBtnBuildsRun.Size = new System.Drawing.Size(36, 24);
+            this.tsBtnBuildsRun.Text = "Run Builds";
+            this.tsBtnBuildsRun.ButtonClick += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
             // 
-            // allToolStripMenuItem
+            // bldRunAll
             // 
-            this.allToolStripMenuItem.Image = global::RuneApp.App.go;
-            this.allToolStripMenuItem.Name = "allToolStripMenuItem";
-            this.allToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.allToolStripMenuItem.Text = "All";
-            this.allToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
+            this.bldRunAll.Image = global::RuneApp.App.go;
+            this.bldRunAll.Name = "bldRunAll";
+            this.bldRunAll.Size = new System.Drawing.Size(144, 22);
+            this.bldRunAll.Text = "All";
+            this.bldRunAll.Click += new System.EventHandler(this.tsBtnBuildsRunAll_Click);
             // 
-            // resumeToolStripMenuItem
+            // bldRunDelay
             // 
-            this.resumeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.bldRunDelay.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.in30SecondsToolStripMenuItem,
             this.in8HoursToolStripMenuItem,
             this.in16HoursToolStripMenuItem});
-            this.resumeToolStripMenuItem.Image = global::RuneApp.App.resume;
-            this.resumeToolStripMenuItem.Name = "resumeToolStripMenuItem";
-            this.resumeToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.resumeToolStripMenuItem.Text = "Resume";
-            this.resumeToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsResume_Click);
+            this.bldRunDelay.Image = global::RuneApp.App.resume;
+            this.bldRunDelay.Name = "bldRunDelay";
+            this.bldRunDelay.Size = new System.Drawing.Size(144, 22);
+            this.bldRunDelay.Text = "All (on delay)";
             // 
             // in30SecondsToolStripMenuItem
             // 
@@ -1618,18 +1629,26 @@
             this.in16HoursToolStripMenuItem.Text = "In 16 hours...";
             this.in16HoursToolStripMenuItem.Click += new System.EventHandler(this.In16HoursToolStripMenuItem_Click);
             // 
-            // runToToolStripMenuItem
+            // bldRunTo
             // 
-            this.runToToolStripMenuItem.Image = global::RuneApp.App.upto;
-            this.runToToolStripMenuItem.Name = "runToToolStripMenuItem";
-            this.runToToolStripMenuItem.Size = new System.Drawing.Size(116, 22);
-            this.runToToolStripMenuItem.Text = "Run to";
-            this.runToToolStripMenuItem.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
+            this.bldRunTo.Image = global::RuneApp.App.upto;
+            this.bldRunTo.Name = "bldRunTo";
+            this.bldRunTo.Size = new System.Drawing.Size(144, 22);
+            this.bldRunTo.Text = "Run to Mon";
+            this.bldRunTo.Click += new System.EventHandler(this.tsBtnBuildsRunUpTo_Click);
+            // 
+            // bldRunOne
+            // 
+            this.bldRunOne.Image = global::RuneApp.App.right;
+            this.bldRunOne.Name = "bldRunOne";
+            this.bldRunOne.Size = new System.Drawing.Size(144, 22);
+            this.bldRunOne.Text = "Selected";
+            this.bldRunOne.Click += new System.EventHandler(this.tsBtnBuildsRunOne_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
             // 
             // tsBtnBuildsSave
             // 
@@ -1637,7 +1656,7 @@
             this.tsBtnBuildsSave.Image = global::RuneApp.App.save;
             this.tsBtnBuildsSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnBuildsSave.Name = "tsBtnBuildsSave";
-            this.tsBtnBuildsSave.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnBuildsSave.Size = new System.Drawing.Size(24, 24);
             this.tsBtnBuildsSave.Text = "Save Builds";
             this.tsBtnBuildsSave.Click += new System.EventHandler(this.tsBtnBuildsSave_Click);
             // 
@@ -1647,7 +1666,7 @@
             this.tsBtnBuildsUnlock.Image = global::RuneApp.App.broken;
             this.tsBtnBuildsUnlock.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnBuildsUnlock.Name = "tsBtnBuildsUnlock";
-            this.tsBtnBuildsUnlock.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnBuildsUnlock.Size = new System.Drawing.Size(24, 24);
             this.tsBtnBuildsUnlock.Text = "Unlock All";
             this.tsBtnBuildsUnlock.Click += new System.EventHandler(this.tsBtnBuildsUnlock_Click);
             // 
@@ -1657,7 +1676,7 @@
             this.tsBtnFindSpeed.Image = global::RuneApp.App.runedial;
             this.tsBtnFindSpeed.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnFindSpeed.Name = "tsBtnFindSpeed";
-            this.tsBtnFindSpeed.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnFindSpeed.Size = new System.Drawing.Size(24, 24);
             this.tsBtnFindSpeed.Text = "toolStripButton3";
             this.tsBtnFindSpeed.ToolTipText = "Identify large builds";
             this.tsBtnFindSpeed.Click += new System.EventHandler(this.tsBtnFindSpeed_Click);
@@ -1668,7 +1687,7 @@
             this.tsBtnLink.Image = global::RuneApp.App.unlockedYes;
             this.tsBtnLink.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnLink.Name = "tsBtnLink";
-            this.tsBtnLink.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnLink.Size = new System.Drawing.Size(24, 24);
             this.tsBtnLink.Text = "Make a linked build";
             this.tsBtnLink.ToolTipText = "Make a linked build";
             this.tsBtnLink.Click += new System.EventHandler(this.tsBtnLink_Click);
@@ -1676,10 +1695,10 @@
             // tsBtnSkip
             // 
             this.tsBtnSkip.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsBtnSkip.Image = ((System.Drawing.Image)(resources.GetObject("tsBtnSkip.Image")));
+            this.tsBtnSkip.Image = global::RuneApp.App.monToBox;
             this.tsBtnSkip.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsBtnSkip.Name = "tsBtnSkip";
-            this.tsBtnSkip.Size = new System.Drawing.Size(23, 22);
+            this.tsBtnSkip.Size = new System.Drawing.Size(24, 24);
             this.tsBtnSkip.Text = "Skip";
             this.tsBtnSkip.ToolTipText = "Skip";
             this.tsBtnSkip.Click += new System.EventHandler(this.tsBtnSkip_Click);
@@ -1703,7 +1722,7 @@
             this.buildList.Location = new System.Drawing.Point(4, 37);
             this.buildList.Margin = new System.Windows.Forms.Padding(2);
             this.buildList.Name = "buildList";
-            this.buildList.Size = new System.Drawing.Size(291, 601);
+            this.buildList.Size = new System.Drawing.Size(286, 601);
             this.buildList.TabIndex = 12;
             this.buildList.UseCompatibleStateImageBehavior = false;
             this.buildList.View = System.Windows.Forms.View.Details;
@@ -1762,8 +1781,8 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.Controls.Add(this.groupBox2);
-            this.splitContainer1.Size = new System.Drawing.Size(601, 646);
-            this.splitContainer1.SplitterDistance = 303;
+            this.splitContainer1.Size = new System.Drawing.Size(596, 646);
+            this.splitContainer1.SplitterDistance = 298;
             this.splitContainer1.TabIndex = 16;
             // 
             // splitContainer2
@@ -1782,7 +1801,7 @@
             // 
             this.splitContainer2.Panel2.Controls.Add(this.splitContainer1);
             this.splitContainer2.Size = new System.Drawing.Size(867, 652);
-            this.splitContainer2.SplitterDistance = 256;
+            this.splitContainer2.SplitterDistance = 255;
             this.splitContainer2.TabIndex = 17;
             // 
             // useRunesCheck
@@ -1866,6 +1885,7 @@
             // 
             // menu_buildlist
             // 
+            this.menu_buildlist.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.menu_buildlist.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.teamToolStripMenuItem});
             this.menu_buildlist.Name = "menu_buildlist";
@@ -2103,8 +2123,8 @@
         private System.Windows.Forms.ColumnHeader runesMType;
         private System.Windows.Forms.ColumnHeader runesMValue;
         private System.Windows.Forms.ToolStrip tsMonTab;
-        private System.Windows.Forms.ToolStripButton tsbIncreasePriority;
-        private System.Windows.Forms.ToolStripButton tsbDecreasePriority;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMoveUp;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMoveDown;
         private System.Windows.Forms.ToolStrip tsRuneTab;
         private System.Windows.Forms.ToolStripButton RuneTab_UnfilterButton;
         private System.Windows.Forms.ListView loadoutList;
@@ -2121,7 +2141,7 @@
         private System.Windows.Forms.Label statName;
         private System.Windows.Forms.ColumnHeader buildNameCol;
         private System.Windows.Forms.ColumnHeader buildIDCol;
-        private System.Windows.Forms.ToolStripButton tsbCreateBuild;
+        private System.Windows.Forms.ToolStripButton tsBtnMonMakeBuild;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.ToolStrip toolStrip6;
         private System.Windows.Forms.ToolStripButton tsBtnBuildsMoveUp;
@@ -2206,10 +2226,10 @@
 		private System.Windows.Forms.ColumnHeader colMonLevel;
 		private System.Windows.Forms.PictureBox monImage;
 		private System.Windows.Forms.ToolStripButton tsBtnLockMon;
-		private System.Windows.Forms.ToolStripSplitButton tsBtnBuildsRunOne;
-		private System.Windows.Forms.ToolStripMenuItem resumeToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem runToToolStripMenuItem;
-		private System.Windows.Forms.ToolStripMenuItem allToolStripMenuItem;
+		private System.Windows.Forms.ToolStripSplitButton tsBtnBuildsRun;
+		private System.Windows.Forms.ToolStripMenuItem bldRunDelay;
+		private System.Windows.Forms.ToolStripMenuItem bldRunTo;
+		private System.Windows.Forms.ToolStripMenuItem bldRunAll;
 		private System.Windows.Forms.ToolStripButton tsBtnLink;
 		private System.Windows.Forms.CheckBox cbGoFast;
 		private System.Windows.Forms.CheckBox cbFillRunes;
@@ -2222,6 +2242,7 @@
 		private System.Windows.Forms.ToolStripMenuItem in30SecondsToolStripMenuItem;
 		private System.ComponentModel.BackgroundWorker backgroundWorker1;
 		private System.Windows.Forms.Timer timer1;
-	}
+        private System.Windows.Forms.ToolStripMenuItem bldRunOne;
+    }
 }
 

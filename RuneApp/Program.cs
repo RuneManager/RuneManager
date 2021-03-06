@@ -70,6 +70,11 @@ namespace RuneApp {
 			}
 		}
 
+		public static bool HasActiveBuild
+		{
+			get { return currentBuild != null; }
+		}
+
 		private static bool DoesSettingExist(string settingName) {
 			return Properties.Settings.Default.Properties.OfType<SettingsProperty>().Any(prop => prop.Name == settingName);
 		}
@@ -179,18 +184,18 @@ namespace RuneApp {
 		}
 
 		private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {
-			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Task Error");
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace, "Task Error");
 		}
 
 		private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
 			if (e.ExceptionObject is Exception exception)
-				MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace , "Domain Error");
+				MessageBox.Show(exception.GetType() + ": " + exception.Message + Environment.NewLine + exception.StackTrace, "Domain Error");
 			else
-				MessageBox.Show(e.ExceptionObject?.ToString() , "Error");
+				MessageBox.Show(e.ExceptionObject?.ToString(), "Error");
 		}
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e) {
-			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace , "Thread Error");
+			MessageBox.Show(e.Exception.GetType() + ": " + e.Exception.Message + Environment.NewLine + e.Exception.StackTrace, "Thread Error");
 		}
 
 		static string lastPrint = null;
@@ -313,13 +318,13 @@ namespace RuneApp {
 							continue;
 						var rr = Program.data.Runes.FirstOrDefault(r => r.Id == l.Runes[i].Id);
 						if (rr != null)
-                        {
+						{
 							l.Runes[i] = rr;
 						} else
-                        {
+						{
 							l.Runes[i].AssignedId = 0;
 							l.Runes[i].AssignedName = "RUNE MISSING";
-                        }
+						}
 					}
 					l.Lock();
 				}
@@ -387,25 +392,25 @@ namespace RuneApp {
 #if !DEBUG
 			try {
 #endif
-				var bstr = File.ReadAllText(filename);
+			var bstr = File.ReadAllText(filename);
 
-				// upgrade:
-				bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
-				bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
-				bstr = bstr.Replace("\"b_def\"", "\"def\"");
-				bstr = bstr.Replace("\"b_spd\"", "\"spd\"");
-				bstr = bstr.Replace("\"b_crate\"", "\"critical_rate\"");
-				bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
-				bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
-				bstr = bstr.Replace("\"b_res\"", "\"res\"");
+			// upgrade:
+			bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
+			bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
+			bstr = bstr.Replace("\"b_def\"", "\"def\"");
+			bstr = bstr.Replace("\"b_spd\"", "\"spd\"");
+			bstr = bstr.Replace("\"b_crate\"", "\"critical_rate\"");
+			bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
+			bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
+			bstr = bstr.Replace("\"b_res\"", "\"res\"");
 
-				var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
-				foreach (var b in bs.OrderBy(b => b.Priority)) {
-					builds.Add(b);
-				}
-				foreach (var b in builds.Where(b => b.Type == BuildType.Link)) {
-					b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
-				}
+			var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
+			foreach (var b in bs.OrderBy(b => b.Priority)) {
+				builds.Add(b);
+			}
+			foreach (var b in builds.Where(b => b.Type == BuildType.Link)) {
+				b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
+			}
 #if !DEBUG
 			}
 			catch (Exception e) {
@@ -661,7 +666,7 @@ namespace RuneApp {
 
 		public static void StopBuild() {
 			// no build selected, no build running
-			if (currentBuild == null)
+			if (!HasActiveBuild)
 				return;
 			runSource?.Cancel();
 			if (currentBuild.runner != null) {
@@ -674,15 +679,11 @@ namespace RuneApp {
 				return;
 
 
-			if (currentBuild != null) {
+			if (HasActiveBuild) {
 				if (runTask != null && runTask.Status != TaskStatus.Running)
 					throw new Exception("Already running builds!");
 				else {
-					runSource.Cancel();
-					if (currentBuild.runner != null) {
-						currentBuild.runner.Cancel();
-					}
-					return;
+					StopBuild();
 				}
 			}
 
@@ -713,7 +714,7 @@ namespace RuneApp {
 					return;
 				}
 				// TODO: show this somewhere
-				if (currentBuild != null)
+				if (HasActiveBuild)
 					throw new InvalidOperationException("Already running a build");
 				if (build.IsRunning)
 					throw new InvalidOperationException("This build is already running");
@@ -912,11 +913,11 @@ namespace RuneApp {
 
 		public static void RunBuilds(bool skipLoaded, int runTo = -1) {
 			if (Program.data == null)
-				return;
+				MessageBox.Show("Data not found.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
 			if (isRunning) {
 				if (runTask != null && runTask.Status != TaskStatus.Running)
-					throw new Exception("Already running builds!");
+					throw new Exception("Build task already being prepared!");
 				else {
 					runSource.Cancel();
 					return;
@@ -1005,6 +1006,7 @@ namespace RuneApp {
 			}
 			catch (Exception e) {
 				MessageBox.Show(e.Message + Environment.NewLine + e.StackTrace, e.GetType().ToString());
+				isRunning = false;
 			}
 		}
 
