@@ -232,13 +232,13 @@ namespace RiftTrackerPlugin {
                                 page.Cells[row, col].Value = stats.Accuracy;
                                 break;
                             case "Set1":
-                                if (RuneOptim.Rune.SetRequired(mon.Current.Sets[1]) == 4)
+                                if (Rune.SetRequired(mon.Current.Sets[1]) == 4)
                                     page.Cells[row, col].Value = mon.Current.Sets[1];
                                 else
                                     page.Cells[row, col].Value = mon.Current.Sets[0];
                                 break;
                             case "Set2":
-                                if (RuneOptim.Rune.SetRequired(mon.Current.Sets[1]) == 4)
+                                if (Rune.SetRequired(mon.Current.Sets[1]) == 4)
                                     page.Cells[row, col].Value = mon.Current.Sets[0];
                                 else
                                     page.Cells[row, col].Value = mon.Current.Sets[1];
@@ -247,19 +247,19 @@ namespace RiftTrackerPlugin {
                                 page.Cells[row, col].Value = mon.Current.Sets[2];
                                 break;
                             case "EHP":
-                                page.Cells[row, col].Value = stats.ExtraValue(RuneOptim.Attr.EffectiveHP);
+                                page.Cells[row, col].Value = stats.ExtraValue(Attr.EffectiveHP);
                                 break;
                             case "EHPDB":
-                                page.Cells[row, col].Value = stats.ExtraValue(RuneOptim.Attr.EffectiveHPDefenseBreak);
+                                page.Cells[row, col].Value = stats.ExtraValue(Attr.EffectiveHPDefenseBreak);
                                 break;
                             case "DPS":
-                                page.Cells[row, col].Value = stats.ExtraValue(RuneOptim.Attr.DamagePerSpeed);
+                                page.Cells[row, col].Value = stats.ExtraValue(Attr.DamagePerSpeed);
                                 break;
                             case "MxD":
-                                page.Cells[row, col].Value = stats.ExtraValue(RuneOptim.Attr.MaxDamage);
+                                page.Cells[row, col].Value = stats.ExtraValue(Attr.MaxDamage);
                                 break;
                             case "AvD":
-                                page.Cells[row, col].Value = stats.ExtraValue(RuneOptim.Attr.AverageDamage);
+                                page.Cells[row, col].Value = stats.ExtraValue(Attr.AverageDamage);
                                 break;
 
                         }

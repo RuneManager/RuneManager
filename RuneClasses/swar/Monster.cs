@@ -183,7 +183,7 @@ namespace RuneOptim.swar {
                 double speed = 0;
                 if (Current != null) {
                     speed += Math.Ceiling(Speed * Current.speedPercentCache / 100f);
-                    speed += Current.Speed;
+                    speed += Current.Runes?.Where(r => r != null).Sum(r => r.Speed[0]) ?? 0;
                 }
 
                 return (int)speed;

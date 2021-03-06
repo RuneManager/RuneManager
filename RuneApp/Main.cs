@@ -501,12 +501,8 @@ namespace RuneApp {
             if (runeDial.RuneSelected == 0)
                 return;
 
-            if (l == null) {
-                runeEquipped.SetRune(null);
-            } else {
-                var r = l.Runes[runeDial.RuneSelected - 1];
-                runeEquipped.SetRune(r);
-            }
+            var r = l?.Runes[runeDial.RuneSelected - 1];
+            runeEquipped.SetRune(r);
         }
 
         private void lbCloseEquipped_Click(object sender, EventArgs e) {
@@ -611,7 +607,7 @@ namespace RuneApp {
                     else
                         mon = build.Mon;
 
-                    ShowMon(mon);
+                    ShowMon(mon, load.GetStats(mon));
 
                     ShowStats(load.GetStats(mon), mon);
 

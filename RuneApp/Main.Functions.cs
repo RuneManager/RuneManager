@@ -166,10 +166,10 @@ namespace RuneApp {
             help.Location = new Point(Location.X + Width, Location.Y);
         }
 
-        private void ShowMon(Monster mon) {
+        private void ShowMon(Monster mon, Stats cur = null) {
             displayMon = mon;
             if (mon != null) {
-                var cur = mon.GetStats();
+                cur = cur ?? mon.GetStats();
 
                 statName.Text = mon.FullName;
                 statID.Text = mon.Id.ToString();

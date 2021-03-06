@@ -632,7 +632,7 @@ namespace RuneApp {
                 excelSheets.MoveBefore(ws.Index, ind);
             }
 
-            int tTop = (int)RuneSet.Broken + 2;
+            int tTop = (int)Math.Log((int)RuneSet.Broken, 2) + 2;
             int tLeft = 1;
 
             int row = tTop;
