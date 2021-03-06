@@ -204,6 +204,7 @@
             this.runeEquipped = new RuneApp.RuneBox();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btnRuneDial = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -506,6 +507,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.btnRuneDial);
             this.groupBox1.Controls.Add(this.monImage);
             this.groupBox1.Controls.Add(this.statLevel);
             this.groupBox1.Controls.Add(this.statID);
@@ -1972,6 +1974,16 @@
             this.runeEquipped.Visible = false;
             this.runeEquipped.OnClickHide += new System.EventHandler(this.lbCloseEquipped_Click);
             // 
+            // btnRuneDial
+            // 
+            this.btnRuneDial.Location = new System.Drawing.Point(206, 338);
+            this.btnRuneDial.Name = "btnRuneDial";
+            this.btnRuneDial.Size = new System.Drawing.Size(27, 22);
+            this.btnRuneDial.TabIndex = 53;
+            this.btnRuneDial.Text = ">";
+            this.btnRuneDial.UseVisualStyleBackColor = true;
+            this.btnRuneDial.Click += new System.EventHandler(this.runeDial1_DoubleClick);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -2222,6 +2234,7 @@
 		private System.Windows.Forms.ToolStripMenuItem in30SecondsToolStripMenuItem;
 		private System.ComponentModel.BackgroundWorker backgroundWorker1;
 		private System.Windows.Forms.Timer timer1;
-	}
+        private System.Windows.Forms.Button btnRuneDial;
+    }
 }
 
