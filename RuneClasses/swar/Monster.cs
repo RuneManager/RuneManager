@@ -288,7 +288,7 @@ namespace RuneOptim.swar {
         private static MonsterStat[] SkillList {
             get {
                 if (skillList == null)
-                    skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(Properties.Resources.SkillsJSON));
+                    skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(Properties.Resources.SkillsJSON, System.Text.Encoding.UTF8));
 
                 return skillList;
             }

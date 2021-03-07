@@ -55,7 +55,7 @@ namespace RuneOptim.swar {
         public static Dictionary<int, string> MonIdNames {
             get {
                 if (monIdNames == null)
-                    monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(Properties.Resources.MonstersJSON));
+                    monIdNames = JsonConvert.DeserializeObject<Dictionary<int, string>>(File.ReadAllText(Properties.Resources.MonstersJSON, System.Text.Encoding.UTF8));
                 return monIdNames;
             }
         }

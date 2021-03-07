@@ -6,6 +6,9 @@ using Newtonsoft.Json.Converters;
 using System.Runtime.Serialization;
 using System.Net;
 using System.IO;
+using System.Diagnostics;
+using System.Text;
+using System.Threading;
 
 namespace RuneOptim.swar {
     public class MonsterStat : StatLoader {
@@ -248,10 +251,14 @@ namespace RuneOptim.swar {
         readonly static object objLock = new object();
 
         readonly static object lockSlow = new object();
+        private static int backOff = 100;
+        private static int baseOff = 10;
+        static int goodHits = 0;
 
         public static T AskSWApi<T>(string location, bool refetch = false) {
             var fpath = location.Replace("https://swarfarm.com/api", "swf_api_cache").Replace("?", "_") + ".json";
             var data = "";
+            bool good = false;
             lock (objLock) {
                 if (apiObjs.ContainsKey(location)) {
                     return (T)apiObjs[location];
@@ -267,22 +274,66 @@ namespace RuneOptim.swar {
             if (!File.Exists(fpath) || refetch) {
                 Directory.CreateDirectory(new FileInfo(fpath).Directory.FullName);
                 using (WebClient client = new WebClient()) {
-                    client.Headers["accept"] = "application/json";
-                    lock (lockSlow) {
-                        System.Threading.Thread.Sleep(200);
-                    }
-                    data = client.DownloadString(location);
+                    
+                    do {
+                        lock (lockSlow) {
+                            if (baseOff > 10)
+                                Debug.WriteLine("Rate limit " + baseOff + "    " + fpath);
+                            System.Threading.Thread.Sleep(baseOff);
+                        }
 
-                    File.WriteAllText(fpath, data);
+                        try {
+                            client.Encoding = Encoding.UTF8;
+                            client.Headers["accept"] = "application/json";
+                            data = Encoding.UTF8.GetString(client.DownloadData(location));
+                            if (backOff >= 150)
+                                backOff -= 50;
+                            good = !data.Contains("<!DOCTYPE html>");
+                            if (!good)
+                                baseOff += 5;
+                        }
+                        catch (WebException wex) when (wex.Response is HttpWebResponse exr) {
+                            if (exr.StatusCode == (HttpStatusCode)429) {
+                                baseOff += 10;
+                                lock (lockSlow) {
+
+                                    int waitTime = backOff;
+                                    if (exr.Headers.AllKeys.Contains("Retry-After") && exr.Headers.AllKeys.Contains("Date")) {
+                                        var retryAt = DateTime.Parse(exr.Headers["Date"]).AddSeconds(int.Parse(exr.Headers["Retry-After"]));
+                                        var delta = retryAt - DateTime.Now;
+                                        Debug.WriteLine("Time to backoff " + delta.TotalMilliseconds + "    " + fpath);
+                                        waitTime = (int)Math.Max(0, delta.TotalMilliseconds);
+                                    }
+                                    else {
+                                        Debug.WriteLine("Time to backoff " + backOff + "    " + fpath);
+                                    }
+
+                                    System.Threading.Thread.Sleep(waitTime + baseOff);
+                                    backOff += 150;
+                                }
+                            }
+
+                        }
+                    } while (!good);
+
+                    goodHits++;
+
+                    if (goodHits > 10 && baseOff > 10) {
+                        baseOff--;
+                        goodHits = 0;
+                    }
+
                 }
             }
             else {
-                data = File.ReadAllText(fpath);
+                data = File.ReadAllText(fpath, Encoding.UTF8);
             }
             if (string.IsNullOrWhiteSpace(data))
                 return default(T);
             lock (objLock) {
                 apiObjs.Add(location, JsonConvert.DeserializeObject<T>(data));
+                if (good)
+                    File.WriteAllText(fpath, data, Encoding.UTF8);
                 return (T)apiObjs[location];
             }
         }

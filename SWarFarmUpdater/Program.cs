@@ -71,33 +71,44 @@ namespace SWFarmLoader {
         }
 
         static void GetData(bool refetch = false) {
-            try {
-                List<MonsterStat> monsters = new List<MonsterStat>();
-                var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary", refetch);
-                int i = 0;
-                //foreach (var it in list) {
-                Parallel.ForEach(list, it => {
-                    Console.CursorLeft = 0;
-                    Console.Write($"{i * 100.0 / list.Length:0.##}% "); i++;
-                    var mm = StatReference.AskSWApi<MonsterStat>(it.URL, refetch);
-                    monsters.Add(mm);
-                }
-                );
-
-                SortedDictionary<int, string> monstersJSON = new SortedDictionary<int, string>();
-                foreach (var mon in monsters.OrderBy(m => m.monsterTypeId)) {
-                    if(mon.monsterTypeId % 100 == 1)
-                    {
-                        monstersJSON.Add(mon.monsterTypeId / 100, mon.name);
-                    } else if (mon.monsterTypeId % 100 / 10 == 0) {
-                        // duplicate so skip
-                    } else
-                    {
-                        monstersJSON.Add(mon.monsterTypeId, mon.name);
+            using (var prog = new ProgressBar()) {
+                try {
+                    Console.WriteLine("\nGetting monsters.");
+                    List<MonsterStat> monsters = new List<MonsterStat>();
+                    var list = StatReference.AskSWApi<StatLoader[]>("https://swarfarm.com/api/bestiary", refetch);
+                    int i = 0;
+                    //foreach (var it in list) {
+                    Parallel.ForEach(list, new ParallelOptions() { 
+                        MaxDegreeOfParallelism = Environment.ProcessorCount,
+                    }, it => {
+                        //Console.CursorLeft = 0;
+                        //Console.Write($"{i * 100.0 / list.Length:0.##}% "); i++;
+                        var mm = StatReference.AskSWApi<MonsterStat>(it.URL, refetch);
+                        i++;
+                        prog.Report(i / (double)list.Length);
+                        monsters.Add(mm);
                     }
-                };
-                /*
-                File.WriteAllText("mons2.cs", $@"using RuneOptim;
+                    );
+
+                    Console.WriteLine("\nGetting names.");
+                    i = 0;
+                    SortedDictionary<int, string> monstersJSON = new SortedDictionary<int, string>();
+                    foreach (var mon in monsters.OrderBy(m => m.monsterTypeId)) {
+                        prog.Report(i / (double)monsters.Count);
+                        i++;
+                        if (mon.monsterTypeId % 100 == 1) {
+                            monstersJSON.Add(mon.monsterTypeId / 100, mon.name);
+                        }
+                        else if (mon.monsterTypeId % 100 / 10 == 0) {
+                            // duplicate so skip
+                        }
+                        else {
+                            monstersJSON.Add(mon.monsterTypeId, mon.name);
+                        }
+                    };
+
+                    /*
+                    File.WriteAllText("mons2.cs", $@"using RuneOptim;
 
 namespace RuneOptim.Monsters {{
     public static class Library {{
@@ -106,10 +117,10 @@ namespace RuneOptim.Monsters {{
     }}
 }}
 ");*/
-/*
-                var qwerqe = monsters.GroupBy(m => m.monsterTypeId / 100);
+                    /*
+                    var qwerqe = monsters.GroupBy(m => m.monsterTypeId / 100);
 
-                File.WriteAllText("mons3.cs", $@"using RuneOptim;
+                    File.WriteAllText("mons3.cs", $@"using RuneOptim;
 
 namespace RuneOptim.Monsters {{
     public enum MonsterTypeMap {{
@@ -121,12 +132,14 @@ namespace RuneOptim.Monsters {{
 ", qwerqe.Select(g => writeGroup(g, @"      ")))}
     }}
 }}");
-*/
-                File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.monsterTypeId), Formatting.Indented));
-                File.WriteAllText("monsters.json", JsonConvert.SerializeObject(monstersJSON, Formatting.Indented));
-            }
-            catch (Exception e) {
-                Console.WriteLine(e.GetType() + ": " + e.Message);
+                    */
+
+                    File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.monsterTypeId), Formatting.Indented), Encoding.UTF8);
+                    File.WriteAllText("monsters.json", JsonConvert.SerializeObject(monstersJSON, Formatting.Indented), Encoding.UTF8);
+                }
+                catch (Exception e) {
+                    Console.WriteLine(e.GetType() + ": " + e.Message);
+                }
             }
         }
 
