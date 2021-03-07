@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 
 namespace RunePlugin.Response {
-	[SWCommand(SWCommand.LockUnit)]
-	[SWCommand(SWCommand.UnlockUnit)]
-	public class GenericUnitResponse : SWResponse {
-		[JsonProperty("unit_id")]
-		public ulong UnitId;
-	}
-	
+    [SWCommand(SWCommand.LockUnit)]
+    [SWCommand(SWCommand.UnlockUnit)]
+    public class GenericUnitResponse : SWResponse {
+        [JsonProperty("unit_id")]
+        public ulong UnitId;
+    }
+    
 }

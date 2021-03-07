@@ -67,23 +67,23 @@ namespace RuneApp.InternalServer.Swagger {
         /// * Array Model
         /// **/
         ///var ArrayModel = function (definition) {
-        ///	this.name = &quot;name&quot;;
-        ///	this.definition = definition || {};
-        ///	this.properties = [];
-        ///	this.type;
-        ///	this.ref;
+        /// this.name = &quot;name&quot;;
+        /// this.definition = definition || {};
+        /// this.properties = [];
+        /// this.type;
+        /// this.ref;
         ///
-        ///	var requiredFields = definition.enum || [];
-        ///	var items = definition.items;
-        ///	if (items) {
-        ///		var type = items.type;
-        ///		if (items.type) {
-        ///			this.type = typeFromJsonSchema(type.type, type.format);
-        ///		}
-        ///		else {
-        ///			this.ref = items[&apos;$ref&apos;];
-        ///		}
-        ///	}
+        /// var requiredFields = definition.enum || [];
+        /// var items = definition.items;
+        /// if (items) {
+        ///     var type = items.type;
+        ///     if (items.type) {
+        ///         this.type = typeFromJsonSchema(type.type, type.format);
+        ///     }
+        ///     else {
+        ///         this.ref = items[&apos;$ref&apos;];
+        ///     }
+        /// }
         ///}
         ///
         ///ArrayModel.prototype.crea [rest of string was truncated]&quot;;.
@@ -156,20 +156,20 @@ namespace RuneApp.InternalServer.Swagger {
         ///// version 2.1.0-alpha.7
         ///$(function () {
         ///
-        ///	// Helper function for vertically aligning DOM elements
-        ///	// http://www.seodenver.com/simple-vertical-align-plugin-for-jquery/
-        ///	$.fn.vAlign = function () {
-        ///		return this.each(function (i) {
-        ///			var ah = $(this).height();
-        ///			var ph = $(this).parent().height();
-        ///			var mh = (ph - ah) / 2;
-        ///			$(this).css(&apos;margin-top&apos;, mh);
-        ///		});
-        ///	};
+        /// // Helper function for vertically aligning DOM elements
+        /// // http://www.seodenver.com/simple-vertical-align-plugin-for-jquery/
+        /// $.fn.vAlign = function () {
+        ///     return this.each(function (i) {
+        ///         var ah = $(this).height();
+        ///         var ph = $(this).parent().height();
+        ///         var mh = (ph - ah) / 2;
+        ///         $(this).css(&apos;margin-top&apos;, mh);
+        ///     });
+        /// };
         ///
-        ///	$.fn.stretchFormtasticInputWidthToParent = function () {
-        ///		return this.each(function (i) {
-        ///			var p_widt [rest of string was truncated]&quot;;.
+        /// $.fn.stretchFormtasticInputWidthToParent = function () {
+        ///     return this.each(function (i) {
+        ///         var p_widt [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string swagger_ui {
             get {

@@ -6,7 +6,7 @@ using RuneOptim.swar;
 using RuneOptim.Management;
 
 namespace RuneOptim.Tests {
-	[TestClass()]
+    [TestClass()]
     public class LoadoutTests
     {
 

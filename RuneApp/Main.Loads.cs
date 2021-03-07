@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace RuneApp {
-	partial class Main {
+    partial class Main {
 
-		private void ClearLoadouts() {
-			Program.ClearLoadouts();
-			checkLocked();
-		}
+        private void ClearLoadouts() {
+            Program.ClearLoadouts();
+            checkLocked();
+        }
 
-	}
+    }
 }

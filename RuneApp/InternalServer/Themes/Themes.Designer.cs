@@ -62,14 +62,14 @@ namespace RuneApp.InternalServer.Themes {
         
         /// <summary>
         ///   Looks up a localized string similar to body {
-        ///	background: #000;
-        ///	color: #ccc;
+        /// background: #000;
+        /// color: #ccc;
         ///}
         ///a, .link {
-        ///	color: #aaf;
+        /// color: #aaf;
         ///}
         ///a:visited, .link_visited {
-        ///	color: #88c;
+        /// color: #88c;
         ///}.
         /// </summary>
         internal static string dark {
@@ -80,8 +80,8 @@ namespace RuneApp.InternalServer.Themes {
         
         /// <summary>
         ///   Looks up a localized string similar to body {
-        ///	background: #ccc;
-        ///	color: #733;
+        /// background: #ccc;
+        /// color: #733;
         ///}
         ///.
         /// </summary>

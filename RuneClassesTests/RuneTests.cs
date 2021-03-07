@@ -2,7 +2,7 @@
 using RuneOptim.swar;
 
 namespace RuneOptim.Tests {
-	[TestClass()]
+    [TestClass()]
     public class RuneTests
     {
         [TestMethod()]

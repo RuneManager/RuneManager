@@ -7,40 +7,40 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace RuneOptim.BuildProcessing {
-	/// <summary>
-	/// Perfect for SPEED
-	/// </summary>
-	public class BuildBrokenFast : BuildFast {
-		public override int Order { get => 1; }
-		public override string Name { get; }
+    /// <summary>
+    /// Perfect for SPEED
+    /// </summary>
+    public class BuildBrokenFast : BuildFast {
+        public override int Order { get => 1; }
+        public override string Name { get; }
 
-		public override IBuildRunner GetRunner() {
-			return new BuildBrokenFastRunner();
-		}
+        public override IBuildRunner GetRunner() {
+            return new BuildBrokenFastRunner();
+        }
 
-		public override bool IsValid(Build b) {
+        public override bool IsValid(Build b) {
 
-			if (!base.IsValid(b))
-				return false;
+            if (!base.IsValid(b))
+                return false;
 
-			if (b.RequiredSets.Any())
-				return false;
+            if (b.RequiredSets.Any())
+                return false;
 
-			return b.AllowBroken;
-		}
+            return b.AllowBroken;
+        }
 
-		public class BuildBrokenFastRunner : BuildRunner<bool> {
+        public class BuildBrokenFastRunner : BuildRunner<bool> {
 
-			public int takeNum = 5;
+            public int takeNum = 5;
 
-			protected override Rune[][] messupRunes(IEnumerable<Rune> inRunes) {
+            protected override Rune[][] messupRunes(IEnumerable<Rune> inRunes) {
 
 
 
-				return inRunes.GroupBy(r => r.Slot).OrderBy(r => r.Key).Select(g => g.OrderByDescending(r => build.CalcScore(r, this.build.Mon)).Take(takeNum).ToArray()).ToArray();
-			}
+                return inRunes.GroupBy(r => r.Slot).OrderBy(r => r.Key).Select(g => g.OrderByDescending(r => build.CalcScore(r, this.build.Mon)).Take(takeNum).ToArray()).ToArray();
+            }
 
-		}
-	}
+        }
+    }
 
 }

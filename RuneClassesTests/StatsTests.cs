@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RuneOptim.swar;
 
 namespace RuneOptim.Tests {
-	[TestClass()]
+    [TestClass()]
     public class StatsTests
     {
         [TestMethod()]

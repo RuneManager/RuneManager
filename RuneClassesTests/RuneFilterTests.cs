@@ -2,7 +2,7 @@
 using RuneOptim.BuildProcessing;
 
 namespace RuneOptim.Tests {
-	[TestClass()]
+    [TestClass()]
     public class RuneFilterTests
     { 
         [TestMethod()]

@@ -7,65 +7,65 @@ using Newtonsoft.Json;
 using RuneOptim.swar;
 
 namespace RunePlugin.Response {
-	public enum WinLose {
-		Win = 1,
-		Lose = 2,
-	}
+    public enum WinLose {
+        Win = 1,
+        Lose = 2,
+    }
 
-	[SWCommand(SWCommand.BattleScenarioResult)]
-	public class GenericBattleResponse : SWResponse {
-		[JsonProperty("win_lose")]
-		public WinLose Win;
+    [SWCommand(SWCommand.BattleScenarioResult)]
+    public class GenericBattleResponse : SWResponse {
+        [JsonProperty("win_lose")]
+        public WinLose Win;
 
-		[JsonProperty("clear_time")]
-		public ClearRecord Time;
+        [JsonProperty("clear_time")]
+        public ClearRecord Time;
 
-		[JsonProperty("reward")]
-		public DungeonReward Reward;
+        [JsonProperty("reward")]
+        public DungeonReward Reward;
 
-		[JsonProperty("unit_list")]
-		public Monster[] Monsters;
-	}
+        [JsonProperty("unit_list")]
+        public Monster[] Monsters;
+    }
 
-	[SWCommand(SWCommand.BattleDungeonResult)]
-	public class BattleDungeonResultResponse : GenericBattleResponse {
-		[JsonProperty("clear_bonus")]
-		public DungeonReward ClearBonus;
-	}
+    [SWCommand(SWCommand.BattleDungeonResult)]
+    public class BattleDungeonResultResponse : GenericBattleResponse {
+        [JsonProperty("clear_bonus")]
+        public DungeonReward ClearBonus;
+    }
 
-	[SWCommand(SWCommand.BattleRiftDungeonResult)]
-	public class BattleRiftDungeonResultResponse : SWResponse {
-		[JsonProperty("rift_dungeon_box_id")]
-		public int RiftDungeonBoxId;
+    [SWCommand(SWCommand.BattleRiftDungeonResult)]
+    public class BattleRiftDungeonResultResponse : SWResponse {
+        [JsonProperty("rift_dungeon_box_id")]
+        public int RiftDungeonBoxId;
 
-		[JsonProperty("total_damage")]
-		public ulong TotalDamage;
+        [JsonProperty("total_damage")]
+        public ulong TotalDamage;
 
-		[JsonProperty("best_clear_rift_dungeon_info")]
-		public BestRiftDeck BestClearRiftDungeonInfo;
+        [JsonProperty("best_clear_rift_dungeon_info")]
+        public BestRiftDeck BestClearRiftDungeonInfo;
 
-		[JsonProperty("bestdeck_rift_dungeon_info")]
-		public RiftDeck BestDeckRiftDungeonInfo;
+        [JsonProperty("bestdeck_rift_dungeon_info")]
+        public RiftDeck BestDeckRiftDungeonInfo;
 
-		[JsonProperty("item_list")]
-		public InventoryItem[] ItemList;
-	}
+        [JsonProperty("item_list")]
+        public InventoryItem[] ItemList;
+    }
 
-	public class ScenarioInfo {
-		[JsonProperty("wizard_id")]
-		public ulong WizardId;
+    public class ScenarioInfo {
+        [JsonProperty("wizard_id")]
+        public ulong WizardId;
 
-		[JsonProperty("region_id")]
-		public int RegionId;
+        [JsonProperty("region_id")]
+        public int RegionId;
 
-		[JsonProperty("difficulty")]
-		public int Difficulty;
+        [JsonProperty("difficulty")]
+        public int Difficulty;
 
-		[JsonProperty("stage_no")]
-		public int StageNumber;
+        [JsonProperty("stage_no")]
+        public int StageNumber;
 
-		[JsonProperty("cleared")]
-		public bool Cleared;
-	}
+        [JsonProperty("cleared")]
+        public bool Cleared;
+    }
 
 }

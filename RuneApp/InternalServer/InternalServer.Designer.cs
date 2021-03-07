@@ -84,14 +84,14 @@ namespace RuneApp.InternalServer {
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;en&quot; xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
         ///&lt;head&gt;
-        ///	&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;/&gt;
-        ///	&lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
-        ///	&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
-        ///	&lt;meta charset=&quot;utf-8&quot;/&gt;
-        ///	&lt;title&gt;{title}&lt;/title&gt;
-        ///	&lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;/favicon.ico&quot;&gt;
-        ///	&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.css&quot; /&gt;
-        ///	&lt;l [rest of string was truncated]&quot;;.
+        /// &lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot;/&gt;
+        /// &lt;meta http-equiv=&quot;X-UA-Compatible&quot; content=&quot;IE=edge&quot;&gt;
+        /// &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        /// &lt;meta charset=&quot;utf-8&quot;/&gt;
+        /// &lt;title&gt;{title}&lt;/title&gt;
+        /// &lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;/favicon.ico&quot;&gt;
+        /// &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdnjs.cloudflare.com/ajax/libs/normalize/7.0.0/normalize.css&quot; /&gt;
+        /// &lt;l [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string default_tpl {
             get {
@@ -121,30 +121,30 @@ namespace RuneApp.InternalServer {
         
         /// <summary>
         ///   Looks up a localized string similar to .rune-container {
-        ///	display: flex;
-        ///	flex-wrap: wrap;
-        ///	justify-content: space-between;
-        ///	align-items: flex-start;
+        /// display: flex;
+        /// flex-wrap: wrap;
+        /// justify-content: space-between;
+        /// align-items: flex-start;
         ///}
         ///.rune-box {
-        ///	display: inline-flex;
-        ///	flex-direction: column;
-        ///	border: 1px solid black;
-        ///	border-radius: 5pt;
-        ///	margin: 1pt;
-        ///	padding: 1pt;
-        ///	min-width: 11em;
-        ///	min-height: 8.7em;
+        /// display: inline-flex;
+        /// flex-direction: column;
+        /// border: 1px solid black;
+        /// border-radius: 5pt;
+        /// margin: 1pt;
+        /// padding: 1pt;
+        /// min-width: 11em;
+        /// min-height: 8.7em;
         ///}
         ///.rune-icon {
-        ///	text-align: center;
-        ///	vertical-align: middle;
-        ///	background-position-x: center;
-        ///	background-position-y: center;
-        ///	background-repeat: no-repeat;
+        /// text-align: center;
+        /// vertical-align: middle;
+        /// background-position-x: center;
+        /// background-position-y: center;
+        /// background-repeat: no-repeat;
         ///}
         ///.rune-icon-back {
-        ///	display: inline-block;
+        /// display: inline-block;
         /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string runes_css {
@@ -161,8 +161,8 @@ namespace RuneApp.InternalServer {
         ///&lt;br /&gt;
         ///&lt;br /&gt;
         ///&lt;ul&gt;
-        ///	&lt;li&gt;List item&lt;/li&gt;
-        ///	&lt;li&gt;Another&lt;/li&gt;
+        /// &lt;li&gt;List item&lt;/li&gt;
+        /// &lt;li&gt;Another&lt;/li&gt;
         ///&lt;/ul&gt;.
         /// </summary>
         internal static string theme_preview {

@@ -7,9 +7,9 @@ using Newtonsoft.Json;
 using RuneOptim.swar;
 
 namespace RunePlugin.Response {
-	[SWCommand(SWCommand.UpgradeDeco)]
-	public class UpgradeDecoResponse : SWResponse {
-		[JsonProperty("deco_info")]
-		public Deco Deco;
-	}
+    [SWCommand(SWCommand.UpgradeDeco)]
+    public class UpgradeDecoResponse : SWResponse {
+        [JsonProperty("deco_info")]
+        public Deco Deco;
+    }
 }
