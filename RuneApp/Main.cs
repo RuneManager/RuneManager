@@ -802,9 +802,7 @@ namespace RuneApp {
         private void tsBtnLoadsRemove_Click(object sender, EventArgs e) {
             foreach (ListViewItem li in loadoutList.SelectedItems) {
                 Loadout l = (Loadout)li.Tag;
-
-                Program.loads.Remove(l);
-                //loadoutList.Items.Remove(li);
+                Program.RemoveLoad(l);
             }
             checkLocked();
         }

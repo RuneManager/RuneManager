@@ -582,7 +582,7 @@ namespace RuneApp {
         internal static void ClearLoadouts() {
             foreach (Loadout l in loads) {
                 Build build = Program.builds.FirstOrDefault(b => b.ID == l.BuildID);
-                BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, ""));
+                BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
                 l.Unlock();
             }
             loads.Clear();
@@ -591,7 +591,7 @@ namespace RuneApp {
         public static void RemoveLoad(Loadout l)
         {
             Build build = Program.builds.FirstOrDefault(b => b.ID == l.BuildID);
-            BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, ""));
+            BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
             l.Unlock();
             loads.Remove(l);
         }
