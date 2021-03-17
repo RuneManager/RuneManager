@@ -354,7 +354,7 @@ namespace RuneApp {
             else if (b.Type == BuildType.Link)
                 nli.SubItems[0].ForeColor = Color.Teal;
             if (Program.Settings.SplitAssign)
-                nli.SubItems[3].Text = l.RunesNew.ToString() + "/" + l.runesChanged.ToString();
+                nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.runesChanged.ToString();
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
             if (l.Time / (double)1000 > 60)
