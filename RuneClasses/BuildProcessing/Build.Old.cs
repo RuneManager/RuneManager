@@ -405,7 +405,7 @@ namespace RuneOptim.BuildProcessing {
         [Obsolete]
         public BuildResult GenBuilds(string prefix = "") {
             if (Type == BuildType.Lock) {
-                Best = new Monster(Mon, true);
+                Best = new Monster(new Monster(Mon), true);
                 return BuildResult.Success;
             }
             else if (Type == BuildType.Link) {
