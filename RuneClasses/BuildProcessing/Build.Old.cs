@@ -82,18 +82,6 @@ namespace RuneOptim.BuildProcessing {
                 return;
             try {
 
-                if (Type == BuildType.Lock) {
-                    foreach (var r in Mon.Current.Runes) {
-                        if (r != null) {
-                            if (r.Locked)
-                                runes[r.Slot - 1] = new Rune[0];
-                            else
-                                runes[r.Slot - 1] = new Rune[] { r };
-                        }
-                    }
-                    return;
-                }
-
                 if (Type == BuildType.Link && LinkBuild == null) {
                     for (int i = 0; i < 6; i++)
                         runes[i] = new Rune[0];
@@ -102,6 +90,23 @@ namespace RuneOptim.BuildProcessing {
 
                 // todo: less .ToArray-ing
                 ParallelQuery<Rune> rsGlobal = save.Runes.AsParallel();
+
+                if (Type == BuildType.Lock)
+                {
+                    foreach (var r in Mon.Current.Runes)
+                    {
+                        // make sure to use runes out of rsGlobal (vs. orphaned monster.current runes)
+                        Rune rune = rsGlobal.FirstOrDefault(rn => rn.Id == r.Id);
+                        if (rune != null)
+                        {
+                           if (rune.Locked)
+                                runes[rune.Slot - 1] = new Rune[0];
+                            else
+                                runes[rune.Slot - 1] = new Rune[] { rune };
+                        }
+                    }
+                    return;
+                }
 
                 // if not saving stats, cull unusable here
                 if (!BuildSaveStats) {
@@ -405,7 +410,13 @@ namespace RuneOptim.BuildProcessing {
         [Obsolete]
         public BuildResult GenBuilds(string prefix = "") {
             if (Type == BuildType.Lock) {
-                Best = new Monster(new Monster(Mon), true);
+                Monster temp = new Monster(Mon);
+                foreach (var slot in runes)
+                {
+                    if (slot.Length > 0)
+                        temp.ApplyRune(slot[0]);
+                }
+                Best = new Monster(temp, true);
                 return BuildResult.Success;
             }
             else if (Type == BuildType.Link) {
