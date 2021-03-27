@@ -277,18 +277,19 @@ namespace RuneApp {
         /// Checks the Working directory for a supported save file
         /// </summary>
         public static LoadSaveResult FindSave() {
-            string[] files = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
-            if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation)) {
+            if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
                 return LoadSave(Program.Settings.SaveLocation);
-            }
-            else if (files.Any()) {
-                if (!files.HasCount(1))
-                    return LoadSaveResult.FileNotFound;
-                return LoadSave(files.First());
-            }
-            else if (File.Exists("save.json")) {
+
+            if (File.Exists("save.json"))
                 return LoadSave("save.json");
-            }
+
+            // check the first 3 lines of JSON files for the HubUserLogin command
+            var files = Directory.GetFiles(Environment.CurrentDirectory, "*.json")
+                .Where(f => File.ReadLines(f).Take(3).Any(l => l.Contains("HubUserLogin")));
+
+            if (files.Any() && files.HasCount(1)) 
+                return LoadSave(files.First());
+
             return LoadSaveResult.FileNotFound;
         }
 

@@ -133,7 +133,7 @@ namespace RuneApp {
         }
 
         private DialogResult CheckSaveChanges() {
-            if (!Program.data.isModified)
+            if (Program.data == null || !Program.data.isModified)
                 return DialogResult.Yes;
 
             var res = MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
