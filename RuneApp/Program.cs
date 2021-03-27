@@ -24,9 +24,8 @@ namespace RuneApp {
         Success = 1,
     }
 
-    public static class Program {
-        [Obsolete("try using the lineLog")]
-        public static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+    public static partial class Program {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
         private static LineLogger lineLog = null;
         public static LineLogger LineLog {
@@ -34,12 +33,14 @@ namespace RuneApp {
                 if (lineLog == null) {
                     var prof = Environment.GetEnvironmentVariable("DIAGHUB_SESSION_ID");
                     var prof2 = Environment.GetEnvironmentVariable("COR_ENABLE_PROFILING");
-#pragma warning disable CS0618 // Type or member is obsolete
                     lineLog = new LineLogger((string.IsNullOrWhiteSpace(prof) && string.IsNullOrWhiteSpace(prof2)) ? log : null);
-#pragma warning restore CS0618 // Type or member is obsolete
 
                 }
                 return lineLog;
+            }
+            set
+            {
+                lineLog = value;
             }
         }
 
@@ -96,6 +97,7 @@ namespace RuneApp {
         private static Build currentBuild = null;
         public static Build CurrentBuild => currentBuild;
         private static Task runTask = null;
+        public static Task RunTask => runTask;
         private static CancellationToken runToken;
         private static CancellationTokenSource runSource = null;
 
@@ -114,8 +116,22 @@ namespace RuneApp {
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main() {
-            ReadConfig();
+        public static void Main(string[] args) {
+
+            if (args.Contains("-?") || args.Contains("--help"))
+            {
+                LineLog.Info("RuneApp - Summoners War Rune Optimizer.");
+                LineLog.Info("");
+                LineLog.Info("TODO: fill out this");
+                LineLog.Info("");
+                LineLog.Info("Usage:");
+                LineLog.Info("\t -? | --help: show this help.");
+                LineLog.Info("\t -a # | --affinity #: set the processor affinity to the first N 'cores'.");
+                LineLog.Info("\t -H: run the Program headless (currently disables some features).");
+                return;
+            }
+
+
             LineLog.Info("Program start");
             try {
                 if (Settings.UpgradeRequired) {
@@ -132,7 +148,7 @@ namespace RuneApp {
             loads.CollectionChanged += Loads_CollectionChanged;
             BuildsPrintTo += Program_BuildsPrintTo;
 
-            if (Program.Settings.InternalServer) {
+            if (Program.Settings.InternalServer && !args.Contains("-H")) {
                 try {
                     master.Start();
                 }
@@ -142,33 +158,41 @@ namespace RuneApp {
                 }
             }
 
-            if (Program.Settings.WatchSave)
+            if (Program.Settings.WatchSave && !args.Contains("-H"))
                 watchSave();
 
             RuneLog.logTo = new progWriter();
 
 
-            if (false && Environment.MachineName == "SAMS-COMP") {
-                Process Proc = Process.GetCurrentProcess();
-                long AffinityMask = (long)Proc.ProcessorAffinity;
-                AffinityMask &= 0x000F; // use only any of the first 4 available processors
-                Proc.ProcessorAffinity = (IntPtr)AffinityMask;
+            if (args.Contains("-a") || args.Contains("--affinity")) {
+                int p = Array.IndexOf(args, "-a");
+                if (p == -1)
+                    p = Array.IndexOf(args, "--affinity");
+                p += 1;
 
-                //ProcessThread Thread = Proc.Threads[0];
-                //AffinityMask = 1 << 5; // use only the second processor, despite availability
-                //Thread.ProcessorAffinity = (IntPtr)AffinityMask;
+                if (p < args.Length && int.TryParse(args[p], out int procs))
+                {
+                    long pMask = 0;
+                    for( int i = 0; i < procs; i++)
+                    {
+                        pMask |= 1 << i;
+                    }
+
+                    Process Proc = Process.GetCurrentProcess();
+                    long AffinityMask = (long)Proc.ProcessorAffinity;
+                    AffinityMask &= pMask;
+                    //AffinityMask &= 0x000F; // use only any of the first 4 available processors
+                    Proc.ProcessorAffinity = (IntPtr)AffinityMask;
+                }
             }
 
+            // Detect if we are profiling in VisualStudio
             var prof = Environment.GetEnvironmentVariable("DIAGHUB_SESSION_ID");
-
             var prof2 = Environment.GetEnvironmentVariable("COR_ENABLE_PROFILING");
 
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-
-
-            //MessageBox.Show(prof + "|" + prof2, "");
 
             if (!string.IsNullOrWhiteSpace(prof) || !string.IsNullOrWhiteSpace(prof2)) {
                 RuneLog.logTo = null;
@@ -178,9 +202,12 @@ namespace RuneApp {
             // TODO: find a better place to put this
             LoadGoals();
 
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Main());
+            if ( !args.Contains("-H") )
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new Main());
+            }
         }
 
         private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e) {

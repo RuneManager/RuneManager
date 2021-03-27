@@ -385,7 +385,7 @@ namespace RuneApp {
                 return;
 
             foreach (string tab in tabNames) {
-                SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
+                SlotIndex tabdex = LibExtensionMethods.GetIndex(tab);
                 foreach (string stat in Build.StatNames) {
                     UpdateStat(tab, stat);
                 }
@@ -618,7 +618,7 @@ namespace RuneApp {
         }
 
         void UpdateStat(string tab, string stat) {
-            SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
+            SlotIndex tabdex = LibExtensionMethods.GetIndex(tab);
             TabPage ctab = GetTab(tab);
             var ctest = ctab.Controls.Find(tab + stat + "test", true).First();
             double tt;
@@ -745,7 +745,7 @@ namespace RuneApp {
 
         void TestRuneTab(Rune rune, string tab) {
             bool res = false;
-            SlotIndex tabdex = ExtensionMethods.GetIndex(tab);
+            SlotIndex tabdex = LibExtensionMethods.GetIndex(tab);
             if (!build.RuneScoring.ContainsKey(tabdex))
                 return;
 

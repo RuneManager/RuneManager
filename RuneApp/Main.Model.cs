@@ -40,9 +40,6 @@ namespace RuneApp {
         
         public static Main Instance;
 
-        //public static Configuration config {  get { return Program.config; } }
-        [Obsolete("Try using LineLog instead")]
-        public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
         public static LineLogger LineLog { [DebuggerStepThrough] get { return Program.LineLog; } }
 
         private ListViewItem lastFocused = null;

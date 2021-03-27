@@ -121,6 +121,7 @@
       <DependentUpon>Create.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Generate.cs">
       <SubType>Form</SubType>
     </Compile>

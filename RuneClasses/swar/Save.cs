@@ -191,7 +191,7 @@ namespace RuneOptim.swar {
         private void Monsters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (Monster mon in e.NewItems.Cast<Monster>()) {
+                    foreach (Monster mon in e.NewItems) {
                         mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
                         mon.loadOrder = monLoaded++;
                         if (mon.Name == null) {

@@ -276,9 +276,9 @@ namespace RuneApp {
             if (double.TryParse(ctrl?.Text, out temp))
                 count = (int)temp;
 
-            if (!build.RuneScoring.ContainsKey(ExtensionMethods.GetIndex(tabName)))
-                build.RuneScoring.Add(ExtensionMethods.GetIndex(tabName), new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count));
-            build.RuneScoring[ExtensionMethods.GetIndex(tabName)] = new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count);
+            if (!build.RuneScoring.ContainsKey(LibExtensionMethods.GetIndex(tabName)))
+                build.RuneScoring.Add(LibExtensionMethods.GetIndex(tabName), new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count));
+            build.RuneScoring[LibExtensionMethods.GetIndex(tabName)] = new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count);
 
             // TODO: trim the ZERO nodes on the tree
 

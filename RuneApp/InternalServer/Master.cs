@@ -16,8 +16,8 @@ namespace RuneApp.InternalServer {
     /// </summary>
     public partial class Master : PageRenderer {
 #if !TEST_SLAVE
-        [Obsolete("Try LineLog")]
-        public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
+        //[Obsolete("Try LineLog")]
+        //public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
         public static LineLogger LineLog { [DebuggerStepThrough] get { return Program.LineLog; } }
 #else
         public Logger Log { get { return Program.log; } }
