@@ -227,6 +227,9 @@
       <DependentUpon>Options.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Program.Builds.cs" />
+    <Compile Include="Program.Saves.cs" />
+    <Compile Include="Program.Operation.cs" />
     <Compile Include="progWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\RuneBox.cs">
