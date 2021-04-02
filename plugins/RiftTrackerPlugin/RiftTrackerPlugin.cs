@@ -44,7 +44,7 @@ namespace RiftTrackerPlugin {
                 }
                 foreach (var m in allMons.SelectMany(q => q.Value.Select(r => r.Value.Value)))
                 {
-                    var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
+                    var tid = long.Parse(m.MonsterTypeId.ToString().Substring(0, m.MonsterTypeId.ToString().Length - 2) + "1" + m.MonsterTypeId.ToString().Last());
                     m.Name = MonsterName(tid);
 
                     foreach (var r in m.Runes)
@@ -87,7 +87,7 @@ namespace RiftTrackerPlugin {
             var mons = JsonConvert.DeserializeObject<Monster[]>(jobj["unit_list"].ToString());
             foreach (var m in mons)
             {
-                var tid = long.Parse(m.monsterTypeId.ToString().Substring(0, m.monsterTypeId.ToString().Length - 2) + "1" + m.monsterTypeId.ToString().Last());
+                var tid = long.Parse(m.MonsterTypeId.ToString().Substring(0, m.MonsterTypeId.ToString().Length - 2) + "1" + m.MonsterTypeId.ToString().Last());
                 m.Name = MonsterName(tid);
                 
                 foreach (var r in m.Runes)
@@ -106,7 +106,7 @@ namespace RiftTrackerPlugin {
                 {
                     if (mm.Name == "Missingno")
                     {
-                        tid = long.Parse(mm.monsterTypeId.ToString().Substring(0, mm.monsterTypeId.ToString().Length-2) + "1" + mm.monsterTypeId.ToString().Last());
+                        tid = long.Parse(mm.MonsterTypeId.ToString().Substring(0, mm.MonsterTypeId.ToString().Length-2) + "1" + mm.MonsterTypeId.ToString().Last());
                         mm.Name = MonsterName(tid);
                     }
 

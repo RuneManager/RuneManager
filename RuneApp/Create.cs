@@ -173,7 +173,7 @@ namespace RuneApp {
             build.Mon.GetStats();
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillFunc?[i] != null) {
+                if (build?.Mon?.SkillsFunction?[i] != null) {
                     statRows[Attr.Skill1 + i] = new StatRow();
 
                     //var ff = build.mon.SkillFunc[i]; build.mon.GetSkillDamage(Attr.AverageDamage, i);
@@ -876,7 +876,7 @@ namespace RuneApp {
                         statRows[extra].Worth.Text = build.Sort.ExtraGet(extra) != 0 ? build.Sort.ExtraGet(extra).ToString() : "";
                     }
                     for (int i = 0; i < 4; i++) {
-                        if (build?.Mon?.SkillFunc?[i] != null) {
+                        if (build?.Mon?.SkillsFunction?[i] != null) {
                             var skilla = Attr.Skill1 + i;
                             statRows[skilla].Worth.Text = build.Sort.DamageSkillups[i] != 0 ? build.Sort.DamageSkillups[i].ToString() : "";
                         }
@@ -894,7 +894,7 @@ namespace RuneApp {
                         build.Sort.ExtraSet(extra, val);
                     }
                     for (int i = 0; i < 4; i++) {
-                        if (build?.Mon?.SkillFunc?[i] != null) {
+                        if (build?.Mon?.SkillsFunction?[i] != null) {
                             var skilla = Attr.Skill1 + i;
                             double.TryParse(statRows[skilla].Worth.Text, out val);
                             build.Sort.DamageSkillupsSet(i, val);

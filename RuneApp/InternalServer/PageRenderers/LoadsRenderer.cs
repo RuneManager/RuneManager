@@ -75,7 +75,7 @@ namespace RuneApp.InternalServer {
 
                 // make a copy of all the data to mess around with
                 foreach (var m in Program.Data.Monsters) {
-                    mons.Add(new MiniMon() { mon = m, storage = m.inStorage, lockedOut = m.OnDefense || m.IsRep || (m.BuildingId != 0 && !m.inStorage) });
+                    mons.Add(new MiniMon() { mon = m, storage = m.InStorage, lockedOut = m.OnDefense || m.IsRep || (m.BuildingId != 0 && !m.InStorage) });
                 }
                 foreach (var r in Program.Data.Runes) {
                     var mr = new MiniRune() { rune = r };
@@ -493,7 +493,7 @@ function hackLots(prop, num, on) {
 
                     if (action == ActionType.MonIn) {
                         foreach (var m in manyMons)
-                            ret.contentList.Add(ServeImageClass($"monsters/{m.monsterTypeId}.png", "mon-portrait"));
+                            ret.contentList.Add(ServeImageClass($"monsters/{m.MonsterTypeId}.png", "mon-portrait"));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
                         ret.contentList.Add(ServeImageClass($"loads/building_store_small.png", "storage"));
                     }
@@ -501,13 +501,13 @@ function hackLots(prop, num, on) {
                         ret.contentList.Add(ServeImageClass($"loads/building_store_small.png", "storage"));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
                         foreach (var m in manyMons)
-                            ret.contentList.Add(ServeImageClass($"monsters/{m.monsterTypeId}.png", "mon-portrait"));
+                            ret.contentList.Add(ServeImageClass($"monsters/{m.MonsterTypeId}.png", "mon-portrait"));
                     }
                     else if (action == ActionType.RuneIn) {
                         foreach (var r in manyRunes)
                             ret.contentList.Add(RuneRenderer.renderRune(r, true));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
-                        ret.contentList.Add(ServeImageClass($"monsters/{mon.monsterTypeId}.png", "mon-portrait"));
+                        ret.contentList.Add(ServeImageClass($"monsters/{mon.MonsterTypeId}.png", "mon-portrait"));
                     }
                     else if (action == ActionType.RuneOut) {
                         return new ServedResult("span");

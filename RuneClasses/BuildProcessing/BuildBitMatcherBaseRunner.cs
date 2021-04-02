@@ -256,7 +256,7 @@ namespace RuneOptim.BuildProcessing {
                         lock (bag.SyncRoot) {
                             var tn = Math.Max(settings.BuildGenerate, 250000);
                             if (bag.Count > tn) {
-                                var bb = bag.OrderByDescending(b => b.score).Take(25000).ToList();
+                                var bb = bag.OrderByDescending(b => b.Score).Take(25000).ToList();
                                 bag.Clear();
                                 bag.AddRange(bb);
 

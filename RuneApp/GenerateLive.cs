@@ -177,19 +177,19 @@ namespace RuneApp {
                     bool hasChanged = false;
                     Monster fresh;
                     if (freshMons.TryTake(out fresh)) {
-                        if (fresh.score == 0)
-                            fresh.score = build.CalcScore(fresh);
+                        if (fresh.Score == 0)
+                            fresh.Score = build.CalcScore(fresh);
                         //Console.WriteLine("Checking build " + string.Join(",", fresh.Current.Runes.Select(r => r.ID.ToString())));
-                        if (currentList.Count < Program.Settings.TestShow || fresh.score > currentList.Min(qq => qq.score)) {
+                        if (currentList.Count < Program.Settings.TestShow || fresh.Score > currentList.Min(qq => qq.Score)) {
                             currentList.Add(fresh); //.Where(IsOkayBuild)
-                            currentList = currentList.OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
+                            currentList = currentList.OrderByDescending(m => m.Score).Take(Program.Settings.TestShow).ToList();
                             hasChanged = true;
                         }
                     }
 
                     if (changedSpec && monsList.Count > 0) {
                         // todo: recheck min/max //  && IsOkayBuild(m.Value)
-                        currentList = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
+                        currentList = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.Score).Take(Program.Settings.TestShow).ToList();
                         if (currentList.Count > 0)
                             hasChanged = true;
                     }
@@ -250,7 +250,7 @@ namespace RuneApp {
 
                         li.SubItems.Add(underSpec + "/" + under12);
                         double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-                        b.score = pts;
+                        b.Score = pts;
 
                         // put the sum points into the first item
                         li.SubItems[0].Text = pts.ToString("0.##");
@@ -634,7 +634,7 @@ namespace RuneApp {
                 listGenCancelled = true;
                 lock (listGenLock) {
                     listGenCancelled = false;
-                    var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow);
+                    var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.Score).Take(Program.Settings.TestShow);
                     var ilist = loadoutList.Items.OfType<ListViewItem>();
 
                     int num = 0;
@@ -687,7 +687,7 @@ namespace RuneApp {
 
                         li.SubItems.Add(underSpec + "/" + under12);
                         double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-                        b.score = pts;
+                        b.Score = pts;
 
                         // put the sum points into the first item
                         li.SubItems[0].Text = pts.ToString("0.##");
@@ -760,7 +760,7 @@ namespace RuneApp {
                 List<Rune> lrunes = new List<Rune>();
                 foreach (var g in mons) {
                     foreach (var r in g.Current.Runes) {
-                        r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
+                        r.manageStats.AddOrUpdate("besttestscore", g.Score, (k, v) => v < g.Score ? g.Score : v);
 
                         if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
                             lrunes.Add(r);

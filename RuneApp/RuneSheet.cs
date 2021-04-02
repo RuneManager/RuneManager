@@ -213,7 +213,7 @@ namespace RuneApp {
             Stats minav = new Stats();
             foreach (var b in build.BuildUsage.loads) {
                 double sc = build.CalcScore(b.GetStats());
-                b.score = sc;
+                b.Score = sc;
                 scoreav += sc;
                 minav += b.GetStats();
                 foreach (var s in Build.ExtraNames) {
@@ -323,8 +323,8 @@ namespace RuneApp {
 
             foreach (var b in build.BuildUsage.loads.Take(20)) {
                 row = trow;
-                ws.Cells[row, col].Value = b.score;
-                if (b.score < scoreav) {
+                ws.Cells[row, col].Value = b.Score;
+                if (b.Score < scoreav) {
                     ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
                     ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(Color.LightPink);
                 }
@@ -467,7 +467,7 @@ namespace RuneApp {
                 row = rstart;
                 ws.Cells[row, col].CreateArrayFormula($"({abc[col - 1]}{row + 1}-{abc[col - 1]}{row + 2})/{abc[col - 1]}{row + 1}/MIN(ABS((F{row + 1}:P{row + 1}-F{row + 2}:P{row + 2})/F{row + 1}:P{row + 1}))");
                 row++;
-                ws.Cells[row, col].Formula = $"AVERAGEIF(runesFor{build.ID}[Good], \"{build.Best.score}\", runesFor{build.ID}[{a.ToString()}])";
+                ws.Cells[row, col].Formula = $"AVERAGEIF(runesFor{build.ID}[Good], \"{build.Best.Score}\", runesFor{build.ID}[{a.ToString()}])";
                 row++;
                 ws.Cells[row, col].Formula = $"AVERAGEA(runesFor{build.ID}[{a.ToString()}])";
                 row++;

@@ -56,7 +56,7 @@ namespace RuneApp {
 
             statColScore.Stats = build.Sort;
             build.Sort.OnStatChanged += Sort_OnStatChanged;
-            statColScore.SetSkills(build.Mon._SkillList.Count);
+            statColScore.SetSkills(build.Mon.SkillList.Count);
 
             // Disregard locked, but honor equippedness checking
             build.BuildPrintTo += Build_BuildPrintTo;
@@ -140,7 +140,7 @@ namespace RuneApp {
 
             li.SubItems.Add(underSpec + "/" + under12);
             double pts = build.CalcScore(Cur, (str, i) => { li.SubItems.Add(str); });
-            m.score = pts;
+            m.Score = pts;
 
             // put the sum points into the first item
             li.SubItems[0].Text = pts.ToString("0.##");

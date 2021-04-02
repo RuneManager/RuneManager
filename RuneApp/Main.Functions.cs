@@ -111,13 +111,13 @@ namespace RuneApp {
 
             nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, mon.FullName);
             nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, mon.Grade.ToString());
-            nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.priority.ToString("#"));
+            nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.Priority.ToString("#"));
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
-            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
-            nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
+            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.MonsterTypeId.ToString());
+            nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.Level.ToString());
             if (Program.Builds.Any(b => b.MonId == mon.Id))
                 nli.ForeColor = Color.Green;
-            else if (mon.inStorage)
+            else if (mon.InStorage)
                 nli.ForeColor = Color.Gray;
             return nli;
         }
@@ -173,12 +173,12 @@ namespace RuneApp {
 
                 statName.Text = mon.FullName;
                 statID.Text = mon.Id.ToString();
-                statLevel.Text = mon.level.ToString();
+                statLevel.Text = mon.Level.ToString();
 
                 ShowStats(cur, mon);
                 ShowLoadout(mon.Current);
 
-                var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.monsterTypeId) + ".png";
+                var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.MonsterTypeId) + ".png";
                 if (File.Exists(fname))
                     monImage.ImageLocation = fname;
                 else
@@ -347,7 +347,7 @@ namespace RuneApp {
             if (Program.Builds.Count > 0)
                 maxPri = Program.Builds.Max(b => b.Priority) + 1;
             foreach (var mon in Program.Data.Monsters) {
-                mon.priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
+                mon.Priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
             }
             dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 

@@ -18,16 +18,16 @@ namespace RuneApp {
    
             foreach (Monster mon in Program.Data.Monsters) {
                 string pri = "";
-                if (mon.priority != 0)
-                    pri = mon.priority.ToString();
+                if (mon.Priority != 0)
+                    pri = mon.Priority.ToString();
 
                 ListViewItem item = new ListViewItem(new string[]{
                     mon.FullName,
                     mon.Id.ToString(),
                     pri,
-                    mon.level.ToString(),
+                    mon.Level.ToString(),
                 });
-                if (mon.inStorage)
+                if (mon.InStorage)
                     item.ForeColor = Color.Gray;
 
                 item.Tag = mon;

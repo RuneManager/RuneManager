@@ -319,7 +319,7 @@ namespace RuneOptim.BuildProcessing {
                 return null;
 
             // if to get awakened
-            if (DownloadAwake && !Mon.downloaded) {
+            if (DownloadAwake && !Mon.Downloaded) {
                 var mref = MonsterStat.FindMon(Mon);
                 if (mref != null) {
                     // download the current (unawakened monster)
@@ -331,7 +331,7 @@ namespace RuneOptim.BuildProcessing {
             }
             // getting awakened also gets level 40, so...
             // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
-            else if (Mon.level < 40 && DownloadStats && !Mon.downloaded) {
+            else if (Mon.Level < 40 && DownloadStats && !Mon.Downloaded) {
                 var mref = MonsterStat.FindMon(Mon);
                 if (mref != null)
                     Mon = mref.Download().GetMon(Mon);
@@ -443,7 +443,7 @@ namespace RuneOptim.BuildProcessing {
             }
             try {
                 // if to get awakened
-                if (DownloadAwake && !Mon.downloaded) {
+                if (DownloadAwake && !Mon.Downloaded) {
                     BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Downloading Awake def"));
                     var mref = MonsterStat.FindMon(Mon);
                     if (mref != null) {
@@ -460,7 +460,7 @@ namespace RuneOptim.BuildProcessing {
                 }
                 // getting awakened also gets level 40, so...
                 // only get lvl 40 stats if the monster isn't 40, wants to download AND isn't already downloaded (first and last are about the same)
-                else if (Mon.level < 40 && DownloadStats && !Mon.downloaded) {
+                else if (Mon.Level < 40 && DownloadStats && !Mon.Downloaded) {
                     BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Downloading 40 def"));
                     var mref = MonsterStat.FindMon(Mon);
                     if (mref != null)
@@ -511,7 +511,7 @@ namespace RuneOptim.BuildProcessing {
 
                 Mon.ExtraCritRate = extraCritRate;
                 Mon.GetStats();
-                Mon.DamageFormula?.Invoke(Mon);
+                Mon.DamageMethod?.Invoke(Mon);
 
                 int?[] slotFakesTemp = new int?[6];
                 bool[] slotPred = new bool[6];
@@ -624,7 +624,7 @@ namespace RuneOptim.BuildProcessing {
                                 }
 #endif
                             lock (bestLock) {
-                                tests = tests.OrderByDescending(b => b.score).Take(75000).ToList();
+                                tests = tests.OrderByDescending(b => b.Score).Take(75000).ToList();
                             }
                         }
 
@@ -888,7 +888,7 @@ namespace RuneOptim.BuildProcessing {
                                         if (!isBad) {
                                             // we found an okay build!
                                             plus++;
-                                            test.score = curScore;
+                                            test.Score = curScore;
 
                                             if (BuildSaveStats) {
                                                 foreach (Rune r in test.Current.Runes) {
@@ -920,7 +920,7 @@ namespace RuneOptim.BuildProcessing {
                                                     myBest = new Monster(test, true);
                                                     myStats = myBest.GetStats();
                                                     myBestScore = CalcScore(myStats);
-                                                    myBest.score = myBestScore;
+                                                    myBest.Score = myBestScore;
                                                 }
 
                                                 // if mine is better than what I last saw
@@ -930,7 +930,7 @@ namespace RuneOptim.BuildProcessing {
                                                             Best = new Monster(myBest, true);
                                                             bstats = Best.GetStats();
                                                             bestScore = CalcScore(bstats);
-                                                            Best.score = bestScore;
+                                                            Best.Score = bestScore;
                                                         }
                                                         else {
                                                             // sync best score
@@ -939,7 +939,7 @@ namespace RuneOptim.BuildProcessing {
                                                             if (myBestScore > lastBest) {
                                                                 Best = new Monster(myBest, true);
                                                                 bestScore = CalcScore(bstats);
-                                                                Best.score = bestScore;
+                                                                Best.Score = bestScore;
                                                                 bstats = Best.GetStats();
                                                             }
                                                         }
@@ -957,13 +957,13 @@ namespace RuneOptim.BuildProcessing {
                                                     myBest = new Monster(test, true);
                                                     myStats = myBest.GetStats();
                                                     myBestScore = CalcScore(myStats);
-                                                    myBest.score = myBestScore;
+                                                    myBest.Score = myBestScore;
                                                     syncList.Add(myBest);
                                                 }
                                                 else if (BuildSaveStats) {
                                                     // keep it for spreadsheeting
                                                     syncList.Add(new Monster(test, true) {
-                                                        score = curScore
+                                                        Score = curScore
                                                     });
                                                 }
                                             }
@@ -1059,12 +1059,12 @@ namespace RuneOptim.BuildProcessing {
                     // remember the good one
                     Best = Loads.First();
                     Best.Current.TempLoad = false;
-                    Best.score = CalcScore(Best.GetStats());
-                    BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "best " + (Best?.score ?? -1)));
+                    Best.Score = CalcScore(Best.GetStats());
+                    BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, prefix + "best " + (Best?.Score ?? -1)));
                     Best.Current.ActualTests = Actual;
                     foreach (var bb in Loads) {
                         foreach (Rune r in bb.Current.Runes) {
-                            double val = Best.score;
+                            double val = Best.Score;
                             if (BuildGoodRunes) {
                                 val *= 0.25;
                                 if (bb == Best)
@@ -1086,8 +1086,8 @@ namespace RuneOptim.BuildProcessing {
                     foreach (var ra in Runes) {
                         foreach (var r in ra) {
                             var cbp = r.manageStats.GetOrAdd("currentBuildPoints", 0);
-                            if (cbp / Best.score < 1)
-                                r.manageStats.AddOrUpdate("bestBuildPercent", cbp / Best.score, (k, v) => Math.Max(v, cbp / Best.score));
+                            if (cbp / Best.Score < 1)
+                                r.manageStats.AddOrUpdate("bestBuildPercent", cbp / Best.Score, (k, v) => Math.Max(v, cbp / Best.Score));
                         }
                     }
                 }

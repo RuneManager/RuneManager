@@ -67,20 +67,20 @@ namespace RuneApp
             }
 
             // TODO: modify stats and trigger callbacks
-            m.level = mon.level;
+            m.Level = mon.Level;
             m.Grade = mon.Grade;
-            m.monsterTypeId = mon.monsterTypeId;
+            m.MonsterTypeId = mon.MonsterTypeId;
 
             foreach (var attr in Build.StatEnums)
             {
                 m[attr] = mon[attr];
             }
 
-            for (int i = 0; i < mon._SkillList.Count; i++)
+            for (int i = 0; i < mon.SkillList.Count; i++)
             {
-                m._SkillList[i].Level = mon._SkillList[i].Level;
+                m.SkillList[i].Level = mon.SkillList[i].Level;
             }
-            m.damageFormula = null;
+            m.DamageMultiplier = null;
             m.RefreshStats();
 
             for (int i = 0; i < 6; i++)

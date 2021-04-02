@@ -47,7 +47,7 @@ namespace RuneOptim.Management {
         public GoalState(Save data) {
             pieces = data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces).Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => (MonsterTypeMap)p.Id);
             essence = data.InventoryItems.Where(i => i.Type == ItemType.Essence).Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => (EssenceType)p.Id);
-            monsters = data.Monsters.Select(m => new MonsterG((MonsterTypeMap)m.monsterTypeId) { level = m.level, grade = m.Grade }).ToList();
+            monsters = data.Monsters.Select(m => new MonsterG((MonsterTypeMap)m.MonsterTypeId) { level = m.Level, grade = m.Grade }).ToList();
         }
     }
 

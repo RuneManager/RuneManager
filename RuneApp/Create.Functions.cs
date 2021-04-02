@@ -271,7 +271,7 @@ namespace RuneApp {
         private void refreshStats(Monster mon, Stats cur) {
             statName.Text = mon.FullName;
             statID.Text = mon.Id.ToString();
-            statLevel.Text = mon.level.ToString();
+            statLevel.Text = mon.Level.ToString();
 
             // read a bunch of numbers
             foreach (var stat in Build.StatEnums) {
@@ -309,7 +309,7 @@ namespace RuneApp {
             }
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillFunc?[i] != null) {
+                if (build?.Mon?.SkillsFunction?[i] != null) {
                     Attr aaa = Attr.Skill1 + i;
 
                     double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i);
@@ -532,8 +532,8 @@ namespace RuneApp {
             }
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillFunc?[i] != null) {
-                    var ff = build.Mon.SkillFunc[i];
+                if (build?.Mon?.SkillsFunction?[i] != null) {
+                    var ff = build.Mon.SkillsFunction[i];
                     string stat = "Skill" + i;
                     Attr aaa = Attr.Skill1 + i;
 

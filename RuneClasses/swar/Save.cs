@@ -145,7 +145,7 @@ namespace RuneOptim.swar {
                     foreach (var b in e.NewItems.Cast<Building>()) {
                         if (b.BuildingType == BuildingType.MonsterStorage) {
                             foreach (var m in Monsters.Where(mo => mo.BuildingId == b.Id)) {
-                                m.inStorage = true;
+                                m.InStorage = true;
                             }
                         }
                     }
@@ -210,10 +210,10 @@ namespace RuneOptim.swar {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems) {
                         if (mon.Name == null)
-                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
-                        mon.loadOrder = monLoaded++;
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId).Value;
+                        mon.LoadOrder = monLoaded++;
                         if (mon.Name == null) {
-                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value;
                         }
                         if (mon.Name == null) {
                             mon.Name = "MissingNo";
@@ -226,7 +226,7 @@ namespace RuneOptim.swar {
                         mon.Current.Shrines = shrines;
 
                         if (mon.BuildingId == Buildings.FirstOrDefault(b => b.BuildingType == BuildingType.MonsterStorage)?.Id)
-                            mon.inStorage = true;
+                            mon.InStorage = true;
 
                         // Add all the Runes in the pool assigned to the monster to it's current loadout
                         foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id)) {

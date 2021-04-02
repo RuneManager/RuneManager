@@ -30,7 +30,7 @@ namespace RuneOptim.swar {
             get {
                 if (IsHomunculus)
                     return HomunculusName;
-                return (awakened == 1 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
+                return (Awakened == 1 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
             }
             set {
                 name = value;
@@ -47,18 +47,18 @@ namespace RuneOptim.swar {
         public int Grade;
 
         [JsonProperty("unit_level")]
-        public int level = 1;
+        public int Level = 1;
 
         [JsonProperty("unit_master_id")]
-        public int monsterTypeId;
+        public int MonsterTypeId;
 
-        public int GetFamily { get { return monsterTypeId / 100; } }
+        public int GetFamily { get { return MonsterTypeId / 100; } }
 
         [JsonProperty("building_id")]
         public ulong BuildingId;
 
         [JsonProperty("create_time")]
-        public DateTime? createdOn = null;
+        public DateTime? CreatedOn = null;
 
         private static Dictionary<int, MonsterStat> monDefs = null;
 
@@ -66,9 +66,9 @@ namespace RuneOptim.swar {
             get {
                 if (monDefs == null) {
                     monDefs = new Dictionary<int, MonsterStat>();
-                    foreach (var item in SkillList) {
-                        if (!monDefs.ContainsKey(item.monsterTypeId))
-                            monDefs.Add(item.monsterTypeId, item);
+                    foreach (var item in MonsterStatList) {
+                        if (!monDefs.ContainsKey(item.MonsterTypeId))
+                            monDefs.Add(item.MonsterTypeId, item);
                     }
                 }
                 return monDefs;
@@ -80,7 +80,7 @@ namespace RuneOptim.swar {
             get {
                 if (skillDefs == null) {
                     skillDefs = new Dictionary<int, SkillDef>();
-                    foreach (var item in SkillList) {
+                    foreach (var item in MonsterStatList) {
                         foreach (var skill in item.Skills) {
                             if (!skillDefs.ContainsKey(skill.Com2usId))
                                 skillDefs.Add(skill.Com2usId, skill);
@@ -99,17 +99,17 @@ namespace RuneOptim.swar {
         public Element Element;
 
         [JsonProperty("skills")]
-        private IList<Skill> _skilllist = null;
+        private IList<Skill> skilllist = null;
 
         [JsonIgnore]
-        public IList<Skill> _SkillList {
+        public IList<Skill> SkillList {
             get {
-                if (_skilllist == null)
-                    _skilllist = new List<Skill>();
-                return _skilllist;
+                if (skilllist == null)
+                    skilllist = new List<Skill>();
+                return skilllist;
             }
             set {
-                _skilllist = value;
+                skilllist = value;
             }
         }
 
@@ -132,15 +132,15 @@ namespace RuneOptim.swar {
             }
         }
 
-        public int priority = 0;
+        public int Priority = 0;
 
         public bool Locked = false;
 
         [JsonIgnore]
-        public bool downloaded = false;
+        public bool Downloaded = false;
 
         [JsonIgnore]
-        public double score = 0;
+        public double Score = 0;
 
         [JsonIgnore]
         private Stats curStats = null;
@@ -149,7 +149,7 @@ namespace RuneOptim.swar {
         private bool changeStats = true;
 
         [JsonIgnore]
-        public bool inStorage = false;
+        public bool InStorage = false;
 
         [JsonProperty("homunculus")]
         public bool IsHomunculus = false;
@@ -158,7 +158,7 @@ namespace RuneOptim.swar {
         public string HomunculusName;
 
         [JsonIgnore]
-        public int loadOrder = int.MaxValue;
+        public int LoadOrder = int.MaxValue;
 
         [JsonIgnore]
         public bool IsRep = false;
@@ -230,25 +230,25 @@ namespace RuneOptim.swar {
         public Monster(Monster rhs, bool loadout = false) : base(rhs) {
             FullName = rhs.FullName;
             Id = rhs.Id;
-            level = rhs.level;
-            monsterTypeId = rhs.monsterTypeId;
+            Level = rhs.Level;
+            MonsterTypeId = rhs.MonsterTypeId;
             Grade = rhs.Grade;
             Element = rhs.Element;
-            if (_skilllist != null) {
-                if (rhs._skilllist != null)
-                    _skilllist = _skilllist.Concat(rhs._skilllist).ToList();
+            if (skilllist != null) {
+                if (rhs.skilllist != null)
+                    skilllist = skilllist.Concat(rhs.skilllist).ToList();
             }
-            else if (rhs._skilllist != null) {
+            else if (rhs.skilllist != null) {
                 // todo: do we *need* the copy?
                 if (loadout)
-                    _skilllist = rhs._skilllist;
+                    skilllist = rhs.skilllist;
                 else
-                    _skilllist = rhs._skilllist.ToList();
+                    skilllist = rhs.skilllist.ToList();
             }
 
-            priority = rhs.priority;
-            downloaded = rhs.downloaded;
-            inStorage = rhs.inStorage;
+            Priority = rhs.Priority;
+            Downloaded = rhs.Downloaded;
+            InStorage = rhs.InStorage;
 
             if (loadout) {
                 Current = new Loadout(rhs.Current, rhs.Current.FakeLevel, rhs.Current.PredictSubs);
@@ -283,20 +283,20 @@ namespace RuneOptim.swar {
                 OnRunesChanged?.Invoke(this, new RuneChangeEventArgs() { });
         }
 
-        private static MonsterStat[] skillList = null;
+        private static MonsterStat[] monsterStatList = null;
 
-        private static MonsterStat[] SkillList {
+        private static MonsterStat[] MonsterStatList {
             get {
-                if (skillList == null)
-                    skillList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(Properties.Resources.SkillsJSON, System.Text.Encoding.UTF8));
+                if (monsterStatList == null)
+                    monsterStatList = JsonConvert.DeserializeObject<MonsterStat[]>(File.ReadAllText(Properties.Resources.SkillsJSON, System.Text.Encoding.UTF8));
 
-                return skillList;
+                return monsterStatList;
             }
         }
 
-        public int awakened {
+        public int Awakened {
             get {
-                return monsterTypeId / 10 - monsterTypeId / 100 * 10;
+                return MonsterTypeId / 10 - MonsterTypeId / 100 * 10;
             }
         }
 
@@ -308,7 +308,7 @@ namespace RuneOptim.swar {
                 Current.Element = Element;
                 Current.GetStats(this, ref curStats);
                 curStats.SkillupDamage = SkillupDamage;
-                curStats.damageFormula = damageFormula;
+                curStats.DamageMultiplier = DamageMultiplier;
                 changeStats = false;
             }
 
@@ -316,15 +316,15 @@ namespace RuneOptim.swar {
         }
 
         private void checkSkillups() {
-            if (_skilllist != null && damageFormula == null && MonDefs.ContainsKey(monsterTypeId)) {
+            if (skilllist != null && DamageMultiplier == null && MonDefs.ContainsKey(MonsterTypeId)) {
                 MonsterDefinitions.MultiplierGroup average = new MonsterDefinitions.MultiplierGroup();
 
                 int skdmg = 0;
                 int i = -1;
 
-                foreach (var si in _skilllist) {
+                foreach (var si in skilllist) {
                     i++;
-                    SkillupLevel[i] = _skilllist[i].Level ?? 0;
+                    SkillupLevel[i] = skilllist[i].Level ?? 0;
                     if (SkillupMax[i] == 0)
                         SkillupMax[i] = SkillupLevel[i];
                     if (!SkillDefs.ContainsKey(si.SkillId ?? 0))
@@ -332,7 +332,7 @@ namespace RuneOptim.swar {
                     var ss = SkillDefs[si.SkillId ?? 0];
                     var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
                     if (df.props.Count > 0) {
-                        var levels = ss.LevelProgressDescription.Split('\n').Take(_skilllist[i].Level - 1 ?? 0);
+                        var levels = ss.LevelProgressDescription.Split('\n').Take(skilllist[i].Level - 1 ?? 0);
                         SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
                         var ct = levels.Count(s => s == "Cooltime Turn -1");
                         int cooltime = (ss.Cooltime ?? 1) - ct;
@@ -342,7 +342,7 @@ namespace RuneOptim.swar {
                         DamageSkillups[i] = dmg.Any() ? dmg.Sum() : 0;
                         skdmg += (dmg.Any() ? dmg.Sum() : 0) / cooltime;
 
-                        _SkillsFormula[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(statType), statType).Compile();
+                        SkillsFunction[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(StatType), StatType).Compile();
 
                         if (i != 0) {
                             df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
@@ -353,7 +353,7 @@ namespace RuneOptim.swar {
                         average.props.Add(new MonsterDefinitions.MultiplierValue(df));
                     }
                 }
-                damageFormula = average;
+                DamageMultiplier = average;
                 SkillupDamage = skdmg;
             }
         }
@@ -387,19 +387,19 @@ namespace RuneOptim.swar {
         }
 
         public override string ToString() {
-            return Id + " " + FullName + " lvl. " + level;
+            return Id + " " + FullName + " lvl. " + Level;
         }
 
         int IComparable<Monster>.CompareTo(Monster other) {
             var comp = other.Grade - Grade;
             if (comp != 0) return comp;
-            comp = other.level - level;
+            comp = other.Level - Level;
             if (comp != 0) return comp;
             comp = (int)Element - (int)other.Element;
             if (comp != 0) return comp;
-            comp = other.awakened - awakened;
+            comp = other.Awakened - Awakened;
             if (comp != 0) return comp;
-            comp = loadOrder - other.loadOrder;
+            comp = LoadOrder - other.LoadOrder;
             return comp;
         }
     }

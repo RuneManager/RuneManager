@@ -108,7 +108,7 @@ http.send(params);
         static ServedResult renderMonster(Monster mon) {
             var div = new ServedResult("div") {
                 contentList = {
-                    renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"monsters/{mon.monsterTypeId}.png\"" }, { "width", "50px" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
+                    renderMonLink(mon, new ServedResult("img") { contentDic = { { "src", $"\"monsters/{mon.MonsterTypeId}.png\"" }, { "width", "50px" } } }, LinkRenderOptions.All ^ LinkRenderOptions.Portrait, false),
                     new ServedResult("br"),
                     new ServedResult("span") { contentList = { mon.Id.ToString() } },
                     new ServedResult("br"),
@@ -172,7 +172,7 @@ http.send(params);
             var monunNull = Program.Data.Monsters.Where(m => m != null);
 
 
-            var fuss = monunNull.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);
+            var fuss = monunNull.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).IsFusion).OrderByDescending(m => m.Awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.Level);
             // TODO: pull these from goals
             var nKfg = 1;// 6 - fuss.Count(m => m.Id.ToString().StartsWith("173") && m.Element == Element.Wind);
             var nJojo = 1;
@@ -180,10 +180,10 @@ http.send(params);
 
             // TODO: get fuse recipes from somewhere else
             foreach (var m in fuss) {
-                var idk = m.monsterTypeId.ToString().Substring(0, 3);
+                var idk = m.MonsterTypeId.ToString().Substring(0, 3);
                 if (!dict.ContainsKey(idk))
                     dict.Add(idk, 0);
-                var mname = m.monsterTypeId.ToString();
+                var mname = m.MonsterTypeId.ToString();
                 if (dict[idk] < nKfg && !reserved.Contains(m)) {
                     if ((mname.StartsWith("110") && m.Element == Element.Fire) || 
                         (mname.StartsWith("102") && m.Element == Element.Water) || 
@@ -203,7 +203,7 @@ http.send(params);
                     }
                 }
                 
-                if (!reserved.Any(r => r.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3)))
+                if (!reserved.Any(r => r.MonsterTypeId.ToString().Substring(0, 3) == m.MonsterTypeId.ToString().Substring(0, 3)))
                     reserved.Add(m);
             }
 
@@ -217,25 +217,25 @@ http.send(params);
 
             var pairs = new Dictionary<Monster, List<Monster>>();
             var rem = new List<Monster>();
-            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
-                .ThenByDescending(m => m.level)
+            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.Priority - 0.1)).ThenByDescending(m => m.Grade)
+                .ThenByDescending(m => m.Level)
                 .ThenBy(m => m.Element)
-                .ThenByDescending(m => m.awakened)
-                .ThenBy(m => m.loadOrder)) {
+                .ThenByDescending(m => m.Awakened)
+                .ThenBy(m => m.LoadOrder)) {
                 pairs.Add(m, new List<Monster>());
                 int i = Math.Min(m.Grade, m.SkillupsTotal - m.SkillupsLevel);
                 for (; i > 0; i--) {
                     Monster um = null;
-                    if (m.level == m.Grade * 5 + 10)
+                    if (m.Level == m.Grade * 5 + 10)
                         um = unlocked
-                             .Where(ul => (ul.Grade == m.Grade && ul.level == 1) || ul.Grade == m.Grade - 1)
-                             .OrderByDescending(ul => ul.level)
-                             .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+                             .Where(ul => (ul.Grade == m.Grade && ul.Level == 1) || ul.Grade == m.Grade - 1)
+                             .OrderByDescending(ul => ul.Level)
+                             .FirstOrDefault(ul => ul.MonsterTypeId.ToString().Substring(0, 3) == m.MonsterTypeId.ToString().Substring(0, 3));
                     else
                         um = unlocked
-                                .Where(ul => ul.level == 1)
+                                .Where(ul => ul.Level == 1)
                                 .OrderBy(ul => ul.Grade)
-                                .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+                                .FirstOrDefault(ul => ul.MonsterTypeId.ToString().Substring(0, 3) == m.MonsterTypeId.ToString().Substring(0, 3));
 
                     if (um == null)
                         break;
@@ -244,27 +244,27 @@ http.send(params);
                     unlocked.Remove(um);
                 }
             }
-            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
-                .ThenByDescending(m => m.level)
+            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.Priority - 0.1)).ThenByDescending(m => m.Grade)
+                .ThenByDescending(m => m.Level)
                 .ThenBy(m => m.Element)
-                .ThenByDescending(m => m.awakened)
-                .ThenBy(m => m.loadOrder)) {
+                .ThenByDescending(m => m.Awakened)
+                .ThenBy(m => m.LoadOrder)) {
                 if (!pairs.ContainsKey(m))
                     pairs.Add(m, new List<Monster>());
                 int i = m.SkillupsTotal - m.SkillupsLevel - pairs[m].Count;
                 for (; i > 0; i--) {
                     Monster um = null;
-                    if (m.level == m.Grade * 5 + 10)
+                    if (m.Level == m.Grade * 5 + 10)
                         um = unlocked
-                             .OrderByDescending(ul => ul.Grade == m.Grade && ul.level == 1)
+                             .OrderByDescending(ul => ul.Grade == m.Grade && ul.Level == 1)
                              .ThenByDescending(ul => ul.Grade == m.Grade - 1)
-                             .ThenByDescending(ul => ul.level)
-                             .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+                             .ThenByDescending(ul => ul.Level)
+                             .FirstOrDefault(ul => ul.MonsterTypeId.ToString().Substring(0, 3) == m.MonsterTypeId.ToString().Substring(0, 3));
                     else
                         um = unlocked
-                                .Where(ul => ul.level == 1)
+                                .Where(ul => ul.Level == 1)
                                 .OrderBy(ul => ul.Grade)
-                                .FirstOrDefault(ul => ul.monsterTypeId.ToString().Substring(0, 3) == m.monsterTypeId.ToString().Substring(0, 3));
+                                .FirstOrDefault(ul => ul.MonsterTypeId.ToString().Substring(0, 3) == m.MonsterTypeId.ToString().Substring(0, 3));
 
                     if (um == null)
                         break;
@@ -275,7 +275,7 @@ http.send(params);
                 bool[] zerop = new bool[5];
                 while (i > 0 && !zerop.All(p => p)) {
                     for (int j = 1; j < 6; j++) {
-                        int monbase = (m.monsterTypeId / 100) * 100;
+                        int monbase = (m.MonsterTypeId / 100) * 100;
                         if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= Save.getPiecesRequired(pieces[monbase + j].Id)) {
                             pieces[monbase + j].Quantity -= Save.getPiecesRequired(pieces[monbase + j].Id);
                             pairs[m].Add(new Monster() { Element = pieces[monbase + j].Element, Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
@@ -301,10 +301,10 @@ http.send(params);
             mm = mm.OrderByDescending(m => !unlocked.Contains(m))
                 .ThenByDescending(m => m.Locked)
                 .ThenByDescending(m => m.Grade)
-                .ThenByDescending(m => m.level)
+                .ThenByDescending(m => m.Level)
                 .ThenBy(m => m.Element)
-                .ThenByDescending(m => m.awakened)
-                .ThenBy(m => m.loadOrder)
+                .ThenByDescending(m => m.Awakened)
+                .ThenBy(m => m.LoadOrder)
                 ;
 
             list.contentList.AddRange(ll.Select(l => renderLoad(l, pairs)));
@@ -342,7 +342,7 @@ http.send(params);
                     nl.name = "br";
                 return li;
             }));
-            list.contentList.AddRange(reserved.GroupBy(mg => mg.monsterTypeId).Select(mg => {
+            list.contentList.AddRange(reserved.GroupBy(mg => mg.MonsterTypeId).Select(mg => {
                 var li = new ServedResult("li");
                 li.contentList.Add(new ServedResult(mg.AtLeast(2) ? "a" : "span") {
                     contentDic = { { "href", "\"javascript:showhide('g" + mg.First().Id + "')\"" } },
@@ -364,7 +364,7 @@ http.send(params);
             }));
 
             //
-            var food = trashOnes.OrderBy(t => t.Grade).ThenBy(t => t.Element).ThenByDescending(t => t.monsterTypeId).Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
+            var food = trashOnes.OrderBy(t => t.Grade).ThenBy(t => t.Element).ThenByDescending(t => t.MonsterTypeId).Select(m => new Food() { mon = m, fakeLevel = m.Grade }).ToList();
             food = makeFood(2, food);
             food = makeFood(3, food);
             food = makeFood(4, food);
@@ -377,7 +377,7 @@ http.send(params);
         static ServedResult recurseFood(Food f) {
             ServedResult sr = new ServedResult("li");
             sr.contentList.Add(renderMonLink(f.mon, null, LinkRenderOptions.None));
-            sr.contentList.Add(" " + f.mon.Grade + "*" + "L" + f.mon.level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
+            sr.contentList.Add(" " + f.mon.Grade + "*" + "L" + f.mon.Level + (f.mon.Grade != f.fakeLevel ? " > " + f.fakeLevel + "*" : ""));
             if (f.food.Any()) {
                 var rr = new ServedResult("ul");
                 foreach (var o in f.food) {
@@ -395,7 +395,7 @@ http.send(params);
                 if (current == null) {
                     if (food.Count(f => f.fakeLevel == lev - 1) <= lev - 1)
                         break;
-                    current = food.OrderByDescending(f => f.mon.level).FirstOrDefault(f => f.fakeLevel == lev - 1);
+                    current = food.OrderByDescending(f => f.mon.Level).FirstOrDefault(f => f.fakeLevel == lev - 1);
                     if (current == null)
                         break;
                     food.Remove(current);
@@ -404,7 +404,7 @@ http.send(params);
                 }
                 else {
                     // only eat things which are 1 or upgraded
-                    var tfood = food.Where(f => f.mon.level == 1 || f.fakeLevel != f.mon.Grade).FirstOrDefault(f => f.fakeLevel == lev - 1);
+                    var tfood = food.Where(f => f.mon.Level == 1 || f.fakeLevel != f.mon.Grade).FirstOrDefault(f => f.fakeLevel == lev - 1);
                     if (tfood == null)
                         break;
                     if (current.food.Count(f => f.fakeLevel == lev - 1) >= lev - 1) {
@@ -443,7 +443,7 @@ http.send(params);
             if (prefix != null)
                 res.contentList.Add(prefix);
             if ((renderOptions & LinkRenderOptions.Portrait) == LinkRenderOptions.Portrait)
-                res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"monsters/{m.monsterTypeId}.png\"" } } });
+                res.contentList.Add(new ServedResult("img") { contentDic = { { "class", "\"monster-profile\"" }, { "style", "\"height: 2em;\"" }, { "src", $"\"monsters/{m.MonsterTypeId}.png\"" } } });
             var str = m.FullName;
             var suff = "";
             if (m.Name.Contains("Pieces")) {
@@ -455,7 +455,7 @@ http.send(params);
                 if ((renderOptions & LinkRenderOptions.Grade) == LinkRenderOptions.Grade)
                     str += " " + m.Grade + "*";
                 if ((renderOptions & LinkRenderOptions.Level) == LinkRenderOptions.Level)
-                    str += " " + m.level;
+                    str += " " + m.Level;
                 res.contentList.Add(new ServedResult(linkify ? "a" : "span") {
                     contentDic = {
                         { "id", m.Id.ToString() },

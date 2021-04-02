@@ -12,14 +12,14 @@ namespace RuneOptim.swar {
     public class Stats {
         // allows mapping save.json into the program via Monster
         [JsonProperty("con")]
-        public double _con = 0;
+        public double Con = 0;
 
         [JsonProperty("hp", NullValueHandling = NullValueHandling.Ignore)]
-        public double? _health = null;
+        public double? Hp = null;
 
         // TODO: should I set con?
         [JsonIgnore]
-        public double Health { get { return _health ?? _con * 15; } set { _con = value / 15.0; _health = value; } }
+        public double Health { get { return Hp ?? Con * 15; } set { Con = value / 15.0; Hp = value; } }
 
         [JsonProperty("atk")]
         private double attack = 0;
@@ -156,12 +156,12 @@ namespace RuneOptim.swar {
             Resistance = rhs.Resistance;
             Accuracy = rhs.Accuracy;
 
-            damageFormula = rhs.damageFormula;
-            _damageFormula = rhs._damageFormula;
+            DamageMultiplier = rhs.DamageMultiplier;
+            DamageFormula = rhs.DamageFormula;
 
             //rhs._skillsFormula.CopyTo(_skillsFormula, 0);
             //rhs.DamageSkillups.CopyTo(DamageSkillups, 0);
-            _skillsFormula = rhs._skillsFormula;
+            SkillsFormula = rhs.SkillsFormula;
             //DamageSkillups = rhs.DamageSkillups.ToArray();
             ExtraCritRate = rhs.ExtraCritRate;
 
@@ -234,59 +234,52 @@ namespace RuneOptim.swar {
         }
 
         [JsonIgnore]
-        public MonsterDefinitions.MultiplierBase damageFormula = null;
+        public MonsterDefinitions.MultiplierBase DamageMultiplier = null;
 
         [JsonIgnore]
-        protected readonly static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
+        protected readonly static ParameterExpression StatType = Expression.Parameter(typeof(Stats), "stats");
 
         [JsonIgnore]
-        protected Func<Stats, double> _damageFormula = null;
+        protected Func<Stats, double> DamageFormula = null;
 
         [JsonIgnore]
-        protected Func<Stats, double>[] _skillsFormula = null;
+        protected Func<Stats, double>[] SkillsFormula = null;
 
         [JsonIgnore]
-        protected Func<Stats, double>[] _SkillsFormula {
+        public Func<Stats, double>[] SkillsFunction {
             get {
-                if (_skillsFormula == null)
-                    _skillsFormula = new Func<Stats, double>[8];
-                return _skillsFormula;
+                if (SkillsFormula == null)
+                    SkillsFormula = new Func<Stats, double>[8];
+                return SkillsFormula;
             }
         }
 
         [JsonIgnore]
-        protected Expression __form = null;
+        protected Expression FomulaExpression = null;
 
         [JsonIgnore]
-        public Func<Stats, double> DamageFormula {
+        public Func<Stats, double> DamageMethod {
             get {
-                if (_damageFormula == null) {
+                if (DamageFormula == null) {
                     BakeDamageFormula();
                 }
-                return _damageFormula;
+                return DamageFormula;
             }
         }
 
         public void BakeDamageFormula() {
-            if (_damageFormula == null && damageFormula != null) {
-                __form = damageFormula.AsExpression(statType);
-                _damageFormula = Expression.Lambda<Func<Stats, double>>(__form, statType).Compile();
-            }
-        }
-
-        [JsonIgnore]
-        public Func<Stats, double>[] SkillFunc {
-            get {
-                return _SkillsFormula;
+            if (DamageFormula == null && DamageMultiplier != null) {
+                FomulaExpression = DamageMultiplier.AsExpression(StatType);
+                DamageFormula = Expression.Lambda<Func<Stats, double>>(FomulaExpression, StatType).Compile();
             }
         }
 
         public double GetSkillMultiplier(int skillNum, Stats applyTo = null) {
-            if (_SkillsFormula.Length < skillNum || _SkillsFormula[skillNum] == null)
+            if (SkillsFunction.Length < skillNum || SkillsFunction[skillNum] == null)
                 return 0;
             if (applyTo == null)
                 applyTo = this;
-            return _SkillsFormula[skillNum](applyTo);
+            return SkillsFunction[skillNum](applyTo);
         }
 
         public double GetSkillDamage(Attr type, int skillNum, Stats applyTo = null) {
@@ -372,9 +365,9 @@ namespace RuneOptim.swar {
                 case Attr.DamagePerSpeed:
                     return ExtraValue(Attr.AverageDamage) * Speed * 0.01;
                 case Attr.AverageDamage:
-                    return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01 * Math.Min(CritRate + ExtraCritRate, 100) * 0.01);
+                    return (DamageMethod?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01 * Math.Min(CritRate + ExtraCritRate, 100) * 0.01);
                 case Attr.MaxDamage:
-                    return (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01);
+                    return (DamageMethod?.Invoke(this) ?? Attack) * (1 + SkillupDamage * 0.01 + CritDamage * 0.01);
                 default:
                     throw new NotImplementedException();
             }
@@ -720,14 +713,14 @@ namespace RuneOptim.swar {
             if (ExtraValue(Attr.MaxDamage) < rhs.MaxDamage)
                 return false;
 
-            if (_skillsFormula != null) {
-                if (_skillsFormula[0] != null && GetSkillDamage(Attr.AverageDamage, 0) < rhs.DamageSkillups[0])
+            if (SkillsFormula != null) {
+                if (SkillsFormula[0] != null && GetSkillDamage(Attr.AverageDamage, 0) < rhs.DamageSkillups[0])
                     return false;
-                if (_skillsFormula[1] != null && GetSkillDamage(Attr.AverageDamage, 1) < rhs.DamageSkillups[1])
+                if (SkillsFormula[1] != null && GetSkillDamage(Attr.AverageDamage, 1) < rhs.DamageSkillups[1])
                     return false;
-                if (_skillsFormula[2] != null && GetSkillDamage(Attr.AverageDamage, 2) < rhs.DamageSkillups[2])
+                if (SkillsFormula[2] != null && GetSkillDamage(Attr.AverageDamage, 2) < rhs.DamageSkillups[2])
                     return false;
-                if (_skillsFormula[3] != null && GetSkillDamage(Attr.AverageDamage, 3) < rhs.DamageSkillups[3])
+                if (SkillsFormula[3] != null && GetSkillDamage(Attr.AverageDamage, 3) < rhs.DamageSkillups[3])
                     return false;
             }
 

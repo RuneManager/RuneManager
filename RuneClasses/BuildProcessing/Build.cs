@@ -945,7 +945,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (current.SkillFunc[j] != null) {
+                if (current.SkillsFunction[j] != null) {
                     pts += ScoreSkill(current, j, out str);
                     writeTo?.Invoke(str, i);
                     i++;
@@ -987,7 +987,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (current.SkillFunc[j] != null) {
+                if (current.SkillsFunction[j] != null) {
                     pts += ScoreSkill(current, j, out str, outvals);
                     writeTo?.Invoke(str, i);
                     i++;
@@ -1017,7 +1017,7 @@ namespace RuneOptim.BuildProcessing {
             t.ApplyRune(rune, 7);
 
             var a = (t.GetStats() + avg) - s;
-            current.SkillFunc.CopyTo(a.SkillFunc, 0);
+            current.SkillsFunction.CopyTo(a.SkillsFunction, 0);
 
 
             int i = 2;
@@ -1032,7 +1032,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (a.SkillFunc[j] != null) {
+                if (a.SkillsFunction[j] != null) {
                     pts += ScoreSkill(a, j);
                     i++;
                 }
@@ -1061,7 +1061,7 @@ namespace RuneOptim.BuildProcessing {
             t.ApplyRune(rune, 7);
             
             var a = t.GetStats() - s;
-            current.SkillFunc.CopyTo(a.SkillFunc, 0);
+            current.SkillsFunction.CopyTo(a.SkillsFunction, 0);
 
             int i = 2;
             foreach (Attr stat in StatEnums) {
@@ -1075,7 +1075,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (a.SkillFunc[j] != null) {
+                if (a.SkillsFunction[j] != null) {
                     pts += ScoreSkill(a, j, outvals);
                     i++;
                 }
@@ -1109,7 +1109,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (current.SkillFunc[j] != null) {
+                if (current.SkillsFunction[j] != null) {
                     pts += ScoreSkill(current, j);
                     i++;
                 }
@@ -1146,7 +1146,7 @@ namespace RuneOptim.BuildProcessing {
             }
 
             for (int j = 0; j < 4; j++) {
-                if (current.SkillFunc[j] != null) {
+                if (current.SkillsFunction[j] != null) {
                     pts += ScoreSkill(current, j, outvals);
                     i++;
                 }
@@ -1585,14 +1585,14 @@ namespace RuneOptim.BuildProcessing {
         public IEnumerable<Rune> GetPowerupRunes() {
             if (!Loads.Any())
                 return new Rune[] { };
-            double max = Loads.Max(g => g.score);
+            double max = Loads.Max(g => g.Score);
             foreach (var r in Loads.SelectMany(m => m.Current.Runes)) {
                 r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
             }
 
             foreach (var g in Loads) {
                 foreach (var r in g.Current.Runes) {
-                    r.manageStats.AddOrUpdate("besttestscore", g.score / max, (k, v) => v < g.score / max ? g.score / max : v);
+                    r.manageStats.AddOrUpdate("besttestscore", g.Score / max, (k, v) => v < g.Score / max ? g.Score / max : v);
                 }
             }
 
