@@ -51,6 +51,19 @@ namespace RuneApp {
         public static Save Data {
             get => data;
             set {
+                foreach (var b in builds) {
+                    if (!value.Monsters.Contains(b.Mon)) {
+                        var mm = value.GetMonster(b.MonId);
+                        if (mm != null) {
+                            b.Mon = mm;
+                        }
+                        else {
+                            // todo: failed to find referenced monster in new save.
+                        }
+
+                    }
+                }
+
                 data = value;
             }
         }
@@ -119,6 +132,9 @@ namespace RuneApp {
         static System.Timers.Timer saveFileDebouncer = null;
         public static event EventHandler saveFileTouched;
 
+        private static TaskCompletionSource<int> readyTcs = new TaskCompletionSource<int>();
+        public static Task Ready => readyTcs.Task;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -135,6 +151,9 @@ namespace RuneApp {
                 LineLog.Info("\t -? | --help: show this help.");
                 LineLog.Info("\t -a # | --affinity #: set the processor affinity to the first N 'cores'.");
                 LineLog.Info("\t -H: run the Program headless (currently disables some features).");
+                LineLog.Info("\t -S: disable internal server.");
+                LineLog.Info("\t -W: disable watching save.");
+                readyTcs.SetCanceled();
                 return;
             }
 
@@ -155,7 +174,7 @@ namespace RuneApp {
             loads.CollectionChanged += Loads_CollectionChanged;
             BuildsPrintTo += Program_BuildsPrintTo;
 
-            if (Program.Settings.InternalServer && !args.Contains("-H")) {
+            if (Program.Settings.InternalServer && !args.Contains("-H") && !args.Contains("-S")) {
                 try {
                     master.Start();
                 }
@@ -165,7 +184,7 @@ namespace RuneApp {
                 }
             }
 
-            if (Program.Settings.WatchSave && !args.Contains("-H"))
+            if (Program.Settings.WatchSave && !args.Contains("-H") && !args.Contains("-W"))
                 watchSave();
 
             RuneLog.logTo = new progWriter();
@@ -209,11 +228,15 @@ namespace RuneApp {
             // TODO: find a better place to put this
             LoadGoals();
 
-            if ( !args.Contains("-H") )
-            {
+            if (!args.Contains("-H")) {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new Main());
+                var main = new Main();
+                main.Ready.ContinueWith(t => readyTcs.TrySetResult(1));
+                Application.Run(main);
+            }
+            else {
+                readyTcs.TrySetResult(-1);
             }
         }
 
@@ -252,6 +275,12 @@ namespace RuneApp {
                         makeStats = !tstats;
                 }*/
             }
+        }
+
+        public static void Close() {
+            // todo: not do this if headless?
+            // is this the nicest way?
+            Application.Exit();
         }
 
         private static void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {

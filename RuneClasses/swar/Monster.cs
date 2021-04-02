@@ -14,7 +14,7 @@ namespace RuneOptim.swar {
     // The monster stores its base stats in its base class
     public class Monster : Stats, IComparable<Monster> {
         [JsonProperty("name")]
-        private string name = "Missingno";
+        private string name;
 
         public string Name {
             get {
@@ -30,7 +30,7 @@ namespace RuneOptim.swar {
             get {
                 if (IsHomunculus)
                     return HomunculusName;
-                return (awakened == 1 ? "" : Element.ToString() + " ") + Name;
+                return (awakened == 1 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
             }
             set {
                 name = value;

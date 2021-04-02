@@ -1,9 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Newtonsoft.Json;
 using RuneApp;
+using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 
 namespace RuneAppTests
@@ -14,17 +18,31 @@ namespace RuneAppTests
         Main main;
 
         [TestInitialize]
-        public void Setup()
+        public async Task Setup()
         {
-            Program.Main(new[] { "-H" } );
-            main = new Main();
+            var t = new Thread(() =>
+            {
+                if (Thread.CurrentThread.GetApartmentState() != ApartmentState.STA)
+                {
+                    throw new ThreadStateException("The current threads apartment state is not STA");
+                }
+
+                Program.Main(new string[] { "-W", "-S" });
+            });
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+            await Program.Ready;
+            main = Application.OpenForms.OfType<Main>().FirstOrDefault();
         }
 
         [TestCleanup]
-        public void Teardown()
+        public async Task Teardown()
         {
-            main.Close();
-            main.Dispose();
+            await Program.Ready;
+            main.Invoke((MethodInvoker)delegate
+            {
+                //Program.Close();
+            });
         }
 
 
@@ -61,6 +79,32 @@ namespace RuneAppTests
             
 
 
+        }
+
+        [TestMethod]
+        public void _45_BuildNamesDontRefresh()
+        {
+            // get a non-homu build, and check that the LVI has the correct name
+            var build = Program.builds.FirstOrDefault(b => !b.Mon.IsHomunculus);
+            ListViewItem lvi = main.Invoke(() => main.BuildListViewItems.FirstOrDefault(l => l.Tag == build));
+            Assert.AreEqual(build.Mon.FullName, lvi.Text);
+
+            // "update" the save with new info (awakened name)
+            var ddat = new Save(Program.Data);
+            var tempMonster = ddat.GetMonster(build.MonId);
+            ddat.Monsters.Clear();
+            // this property drives the listView text
+            tempMonster.FullName = "test_monster";
+            ddat.Monsters.Add(tempMonster);
+
+            // pretend to click the "refresh" button
+            Program.Data = Program.LoadSaveData(JsonConvert.SerializeObject(ddat), Program.loads);
+            main.RebuildLists();
+            main.refreshLoadouts();
+
+            // the monster has a new ref, but the lvi is same.
+            var updatedMonster = Program.Data.GetMonster(build.MonId);
+            Assert.AreEqual(updatedMonster.FullName, lvi.Text);
         }
     }
 }

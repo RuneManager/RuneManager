@@ -25,8 +25,12 @@ namespace RuneOptim.swar {
             else if (reader.Value is Int64 l) {
                 return (RuneSet)(1 << (int)(l - 1));
             }
+            else if (reader.Value is string s && int.TryParse(s, out var n))
+            {
+                return (RuneSet)(1 << (int)(n - 1));
+            }
             else {
-                throw new Exception();
+                throw new TypeLoadException("I don't like " + reader.Value + " (" + reader.Value?.GetType() +")");
             }
 
         }

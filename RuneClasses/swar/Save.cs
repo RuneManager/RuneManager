@@ -76,6 +76,23 @@ namespace RuneOptim.swar {
             GuildDefenseUnits.CollectionChanged += GuildDefenseUnits_CollectionChanged;
         }
 
+        public Save(Save rhs) : this()
+        {
+            Runes.AddRange(rhs.Runes);
+            Monsters.AddRange(rhs.Monsters);
+            Crafts.AddRange(rhs.Crafts);
+            InventoryItems.AddRange(rhs.InventoryItems);
+            Decorations.AddRange(rhs.Decorations);
+            LockedUnits.AddRange(rhs.LockedUnits);
+            Buildings.AddRange(rhs.Buildings);
+            DefenseUnits.AddRange(rhs.DefenseUnits);
+            GuildDefenseUnits.AddRange(rhs.GuildDefenseUnits);
+            priority = rhs.priority;
+            isModified = rhs.isModified;
+            shrines.CopyFrom(rhs.shrines, true);
+            WizardInfo = rhs.WizardInfo;
+        }
+
         public static int getPiecesRequired(int monsterTypeId) {
             var a = monsterTypeId / 100;
             var b = MonIdNames[a];
@@ -192,7 +209,8 @@ namespace RuneOptim.swar {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems) {
-                        mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
+                        if (mon.Name == null)
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
                         mon.loadOrder = monLoaded++;
                         if (mon.Name == null) {
                             mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
@@ -238,11 +256,13 @@ namespace RuneOptim.swar {
                         }
                     }
                     break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    // todo: looks like collection is dead at this point :(
+                    break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("" + e.Action);
             }
         }
 

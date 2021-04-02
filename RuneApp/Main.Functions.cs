@@ -368,6 +368,12 @@ namespace RuneApp {
             checkLocked();
             ColorMonsWithBuilds();
 
+            foreach (ListViewItem lvi in buildList.Items) {
+                // regenerate the Build list text
+                if (lvi.Tag is Build b)
+                    ListViewItemBuild(lvi, b);
+            } 
+
             dataMonsterList.ListViewItemSorter = oldMonSort;
             if (dataMonsterList.ListViewItemSorter != null) {
                 var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;

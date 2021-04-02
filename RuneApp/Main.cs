@@ -26,9 +26,13 @@ namespace RuneApp {
         // TODO: empty the logic into functions, instead of inside the callbacks
 
         BlockingCollection<EventArgs> blockCol = new BlockingCollection<EventArgs>();
+        TaskCompletionSource<long> readyTcs = new TaskCompletionSource<long>();
+        public Task Ready => readyTcs.Task;
 
-        private void Main_Load(object sender, EventArgs e) {
+        private async void Main_Load(object sender, EventArgs e) {
 
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             #region Watch collections and try loading
             Program.saveFileTouched += Program_saveFileTouched;
             //Program.data.Runes.CollectionChanged += Runes_CollectionChanged;
@@ -41,11 +45,14 @@ namespace RuneApp {
             buildList.Items.Add("Loading...");
             dataMonsterList.Items.Add("Loading...");
 
-            Task.Run(() => {
+            var loadTask = Task.Run(() =>
+            {
                 // TODO: this is slow during profiling
 #if !DEBUG
-                try {
+                try
 #endif
+                {
+                    // WIZARD DATA
                     LoadSaveResult loadResult = 0;
                     do {
                         loadResult = Program.FindSave();
@@ -54,7 +61,7 @@ namespace RuneApp {
                                 break;
                             default:
                                 if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                                    loadResult = loadSaveDialogue();
+                                    loadResult = Invoke(loadSaveDialogue);
                                 }
                                 else {
                                     Application.Exit();
@@ -64,13 +71,14 @@ namespace RuneApp {
                         }
                     } while (loadResult != LoadSaveResult.Success);
 
+                    // BUILDS
                     loadResult = 0;
                     do {
                         loadResult = Program.LoadBuilds();
                         switch (loadResult) {
                             case LoadSaveResult.Failure:
                                 if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                                    loadResult = loadSaveDialogue();
+                                    loadResult = Invoke(loadSaveDialogue);
                                 }
                                 break;
                             case LoadSaveResult.EmptyFile:
@@ -87,8 +95,8 @@ namespace RuneApp {
                         RebuildLists();
                     });
 
-#if !DEBUG
                 }
+#if !DEBUG
                 catch (Exception ex) {
                     MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
                     LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
@@ -175,9 +183,37 @@ namespace RuneApp {
             if (Program.Settings.ShowIreneOnStart)
                 irene.Show(this);
 
-            LineLog.Info("Main form loaded");
+            await loadTask;
+
+            this.Invoke((MethodInvoker)delegate
+            {
+                buildList.Sort();
+            });
+            sw.Stop(); 
+            LineLog.Info("Main form loaded in " + sw.ElapsedMilliseconds + "ms");
             loading = false;
-            buildList.Sort();
+            readyTcs.TrySetResult(sw.ElapsedMilliseconds);
+            
+            
+        }
+
+        public T Invoke<T>(Func<T> getThis)
+        {
+            T res = default;
+
+            if (InvokeRequired)
+            {
+                Invoke((MethodInvoker)delegate
+                {
+                    res = getThis();
+                });
+            }
+            else
+            {
+                res = getThis();
+            }
+
+            return res;
         }
 
         private void Timer1_Tick(object sender, EventArgs e) {

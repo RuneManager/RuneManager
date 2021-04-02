@@ -21,7 +21,7 @@ namespace RuneApp {
     partial class Main {
         // TODO: shuffle these under custom controls?
 
-
+        public IEnumerable<ListViewItem> BuildListViewItems => buildList.Items.OfType<ListViewItem>();
 
         private DateTime resumeTime = DateTime.MinValue;
 
