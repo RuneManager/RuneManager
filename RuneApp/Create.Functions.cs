@@ -872,8 +872,8 @@ namespace RuneApp {
                 // good idea, generate right now whenever the user clicks a... whatever
                 build.RunesUseLocked = false;
                 build.RunesUseEquipped = Program.Settings.UseEquipped;
-                build.RunesDropHalfSetStat = Program.goFast;
-                build.RunesOnlyFillEmpty = Program.fillRunes;
+                build.RunesDropHalfSetStat = Program.GoFast;
+                build.RunesOnlyFillEmpty = Program.FillRunes;
                 build.BuildSaveStats = false;
                 build.GenRunes(Program.Data);
             });

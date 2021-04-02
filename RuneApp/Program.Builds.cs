@@ -16,7 +16,7 @@ namespace RuneApp
         public static void BuildPriority(Build build, int deltaPriority)
         {
             build.Priority += deltaPriority;
-            var bpri = builds.OrderBy(b => b.Priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
+            var bpri = Builds.OrderBy(b => b.Priority).ThenBy(b => b == build ? deltaPriority : 0).ToList();
             int i = 1;
             foreach (var b in bpri)
             {
@@ -48,8 +48,8 @@ namespace RuneApp
                 build.BuildDumpBads = false;
                 build.BuildSaveStats = false;
                 build.BuildGoodRunes = false;
-                build.RunesOnlyFillEmpty = Program.fillRunes;
-                build.RunesDropHalfSetStat = Program.goFast;
+                build.RunesOnlyFillEmpty = Program.FillRunes;
+                build.RunesDropHalfSetStat = Program.GoFast;
                 build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
                 build.GenRunes(Program.Data);
@@ -106,8 +106,8 @@ namespace RuneApp
                 BuildSaveStats = saveStats,
                 RunesUseEquipped = Program.Settings.UseEquipped,
                 Shrines = Program.Data.shrines,
-                RunesOnlyFillEmpty = Program.fillRunes,
-                RunesDropHalfSetStat = Program.goFast,
+                RunesOnlyFillEmpty = Program.FillRunes,
+                RunesDropHalfSetStat = Program.GoFast,
                 IgnoreLess5 = Program.Settings.IgnoreLess5,
                 BuildDumpBads = true,
             });
@@ -156,7 +156,7 @@ namespace RuneApp
                 }
 
                 // unlock runes on current loadout (if present)
-                var load = loads.FirstOrDefault(l => l.BuildID == build.ID);
+                var load = Loads.FirstOrDefault(l => l.BuildID == build.ID);
                 if (load != null)
                     load.Unlock();
 
@@ -229,10 +229,10 @@ namespace RuneApp
                     dmon.Current.PredictSubs = dmonps;
                     dmon.Current.Buffs = dmonbf;
 
-                    loads.Add(build.Best.Current);
+                    Loads.Add(build.Best.Current);
 
                     // if we are on the hunt of good runes.
-                    if (goodRunes && bSettings.BuildSaveStats && build.Type != BuildType.Lock)
+                    if (GoodRunes && bSettings.BuildSaveStats && build.Type != BuildType.Lock)
                     {
                         var theBest = build.Best;
                         int count = 0;
@@ -252,7 +252,7 @@ namespace RuneApp
                     if (bSettings.BuildSaveStats && build.Type != BuildType.Lock)
                     {
                         BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Excel"));
-                        runeSheet.StatsExcelBuild(build, build.Mon, build.Best.Current, true);
+                        RuneSheet.StatsExcelBuild(build, build.Mon, build.Best.Current, true);
                     }
 
                     BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Clean"));
@@ -307,9 +307,9 @@ namespace RuneApp
                 b.RunesUseLocked = false;
                 b.RunesUseEquipped = Program.Settings.UseEquipped;
                 b.BuildSaveStats = true;
-                b.RunesOnlyFillEmpty = Program.fillRunes;
-                b.BuildGoodRunes = goodRunes;
-                b.RunesDropHalfSetStat = Program.goFast;
+                b.RunesOnlyFillEmpty = Program.FillRunes;
+                b.BuildGoodRunes = GoodRunes;
+                b.RunesDropHalfSetStat = Program.GoFast;
                 b.IgnoreLess5 = Program.Settings.IgnoreLess5;
                 b.GenRunes(Program.Data);
 
@@ -377,9 +377,9 @@ namespace RuneApp
                 }
 
                 List<Build> toRun = new List<Build>();
-                foreach (var build in builds.OrderBy(b => b.Priority))
+                foreach (var build in Builds.OrderBy(b => b.Priority))
                 {
-                    if ((!skipLoaded || !loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.Priority <= runTo))
+                    if ((!skipLoaded || !Loads.Any(l => l.BuildID == build.ID)) && (runTo == -1 || build.Priority <= runTo))
                         toRun.Add(build);
                 }
 
@@ -428,10 +428,10 @@ namespace RuneApp
                     if (!runToken.IsCancellationRequested && Program.Settings.MakeStats)
                     {
                         if (!skipLoaded)
-                            Program.runeSheet.StatsExcelRunes(true);
+                            Program.RuneSheet.StatsExcelRunes(true);
                         try
                         {
-                            Program.runeSheet.StatsExcelSave(true);
+                            Program.RuneSheet.StatsExcelSave(true);
                         }
                         catch (Exception ex)
                         {

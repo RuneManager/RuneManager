@@ -189,13 +189,13 @@ function log() {
                         }
                         switch (req.QueryString.GetValues("action").First()) {
                             case "reserve":
-                                if (!Program.goals.ReservedIds.Contains(id)) {
-                                    Program.goals.ReservedIds.Add(id);
+                                if (!Program.Goals.ReservedIds.Contains(id)) {
+                                    Program.Goals.ReservedIds.Add(id);
                                     Program.SaveGoals();
                                 }
                                 break;
                             case "unreserve":
-                                Program.goals.ReservedIds.Remove(id);
+                                Program.Goals.ReservedIds.Remove(id);
                                 Program.SaveGoals();
                                 break;
                             case "lock":
@@ -209,11 +209,11 @@ function log() {
                                 Program.Data.isModified = true;
                                 break;
                             case "doskill":
-                                Program.goals.NoSkillIds.Remove(id);
+                                Program.Goals.NoSkillIds.Remove(id);
                                 Program.SaveGoals();
                                 break;
                             case "noskill":
-                                Program.goals.NoSkillIds.Add(id);
+                                Program.Goals.NoSkillIds.Add(id);
                                 Program.SaveGoals();
                                 break;
                         }

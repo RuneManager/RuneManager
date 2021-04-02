@@ -85,13 +85,13 @@ namespace RuneApp.InternalServer {
                     }
                     runes.Add(mr);
                 }
-                foreach (var b in Program.builds) {
+                foreach (var b in Program.Builds) {
                     var mm = mons.FirstOrDefault(m => m.Id == b.MonId);
                     if (mm != null)
                         mm.priority = b.Priority;
                 }
-                foreach (var l in Program.loads) {
-                    var b = Program.builds.FirstOrDefault(bb => bb.ID == l.BuildID);
+                foreach (var l in Program.Loads) {
+                    var b = Program.Builds.FirstOrDefault(bb => bb.ID == l.BuildID);
                     foreach (var r in l.Runes) {
                         var mm = mons.FirstOrDefault(mo => mo.Id == b.MonId);
                         mm.runesDesired[r.Slot - 1] = runes.FirstOrDefault(mr => mr.Id == r.Id);

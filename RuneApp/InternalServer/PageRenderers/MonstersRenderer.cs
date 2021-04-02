@@ -114,12 +114,12 @@ http.send(params);
                     new ServedResult("br"),
                 }
             };
-            if (Program.goals.ReservedIds.Contains(mon.Id))
+            if (Program.Goals.ReservedIds.Contains(mon.Id))
                 div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('unreserve');" } }, contentList = { "Unreserve" } });
             else
                 div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('reserve');" } }, contentList = { "Reserve" } });
 
-            if (Program.goals.NoSkillIds.Contains(mon.Id)) {
+            if (Program.Goals.NoSkillIds.Contains(mon.Id)) {
                 div.contentList.Add(new ServedResult("br"));
                 div.contentList.Add(new ServedResult("button") { contentDic = { { "onclick", "javascript:performAction('doskill');" } }, contentList = { "Not Skilling" } });
                 div.contentList.Add(new ServedImage($"../images/mon.png"));
@@ -150,10 +150,10 @@ http.send(params);
             }
             pieces = pieces.Where(p => p.Value.Quantity > Save.getPiecesRequired(p.Value.Id)).ToDictionary(p => p.Key, p => p.Value);
 
-            var ll = Program.loads;
+            var ll = Program.Loads;
             var ldic = ll.ToDictionary(l => l.BuildID);
 
-            var bq = Program.builds.Where(b => !ldic.ContainsKey(b.ID));
+            var bq = Program.Builds.Where(b => !ldic.ContainsKey(b.ID));
             var bb = new List<Build>();
             foreach (var b in bq) {
                 if (!bb.Any(u => u.MonId == b.MonId))
@@ -162,11 +162,11 @@ http.send(params);
 
             var bdic = bb.ToDictionary(b => b.MonId);
 
-            var remids = Program.goals.ReservedIds.Where(i => Program.Data.GetMonster(i) == null).ToList();
+            var remids = Program.Goals.ReservedIds.Where(i => Program.Data.GetMonster(i) == null).ToList();
             foreach (var i in remids) {
-                Program.goals.ReservedIds.Remove(i);
+                Program.Goals.ReservedIds.Remove(i);
             }
-            var reserved = Program.goals.ReservedIds.Select(id => Program.Data.GetMonster(id)).Where(m => m != null).ToList();
+            var reserved = Program.Goals.ReservedIds.Select(id => Program.Data.GetMonster(id)).Where(m => m != null).ToList();
             //reserved = reserved.Union(Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).GroupBy(m => m.monsterTypeId).Select(m => m.First())).Distinct();
 
             var monunNull = Program.Data.Monsters.Where(m => m != null);
@@ -217,7 +217,7 @@ http.send(params);
 
             var pairs = new Dictionary<Monster, List<Monster>>();
             var rem = new List<Monster>();
-            foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
                 .ThenByDescending(m => m.level)
                 .ThenBy(m => m.Element)
                 .ThenByDescending(m => m.awakened)
@@ -244,7 +244,7 @@ http.send(params);
                     unlocked.Remove(um);
                 }
             }
-            foreach (var m in locked.Where(m => !Program.goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
+            foreach (var m in locked.Where(m => !Program.Goals.NoSkillIds.Contains(m.Id)).OrderByDescending(m => 1 / (bb.FirstOrDefault(b => b.Mon == m)?.Priority ?? m.priority - 0.1)).ThenByDescending(m => m.Grade)
                 .ThenByDescending(m => m.level)
                 .ThenBy(m => m.Element)
                 .ThenByDescending(m => m.awakened)
@@ -291,7 +291,7 @@ http.send(params);
             }
 
             mm = mm.Except(bb.Select(b => b.Mon));
-            mm = mm.Except(Program.builds.Select(b => b.Mon));
+            mm = mm.Except(Program.Builds.Select(b => b.Mon));
             mm = mm.Except(pairs.SelectMany(p => p.Value));
             mm = mm.Except(rem);
 
@@ -475,7 +475,7 @@ http.send(params);
         }
 
         protected static ServedResult renderLoad(Loadout l, Dictionary<Monster, List<Monster>> pairs) {
-            var b = Program.builds.FirstOrDefault(bu => bu.ID == l.BuildID);
+            var b = Program.Builds.FirstOrDefault(bu => bu.ID == l.BuildID);
             var m = b.Mon;
 
             var li = new ServedResult("li");

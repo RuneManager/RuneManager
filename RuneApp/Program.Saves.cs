@@ -44,11 +44,11 @@ namespace RuneApp
                 var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
                 foreach (var b in bs.OrderBy(b => b.Priority))
                 {
-                    builds.Add(b);
+                    Builds.Add(b);
                 }
-                foreach (var b in builds.Where(b => b.Type == BuildType.Link))
+                foreach (var b in Builds.Where(b => b.Type == BuildType.Link))
                 {
-                    b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
+                    b.LinkBuild = Program.Builds.FirstOrDefault(bu => bu.ID == b.LinkId);
                 }
             }
 #if !DEBUG
@@ -59,7 +59,7 @@ namespace RuneApp
             }
 #endif
 
-            if (Program.builds.Count > 0 && (Program.Data?.Monsters == null))
+            if (Program.Builds.Count > 0 && (Program.Data?.Monsters == null))
             {
                 // backup, just in case
                 string destFile = Path.Combine("", string.Format("{0}.backup{1}", "builds", ".json"));
@@ -83,17 +83,17 @@ namespace RuneApp
         {
             LineLog.Debug("processing builds");
             int current_pri = 1;
-            foreach (Build b in Program.builds.OrderBy(bu => bu.Priority))
+            foreach (Build b in Program.Builds.OrderBy(bu => bu.Priority))
             {
                 int id = b.ID;
-                if (b.ID == 0 || Program.builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID))
+                if (b.ID == 0 || Program.Builds.Where(bu => bu != b).Select(bu => bu.ID).Any(bid => bid == b.ID))
                 {
                     //id = buildList.Items.Count + 1;
                     id = 1;
-                    while (Program.builds.Any(bu => bu.ID == id))
+                    while (Program.Builds.Any(bu => bu.ID == id))
                         id++;
 
-                    foreach (var lb in Program.builds.Where(bu => bu.LinkId == b.ID))
+                    foreach (var lb in Program.Builds.Where(bu => bu.LinkId == b.ID))
                     {
                         lb.LinkId = id;
                     }
@@ -151,7 +151,7 @@ namespace RuneApp
         {
             LineLog.Debug($"Saving builds to {filename}");
             // TODO: fix this mess
-            foreach (Build bb in builds)
+            foreach (Build bb in Builds)
             {
                 if (bb.Mon != null && bb.Mon.FullName != "Missingno")
                 {
@@ -172,14 +172,14 @@ namespace RuneApp
             }
 
             // only write if there are builds, may save some files
-            if (Program.builds.Count > 0)
+            if (Program.Builds.Count > 0)
             {
                 try
                 {
                     // keep a single recent backup
                     if (File.Exists(filename))
                         File.Copy(filename, filename + ".backup", true);
-                    var str = JsonConvert.SerializeObject(Program.builds, Formatting.Indented);
+                    var str = JsonConvert.SerializeObject(Program.Builds, Formatting.Indented);
                     File.WriteAllText(filename, str);
                     return LoadSaveResult.Success;
                 }
@@ -197,14 +197,14 @@ namespace RuneApp
         {
             LineLog.Debug($"Saving loads to {filename}");
 
-            if (loads.Count > 0)
+            if (Loads.Count > 0)
             {
                 try
                 {
                     // keep a single recent backup
                     if (File.Exists(filename))
                         File.Copy(filename, filename + ".backup", true);
-                    var str = JsonConvert.SerializeObject(loads, Formatting.Indented);
+                    var str = JsonConvert.SerializeObject(Loads, Formatting.Indented);
                     File.WriteAllText(filename, str);
                     return LoadSaveResult.Success;
                 }
@@ -223,7 +223,7 @@ namespace RuneApp
             {
                 string text = File.ReadAllText(filename);
                 var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
-                loads.Clear();
+                Loads.Clear();
 
                 foreach (var load in lloads)
                 {
@@ -243,7 +243,7 @@ namespace RuneApp
                         }
                     }
                     load.Shrines = Data.shrines;
-                    loads.Add(load);
+                    Loads.Add(load);
                 }
                 return LoadSaveResult.Success;
             }
@@ -258,21 +258,21 @@ namespace RuneApp
 
         internal static void ClearLoadouts()
         {
-            foreach (Loadout l in loads)
+            foreach (Loadout l in Loads)
             {
-                Build build = Program.builds.FirstOrDefault(b => b.ID == l.BuildID);
+                Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
                 BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
                 l.Unlock();
             }
-            loads.Clear();
+            Loads.Clear();
         }
 
         public static void RemoveLoad(Loadout l)
         {
-            Build build = Program.builds.FirstOrDefault(b => b.ID == l.BuildID);
+            Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
             BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
             l.Unlock();
-            loads.Remove(l);
+            Loads.Remove(l);
         }
 
         public static LoadSaveResult SaveGoals(string filename = "goals.json")
@@ -282,7 +282,7 @@ namespace RuneApp
             try
             {
                 // keep a single recent backup
-                var str = JsonConvert.SerializeObject(goals, Formatting.Indented);
+                var str = JsonConvert.SerializeObject(Goals, Formatting.Indented);
                 File.WriteAllText(filename, str);
                 return LoadSaveResult.Success;
             }
@@ -301,11 +301,11 @@ namespace RuneApp
                 if (File.Exists(filename))
                 {
                     string text = File.ReadAllText(filename);
-                    goals = JsonConvert.DeserializeObject<Goals>(text);
+                    Goals = JsonConvert.DeserializeObject<Goals>(text);
                 }
                 else
                 {
-                    goals = new Goals();
+                    Goals = new Goals();
                 }
                 return LoadSaveResult.Success;
             }

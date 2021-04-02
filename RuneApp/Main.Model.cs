@@ -29,9 +29,9 @@ namespace RuneApp {
         public static Help help;
         public static Irene irene;
 
-        public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
-        public static bool goFast { get { return Program.goFast; } set { Program.goFast = value; } }
-        public static bool fillRunes { get { return Program.fillRunes; } set { Program.fillRunes = value; } }
+        public static bool goodRunes { get { return Program.GoodRunes; } set { Program.GoodRunes = value; } }
+        public static bool goFast { get { return Program.GoFast; } set { Program.GoFast = value; } }
+        public static bool fillRunes { get { return Program.FillRunes; } set { Program.FillRunes = value; } }
 
         public static Main currentMain;
         public static RuneDisplay runeDisplay;

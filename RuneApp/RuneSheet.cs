@@ -690,7 +690,7 @@ namespace RuneApp {
 
                 Build b = null;
                 if (m != null) {
-                    b = Program.builds.FirstOrDefault(bu => bu.Mon == m);
+                    b = Program.Builds.FirstOrDefault(bu => bu.Mon == m);
                 }
 
                 for (col = 1; col <= colHead.Count; col++) {
@@ -1058,7 +1058,7 @@ namespace RuneApp {
 
             r.manageStats.GetOrAdd("Mon", 0);
             if (r.manageStats["In"] > 0) {
-                var b = Program.builds.FirstOrDefault(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r));
+                var b = Program.Builds.FirstOrDefault(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r));
                 r.manageStats["Action"] = -1;
                 if (b == null) {
                     r.manageStats["Priority"] = 2;
@@ -1069,7 +1069,7 @@ namespace RuneApp {
                 }
                 else {
                     r.manageStats["Mon"] = b.Mon.Id;
-                    r.manageStats["Priority"] = b.Priority / (double)Program.builds.Max(bu => bu.Priority);
+                    r.manageStats["Priority"] = b.Priority / (double)Program.Builds.Max(bu => bu.Priority);
                     int p = b.GetFakeLevel(r);
                     if (r.Level < p)
                         r.manageStats["Action"] = p;

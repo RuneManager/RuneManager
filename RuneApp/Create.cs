@@ -773,8 +773,8 @@ namespace RuneApp {
         private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {
             build.RunesUseEquipped = Program.Settings.UseEquipped;
             build.RunesUseLocked = false;
-            build.RunesDropHalfSetStat = Program.goFast;
-            build.RunesOnlyFillEmpty = Program.fillRunes;
+            build.RunesDropHalfSetStat = Program.GoFast;
+            build.RunesOnlyFillEmpty = Program.FillRunes;
             // good idea, generate right now whenever the user clicks a... whatever
             build.GenRunes(Program.Data);
 
@@ -790,8 +790,8 @@ namespace RuneApp {
         void button1_Click(object sender, EventArgs e) {
             build.RunesUseLocked = false;
             build.RunesUseEquipped = true;
-            build.RunesDropHalfSetStat = Program.goFast;
-            build.RunesOnlyFillEmpty = Program.fillRunes;
+            build.RunesDropHalfSetStat = Program.GoFast;
+            build.RunesOnlyFillEmpty = Program.FillRunes;
             build.GenRunes(Program.Data);
             using (var ff = new RuneSelect()) {
                 ff.returnedRune = runeTest;
@@ -863,7 +863,7 @@ namespace RuneApp {
             // sort live on change
             // copy weights back to here
 
-            if (!Program.config.AppSettings.Settings.AllKeys.Contains("generateLive")) {
+            if (!Program.Config.AppSettings.Settings.AllKeys.Contains("generateLive")) {
                 var ff = new Generate(build);
                 var backupSort = new Stats(build.Sort);
                 var res = ff.ShowDialog();

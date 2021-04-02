@@ -60,13 +60,13 @@ namespace RuneAppTests
             else
                 Assert.Fail("No save");
 
-            Assert.IsTrue(Program.builds.Count > 0, "No builds");
+            Assert.IsTrue(Program.Builds.Count > 0, "No builds");
 
-            var b = Program.builds.FirstOrDefault();
+            var b = Program.Builds.FirstOrDefault();
             Program.RunBuild(b);
             await Program.RunTask;
 
-            Assert.IsTrue(Program.loads.Any(), "No loadout was created.");
+            Assert.IsTrue(Program.Loads.Any(), "No loadout was created.");
 
             // refresh button implementation:
             if (File.Exists(Program.Settings.SaveLocation))
@@ -85,7 +85,7 @@ namespace RuneAppTests
         public void _45_BuildNamesDontRefresh()
         {
             // get a non-homu build, and check that the LVI has the correct name
-            var build = Program.builds.FirstOrDefault(b => !b.Mon.IsHomunculus);
+            var build = Program.Builds.FirstOrDefault(b => !b.Mon.IsHomunculus);
             ListViewItem lvi = main.Invoke(() => main.BuildListViewItems.FirstOrDefault(l => l.Tag == build));
             Assert.AreEqual(build.Mon.FullName, lvi.Text);
 
@@ -98,7 +98,7 @@ namespace RuneAppTests
             ddat.Monsters.Add(tempMonster);
 
             // pretend to click the "refresh" button
-            Program.Data = Program.LoadSaveData(JsonConvert.SerializeObject(ddat), Program.loads);
+            Program.Data = Program.LoadSaveData(JsonConvert.SerializeObject(ddat), Program.Loads);
             main.RebuildLists();
             main.refreshLoadouts();
 

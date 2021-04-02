@@ -454,8 +454,8 @@ namespace RuneApp {
                     monSetsCancelled = false;
                     build.RunesUseLocked = Program.Settings.LockTest;
                     build.RunesUseEquipped = Program.Settings.UseEquipped;
-                    build.RunesDropHalfSetStat = Program.goFast;
-                    build.RunesOnlyFillEmpty = Program.fillRunes;
+                    build.RunesDropHalfSetStat = Program.GoFast;
+                    build.RunesOnlyFillEmpty = Program.FillRunes;
                     build.GenRunes(Program.Data);
 
                     long num = 0;

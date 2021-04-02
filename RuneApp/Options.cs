@@ -65,7 +65,7 @@ namespace RuneApp {
 
             if (!cInternalServer.Checked) {
                 try {
-                    Program.master.Start();
+                    Program.Master.Start();
                     cInternalServer.Checked = true;
                 }
                 catch (Exception ex) {
@@ -74,7 +74,7 @@ namespace RuneApp {
             }
             else {
                 try {
-                    Program.master.Stop();
+                    Program.Master.Stop();
                     cInternalServer.Checked = false;
                 }
                 catch (Exception ex) {

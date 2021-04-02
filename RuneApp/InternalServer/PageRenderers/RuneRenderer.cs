@@ -98,7 +98,7 @@ function hackLots(prop, num, on) {
 
                 Build b = null;
                 if (m != null) {
-                    b = Program.builds.FirstOrDefault(bu => bu.Mon == m);
+                    b = Program.Builds.FirstOrDefault(bu => bu.Mon == m);
                 }
                 double ret = r.manageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
 

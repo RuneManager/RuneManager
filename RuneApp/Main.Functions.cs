@@ -115,7 +115,7 @@ namespace RuneApp {
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
-            if (Program.builds.Any(b => b.MonId == mon.Id))
+            if (Program.Builds.Any(b => b.MonId == mon.Id))
                 nli.ForeColor = Color.Green;
             else if (mon.inStorage)
                 nli.ForeColor = Color.Gray;
@@ -344,10 +344,10 @@ namespace RuneApp {
             if (Program.Data == null)
                 return;
             int maxPri = 0;
-            if (Program.builds.Count > 0)
-                maxPri = Program.builds.Max(b => b.Priority) + 1;
+            if (Program.Builds.Count > 0)
+                maxPri = Program.Builds.Max(b => b.Priority) + 1;
             foreach (var mon in Program.Data.Monsters) {
-                mon.priority = (Program.builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
+                mon.priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
             }
             dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
@@ -431,7 +431,7 @@ namespace RuneApp {
             }
             resumeTimer = null;
 
-            var fb = Program.builds.FirstOrDefault(b => b.Best == null);
+            var fb = Program.Builds.FirstOrDefault(b => b.Best == null);
             var lvi = this.buildList.Items.OfType<ListViewItem>().FirstOrDefault(b => b.Tag == fb);
             if (lvi != null) {
                 // TODO: rename build columns

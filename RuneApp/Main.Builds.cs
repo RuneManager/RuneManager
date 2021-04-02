@@ -101,7 +101,7 @@ namespace RuneApp {
 
             var lviList = new List<ListViewItem>();
 
-            foreach (var b in Program.builds) {
+            foreach (var b in Program.Builds) {
                 ListViewItem li = new ListViewItem();
                 this.Invoke((MethodInvoker)delegate {
                     ListViewItemBuild(li, b);
