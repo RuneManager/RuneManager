@@ -44,7 +44,7 @@ namespace RuneApp
                 build.BuildGenerate = Program.Settings.TestGen;
                 build.BuildTake = Program.Settings.TestShow;
                 build.BuildTimeout = Program.Settings.TestTime;
-                build.Shrines = Program.data.shrines;
+                build.Shrines = Program.Data.shrines;
                 build.BuildDumpBads = false;
                 build.BuildSaveStats = false;
                 build.BuildGoodRunes = false;
@@ -52,7 +52,7 @@ namespace RuneApp
                 build.RunesDropHalfSetStat = Program.goFast;
                 build.IgnoreLess5 = Program.Settings.IgnoreLess5;
 
-                build.GenRunes(Program.data);
+                build.GenRunes(Program.Data);
                 var result = build.GenBuilds();
 
                 onFinish?.Invoke(build, result);
@@ -73,7 +73,7 @@ namespace RuneApp
 
         public static void RunBuild(Build build, bool saveStats = false)
         {
-            if (Program.data == null)
+            if (Program.Data == null)
                 return;
 
 
@@ -101,11 +101,11 @@ namespace RuneApp
 
         private static void runBuild(Build build, bool saveStats = false)
         {
-            runBuild(build, Program.data, new BuildSettings()
+            runBuild(build, Program.Data, new BuildSettings()
             {
                 BuildSaveStats = saveStats,
                 RunesUseEquipped = Program.Settings.UseEquipped,
-                Shrines = Program.data.shrines,
+                Shrines = Program.Data.shrines,
                 RunesOnlyFillEmpty = Program.fillRunes,
                 RunesDropHalfSetStat = Program.goFast,
                 IgnoreLess5 = Program.Settings.IgnoreLess5,
@@ -206,7 +206,7 @@ namespace RuneApp
                     //currentBuild = null;
                     build.Best.Current.Time = build.Time;
 
-                    var dmon = Program.data.GetMonster(build.Best.Id);
+                    var dmon = Program.Data.GetMonster(build.Best.Id);
 
                     var dmonld = dmon.Current.Leader;
                     var dmonsh = dmon.Current.Shrines;
@@ -311,7 +311,7 @@ namespace RuneApp
                 b.BuildGoodRunes = goodRunes;
                 b.RunesDropHalfSetStat = Program.goFast;
                 b.IgnoreLess5 = Program.Settings.IgnoreLess5;
-                b.GenRunes(Program.data);
+                b.GenRunes(Program.Data);
 
                 b.BuildTimeout = 0;
                 b.BuildTake = 0;
@@ -329,14 +329,14 @@ namespace RuneApp
             {
                 b.BanEmTemp(new ulong[] { });
                 b.BuildSaveStats = false;
-                b.GenRunes(Program.data);
+                b.GenRunes(Program.Data);
                 LineLog.Info("Ban finished");
             }
         }
 
         public static void RunBuilds(bool skipLoaded, int runTo = -1)
         {
-            if (Program.data == null)
+            if (Program.Data == null)
                 return;
 
             if (isRunning)
@@ -369,7 +369,7 @@ namespace RuneApp
                 if (!skipLoaded)
                 {
                     ClearLoadouts();
-                    foreach (var r in Program.data.Runes)
+                    foreach (var r in Program.Data.Runes)
                     {
                         r.manageStats.AddOrUpdate("buildScoreIn", 0, (k, v) => 0);
                         r.manageStats.AddOrUpdate("buildScoreTotal", 0, (k, v) => 0);
@@ -409,9 +409,9 @@ namespace RuneApp
                 runSource = new CancellationTokenSource();
                 runToken = runSource.Token;
                 runTask = Task.Factory.StartNew(() => {
-                    if (Program.data.Runes != null && !skipLoaded)
+                    if (Program.Data.Runes != null && !skipLoaded)
                     {
-                        foreach (Rune r in Program.data.Runes)
+                        foreach (Rune r in Program.Data.Runes)
                         {
                             r.Swapped = false;
                             r.ResetStats();

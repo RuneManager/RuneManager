@@ -536,14 +536,14 @@ namespace RuneApp {
 
         private void tsBtnMonMoveUp_Click(object sender, EventArgs e) {
             if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
-                int maxPri = Program.data.Monsters.Max(x => x.priority);
+                int maxPri = Program.Data.Monsters.Max(x => x.priority);
                 if (mon.priority == 0) {
                     mon.priority = maxPri + 1;
                     dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
                 }
                 else if (mon.priority != 1) {
                     int pri = mon.priority;
-                    Monster mon2 = Program.data.Monsters.FirstOrDefault(x => x.priority == pri - 1);
+                    Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.priority == pri - 1);
                     if (mon2 != null) {
                         ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.FullName);
                         mon2.priority += 1;
@@ -558,14 +558,14 @@ namespace RuneApp {
 
         private void tsBtnMonMoveDown_Click(object sender, EventArgs e) {
             if (dataMonsterList?.FocusedItem?.Tag is Monster mon) {
-                int maxPri = Program.data.Monsters.Max(x => x.priority);
+                int maxPri = Program.Data.Monsters.Max(x => x.priority);
                 if (mon.priority == 0) {
                     mon.priority = maxPri + 1;
                     dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
                 }
                 else if (mon.priority != maxPri) {
                     int pri = mon.priority;
-                    Monster mon2 = Program.data.Monsters.FirstOrDefault(x => x.priority == pri + 1);
+                    Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.priority == pri + 1);
                     if (mon2 != null) {
                         ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.FullName);
                         mon2.priority -= 1;
@@ -603,7 +603,7 @@ namespace RuneApp {
 
                     Monster mon = null;
                     if (build == null)
-                        mon = Program.data.GetMonster(monid);
+                        mon = Program.Data.GetMonster(monid);
                     else
                         mon = build.Mon;
 
@@ -613,7 +613,7 @@ namespace RuneApp {
 
                     ShowLoadout(load);
 
-                    var dmon = Program.data.GetMonster(monid);
+                    var dmon = Program.Data.GetMonster(monid);
                     if (dmon != null) {
                         var dmonld = dmon.Current.Leader;
                         var dmonsh = dmon.Current.Shrines;
@@ -660,7 +660,7 @@ namespace RuneApp {
             int cost = 0;
             foreach (ListViewItem li in loadoutList.SelectedItems) {
                 if (li.Tag is Loadout load) {
-                    var mon = Program.data.GetMonster(ulong.Parse(li.SubItems[2].Text));
+                    var mon = Program.Data.GetMonster(ulong.Parse(li.SubItems[2].Text));
                     if (mon != null)
                         cost += mon.SwapCost(load);
                 }
@@ -796,9 +796,9 @@ namespace RuneApp {
         }
 
         private void tsBtnBuildsUnlock_Click(object sender, EventArgs e) {
-            if (Program.data == null || Program.data.Runes == null)
+            if (Program.Data == null || Program.Data.Runes == null)
                 return;
-            foreach (Rune r in Program.data.Runes) {
+            foreach (Rune r in Program.Data.Runes) {
                 r.Locked = false;
             }
             checkLocked();
@@ -833,11 +833,11 @@ namespace RuneApp {
         }
 
         private void tsbUnequipAll_Click(object sender, EventArgs e) {
-            if (Program.data == null)
+            if (Program.Data == null)
                 return;
 
-            if (Program.data.Monsters != null)
-                foreach (Monster mon in Program.data.Monsters) {
+            if (Program.Data.Monsters != null)
+                foreach (Monster mon in Program.Data.Monsters) {
                     for (int i = 1; i < 7; i++) {
                         var r = mon.Current.RemoveRune(i);
                         if (r != null) {
@@ -848,8 +848,8 @@ namespace RuneApp {
                     }
                 }
 
-            if (Program.data.Runes != null)
-                foreach (Rune r in Program.data.Runes) {
+            if (Program.Data.Runes != null)
+                foreach (Rune r in Program.Data.Runes) {
                     r.AssignedId = 0;
                     r.AssignedName = "Inventory";
                 }
@@ -1012,7 +1012,7 @@ namespace RuneApp {
         }
 
         private void unequipMonsterButton_Click(object sender, EventArgs e) {
-            if (Program.data?.Monsters == null)
+            if (Program.Data?.Monsters == null)
                 return;
 
             foreach (ListViewItem li in dataMonsterList.SelectedItems) {
@@ -1178,7 +1178,7 @@ namespace RuneApp {
                     b.BuildSaveStats = false;
                     b.RunesDropHalfSetStat = Program.goFast;
                     b.RunesOnlyFillEmpty = Program.fillRunes;
-                    b.GenRunes(Program.data);
+                    b.GenRunes(Program.Data);
                     if (b.runes.Any(rr => rr == null))
                         continue;
                     long c = b.runes[0].Length;

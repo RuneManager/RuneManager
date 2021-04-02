@@ -173,7 +173,7 @@ function log() {
                         if (id == 0)
                             id = mon.Id;
 
-                        if (uri.Length == 0 || Program.data.GetMonster(id) == null) {
+                        if (uri.Length == 0 || Program.Data.GetMonster(id) == null) {
                             Program.AddMonster(mon);
                             return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
                         }
@@ -183,7 +183,7 @@ function log() {
                         }
                     }
                     else if (req.QueryString.GetValues("action").Length > 0) {
-                        mon = Program.data.GetMonster(id);
+                        mon = Program.Data.GetMonster(id);
                         if (mon == null) {
                             return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "nonexistant", id.ToString() } } }.ToJson()) };
                         }
@@ -200,13 +200,13 @@ function log() {
                                 break;
                             case "lock":
                                 mon.Locked = true;
-                                Program.data.LockedUnits.Add(mon.Id);
-                                Program.data.isModified = true;
+                                Program.Data.LockedUnits.Add(mon.Id);
+                                Program.Data.isModified = true;
                                 break;
                             case "unlock":
                                 mon.Locked = false;
-                                Program.data.LockedUnits.Remove(mon.Id);
-                                Program.data.isModified = true;
+                                Program.Data.LockedUnits.Remove(mon.Id);
+                                Program.Data.isModified = true;
                                 break;
                             case "doskill":
                                 Program.goals.NoSkillIds.Remove(id);
@@ -248,10 +248,10 @@ function log() {
                         ulong.TryParse(uri[0], out id);
                     }
 
-                    mon = Program.data.GetMonster(id);
+                    mon = Program.Data.GetMonster(id);
                     if (mon != null) {
-                        Program.data.Monsters.Remove(mon);
-                        Program.data.isModified = true;
+                        Program.Data.Monsters.Remove(mon);
+                        Program.Data.isModified = true;
                         return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
                     }
                     return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
@@ -279,7 +279,7 @@ function log() {
             public class RunesRenderer : PageRenderer {
                 [HttpMethod("POST")]
                 public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri) {
-                    if (Program.data == null) {
+                    if (Program.Data == null) {
                         return return404();
                     }
                     Rune rune = null;
@@ -295,7 +295,7 @@ function log() {
                         if (id == 0)
                             id = rune.Id;
 
-                        if (uri.Length == 0 || Program.data.GetRune(id) == null) {
+                        if (uri.Length == 0 || Program.Data.GetRune(id) == null) {
                             Program.AddRune(rune);
                             return new HttpResponseMessage(HttpStatusCode.Created) { Content = new StringContent(new ServedResult("POST") { contentDic = { { "created", id.ToString() } } }.ToJson()) };
                         }
@@ -319,10 +319,10 @@ function log() {
                     if (uri.Length > 0) {
                         ulong.TryParse(uri[0], out id);
                     }
-                    rune = Program.data?.GetRune(id);
+                    rune = Program.Data?.GetRune(id);
                     if (rune != null) {
-                        Program.data.Runes.Remove(rune);
-                        Program.data.isModified = true;
+                        Program.Data.Runes.Remove(rune);
+                        Program.Data.isModified = true;
                         return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
                     }
                     return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };

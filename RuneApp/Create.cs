@@ -776,7 +776,7 @@ namespace RuneApp {
             build.RunesDropHalfSetStat = Program.goFast;
             build.RunesOnlyFillEmpty = Program.fillRunes;
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Program.data);
+            build.GenRunes(Program.Data);
 
             using (RuneSelect rs = new RuneSelect()) {
                 rs.returnedRune = build.Mon.Current.Runes[e.Slot - 1];
@@ -792,14 +792,14 @@ namespace RuneApp {
             build.RunesUseEquipped = true;
             build.RunesDropHalfSetStat = Program.goFast;
             build.RunesOnlyFillEmpty = Program.fillRunes;
-            build.GenRunes(Program.data);
+            build.GenRunes(Program.Data);
             using (var ff = new RuneSelect()) {
                 ff.returnedRune = runeTest;
                 ff.build = build;
 
                 switch (tabControl1.SelectedTab.Text) {
                     case "Evens":
-                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 0);
+                        ff.runes = Program.Data.Runes.Where(r => r.Slot % 2 == 0);
                         List<Rune> fr = new List<Rune>();
                         fr.AddRange(ff.runes.Where(r => r.Slot == 2 && build.SlotStats[1].Contains(r.Main.Type.ToForms())));
                         fr.AddRange(ff.runes.Where(r => r.Slot == 4 && build.SlotStats[3].Contains(r.Main.Type.ToForms())));
@@ -807,14 +807,14 @@ namespace RuneApp {
                         ff.runes = fr;
                         break;
                     case "Odds":
-                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 1);
+                        ff.runes = Program.Data.Runes.Where(r => r.Slot % 2 == 1);
                         break;
                     case "Global":
-                        ff.runes = Program.data.Runes;
+                        ff.runes = Program.Data.Runes;
                         break;
                     default:
                         int slot = int.Parse(tabControl1.SelectedTab.Text);
-                        ff.runes = Program.data.Runes.Where(r => r.Slot == slot);
+                        ff.runes = Program.Data.Runes.Where(r => r.Slot == slot);
                         break;
                 }
 

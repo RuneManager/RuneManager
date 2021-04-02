@@ -50,7 +50,7 @@ namespace RuneApp.InternalServer {
                 {
                     contentDic = { { "class", "\"rune-container\"" } },
                 };
-                rcont.contentList.AddRange(Program.data.Runes
+                rcont.contentList.AddRange(Program.Data.Runes
                     .Where(r => r != null)
                     .OrderByDescending(r => calcSort(r))
                     .ThenByDescending(r => r.BarionEfficiency * (12 - Math.Min(12, r.Level)))
@@ -93,7 +93,7 @@ function hackLots(prop, num, on) {
                     return 0;
                 Monster m = null;
                 if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
-                    m = Program.data.GetMonster((ulong)r.manageStats["Mon"]);
+                    m = Program.Data.GetMonster((ulong)r.manageStats["Mon"]);
                 }
 
                 Build b = null;

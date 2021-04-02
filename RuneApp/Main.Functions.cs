@@ -52,7 +52,7 @@ namespace RuneApp {
             if (!shrineMap.ContainsKey(stat))
                 shrineMap.Add(stat, new List<ToolStripMenuItem>());
             shrineMap[stat].Add(it);
-            if (Program.data.shrines[stat].EqualTo(value))
+            if (Program.Data.shrines[stat].EqualTo(value))
                 it.Checked = true;
         }
 
@@ -66,14 +66,14 @@ namespace RuneApp {
                     i.Checked = false;
                 }
                 it.Checked = true;
-                if (Program.data == null)
+                if (Program.Data == null)
                     return;
 
                 if (string.IsNullOrWhiteSpace(stat))
                     return;
 
-                Program.data.shrines[stat] = tag.Value;
-                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.data.shrines));
+                Program.Data.shrines[stat] = tag.Value;
+                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.shrines));
             }
         }
 
@@ -125,15 +125,15 @@ namespace RuneApp {
         private void filterRunesList(Predicate<object> p) {
             dataRuneList.Items.Clear();
 
-            if (Program.data?.Runes == null) return;
+            if (Program.Data?.Runes == null) return;
 
-            foreach (Rune rune in Program.data.Runes.Where(p.Invoke)) {
+            foreach (Rune rune in Program.Data.Runes.Where(p.Invoke)) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
         }
 
         private DialogResult CheckSaveChanges() {
-            if (Program.data == null || !Program.data.isModified)
+            if (Program.Data == null || !Program.Data.isModified)
                 return DialogResult.Yes;
 
             var res = MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -341,17 +341,17 @@ namespace RuneApp {
             dataMonsterList.Items.Clear();
             dataRuneList.Items.Clear();
             listView4.Items.Clear();
-            if (Program.data == null)
+            if (Program.Data == null)
                 return;
             int maxPri = 0;
             if (Program.builds.Count > 0)
                 maxPri = Program.builds.Max(b => b.Priority) + 1;
-            foreach (var mon in Program.data.Monsters) {
+            foreach (var mon in Program.Data.Monsters) {
                 mon.priority = (Program.builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
             }
-            dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
+            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
-            dataCraftList.Items.AddRange(Program.data.Crafts.Select(craft => new ListViewItem() {
+            dataCraftList.Items.AddRange(Program.Data.Crafts.Select(craft => new ListViewItem() {
                 Text = craft.ItemId.ToString(),
                 SubItems =
                 {
@@ -362,7 +362,7 @@ namespace RuneApp {
                 }
             }).ToArray());
 
-            foreach (Rune rune in Program.data.Runes) {
+            foreach (Rune rune in Program.Data.Runes) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
             checkLocked();
@@ -396,11 +396,11 @@ namespace RuneApp {
         }
 
         public void checkLocked() {
-            if (Program.data?.Runes == null)
+            if (Program.Data?.Runes == null)
                 return;
 
             Invoke((MethodInvoker)delegate {
-                toolStripStatusLabel1.Text = "Locked: " + Program.data.Runes.Count(r => r.Locked);
+                toolStripStatusLabel1.Text = "Locked: " + Program.Data.Runes.Count(r => r.Locked);
                 foreach (ListViewItem li in dataRuneList.Items) {
                     if (li.Tag is Rune rune)
                         li.BackColor = rune.Locked ? Color.Red : Color.Transparent;

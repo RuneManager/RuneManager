@@ -175,7 +175,7 @@ namespace RuneApp {
                 build.RunesUseEquipped = true;
                 build.AutoRuneAmount = 8;
 
-                build.GenRunes(Program.data);
+                build.GenRunes(Program.Data);
 
                 if (build.runes.Any(rs => rs.Length > 10))
                     return;

@@ -20,8 +20,8 @@ namespace RuneApp.InternalServer {
             int StoreNum { get { return mons.Count(m => m.storage); } }
             int RuneNum { get { return runes.Count(r => r.current == null) + crafts.Count(c => c.grindOn == null); } }
 
-            bool HasStoreSpace { get { return StoreNum < Program.data.WizardInfo.UnitDepositorySlots.Number; } }
-            bool HasBoxSpace { get { return BoxNum < Program.data.WizardInfo.UnitSlots.Number; } }
+            bool HasStoreSpace { get { return StoreNum < Program.Data.WizardInfo.UnitDepositorySlots.Number; } }
+            bool HasBoxSpace { get { return BoxNum < Program.Data.WizardInfo.UnitSlots.Number; } }
             bool HasRuneSpace { get { return RuneNum < 600; } }
 
 
@@ -70,14 +70,14 @@ namespace RuneApp.InternalServer {
 
                 string message = "";
 
-                if (Program.data == null)
+                if (Program.Data == null)
                     return return404();
 
                 // make a copy of all the data to mess around with
-                foreach (var m in Program.data.Monsters) {
+                foreach (var m in Program.Data.Monsters) {
                     mons.Add(new MiniMon() { mon = m, storage = m.inStorage, lockedOut = m.OnDefense || m.IsRep || (m.BuildingId != 0 && !m.inStorage) });
                 }
-                foreach (var r in Program.data.Runes) {
+                foreach (var r in Program.Data.Runes) {
                     var mr = new MiniRune() { rune = r };
                     if (r.Assigned != null) {
                         mr.current = mons.FirstOrDefault(mm => mm.Id == r.AssignedId);
@@ -106,8 +106,8 @@ namespace RuneApp.InternalServer {
                     actList.Add(new RuneAction(ActionType.MonIn) {
                         mon = mo.mon,
                         amount = StoreNum,
-                        maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                        message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                        maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                        message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                     });
                     mo.storage = true;
                 }
@@ -120,7 +120,7 @@ namespace RuneApp.InternalServer {
                         break;
 
                     // put the mons we don't need into storage
-                    if (HasStoreSpace && BoxNum >= Program.data.WizardInfo.UnitSlots.Number / 10 * 9) {
+                    if (HasStoreSpace && BoxNum >= Program.Data.WizardInfo.UnitSlots.Number / 10 * 9) {
                         while (mons.Any(m => m.ActionsLeft == 0 && !m.storage && !m.lockedOut)) {
                             if (!HasStoreSpace)
                                 break;
@@ -130,22 +130,22 @@ namespace RuneApp.InternalServer {
                             actList.Add(new RuneAction(ActionType.MonIn) {
                                 mon = mo.mon,
                                 amount = StoreNum,
-                                maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                                message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                                maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                                message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                             });
                             mo.storage = true;
                         }
                     }
                     var monPlist = mons.Where(m => m.ActionsLeft > 0).OrderBy(m => m.Score);
-                    if (BoxNum < Program.data.WizardInfo.UnitSlots.Number / 10 * 7) {
-                        while (BoxNum < Program.data.WizardInfo.UnitSlots.Number / 10 * 9 - 1 && monPlist.Any(m => m.storage)) {
+                    if (BoxNum < Program.Data.WizardInfo.UnitSlots.Number / 10 * 7) {
+                        while (BoxNum < Program.Data.WizardInfo.UnitSlots.Number / 10 * 9 - 1 && monPlist.Any(m => m.storage)) {
                             var qqlist = monPlist.OrderByDescending(m => m.runesCurrent.Sum(r => r?.desired == null ? 0 : 1 / (double)r.desired.Score));
                             var tmon = qqlist.FirstOrDefault(m => m.storage);
                             actList.Add(new RuneAction(ActionType.MonOut) {
                                 mon = tmon.mon,
                                 amount = BoxNum,
-                                maximum = Program.data.WizardInfo.UnitSlots.Number,
-                                message = "Not Good (" + tmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.data.WizardInfo.UnitDepositorySlots.Number
+                                maximum = Program.Data.WizardInfo.UnitSlots.Number,
+                                message = "Not Good (" + tmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.Data.WizardInfo.UnitDepositorySlots.Number
                             });
                             tmon.storage = false;
                         }
@@ -160,8 +160,8 @@ namespace RuneApp.InternalServer {
                         actList.Add(new RuneAction(ActionType.MonOut) {
                             mon = cmon.mon,
                             amount = BoxNum,
-                            maximum = Program.data.WizardInfo.UnitSlots.Number,
-                            message = "Not Good (" + cmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.data.WizardInfo.UnitDepositorySlots.Number
+                            maximum = Program.Data.WizardInfo.UnitSlots.Number,
+                            message = "Not Good (" + cmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.Data.WizardInfo.UnitDepositorySlots.Number
                         });
                         cmon.storage = false;
                     }
@@ -270,8 +270,8 @@ namespace RuneApp.InternalServer {
                     actList.Add(new RuneAction(ActionType.MonIn) {
                         mon = mo.mon,
                         amount = StoreNum,
-                        maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                        message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                        maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                        message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                     });
                     mo.storage = true;
                 }

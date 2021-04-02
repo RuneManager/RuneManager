@@ -456,7 +456,7 @@ namespace RuneApp {
                     build.RunesUseEquipped = Program.Settings.UseEquipped;
                     build.RunesDropHalfSetStat = Program.goFast;
                     build.RunesOnlyFillEmpty = Program.fillRunes;
-                    build.GenRunes(Program.data);
+                    build.GenRunes(Program.Data);
 
                     long num = 0;
                     long total = getTotal();

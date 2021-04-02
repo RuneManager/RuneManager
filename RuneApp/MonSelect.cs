@@ -16,7 +16,7 @@ namespace RuneApp {
             InitializeComponent(); 
    
    
-            foreach (Monster mon in Program.data.Monsters) {
+            foreach (Monster mon in Program.Data.Monsters) {
                 string pri = "";
                 if (mon.priority != 0)
                     pri = mon.priority.ToString();

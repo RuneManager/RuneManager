@@ -65,10 +65,10 @@ function closeBox() {{
 
                 ulong mid = 0;
                 if (ulong.TryParse(uri[0], out mid)) {
-                    if (Program.data == null)
+                    if (Program.Data == null)
                         return returnHtml(null, "missingdata");
                     // got Monster Id
-                    var m = Program.data.GetMonster(mid);
+                    var m = Program.Data.GetMonster(mid);
                     if (m == null)
                         return returnHtml(null, "missingno");
                     return returnHtml(new ServedResult[] {
@@ -93,10 +93,10 @@ http.send(params);
                     }, renderMonster(m));
                 }
                 else {
-                    if (Program.data == null)
+                    if (Program.Data == null)
                         return returnHtml(null, "missingdata");
 
-                    var m = Program.data.GetMonster(uri[0]);
+                    var m = Program.Data.GetMonster(uri[0]);
                     if (m != null)
                         return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "monsters/" + m.Id } } };
                 }
@@ -140,10 +140,10 @@ http.send(params);
             // return all completed loads on top, in progress build, unrun builds, mons with no builds
             ServedResult list = new ServedResult("ul");
             list.contentList = new List<ServedResult>();
-            if (Program.data == null)
+            if (Program.Data == null)
                 return "no";
 
-            var pieces = Program.data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces)
+            var pieces = Program.Data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces)
                 .Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => p.Id);
             foreach (var p in pieces) {
                 pieces[p.Key].Quantity -= Save.getPiecesRequired(p.Value.Id);
@@ -162,14 +162,14 @@ http.send(params);
 
             var bdic = bb.ToDictionary(b => b.MonId);
 
-            var remids = Program.goals.ReservedIds.Where(i => Program.data.GetMonster(i) == null).ToList();
+            var remids = Program.goals.ReservedIds.Where(i => Program.Data.GetMonster(i) == null).ToList();
             foreach (var i in remids) {
                 Program.goals.ReservedIds.Remove(i);
             }
-            var reserved = Program.goals.ReservedIds.Select(id => Program.data.GetMonster(id)).Where(m => m != null).ToList();
+            var reserved = Program.goals.ReservedIds.Select(id => Program.Data.GetMonster(id)).Where(m => m != null).ToList();
             //reserved = reserved.Union(Program.data.Monsters.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).GroupBy(m => m.monsterTypeId).Select(m => m.First())).Distinct();
 
-            var monunNull = Program.data.Monsters.Where(m => m != null);
+            var monunNull = Program.Data.Monsters.Where(m => m != null);
 
 
             var fuss = monunNull.Where(m => !m.Locked && !bdic.ContainsKey(m.Id) && MonsterStat.FindMon(m).isFusion).OrderByDescending(m => m.awakened).ThenByDescending(m => m.Grade).ThenByDescending(m => m.level);

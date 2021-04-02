@@ -32,7 +32,7 @@ namespace RuneApp {
         }
 
         void StatsExcelClear() {
-            if (Program.data?.Runes == null)
+            if (Program.Data?.Runes == null)
                 return;
 
             FileInfo newFile = new FileInfo(@"runestats.xlsx");
@@ -56,7 +56,7 @@ namespace RuneApp {
         }
 
         bool StatsExcelBind(bool passive = false) {
-            if (Program.data?.Runes == null)
+            if (Program.Data?.Runes == null)
                 return false;
 
             if (gotExcelPack)
@@ -617,7 +617,7 @@ namespace RuneApp {
         }
 
         void StatsExcelRunes() {
-            if (Program.data?.Runes == null || excelPack == null)
+            if (Program.Data?.Runes == null || excelPack == null)
                 return;
 
             var ws = excelSheets.FirstOrDefault(w => w.Name == "Runes");
@@ -650,24 +650,24 @@ namespace RuneApp {
 
 
             // calculate the stats
-            foreach (Rune r in Program.data.Runes) {
+            foreach (Rune r in Program.Data.Runes) {
                 double keep = StatsKeepRune(r, colHead);
                 r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             }
 
             int rr = 0;
             // from keepscore 1 to 100
-            foreach (Rune r in Program.data.Runes.Where(r => r.manageStats["In"].EqualTo(0)).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
+            foreach (Rune r in Program.Data.Runes.Where(r => r.manageStats["In"].EqualTo(0)).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
                 rr++;
-                if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.25) {
+                if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.25) {
                     if (!r.manageStats.ContainsKey("Action"))
                         r.manageStats["Action"] = -2;
                 }
-                else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.5) {
+                else if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.5) {
                     if (r.manageStats["Action"].EqualTo(0))
                         r.manageStats["Action"] = -3;
                 }
-                else if (rr < Program.data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.75) {
+                else if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.75) {
                     if (r.manageStats["Action"].EqualTo(0))
                         r.manageStats["Action"] = -1;
                 }
@@ -682,10 +682,10 @@ namespace RuneApp {
                 }
             }
 
-            foreach (Rune r in Program.data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
+            foreach (Rune r in Program.Data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
                 Monster m = null;
                 if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
-                    m = Program.data.GetMonster((ulong)r.manageStats["Mon"]);
+                    m = Program.Data.GetMonster((ulong)r.manageStats["Mon"]);
                 }
 
                 Build b = null;

@@ -20,40 +20,46 @@ namespace RuneApp
                 return LoadSaveResult.FileNotFound;
             }
             LineLog.Debug($"Loading {filename} as builds.");
-
-#if !DEBUG
-            try {
-#endif
             var bstr = File.ReadAllText(filename);
+            return LoadBuildData(bstr);
+        }
 
-            // upgrade:
-            bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
-            bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
-            bstr = bstr.Replace("\"b_def\"", "\"def\"");
-            bstr = bstr.Replace("\"b_spd\"", "\"spd\"");
-            bstr = bstr.Replace("\"b_crate\"", "\"critical_rate\"");
-            bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
-            bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
-            bstr = bstr.Replace("\"b_res\"", "\"res\"");
+        public static LoadSaveResult LoadBuildData(string bstr)
+        {
+#if !DEBUG
+            try 
+#endif
+            {
 
-            var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
-            foreach (var b in bs.OrderBy(b => b.Priority))
-            {
-                builds.Add(b);
-            }
-            foreach (var b in builds.Where(b => b.Type == BuildType.Link))
-            {
-                b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
+                // upgrade:
+                bstr = bstr.Replace("\"b_hp\"", "\"hp\"");
+                bstr = bstr.Replace("\"b_atk\"", "\"atk\"");
+                bstr = bstr.Replace("\"b_def\"", "\"def\"");
+                bstr = bstr.Replace("\"b_spd\"", "\"spd\"");
+                bstr = bstr.Replace("\"b_crate\"", "\"critical_rate\"");
+                bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
+                bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
+                bstr = bstr.Replace("\"b_res\"", "\"res\"");
+
+                var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
+                foreach (var b in bs.OrderBy(b => b.Priority))
+                {
+                    builds.Add(b);
+                }
+                foreach (var b in builds.Where(b => b.Type == BuildType.Link))
+                {
+                    b.LinkBuild = Program.builds.FirstOrDefault(bu => bu.ID == b.LinkId);
+                }
             }
 #if !DEBUG
-            }
+            
             catch (Exception e) {
                 File.WriteAllText("error_build.txt", e.ToString());
                 throw new InvalidOperationException("Error occurred loading Build JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_build.txt");
             }
 #endif
 
-            if (Program.builds.Count > 0 && (Program.data?.Monsters == null))
+            if (Program.builds.Count > 0 && (Program.Data?.Monsters == null))
             {
                 // backup, just in case
                 string destFile = Path.Combine("", string.Format("{0}.backup{1}", "builds", ".json"));
@@ -149,17 +155,17 @@ namespace RuneApp
             {
                 if (bb.Mon != null && bb.Mon.FullName != "Missingno")
                 {
-                    if (!bb.DownloadAwake || (Program.data.GetMonster(bb.Mon.FullName) != null && Program.data.GetMonster(bb.Mon.FullName).FullName != "Missingno"))
+                    if (!bb.DownloadAwake || (Program.Data.GetMonster(bb.Mon.FullName) != null && Program.Data.GetMonster(bb.Mon.FullName).FullName != "Missingno"))
                     {
                         bb.MonName = bb.Mon.FullName;
                         bb.MonId = bb.Mon.Id;
                     }
                     else
                     {
-                        if (Program.data.GetMonster(bb.Mon.Id).FullName != "Missingno")
+                        if (Program.Data.GetMonster(bb.Mon.Id).FullName != "Missingno")
                         {
                             bb.MonId = bb.Mon.Id;
-                            bb.MonName = Program.data.GetMonster(bb.Mon.Id).FullName;
+                            bb.MonName = Program.Data.GetMonster(bb.Mon.Id).FullName;
                         }
                     }
                 }
@@ -226,7 +232,7 @@ namespace RuneApp
                         for (int i = 0; i < 6; i++)
                         {
                             var ids = load.RuneIDs[i];
-                            load.Runes[i] = Program.data.Runes.FirstOrDefault(r => r.Id == ids);
+                            load.Runes[i] = Program.Data.Runes.FirstOrDefault(r => r.Id == ids);
                             if (load.Runes[i] != null)
                             {
                                 load.Runes[i].Locked = true;
@@ -236,7 +242,7 @@ namespace RuneApp
                             }
                         }
                     }
-                    load.Shrines = data.shrines;
+                    load.Shrines = Data.shrines;
                     loads.Add(load);
                 }
                 return LoadSaveResult.Success;
@@ -314,8 +320,8 @@ namespace RuneApp
         public static void SaveData()
         {
             // tag the save as a modified save
-            Program.data.isModified = true;
-            var l = Program.data.Runes.Where(r => r.Locked);
+            Program.Data.isModified = true;
+            var l = Program.Data.Runes.Where(r => r.Locked);
             foreach (var r in l)
                 r.Locked = false;
 
@@ -329,7 +335,7 @@ namespace RuneApp
                 File.Copy(Program.Settings.SaveLocation, fname);
             }
 
-            File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.data, Formatting.Indented));
+            File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.Data, Formatting.Indented));
 
             foreach (var r in l)
                 r.Locked = true;

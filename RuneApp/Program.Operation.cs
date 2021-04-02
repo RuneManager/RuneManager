@@ -9,57 +9,57 @@ namespace RuneApp
 
         public static void AddMonster(Monster mon)
         {
-            if (data.Monsters.Any(m => m.Id == mon.Id))
+            if (Data.Monsters.Any(m => m.Id == mon.Id))
             {
                 UpdateMonster(mon);
                 return;
             }
 
-            if (mon.WizardId == data.WizardInfo.Id)
+            if (mon.WizardId == Data.WizardInfo.Id)
             {
-                data.Monsters.Add(mon);
-                data.isModified = true;
+                Data.Monsters.Add(mon);
+                Data.isModified = true;
                 OnMonsterUpdate?.Invoke(mon, false);
             }
         }
 
         public static void AddRune(Rune rune)
         {
-            if (data.Runes.Any(r => r.Id == rune.Id))
+            if (Data.Runes.Any(r => r.Id == rune.Id))
             {
                 UpdateRune(rune);
                 return;
             }
 
-            if (rune.WizardId == data.WizardInfo.Id)
+            if (rune.WizardId == Data.WizardInfo.Id)
             {
-                data.Runes.Add(rune);
-                data.isModified = true;
+                Data.Runes.Add(rune);
+                Data.isModified = true;
                 OnRuneUpdate?.Invoke(rune, false);
             }
         }
 
         public static void DeleteMonster(Monster mon)
         {
-            var m = data.GetMonster(mon.Id);
-            data.Monsters.Remove(m);
+            var m = Data.GetMonster(mon.Id);
+            Data.Monsters.Remove(m);
 
-            data.isModified = true;
+            Data.isModified = true;
             OnMonsterUpdate?.Invoke(mon, true);
         }
 
         public static void DeleteRune(Rune rune)
         {
-            var r = data.GetRune(rune.Id);
-            data.Runes.Remove(r);
+            var r = Data.GetRune(rune.Id);
+            Data.Runes.Remove(r);
 
-            data.isModified = true;
+            Data.isModified = true;
             OnRuneUpdate?.Invoke(rune, true);
         }
 
         public static void UpdateMonster(Monster mon)
         {
-            var m = data.GetMonster(mon.Id);
+            var m = Data.GetMonster(mon.Id);
             if (m == null)
             {
                 AddMonster(mon);
@@ -89,13 +89,13 @@ namespace RuneApp
                 var rl = mon.Runes.FirstOrDefault(r => r.Slot - 1 == i);
                 if (rl != null)
                 {
-                    var rune = data.GetRune(rl.Id);
+                    var rune = Data.GetRune(rl.Id);
                     if (rune != null)
                     {
                         // if the new rune is assigned to someone else
                         if (rune.AssignedId != m.Id && rune.AssignedId > 0)
                         {
-                            var om = data.GetMonster(rune.AssignedId);
+                            var om = Data.GetMonster(rune.AssignedId);
                             var rm = om?.RemoveRune(rune.Slot);
                             if (rm != null)
                             {
@@ -129,7 +129,7 @@ namespace RuneApp
                 else
                 {
                     // pull a rune off, if that don't work find anyrune who was pointing at my slot
-                    var rm = m.RemoveRune(i + 1) ?? data.Runes.FirstOrDefault(r => r.AssignedId == m.Id && r.Slot - 1 == i);
+                    var rm = m.RemoveRune(i + 1) ?? Data.Runes.FirstOrDefault(r => r.AssignedId == m.Id && r.Slot - 1 == i);
                     if (rm != null)
                     {
                         rm.Assigned = null;
@@ -139,13 +139,13 @@ namespace RuneApp
                 }
             }
 
-            data.isModified = true;
+            Data.isModified = true;
             OnMonsterUpdate?.Invoke(m, false);
         }
 
         public static void UpdateRune(Rune rune, bool keepLocked = true, Monster newAssigned = null)
         {
-            var r = data.GetRune(rune.Id);
+            var r = Data.GetRune(rune.Id);
             if (r == null)
                 return;
             // TODO: modify stats and trigger callbacks
@@ -153,7 +153,7 @@ namespace RuneApp
 
             //r.Assigned?.Current.AddRune(r);
 
-            data.isModified = true;
+            Data.isModified = true;
             OnRuneUpdate?.Invoke(r, false);
         }
 

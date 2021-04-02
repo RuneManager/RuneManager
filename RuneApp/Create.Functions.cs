@@ -875,7 +875,7 @@ namespace RuneApp {
                 build.RunesDropHalfSetStat = Program.goFast;
                 build.RunesOnlyFillEmpty = Program.fillRunes;
                 build.BuildSaveStats = false;
-                build.GenRunes(Program.data);
+                build.GenRunes(Program.Data);
             });
 
             // figure stuff out
