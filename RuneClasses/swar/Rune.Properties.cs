@@ -146,7 +146,7 @@ namespace RuneOptim.swar {
             return count;
         }
 
-        public static AttributeCategory getSetType(this Rune rune)
+        public static AttributeCategory GetSetType(this Rune rune)
         {
             var neutral = new RuneSet[] { RuneSet.Violent, RuneSet.Swift, RuneSet.Focus, RuneSet.Nemesis };
             if (new RuneSet[] { RuneSet.Fatal, RuneSet.Blade, RuneSet.Rage, RuneSet.Vampire, RuneSet.Revenge }.Contains(rune.Set)) // o
@@ -169,7 +169,7 @@ namespace RuneOptim.swar {
         public static double ComputeRating(this Rune rune)
         {
             double r = 0;
-            var type = rune.getSetType();
+            var type = rune.GetSetType();
 
             // for each sub (if flat = 0, null = 0.3, else 1)
 
@@ -478,7 +478,7 @@ namespace RuneOptim.swar {
 
         #region stats
 
-        public readonly static Dictionary<RuneSet, string> setUnicode = new Dictionary<RuneSet, string>() {
+        public readonly static Dictionary<RuneSet, string> SetUnicode = new Dictionary<RuneSet, string>() {
             { RuneSet.Blade, "ᚬ"},
             { RuneSet.Despair, "ᛃ" },
             { RuneSet.Violent, "ᛒ" },

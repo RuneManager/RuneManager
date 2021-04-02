@@ -131,11 +131,11 @@ namespace RuneOptim.BuildProcessing {
 
                 if (BuildSaveStats) {
                     foreach (Rune r in rsGlobal) {
-                        r.manageStats.AddOrUpdate("currentBuildPoints", 0, (k, v) => 0);
+                        r.ManageStats.AddOrUpdate("currentBuildPoints", 0, (k, v) => 0);
                         if (!BuildGoodRunes)
-                            r.manageStats.AddOrUpdate("Set", 1, (s, d) => { return d + 1; });
+                            r.ManageStats.AddOrUpdate("Set", 1, (s, d) => { return d + 1; });
                         else
-                            r.manageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
+                            r.ManageStats.AddOrUpdate("Set", 0.001, (s, d) => { return d + 0.001; });
                     }
                 }
 
@@ -157,9 +157,9 @@ namespace RuneOptim.BuildProcessing {
                     if (BuildSaveStats) {
                         foreach (Rune r in Runes[i]) {
                             if (!BuildGoodRunes)
-                                r.manageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
+                                r.ManageStats.AddOrUpdate("TypeFilt", 1, (s, d) => { return d + 1; });
                             else
-                                r.manageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
+                                r.ManageStats.AddOrUpdate("TypeFilt", 0.001, (s, d) => { return d + 0.001; });
                         }
                         // cull here instead
                         if (!RunesUseEquipped || RunesOnlyFillEmpty)
@@ -219,7 +219,7 @@ namespace RuneOptim.BuildProcessing {
                             // default fail OR
                             Predicate<Rune> slotTest = MakeRuneScoring(i + 1, slotFakes[i] ?? 0, slotPred[i]);
 
-                            Runes[i] = Runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.manageStats.GetOrAdd("testScore", 0)).ToArray();
+                            Runes[i] = Runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.ManageStats.GetOrAdd("testScore", 0)).ToArray();
                             var filt = LoadFilters(i + 1);
                             if (filt.Count != null || filt.Type == FilterType.SumN) {
 
@@ -249,9 +249,9 @@ namespace RuneOptim.BuildProcessing {
                             if (BuildSaveStats) {
                                 foreach (Rune r in Runes[i]) {
                                     if (!BuildGoodRunes)
-                                        r.manageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
+                                        r.ManageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
                                     else
-                                        r.manageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
+                                        r.ManageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
                                 }
                             }
                         }
@@ -266,9 +266,9 @@ namespace RuneOptim.BuildProcessing {
                         foreach (var rsg in runesBySet) {
                             var runesByMain = rsg.GroupBy(r => r.Main.Type);
                             foreach (var rmg in runesByMain) {
-                                rmm = rmg.Max(r => r.manageStats.GetOrAdd("testScore", 0)) * 0.6;
+                                rmm = rmg.Max(r => r.ManageStats.GetOrAdd("testScore", 0)) * 0.6;
                                 if (rmm > 0) {
-                                    outRunes.AddRange(rmg.Where(r => r.manageStats.GetOrAdd("testScore", 0) > rmm));
+                                    outRunes.AddRange(rmg.Where(r => r.ManageStats.GetOrAdd("testScore", 0) > rmm));
                                 }
                             }
                         }
@@ -893,15 +893,15 @@ namespace RuneOptim.BuildProcessing {
                                             if (BuildSaveStats) {
                                                 foreach (Rune r in test.Current.Runes) {
                                                     if (!BuildGoodRunes) {
-                                                        r.manageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
+                                                        r.ManageStats.AddOrUpdate("LoadFilt", 1, (s, d) => { return d + 1; });
                                                         RuneUsage.runesGood.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                                                        r.manageStats.AddOrUpdate("currentBuildPoints", curScore, (k, v) => Math.Max(v, curScore));
-                                                        r.manageStats.AddOrUpdate("cbp" + ID, curScore, (k, v) => Math.Max(v, curScore));
+                                                        r.ManageStats.AddOrUpdate("currentBuildPoints", curScore, (k, v) => Math.Max(v, curScore));
+                                                        r.ManageStats.AddOrUpdate("cbp" + ID, curScore, (k, v) => Math.Max(v, curScore));
                                                     }
                                                     else {
-                                                        r.manageStats.AddOrUpdate("LoadFilt", 0.001, (s, d) => { return d + 0.001; });
+                                                        r.ManageStats.AddOrUpdate("LoadFilt", 0.001, (s, d) => { return d + 0.001; });
                                                         RuneUsage.runesOkay.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                                                        r.manageStats.AddOrUpdate("cbp" + ID, curScore, (k, v) => Math.Max(v, curScore * 0.9));
+                                                        r.ManageStats.AddOrUpdate("cbp" + ID, curScore, (k, v) => Math.Max(v, curScore * 0.9));
                                                     }
                                                 }
                                             }
@@ -1007,14 +1007,14 @@ namespace RuneOptim.BuildProcessing {
                     foreach (var ra in Runes) {
                         foreach (var r in ra) {
                             if (!BuildGoodRunes) {
-                                r.manageStats.AddOrUpdate("buildScoreTotal", CalcScore(Best), (k, v) => v + CalcScore(Best));
+                                r.ManageStats.AddOrUpdate("buildScoreTotal", CalcScore(Best), (k, v) => v + CalcScore(Best));
                                 RuneUsage.runesUsed.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                                r.manageStats.AddOrUpdate("LoadGen", Total, (s, d) => { return d + Total; });
+                                r.ManageStats.AddOrUpdate("LoadGen", Total, (s, d) => { return d + Total; });
 
                             }
                             else {
                                 RuneUsage.runesBetter.AddOrUpdate(r, (byte)r.Slot, (key, ov) => (byte)r.Slot);
-                                r.manageStats.AddOrUpdate("LoadGen", Total * 0.001, (s, d) => { return d + Total * 0.001; });
+                                r.ManageStats.AddOrUpdate("LoadGen", Total * 0.001, (s, d) => { return d + Total * 0.001; });
                             }
                         }
                     }
@@ -1074,9 +1074,9 @@ namespace RuneOptim.BuildProcessing {
                             if (bb != Best)
                                 val *= 0.1;
                             else
-                                r.manageStats.AddOrUpdate("In", BuildGoodRunes ? 2 : 1, (s, e) => BuildGoodRunes ? 2 : 1);
+                                r.ManageStats.AddOrUpdate("In", BuildGoodRunes ? 2 : 1, (s, e) => BuildGoodRunes ? 2 : 1);
 
-                            r.manageStats.AddOrUpdate("buildScoreIn", val, (k, v) => v + val);
+                            r.ManageStats.AddOrUpdate("buildScoreIn", val, (k, v) => v + val);
                         }
                     }
                     for (int i = 0; i < 6; i++) {
@@ -1085,9 +1085,9 @@ namespace RuneOptim.BuildProcessing {
                     }
                     foreach (var ra in Runes) {
                         foreach (var r in ra) {
-                            var cbp = r.manageStats.GetOrAdd("currentBuildPoints", 0);
+                            var cbp = r.ManageStats.GetOrAdd("currentBuildPoints", 0);
                             if (cbp / Best.Score < 1)
-                                r.manageStats.AddOrUpdate("bestBuildPercent", cbp / Best.Score, (k, v) => Math.Max(v, cbp / Best.Score));
+                                r.ManageStats.AddOrUpdate("bestBuildPercent", cbp / Best.Score, (k, v) => Math.Max(v, cbp / Best.Score));
                         }
                     }
                 }

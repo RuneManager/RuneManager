@@ -760,7 +760,7 @@ namespace RuneApp {
                 List<Rune> lrunes = new List<Rune>();
                 foreach (var g in mons) {
                     foreach (var r in g.Current.Runes) {
-                        r.manageStats.AddOrUpdate("besttestscore", g.Score, (k, v) => v < g.Score ? g.Score : v);
+                        r.ManageStats.AddOrUpdate("besttestscore", g.Score, (k, v) => v < g.Score ? g.Score : v);
 
                         if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
                             lrunes.Add(r);
@@ -769,7 +769,7 @@ namespace RuneApp {
 
                 using (var qq = new RuneSelect()) {
                     qq.runes = lrunes;
-                    qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
+                    qq.sortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
                     qq.runeStatKey = "besttestscore";
                     qq.ShowDialog();
                 }

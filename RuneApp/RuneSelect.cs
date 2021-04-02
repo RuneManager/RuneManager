@@ -51,7 +51,7 @@ namespace RuneApp {
                     Rune.StringIt(rune.Main.Type, true),
                     rune.Main.Value.ToString(),
                     points.ToString(),
-                    runeStatKey == null ? null : rune.manageStats.GetOrAdd(runeStatKey, 0).ToString()
+                    runeStatKey == null ? null : rune.ManageStats.GetOrAdd(runeStatKey, 0).ToString()
                 });
                 if (build != null)
                     item.ForeColor = Color.Gray;

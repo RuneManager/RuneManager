@@ -92,19 +92,19 @@ function hackLots(prop, num, on) {
                 if (r == null)
                     return 0;
                 Monster m = null;
-                if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
-                    m = Program.Data.GetMonster((ulong)r.manageStats["Mon"]);
+                if (!r.ManageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
+                    m = Program.Data.GetMonster((ulong)r.ManageStats["Mon"]);
                 }
 
                 Build b = null;
                 if (m != null) {
                     b = Program.Builds.FirstOrDefault(bu => bu.Mon == m);
                 }
-                double ret = r.manageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
+                double ret = r.ManageStats?.GetOrAdd("bestBuildPercent", 0) ?? 0;
 
                 ret *= r.BarionEfficiency;
                 ret /= (b?.Priority ?? 0 + 100);
-                ret *= 1 + Math.Sqrt(r.manageStats.GetOrAdd("LoadFilt", 0) / (r.manageStats.GetOrAdd("LoadGen", 0) + 1000));
+                ret *= 1 + Math.Sqrt(r.ManageStats.GetOrAdd("LoadFilt", 0) / (r.ManageStats.GetOrAdd("LoadGen", 0) + 1000));
                 ret *= 10000;
 
                 return ret;
@@ -127,7 +127,7 @@ function hackLots(prop, num, on) {
                             },
                             contentList = { "+" }
                         },
-                        " " + " " + r.Main.Value + " " + r.Main.Type + " +" + r.Level + " (" + r.manageStats?.GetOrAdd("bestBuildPercent", 0).ToString("0.##") + ")"
+                        " " + " " + r.Main.Value + " " + r.Main.Type + " +" + r.Level + " (" + r.ManageStats?.GetOrAdd("bestBuildPercent", 0).ToString("0.##") + ")"
                     }
                 };
                 // colour name base on level

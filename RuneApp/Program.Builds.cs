@@ -371,8 +371,8 @@ namespace RuneApp
                     ClearLoadouts();
                     foreach (var r in Program.Data.Runes)
                     {
-                        r.manageStats.AddOrUpdate("buildScoreIn", 0, (k, v) => 0);
-                        r.manageStats.AddOrUpdate("buildScoreTotal", 0, (k, v) => 0);
+                        r.ManageStats.AddOrUpdate("buildScoreIn", 0, (k, v) => 0);
+                        r.ManageStats.AddOrUpdate("buildScoreTotal", 0, (k, v) => 0);
                     }
                 }
 

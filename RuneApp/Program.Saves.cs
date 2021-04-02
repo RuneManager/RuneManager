@@ -236,9 +236,9 @@ namespace RuneApp
                             if (load.Runes[i] != null)
                             {
                                 load.Runes[i].Locked = true;
-                                if (load.manageStats != null)
-                                    foreach (var ms in load.manageStats[i])
-                                        load.Runes[i].manageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+                                if (load.HasManageStats)
+                                    foreach (var ms in load.ManageStats[i])
+                                        load.Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
                             }
                         }
                     }

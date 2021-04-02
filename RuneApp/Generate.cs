@@ -328,7 +328,7 @@ namespace RuneApp {
             if (!building) {
                 using (var qq = new RuneSelect()) {
                     qq.runes = build.GetPowerupRunes();
-                    qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
+                    qq.sortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
                     qq.runeStatKey = "besttestscore";
                     qq.ShowDialog();
                 }

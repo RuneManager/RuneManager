@@ -513,7 +513,7 @@ namespace RuneApp {
                 ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
                 if (load?.Runes != null) {
                     double d;
-                    r.manageStats.TryGetValue("cbp" + build.ID, out d);
+                    r.ManageStats.TryGetValue("cbp" + build.ID, out d);
                     ws.Cells[row, col].Value = d;
                     if (load.Runes.Contains(r)) {
                         //ws.Cells[row, col].Value = "Best";
@@ -652,40 +652,40 @@ namespace RuneApp {
             // calculate the stats
             foreach (Rune r in Program.Data.Runes) {
                 double keep = StatsKeepRune(r, colHead);
-                r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+                r.ManageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             }
 
             int rr = 0;
             // from keepscore 1 to 100
-            foreach (Rune r in Program.Data.Runes.Where(r => r.manageStats["In"].EqualTo(0)).OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
+            foreach (Rune r in Program.Data.Runes.Where(r => r.ManageStats["In"].EqualTo(0)).OrderBy(r => r.ManageStats.GetOrAdd("Keep", 0))) {
                 rr++;
-                if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.25) {
-                    if (!r.manageStats.ContainsKey("Action"))
-                        r.manageStats["Action"] = -2;
+                if (rr < Program.Data.Runes.Count(ru => ru.ManageStats["In"].EqualTo(0)) * 0.25) {
+                    if (!r.ManageStats.ContainsKey("Action"))
+                        r.ManageStats["Action"] = -2;
                 }
-                else if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.5) {
-                    if (r.manageStats["Action"].EqualTo(0))
-                        r.manageStats["Action"] = -3;
+                else if (rr < Program.Data.Runes.Count(ru => ru.ManageStats["In"].EqualTo(0)) * 0.5) {
+                    if (r.ManageStats["Action"].EqualTo(0))
+                        r.ManageStats["Action"] = -3;
                 }
-                else if (rr < Program.Data.Runes.Count(ru => ru.manageStats["In"].EqualTo(0)) * 0.75) {
-                    if (r.manageStats["Action"].EqualTo(0))
-                        r.manageStats["Action"] = -1;
+                else if (rr < Program.Data.Runes.Count(ru => ru.ManageStats["In"].EqualTo(0)) * 0.75) {
+                    if (r.ManageStats["Action"].EqualTo(0))
+                        r.ManageStats["Action"] = -1;
                 }
                 else {
-                    r.manageStats["Action"] = -1;
+                    r.ManageStats["Action"] = -1;
                     if (r.Level < 6)
-                        r.manageStats["Action"] = 6;
+                        r.ManageStats["Action"] = 6;
                     else if (r.Level < 9)
-                        r.manageStats["Action"] = 9;
+                        r.ManageStats["Action"] = 9;
                     else if (r.Level < 12)
-                        r.manageStats["Action"] = 12;
+                        r.ManageStats["Action"] = 12;
                 }
             }
 
-            foreach (Rune r in Program.Data.Runes.OrderBy(r => r.manageStats.GetOrAdd("Keep", 0))) {
+            foreach (Rune r in Program.Data.Runes.OrderBy(r => r.ManageStats.GetOrAdd("Keep", 0))) {
                 Monster m = null;
-                if (!r.manageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
-                    m = Program.Data.GetMonster((ulong)r.manageStats["Mon"]);
+                if (!r.ManageStats.GetOrAdd("Mon", 0).EqualTo(0)) {
+                    m = Program.Data.GetMonster((ulong)r.ManageStats["Mon"]);
                 }
 
                 Build b = null;
@@ -696,12 +696,12 @@ namespace RuneApp {
                 for (col = 1; col <= colHead.Count; col++) {
                     switch (colHead[col - 1]) {
                         case "Id":
-                            if (r._extra > 0) {
+                            if (r.Extra > 0) {
                                 Color color = Color.FromArgb(255, 190, 190, 190);
-                                if (r._extra == 5) color = Color.FromArgb(255, 255, 153, 0);
-                                else if (r._extra == 4) color = Color.FromArgb(255, 204, 0, 153);
-                                else if (r._extra == 3) color = Color.FromArgb(255, 102, 205, 255);
-                                else if (r._extra == 2) color = Color.FromArgb(255, 146, 208, 80);
+                                if (r.Extra == 5) color = Color.FromArgb(255, 255, 153, 0);
+                                else if (r.Extra == 4) color = Color.FromArgb(255, 204, 0, 153);
+                                else if (r.Extra == 3) color = Color.FromArgb(255, 102, 205, 255);
+                                else if (r.Extra == 2) color = Color.FromArgb(255, 146, 208, 80);
                                 ws.Cells[row, col].Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 ws.Cells[row, col].Style.Fill.BackgroundColor.SetColor(color);
                             }
@@ -714,7 +714,7 @@ namespace RuneApp {
                             ws.Cells[row, col].Value = r.Rarity;
                             break;
                         case "Orig":
-                            ws.Cells[row, col].Value = r._extra;
+                            ws.Cells[row, col].Value = r.Extra;
                             break;
                         case "Set":
                             if (r.Rarity > 0) {
@@ -741,28 +741,28 @@ namespace RuneApp {
                             ws.Cells[row, col].Value = r.SellValue;
                             break;
                         case "Select":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("Set", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("Set", 0);
                             break;
                         case "Rune":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("RuneFilt", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("RuneFilt", 0);
                             break;
                         case "Type":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("TypeFilt", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("TypeFilt", 0);
                             break;
                         case "Load":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("LoadFilt", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("LoadFilt", 0);
                             break;
                         case "Gen":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("LoadGen", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("LoadGen", 0);
                             break;
                         case "BuildG":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("buildScoreIn", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("buildScoreIn", 0);
                             break;
                         case "BuildT":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("buildScoreTotal", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("buildScoreTotal", 0);
                             break;
                         case "BuildPercent":
-                            ws.Cells[row, col].Value = r.manageStats.GetOrAdd("bestBuildPercent", 0);
+                            ws.Cells[row, col].Value = r.ManageStats.GetOrAdd("bestBuildPercent", 0);
                             break;
                         case "Eff":
                             ws.Cells[row, col].Style.Numberformat.Format = "0.00%";
@@ -777,7 +777,7 @@ namespace RuneApp {
                             ws.Cells[row, col].Value = r.VivoPrestoModel;
                             break;
                         case "Used":
-                            switch ((int)r.manageStats.GetOrAdd("In", 0)) {
+                            switch ((int)r.ManageStats.GetOrAdd("In", 0)) {
                                 case 1:
                                     ws.Cells[row, col].Value = "Best";
                                     break;
@@ -816,22 +816,22 @@ namespace RuneApp {
                             ws.Cells[row, col].Formula = fstr;
                             break;
                         case "Action":
-                            if (r.manageStats.GetOrAdd("Action", 0).EqualTo(0)) {
+                            if (r.ManageStats.GetOrAdd("Action", 0).EqualTo(0)) {
                                 if (r.ScoreATK() < 0.5
                                     && r.ScoreHP() < 0.5
                                     && r.ScoreRune() < 0.5
                                     && r.BarionEfficiency < 0.5
-                                    && r.manageStats.GetOrAdd("Keep", 0) < 40) {
+                                    && r.ManageStats.GetOrAdd("Keep", 0) < 40) {
                                     ws.Cells[row, col].Value = "Sell";
                                 }
                             }
-                            else if (r.manageStats.GetOrAdd("Action", 0) > 0)
-                                ws.Cells[row, col].Value = "To " + r.manageStats.GetOrAdd("Action", 0);
-                            else if (r.manageStats.GetOrAdd("Action", 0).EqualTo(-1))
+                            else if (r.ManageStats.GetOrAdd("Action", 0) > 0)
+                                ws.Cells[row, col].Value = "To " + r.ManageStats.GetOrAdd("Action", 0);
+                            else if (r.ManageStats.GetOrAdd("Action", 0).EqualTo(-1))
                                 ws.Cells[row, col].Value = "Keep";
-                            else if (r.manageStats.GetOrAdd("Action", 0).EqualTo(-2))
+                            else if (r.ManageStats.GetOrAdd("Action", 0).EqualTo(-2))
                                 ws.Cells[row, col].Value = "Sell";
-                            else if (r.manageStats.GetOrAdd("Action", 0).EqualTo(-3))
+                            else if (r.ManageStats.GetOrAdd("Action", 0).EqualTo(-3))
                                 ws.Cells[row, col].Value = "Consider";
                             break;
                         case "Main":
@@ -1052,38 +1052,38 @@ namespace RuneApp {
             keep += Math.Pow(r.Grade, 1.4);
             formula += "+power(" + (heads.Contains("Grade") ? "RuneTable[[#This Row],[Grade]]" : r.Grade.ToString()) + ",1.4)";
 
-            r.manageStats["Action"] = 0;
-            if (!r.manageStats.ContainsKey("In"))
-                r.manageStats["In"] = 0;
+            r.ManageStats["Action"] = 0;
+            if (!r.ManageStats.ContainsKey("In"))
+                r.ManageStats["In"] = 0;
 
-            r.manageStats.GetOrAdd("Mon", 0);
-            if (r.manageStats["In"] > 0) {
+            r.ManageStats.GetOrAdd("Mon", 0);
+            if (r.ManageStats["In"] > 0) {
                 var b = Program.Builds.FirstOrDefault(bu => bu.Best != null && bu.Best.Current.Runes.Contains(r));
-                r.manageStats["Action"] = -1;
+                r.ManageStats["Action"] = -1;
                 if (b == null) {
-                    r.manageStats["Priority"] = 2;
+                    r.ManageStats["Priority"] = 2;
                     if (r.Slot % 2 == 0 && r.Level < 15)
-                        r.manageStats["Action"] = 15;
+                        r.ManageStats["Action"] = 15;
                     if (r.Slot % 2 == 1 && r.Level < 12)
-                        r.manageStats["Action"] = 12;
+                        r.ManageStats["Action"] = 12;
                 }
                 else {
-                    r.manageStats["Mon"] = b.Mon.Id;
-                    r.manageStats["Priority"] = b.Priority / (double)Program.Builds.Max(bu => bu.Priority);
+                    r.ManageStats["Mon"] = b.Mon.Id;
+                    r.ManageStats["Priority"] = b.Priority / (double)Program.Builds.Max(bu => bu.Priority);
                     int p = b.GetFakeLevel(r);
                     if (r.Level < p)
-                        r.manageStats["Action"] = p;
+                        r.ManageStats["Action"] = p;
                 }
                 keep += 10;
             }
-            formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]]<>\"No\",10,0)" : ((r.manageStats["In"] > 0) ? "+10" : "");
+            formula += heads.Contains("Used") ? "+if(RuneTable[[#This Row],[Used]]<>\"No\",10,0)" : ((r.ManageStats["In"] > 0) ? "+10" : "");
 
             // TODO: skip upgrading if rune is trash
 
             if (r.Rarity > Math.Floor(r.Level / (double)3)) {
                 keep += Math.Pow(r.Rarity - Math.Min(4, Math.Floor(r.Level / (double)3)), 1.1) * 6;
                 if (r.Rarity > Math.Floor(r.Level / (double)3) + 1)
-                    r.manageStats["Action"] = r.Rarity * 3;
+                    r.ManageStats["Action"] = r.Rarity * 3;
             }
             /**/
             formula += "+if(" + (heads.Contains("Rarity") ? "RuneTable[[#This Row],[Rarity]]" : r.Rarity.ToString())
@@ -1108,24 +1108,24 @@ namespace RuneApp {
             keep += r.Accuracy[0] * 0.4;
             formula += "+" + (heads.Contains("ACC") ? "RuneTable[[#This Row],[ACC]]" : r.Accuracy[0].ToString()) + "*0.4";
 
-            keep += (Math.Pow(1.004, r.manageStats.GetOrAdd("Set", 0)) - 1) * 10;
-            formula += "+(power(1.004, " + (heads.Contains("Select") ? "RuneTable[[#This Row],[Select]]" : r.manageStats.GetOrAdd("Set", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
+            keep += (Math.Pow(1.004, r.ManageStats.GetOrAdd("Set", 0)) - 1) * 10;
+            formula += "+(power(1.004, " + (heads.Contains("Select") ? "RuneTable[[#This Row],[Select]]" : r.ManageStats.GetOrAdd("Set", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
 
-            keep += (Math.Pow(1.007, r.manageStats.GetOrAdd("RuneFilt", 0)) - 1) * 10;
-            formula += "+(power(1.007, " + (heads.Contains("Rune") ? "RuneTable[[#This Row],[Rune]]" : r.manageStats.GetOrAdd("RuneFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
+            keep += (Math.Pow(1.007, r.ManageStats.GetOrAdd("RuneFilt", 0)) - 1) * 10;
+            formula += "+(power(1.007, " + (heads.Contains("Rune") ? "RuneTable[[#This Row],[Rune]]" : r.ManageStats.GetOrAdd("RuneFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
 
-            keep += (Math.Pow(1.01, r.manageStats.GetOrAdd("TypeFilt", 0)) - 1) * 10;
-            formula += "+(power(1.01, " + (heads.Contains("Type") ? "RuneTable[[#This Row],[Type]]" : r.manageStats.GetOrAdd("TypeFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
+            keep += (Math.Pow(1.01, r.ManageStats.GetOrAdd("TypeFilt", 0)) - 1) * 10;
+            formula += "+(power(1.01, " + (heads.Contains("Type") ? "RuneTable[[#This Row],[Type]]" : r.ManageStats.GetOrAdd("TypeFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ")-1)*10";
 
-            if (r.manageStats.GetOrAdd("LoadGen", 0) > 0) {
-                keep += Math.Pow(r.manageStats.GetOrAdd("LoadFilt", 0) / r.manageStats["LoadGen"], 1.1) * 10;
+            if (r.ManageStats.GetOrAdd("LoadGen", 0) > 0) {
+                keep += Math.Pow(r.ManageStats.GetOrAdd("LoadFilt", 0) / r.ManageStats["LoadGen"], 1.1) * 10;
             }
             /**/
-            formula += "+if(" + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ">0,power("
-            + (heads.Contains("Load") ? "RuneTable[[#This Row],[Load]]" : r.manageStats.GetOrAdd("LoadFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + "/"
-            + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.manageStats["LoadGen"].ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ",1.1)*10,0)";//*/
+            formula += "+if(" + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.ManageStats["LoadGen"].ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ">0,power("
+            + (heads.Contains("Load") ? "RuneTable[[#This Row],[Load]]" : r.ManageStats.GetOrAdd("LoadFilt", 0).ToString(System.Globalization.CultureInfo.CurrentUICulture)) + "/"
+            + (heads.Contains("Gen") ? "RuneTable[[#This Row],[Gen]]" : r.ManageStats["LoadGen"].ToString(System.Globalization.CultureInfo.CurrentUICulture)) + ",1.1)*10,0)";//*/
 
-            r.manageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
+            r.ManageStats.AddOrUpdate("Keep", keep, (s, d) => keep);
             return keep;
         }
 

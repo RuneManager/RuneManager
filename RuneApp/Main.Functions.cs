@@ -87,8 +87,8 @@ namespace RuneApp {
                 nli.SubItems.Add("");
 
             nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
-            if (RuneProperties.setUnicode.ContainsKey(rune.Set))
-                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, RuneProperties.setUnicode[rune.Set]);
+            if (RuneProperties.SetUnicode.ContainsKey(rune.Set))
+                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, RuneProperties.SetUnicode[rune.Set]);
             nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
             nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));

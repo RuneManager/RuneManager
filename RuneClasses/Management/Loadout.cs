@@ -105,7 +105,7 @@ namespace RuneOptim.Management {
         public ConcurrentDictionary<string, double>[] ManageStats {
             get {
                 if (runes.All(r => r != null))
-                    return runes.Select(r => r.manageStats).ToArray();
+                    return runes.Select(r => r.ManageStats).ToArray();
                 return null;
             }
             set {

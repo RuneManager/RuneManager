@@ -63,10 +63,10 @@ namespace RuneOptim.swar {
         public int Level;
 
         [JsonProperty("rank")]
-        public int _rank;
+        public int Rank;
 
         [JsonProperty("locked")]
-        protected bool locked;
+        private bool locked;
 
         [JsonIgnore]
         public bool Locked {
@@ -84,7 +84,7 @@ namespace RuneOptim.swar {
         public Rune EnchantOf;
 
         [JsonProperty("occupied_type")]
-        public int _occupiedType;
+        public int OccupiedType;
 
         [JsonProperty("sell_value")]
         public int SellValue;
@@ -105,7 +105,7 @@ namespace RuneOptim.swar {
         public ulong WizardId = 0;
 
         [JsonProperty("extra")]
-        public int _extra;
+        public int Extra;
 
         #endregion
 
@@ -167,10 +167,10 @@ namespace RuneOptim.swar {
             rhs.Grade = Grade;
             rhs.Slot = Slot;
             rhs.Level = Level;
-            rhs._rank = _rank;
+            rhs.Rank = Rank;
             if (!keepLocked)
                 rhs.Locked = Locked;
-            rhs._occupiedType = _occupiedType;
+            rhs.OccupiedType = OccupiedType;
             rhs.SellValue = SellValue;
 
             Main.CopyTo(ref rhs.Main);

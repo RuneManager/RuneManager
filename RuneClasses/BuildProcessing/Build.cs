@@ -1587,12 +1587,12 @@ namespace RuneOptim.BuildProcessing {
                 return new Rune[] { };
             double max = Loads.Max(g => g.Score);
             foreach (var r in Loads.SelectMany(m => m.Current.Runes)) {
-                r.manageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
+                r.ManageStats.AddOrUpdate("besttestscore", 0, (k, v) => 0);
             }
 
             foreach (var g in Loads) {
                 foreach (var r in g.Current.Runes) {
-                    r.manageStats.AddOrUpdate("besttestscore", g.Score / max, (k, v) => v < g.Score / max ? g.Score / max : v);
+                    r.ManageStats.AddOrUpdate("besttestscore", g.Score / max, (k, v) => v < g.Score / max ? g.Score / max : v);
                 }
             }
 
