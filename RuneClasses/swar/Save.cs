@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace RuneOptim.swar {
+namespace RuneOptim.swar
+{
+
     // Deserializes the .json into this
     public class Save {
         [JsonProperty("unit_list")]
@@ -40,6 +42,9 @@ namespace RuneOptim.swar {
 
         [JsonProperty("wizard_info")]
         public WizardInfo WizardInfo;
+
+        [JsonProperty("guild")]
+        public Guild Guild;
 
         // builds from rune optimizer don't match mine.
         // Don't care right now, perhaps a fuzzy-import later?

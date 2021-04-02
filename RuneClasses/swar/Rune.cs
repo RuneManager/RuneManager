@@ -15,7 +15,7 @@ namespace RuneOptim.swar {
 
             var i = Enum.GetValues(typeof(RuneSet)).OfType<RuneSet>().ToList().IndexOf(date) - 2;
 
-            writer.WriteValue(i.ToString());
+            writer.WriteValue((int)i);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
