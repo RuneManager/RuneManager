@@ -331,7 +331,7 @@ namespace RuneOptim.swar {
                         continue;
                     var ss = SkillDefs[si.SkillId ?? 0];
                     var df = JsonConvert.DeserializeObject<MonsterDefinitions.MultiplierGroup>(ss.MultiplierFormulaRaw, new MonsterDefinitions.MultiplierGroupConverter());
-                    if (df.props.Count > 0) {
+                    if (df.Props.Count > 0) {
                         var levels = ss.LevelProgressDescription.Split('\n').Take(skilllist[i].Level - 1 ?? 0);
                         SkillupMax[i] = ss.LevelProgressDescription.Split('\n').Length;
                         var ct = levels.Count(s => s == "Cooltime Turn -1");
@@ -345,12 +345,12 @@ namespace RuneOptim.swar {
                         SkillsFunction[i] = Expression.Lambda<Func<Stats, double>>(df.AsExpression(StatType), StatType).Compile();
 
                         if (i != 0) {
-                            df.props.Last().op = MonsterDefinitions.MultiplierOperator.Div;
-                            df.props.Add(new MonsterDefinitions.MultiplierValue(cooltime));
-                            if (average.props.Any())
-                                average.props.Last().op = MonsterDefinitions.MultiplierOperator.Add;
+                            df.Props.Last().Op = MonsterDefinitions.MultiplierOperator.Div;
+                            df.Props.Add(new MonsterDefinitions.MultiplierValue(cooltime));
+                            if (average.Props.Any())
+                                average.Props.Last().Op = MonsterDefinitions.MultiplierOperator.Add;
                         }
-                        average.props.Add(new MonsterDefinitions.MultiplierValue(df));
+                        average.Props.Add(new MonsterDefinitions.MultiplierValue(df));
                     }
                 }
                 DamageMultiplier = average;

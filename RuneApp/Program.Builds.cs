@@ -44,7 +44,7 @@ namespace RuneApp
                 build.BuildGenerate = Program.Settings.TestGen;
                 build.BuildTake = Program.Settings.TestShow;
                 build.BuildTimeout = Program.Settings.TestTime;
-                build.Shrines = Program.Data.shrines;
+                build.Shrines = Program.Data.Shrines;
                 build.BuildDumpBads = false;
                 build.BuildSaveStats = false;
                 build.BuildGoodRunes = false;
@@ -105,7 +105,7 @@ namespace RuneApp
             {
                 BuildSaveStats = saveStats,
                 RunesUseEquipped = Program.Settings.UseEquipped,
-                Shrines = Program.Data.shrines,
+                Shrines = Program.Data.Shrines,
                 RunesOnlyFillEmpty = Program.FillRunes,
                 RunesDropHalfSetStat = Program.GoFast,
                 IgnoreLess5 = Program.Settings.IgnoreLess5,

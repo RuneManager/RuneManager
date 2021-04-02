@@ -201,12 +201,12 @@ function log() {
                             case "lock":
                                 mon.Locked = true;
                                 Program.Data.LockedUnits.Add(mon.Id);
-                                Program.Data.isModified = true;
+                                Program.Data.IsModified = true;
                                 break;
                             case "unlock":
                                 mon.Locked = false;
                                 Program.Data.LockedUnits.Remove(mon.Id);
-                                Program.Data.isModified = true;
+                                Program.Data.IsModified = true;
                                 break;
                             case "doskill":
                                 Program.Goals.NoSkillIds.Remove(id);
@@ -251,7 +251,7 @@ function log() {
                     mon = Program.Data.GetMonster(id);
                     if (mon != null) {
                         Program.Data.Monsters.Remove(mon);
-                        Program.Data.isModified = true;
+                        Program.Data.IsModified = true;
                         return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
                     }
                     return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };
@@ -322,7 +322,7 @@ function log() {
                     rune = Program.Data?.GetRune(id);
                     if (rune != null) {
                         Program.Data.Runes.Remove(rune);
-                        Program.Data.isModified = true;
+                        Program.Data.IsModified = true;
                         return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "deleted", id.ToString() } } }.ToJson()) };
                     }
                     return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent(new ServedResult("DELETE") { contentDic = { { "failed", id.ToString() } } }.ToJson()) };

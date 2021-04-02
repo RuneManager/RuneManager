@@ -146,9 +146,9 @@ http.send(params);
             var pieces = Program.Data.InventoryItems.Where(i => i.Type == ItemType.SummoningPieces)
                 .Select(p => new InventoryItem() { Id = p.Id, Quantity = p.Quantity, Type = p.Type, WizardId = p.WizardId }).ToDictionary(p => p.Id);
             foreach (var p in pieces) {
-                pieces[p.Key].Quantity -= Save.getPiecesRequired(p.Value.Id);
+                pieces[p.Key].Quantity -= Save.GetPiecesRequired(p.Value.Id);
             }
-            pieces = pieces.Where(p => p.Value.Quantity > Save.getPiecesRequired(p.Value.Id)).ToDictionary(p => p.Key, p => p.Value);
+            pieces = pieces.Where(p => p.Value.Quantity > Save.GetPiecesRequired(p.Value.Id)).ToDictionary(p => p.Key, p => p.Value);
 
             var ll = Program.Loads;
             var ldic = ll.ToDictionary(l => l.BuildID);
@@ -276,8 +276,8 @@ http.send(params);
                 while (i > 0 && !zerop.All(p => p)) {
                     for (int j = 1; j < 6; j++) {
                         int monbase = (m.MonsterTypeId / 100) * 100;
-                        if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= Save.getPiecesRequired(pieces[monbase + j].Id)) {
-                            pieces[monbase + j].Quantity -= Save.getPiecesRequired(pieces[monbase + j].Id);
+                        if (pieces.ContainsKey(monbase + j) && pieces[monbase + j].Quantity >= Save.GetPiecesRequired(pieces[monbase + j].Id)) {
+                            pieces[monbase + j].Quantity -= Save.GetPiecesRequired(pieces[monbase + j].Id);
                             pairs[m].Add(new Monster() { Element = pieces[monbase + j].Element, Name = pieces[monbase + j].Name + " Pieces (" + pieces[monbase + j].Quantity + " remain)" });
                             i--;
                         }

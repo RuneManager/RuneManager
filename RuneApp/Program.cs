@@ -318,7 +318,7 @@ namespace RuneApp {
                                 var bnum = Builds.Count(bu => bu.MonName == b.MonName);
                                 b.Mon = Program.Data.GetMonster(b.MonName, bnum + 1);
                             }
-                            b.Shrines = Program.Data.shrines;
+                            b.Shrines = Program.Data.Shrines;
                         }
                         else {
                             b.Mon = new Monster();
@@ -403,15 +403,15 @@ namespace RuneApp {
 
             //var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
 
-            if (dat.isModified) {
+            if (dat.IsModified) {
                 Console.WriteLine("Loaded data has been touched, untouching...");
-                dat.isModified = false;
+                dat.IsModified = false;
             }
 
             if (File.Exists("shrine_overwrite.json")) {
-                dat.shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
+                dat.Shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
                 foreach (var m in dat.Monsters)
-                    m.Current.Shrines = dat.shrines;
+                    m.Current.Shrines = dat.Shrines;
             }
 
 #if !DEBUG

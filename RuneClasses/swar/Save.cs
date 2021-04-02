@@ -44,10 +44,10 @@ namespace RuneOptim.swar {
         public IList<object> Builds;
 
         [JsonIgnore]
-        public readonly Stats shrines = new Stats();
+        public readonly Stats Shrines = new Stats();
 
         [JsonProperty("modified")]
-        public bool isModified = false;
+        public bool IsModified = false;
 
         [JsonIgnore]
         static Dictionary<int, string> monIdNames = null;
@@ -61,7 +61,7 @@ namespace RuneOptim.swar {
         }
 
         [JsonIgnore]
-        public int priority = 1;
+        public int Priority = 1;
 
         [JsonIgnore]
         private int monLoaded = 0;
@@ -87,13 +87,13 @@ namespace RuneOptim.swar {
             Buildings.AddRange(rhs.Buildings);
             DefenseUnits.AddRange(rhs.DefenseUnits);
             GuildDefenseUnits.AddRange(rhs.GuildDefenseUnits);
-            priority = rhs.priority;
-            isModified = rhs.isModified;
-            shrines.CopyFrom(rhs.shrines, true);
+            Priority = rhs.Priority;
+            IsModified = rhs.IsModified;
+            Shrines.CopyFrom(rhs.Shrines, true);
             WizardInfo = rhs.WizardInfo;
         }
 
-        public static int getPiecesRequired(int monsterTypeId) {
+        public static int GetPiecesRequired(int monsterTypeId) {
             var a = monsterTypeId / 100;
             var b = MonIdNames[a];
             var c = MonsterStat.BaseStars(b);
@@ -193,7 +193,7 @@ namespace RuneOptim.swar {
                             v = (int)Math.Ceiling(shr.Level * Deco.ShrineLevel[i]);
                         else if (i < 9)
                             v = (int)Math.Ceiling(1 + shr.Level * Deco.ShrineLevel[i]);
-                        shrines[shr.Shrine.ToString()] = v;
+                        Shrines[shr.Shrine.ToString()] = v;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
@@ -223,7 +223,7 @@ namespace RuneOptim.swar {
                             if (!Runes.Any(ru => ru.Id == r.Id))
                                 Runes.Add(r);
                         }
-                        mon.Current.Shrines = shrines;
+                        mon.Current.Shrines = Shrines;
 
                         if (mon.BuildingId == Buildings.FirstOrDefault(b => b.BuildingType == BuildingType.MonsterStorage)?.Id)
                             mon.InStorage = true;

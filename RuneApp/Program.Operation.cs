@@ -18,7 +18,7 @@ namespace RuneApp
             if (mon.WizardId == Data.WizardInfo.Id)
             {
                 Data.Monsters.Add(mon);
-                Data.isModified = true;
+                Data.IsModified = true;
                 OnMonsterUpdate?.Invoke(mon, false);
             }
         }
@@ -34,7 +34,7 @@ namespace RuneApp
             if (rune.WizardId == Data.WizardInfo.Id)
             {
                 Data.Runes.Add(rune);
-                Data.isModified = true;
+                Data.IsModified = true;
                 OnRuneUpdate?.Invoke(rune, false);
             }
         }
@@ -44,7 +44,7 @@ namespace RuneApp
             var m = Data.GetMonster(mon.Id);
             Data.Monsters.Remove(m);
 
-            Data.isModified = true;
+            Data.IsModified = true;
             OnMonsterUpdate?.Invoke(mon, true);
         }
 
@@ -53,7 +53,7 @@ namespace RuneApp
             var r = Data.GetRune(rune.Id);
             Data.Runes.Remove(r);
 
-            Data.isModified = true;
+            Data.IsModified = true;
             OnRuneUpdate?.Invoke(rune, true);
         }
 
@@ -139,7 +139,7 @@ namespace RuneApp
                 }
             }
 
-            Data.isModified = true;
+            Data.IsModified = true;
             OnMonsterUpdate?.Invoke(m, false);
         }
 
@@ -153,7 +153,7 @@ namespace RuneApp
 
             //r.Assigned?.Current.AddRune(r);
 
-            Data.isModified = true;
+            Data.IsModified = true;
             OnRuneUpdate?.Invoke(r, false);
         }
 

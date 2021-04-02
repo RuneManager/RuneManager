@@ -242,7 +242,7 @@ namespace RuneApp
                             }
                         }
                     }
-                    load.Shrines = Data.shrines;
+                    load.Shrines = Data.Shrines;
                     Loads.Add(load);
                 }
                 return LoadSaveResult.Success;
@@ -320,7 +320,7 @@ namespace RuneApp
         public static void SaveData()
         {
             // tag the save as a modified save
-            Program.Data.isModified = true;
+            Program.Data.IsModified = true;
             var l = Program.Data.Runes.Where(r => r.Locked);
             foreach (var r in l)
                 r.Locked = false;

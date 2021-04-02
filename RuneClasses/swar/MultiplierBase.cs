@@ -134,46 +134,46 @@ namespace MonsterDefinitions {
     }
 
     public class MultiplierValue : MultiplierBase {
-        public double? value = null;
-        public MultiplierBase inner = null;
-        public MultiAttr key = MultiAttr.Null;
+        public double? Value = null;
+        public MultiplierBase Inner = null;
+        public MultiAttr Key = MultiAttr.Null;
 
-        public MultiplierOperator op = MultiplierOperator.End;
+        public MultiplierOperator Op = MultiplierOperator.End;
 
         public MultiplierValue() {
         }
 
         public MultiplierValue(double v, MultiplierOperator o = MultiplierOperator.End) {
-            value = v;
-            op = o;
+            Value = v;
+            Op = o;
         }
 
         public MultiplierValue(MultiplierBase i, MultiplierOperator o = MultiplierOperator.End) {
-            inner = i;
-            op = o;
+            Inner = i;
+            Op = o;
         }
 
         public MultiplierValue(MultiAttr a, MultiplierOperator o = MultiplierOperator.End) {
-            key = a;
-            op = o;
+            Key = a;
+            Op = o;
         }
 
         public override Expression AsExpression(ParameterExpression statType) {
-            if (inner != null) {
-                return inner.AsExpression(statType);
+            if (Inner != null) {
+                return Inner.AsExpression(statType);
             }
-            else if (key != MultiAttr.Null) {//Expression.Parameter(typeof(RuneOptim.Stats), "stats")
-                if (key == MultiAttr.Neg)
+            else if (Key != MultiAttr.Null) {//Expression.Parameter(typeof(RuneOptim.Stats), "stats")
+                if (Key == MultiAttr.Neg)
                     return Expression.Constant(1.0);
-                var attr = GetAttr(key);
+                var attr = GetAttr(Key);
                 if (attr <= RuneOptim.swar.Attr.Null)
-                    return Expression.Constant(GetAttrValue(key));
+                    return Expression.Constant(GetAttrValue(Key));
                 else if (attr < RuneOptim.swar.Attr.Null)
-                    return Expression.Multiply(Expression.Property(statType, "Item", Expression.Constant((Attr)(-(int)attr))), Expression.Constant(GetAttrValue(key)));
+                    return Expression.Multiply(Expression.Property(statType, "Item", Expression.Constant((Attr)(-(int)attr))), Expression.Constant(GetAttrValue(Key)));
                 return Expression.Property(statType, "Item", Expression.Constant(attr));
             }
             else {
-                return Expression.Constant(value);
+                return Expression.Constant(Value);
             }
         }
 
@@ -191,7 +191,7 @@ namespace MonsterDefinitions {
                 case MultiAttr.CritDamage:
                 case MultiAttr.Resistance:
                 case MultiAttr.Accuracy:
-                    return (Attr)key;
+                    return (Attr)Key;
                 case MultiAttr.Neg:
                 case MultiAttr.Null:
                 case MultiAttr.PercentOfAlliesAlive:
@@ -257,14 +257,14 @@ namespace MonsterDefinitions {
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder();
-            if (inner != null)
-                sb.Append(inner.ToString());
-            else if (key != MultiAttr.Null)
-                sb.Append(GetEnumMemberAttrValue(key));
+            if (Inner != null)
+                sb.Append(Inner.ToString());
+            else if (Key != MultiAttr.Null)
+                sb.Append(GetEnumMemberAttrValue(Key));
             else
-                sb.Append(value);
+                sb.Append(Value);
             sb.Append(" ");
-            sb.Append(GetEnumMemberAttrValue(op));
+            sb.Append(GetEnumMemberAttrValue(Op));
             return sb.ToString();
         }
 
@@ -276,33 +276,33 @@ namespace MonsterDefinitions {
         }
 
         public override double GetValue(Stats vals) {
-            if (inner != null)
-                return inner.GetValue(vals);
-            else if (key != MultiAttr.Null) {
+            if (Inner != null)
+                return Inner.GetValue(vals);
+            else if (Key != MultiAttr.Null) {
 
             }
-            else if (value != null)
-                return value ?? 0;
+            else if (Value != null)
+                return Value ?? 0;
             return 0;
         }
     }
 
     public class MultiplierGroup : MultiplierBase {
-        public List<MultiplierValue> props = new List<MultiplierValue>();
+        public List<MultiplierValue> Props = new List<MultiplierValue>();
 
         public MultiplierGroup() {
         }
 
         public MultiplierGroup(params MultiplierValue[] vals) {
             foreach (var v in vals) {
-                props.Add(v);
+                Props.Add(v);
             }
         }
 
         public override string ToString() {
             StringBuilder sb = new StringBuilder("[");
 
-            foreach (var prop in props) {
+            foreach (var prop in Props) {
                 sb.Append(prop.ToString());
                 sb.Append(" ");
             }
@@ -312,14 +312,14 @@ namespace MonsterDefinitions {
         }
 
         public override double GetValue(Stats vals) {
-            if (props.Count == 0)
+            if (Props.Count == 0)
                 return 0;
 
-            double ret = props.First().GetValue(vals);
+            double ret = Props.First().GetValue(vals);
 
-            var operate = props.First().op;
+            var operate = Props.First().Op;
 
-            foreach (var prop in props.Skip(1)) {
+            foreach (var prop in Props.Skip(1)) {
                 switch (operate) {
                     case MultiplierOperator.Add:
                         ret += prop.GetValue(vals);
@@ -338,20 +338,20 @@ namespace MonsterDefinitions {
                     default:
                         break;
                 }
-                operate = prop.op;
+                operate = prop.Op;
             }
 
             return ret;
         }
 
         public override Expression AsExpression(ParameterExpression statType) {
-            if (props.Count == 0)
+            if (Props.Count == 0)
                 return Expression.Constant(0.0);
 
-            var express = props.First().AsExpression(statType);
-            var operate = props.First().op;
+            var express = Props.First().AsExpression(statType);
+            var operate = Props.First().Op;
 
-            foreach (var prop in props.Skip(1)) {
+            foreach (var prop in Props.Skip(1)) {
                 switch (operate) {
                     case MultiplierOperator.Add:
                         express = Expression.Add(express, prop.AsExpression(statType));
@@ -370,7 +370,7 @@ namespace MonsterDefinitions {
                     default:
                         break;
                 }
-                operate = prop.op;
+                operate = prop.Op;
             }
             return express;
 
@@ -391,22 +391,22 @@ namespace MonsterDefinitions {
                 if (joperator is JArray) {
                     joperator = (joperator as JArray)[0];
                 }
-                value.op = joperator.ToObject<MultiplierOperator>();
+                value.Op = joperator.ToObject<MultiplierOperator>();
                 if (jvalue is JArray) {
-                    value.inner = GetProp(jvalue as JArray);
+                    value.Inner = GetProp(jvalue as JArray);
                 }
                 else {
                     double tempval;
                     if (double.TryParse(jvalue.ToString(), out tempval)) {
-                        value.value = tempval;
+                        value.Value = tempval;
                     }
                     else {
                         var tstr = jvalue.ToObject<string>();
                         if (tstr != "CEIL")
-                            value.key = GetStatAttrValue(tstr);
+                            value.Key = GetStatAttrValue(tstr);
                     }
                 }
-                multiGroup.props.Add(value);
+                multiGroup.Props.Add(value);
             }
             return multiGroup;
         }

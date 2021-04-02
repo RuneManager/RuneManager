@@ -52,7 +52,7 @@ namespace RuneApp {
             if (!shrineMap.ContainsKey(stat))
                 shrineMap.Add(stat, new List<ToolStripMenuItem>());
             shrineMap[stat].Add(it);
-            if (Program.Data.shrines[stat].EqualTo(value))
+            if (Program.Data.Shrines[stat].EqualTo(value))
                 it.Checked = true;
         }
 
@@ -72,8 +72,8 @@ namespace RuneApp {
                 if (string.IsNullOrWhiteSpace(stat))
                     return;
 
-                Program.Data.shrines[stat] = tag.Value;
-                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.shrines));
+                Program.Data.Shrines[stat] = tag.Value;
+                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
             }
         }
 
@@ -133,7 +133,7 @@ namespace RuneApp {
         }
 
         private DialogResult CheckSaveChanges() {
-            if (Program.Data == null || !Program.Data.isModified)
+            if (Program.Data == null || !Program.Data.IsModified)
                 return DialogResult.Yes;
 
             var res = MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
