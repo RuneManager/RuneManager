@@ -25,7 +25,7 @@ namespace RuneOptim.Tests {
             load.Lock();
             foreach (var r in runes)
             {
-                Assert.IsTrue(r.Locked);
+                Assert.IsTrue(r.UsedInBuild);
             }
         }
 

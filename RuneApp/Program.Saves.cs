@@ -235,7 +235,7 @@ namespace RuneApp
                             load.Runes[i] = Program.Data.Runes.FirstOrDefault(r => r.Id == ids);
                             if (load.Runes[i] != null)
                             {
-                                load.Runes[i].Locked = true;
+                                load.Runes[i].UsedInBuild = true;
                                 if (load.HasManageStats)
                                     foreach (var ms in load.ManageStats[i])
                                         load.Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
@@ -321,9 +321,9 @@ namespace RuneApp
         {
             // tag the save as a modified save
             Program.Data.IsModified = true;
-            var l = Program.Data.Runes.Where(r => r.Locked);
+            var l = Program.Data.Runes.Where(r => r.UsedInBuild);
             foreach (var r in l)
-                r.Locked = false;
+                r.UsedInBuild = false;
 
             if (File.Exists(Program.Settings.SaveLocation))
             {
@@ -338,7 +338,7 @@ namespace RuneApp
             File.WriteAllText(Program.Settings.SaveLocation, JsonConvert.SerializeObject(Program.Data, Formatting.Indented));
 
             foreach (var r in l)
-                r.Locked = true;
+                r.UsedInBuild = true;
         }
 
     }

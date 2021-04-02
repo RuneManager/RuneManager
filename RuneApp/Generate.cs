@@ -146,7 +146,7 @@ namespace RuneApp {
             li.SubItems[0].Text = pts.ToString("0.##");
 
             li.Tag = m;
-            if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.Locked))
+            if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.UsedInBuild))
                 li.ForeColor = Color.Gray;
             else {
                 if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&

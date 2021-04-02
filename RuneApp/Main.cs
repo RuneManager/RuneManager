@@ -835,7 +835,7 @@ namespace RuneApp {
             if (Program.Data == null || Program.Data.Runes == null)
                 return;
             foreach (Rune r in Program.Data.Runes) {
-                r.Locked = false;
+                r.UsedInBuild = false;
             }
             CheckLocked();
         }
@@ -1029,12 +1029,12 @@ namespace RuneApp {
             // swap the selected runes locked state
             foreach (ListViewItem li in dataRuneList.SelectedItems) {
                 if (li.Tag is Rune rune) {
-                    if (rune.Locked) {
-                        rune.Locked = false;
+                    if (rune.UsedInBuild) {
+                        rune.UsedInBuild = false;
                         li.BackColor = Color.Transparent;
                     }
                     else {
-                        rune.Locked = true;
+                        rune.UsedInBuild = true;
                         li.BackColor = Color.Red;
                     }
                 }

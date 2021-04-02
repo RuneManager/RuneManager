@@ -99,7 +99,7 @@ namespace RuneOptim.BuildProcessing {
                         Rune rune = rsGlobal.FirstOrDefault(rn => rn.Id == r.Id);
                         if (rune != null)
                         {
-                           if (rune.Locked)
+                           if (rune.UsedInBuild)
                                 Runes[rune.Slot - 1] = new Rune[0];
                             else
                                 Runes[rune.Slot - 1] = new Rune[] { rune };
@@ -116,7 +116,7 @@ namespace RuneOptim.BuildProcessing {
                         rsGlobal = rsGlobal.Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped);
                     // only if the rune isn't currently locked for another purpose
                     if (!RunesUseLocked)
-                        rsGlobal = rsGlobal.Where(r => !r.Locked);
+                        rsGlobal = rsGlobal.Where(r => !r.UsedInBuild);
                     rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !BannedRunesTemp.Any(b => b == r.Id));
                 }
 
@@ -165,7 +165,7 @@ namespace RuneOptim.BuildProcessing {
                         if (!RunesUseEquipped || RunesOnlyFillEmpty)
                             Runes[i] = Runes[i].AsParallel().Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped).ToArray();
                         if (!RunesUseLocked)
-                            Runes[i] = Runes[i].AsParallel().Where(r => !r.Locked).ToArray();
+                            Runes[i] = Runes[i].AsParallel().Where(r => !r.UsedInBuild).ToArray();
 
                     }
                 }
@@ -279,7 +279,7 @@ namespace RuneOptim.BuildProcessing {
                 // if we are only to fill empty slots
                 if (RunesOnlyFillEmpty) {
                     for (int i = 0; i < 6; i++) {
-                        if (Mon.Current.Runes[i] != null && (!Mon.Current.Runes[i]?.Locked ?? false)) {
+                        if (Mon.Current.Runes[i] != null && (!Mon.Current.Runes[i]?.UsedInBuild ?? false)) {
                             Runes[i] = new Rune[0];
                         }
                     }
@@ -294,7 +294,7 @@ namespace RuneOptim.BuildProcessing {
                     if (i % 2 == 1 && SlotStats[i].Count > 0) {
                         isGoodType = SlotStats[i].Contains(r.Main.Type.ToForms());
                     }
-                    if (!Runes[i].Contains(r) && !r.Locked && isGoodType) {
+                    if (!Runes[i].Contains(r) && !r.UsedInBuild && isGoodType) {
                         var tl = Runes[i].ToList();
                         tl.Add(r);
                         Runes[i] = tl.ToArray();

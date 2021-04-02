@@ -329,7 +329,7 @@ namespace RuneOptim.Management {
         public void Lock() {
             foreach (Rune r in runes) {
                 if (r != null)
-                    r.Locked = true;
+                    r.UsedInBuild = true;
             }
         }
         public void Unlock()
@@ -337,7 +337,7 @@ namespace RuneOptim.Management {
             foreach (Rune r in runes)
             {
                 if (r != null)
-                    r.Locked = false;
+                    r.UsedInBuild = false;
             }
         }
 

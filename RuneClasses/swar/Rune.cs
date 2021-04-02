@@ -65,18 +65,24 @@ namespace RuneOptim.swar {
         [JsonProperty("rank")]
         public int Rank;
 
+        /// <summary>
+        /// In-game lock status
+        /// </summary>
         [JsonProperty("locked")]
-        private bool locked;
+        public bool Locked;
+
+        [JsonProperty("used_in_build")]
+        private bool usedInBuild;
 
         [JsonIgnore]
-        public bool Locked {
+        public bool UsedInBuild {
             get {
-                return locked;
+                return usedInBuild;
             }
             set {
-                locked = value;
+                usedInBuild = value;
                 if (EnchantOf != null)
-                    EnchantOf.locked = value;
+                    EnchantOf.usedInBuild = value;
             }
         }
 
@@ -169,7 +175,7 @@ namespace RuneOptim.swar {
             rhs.Level = Level;
             rhs.Rank = Rank;
             if (!keepLocked)
-                rhs.Locked = Locked;
+                rhs.UsedInBuild = UsedInBuild;
             rhs.OccupiedType = OccupiedType;
             rhs.SellValue = SellValue;
 

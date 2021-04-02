@@ -81,7 +81,7 @@ namespace RuneApp {
             if (nli == null)
                 nli = new ListViewItem();
             nli.Tag = rune;
-            nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+            nli.BackColor = rune.UsedInBuild ? Color.Red : Color.Transparent;
 
             while (nli.SubItems.Count < 8)
                 nli.SubItems.Add("");
@@ -406,10 +406,10 @@ namespace RuneApp {
                 return;
 
             Invoke((MethodInvoker)delegate {
-                toolStripStatusLabel1.Text = "Locked: " + Program.Data.Runes.Count(r => r.Locked);
+                toolStripStatusLabel1.Text = "Locked: " + Program.Data.Runes.Count(r => r.UsedInBuild);
                 foreach (ListViewItem li in dataRuneList.Items) {
                     if (li.Tag is Rune rune)
-                        li.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+                        li.BackColor = rune.UsedInBuild ? Color.Red : Color.Transparent;
                 }
             });
         }

@@ -26,6 +26,9 @@ namespace RuneOptim.swar {
         [JsonProperty("unit_lock_list")]
         public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
+        [JsonProperty("rune_lock_list")]
+        public readonly ObservableCollection<ulong> LockedRunes = new ObservableCollection<ulong>();
+
         [JsonProperty("building_list")]
         public readonly ObservableCollection<Building> Buildings = new ObservableCollection<Building>();
 
@@ -71,6 +74,7 @@ namespace RuneOptim.swar {
             Monsters.CollectionChanged += Monsters_CollectionChanged;
             Decorations.CollectionChanged += Decorations_CollectionChanged;
             LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
+            LockedRunes.CollectionChanged += LockedRunes_CollectionChanged;
             Buildings.CollectionChanged += Buildings_CollectionChanged;
             DefenseUnits.CollectionChanged += DefenseUnits_CollectionChanged;
             GuildDefenseUnits.CollectionChanged += GuildDefenseUnits_CollectionChanged;
@@ -84,6 +88,7 @@ namespace RuneOptim.swar {
             InventoryItems.AddRange(rhs.InventoryItems);
             Decorations.AddRange(rhs.Decorations);
             LockedUnits.AddRange(rhs.LockedUnits);
+            LockedRunes.AddRange(rhs.LockedRunes);
             Buildings.AddRange(rhs.Buildings);
             DefenseUnits.AddRange(rhs.DefenseUnits);
             GuildDefenseUnits.AddRange(rhs.GuildDefenseUnits);
@@ -173,6 +178,30 @@ namespace RuneOptim.swar {
                         var mon = GetMonster(i);
                         if (mon != null)
                             mon.Locked = false;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        private void LockedRunes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+            switch (e.Action) {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (var i in e.NewItems.Cast<ulong>()) {
+                        var rune = GetRune(i);
+                        if (rune != null)
+                            rune.Locked = true;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var i in e.OldItems.Cast<ulong>()) {
+                        var rune = GetRune(i);
+                        if (rune != null)
+                            rune.Locked = false;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
@@ -283,6 +312,8 @@ namespace RuneOptim.swar {
                             }
                         }
                         r.PrebuildAttributes();
+                        if (LockedRunes.Contains(r.Id))
+                            r.Locked = true;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
