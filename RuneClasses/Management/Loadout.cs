@@ -21,10 +21,10 @@ namespace RuneOptim.Management {
         public bool Defense;
         public bool Speed;
         public bool Crit;
-        public float attackMod;
-        public float defenseMod;
-        public float speedMod;
-        public float critMod;
+        public float AttackMod;
+        public float DefenseMod;
+        public float SpeedMod;
+        public float CritMod;
     }
 
     public class Loadout : ILoadout {
@@ -56,17 +56,17 @@ namespace RuneOptim.Management {
 
         public Element Element = Element.Pure;
 
-        protected Buffs buffs;
+        private Buffs buffs;
 
         [JsonIgnore]
         public Buffs Buffs {
             get => buffs;
             set {
                 buffs = value;
-                buffs.speedMod = buffs.Speed ? 0.3f : 0;
-                buffs.attackMod = buffs.Attack ? 0.5f : 0;
-                buffs.defenseMod = buffs.Defense ? 0.7f : 0;
-                buffs.critMod = buffs.Crit ? 0.3f : 0;
+                buffs.SpeedMod = buffs.Speed ? 0.3f : 0;
+                buffs.AttackMod = buffs.Attack ? 0.5f : 0;
+                buffs.DefenseMod = buffs.Defense ? 0.7f : 0;
+                buffs.CritMod = buffs.Crit ? 0.3f : 0;
             }
         }
 
@@ -77,7 +77,7 @@ namespace RuneOptim.Management {
         public long ActualTests = 0;
 
         [JsonIgnore]
-        public bool tempLoad;
+        private bool tempLoad;
 
         [JsonIgnore]
         public bool TempLoad {
@@ -100,8 +100,12 @@ namespace RuneOptim.Management {
         }
 
         [JsonIgnore]
-        public ConcurrentDictionary<string, double>[] manageStats;
+        private ConcurrentDictionary<string, double>[] manageStats;
 
+        [JsonIgnore]
+        public bool HasManageStats => manageStats != null;
+
+        [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public ConcurrentDictionary<string, double>[] ManageStats {
             get {
                 if (runes.All(r => r != null))
@@ -249,9 +253,9 @@ namespace RuneOptim.Management {
 
         private bool changed = false;
         public int RunesNew;
-        public int runesChanged;
-        public int upgrades;
-        public int powerup;
+        public int RunesChanged;
+        public int Upgrades;
+        public int Powerup;
 
         [JsonIgnore]
         public bool Changed { get { return changed; } }
@@ -341,25 +345,25 @@ namespace RuneOptim.Management {
 
 #if ATTR_CACHE
 
-        public int healthFlatCache = 0;
-        public int healthPercentCache = 0;
+        private int healthFlatCache = 0;
+        private int healthPercentCache = 0;
 
-        public int attackFlatCache = 0;
-        public int attackPercentCache = 0;
+        private int attackFlatCache = 0;
+        private int attackPercentCache = 0;
 
-        public int defenseFlatCache = 0;
-        public int defensePercentCache = 0;
+        private int defenseFlatCache = 0;
+        private int defensePercentCache = 0;
 
-        public int speedFlatCache = 0;
-        public int speedPercentCache = 0;
-
-
-        public int critRateCache = 0;
-        public int critDamageCache = 0;
+        private int speedFlatCache = 0;
+        private int speedPercentCache = 0;
 
 
-        public int accuracyCache = 0;
-        public int resistanceCache = 0;
+        private int critRateCache = 0;
+        private int critDamageCache = 0;
+
+
+        private int accuracyCache = 0;
+        private int resistanceCache = 0;
 
 
 #endif
@@ -1012,16 +1016,16 @@ namespace RuneOptim.Management {
             value.Health += Math.Ceiling(baseStats.Health * HealthPercent * 0.01) + HealthFlat;
 
             value.Attack += Math.Ceiling(baseStats.Attack * AttackPercent * 0.01) + AttackFlat;
-            value.Attack *= 1.0 + buffs.attackMod;
+            value.Attack *= 1.0 + buffs.AttackMod;
 
             value.Defense += Math.Ceiling(baseStats.Defense * DefensePercent * 0.01) + DefenseFlat;
-            value.Defense *= 1.0 + buffs.defenseMod;
+            value.Defense *= 1.0 + buffs.DefenseMod;
 
             value.Speed += Math.Ceiling(baseStats.Speed * SpeedPercent * 0.01) + Speed;
-            value.Speed *= 1.0 + buffs.speedMod;
+            value.Speed *= 1.0 + buffs.SpeedMod;
 
             value.CritDamage += CritDamage;
-            value.CritRate += CritRate + buffs.critMod;
+            value.CritRate += CritRate + buffs.CritMod;
 
             value.Accuracy += Accuracy;
             value.Resistance += Resistance;
@@ -1090,10 +1094,10 @@ namespace RuneOptim.Management {
         }
 
         public void RecountDiff(ulong monId) {
-            powerup = 0;
-            upgrades = 0;
+            Powerup = 0;
+            Upgrades = 0;
             RunesNew = 0;
-            runesChanged = 0;
+            RunesChanged = 0;
 
             foreach (Rune r in Runes) {
                 if (r == null) continue;
@@ -1101,13 +1105,13 @@ namespace RuneOptim.Management {
                     if (r.IsUnassigned)
                         RunesNew++;
                     else
-                        runesChanged++;
+                        RunesChanged++;
                 }
-                powerup += Math.Max(0, FakeLevel[r.Slot - 1] - r.Level);
+                Powerup += Math.Max(0, FakeLevel[r.Slot - 1] - r.Level);
                 if (FakeLevel[r.Slot - 1] != 0) {
                     int tup = (int)Math.Floor(Math.Min(12, FakeLevel[r.Slot - 1]) / (double)3);
                     int cup = (int)Math.Floor(Math.Min(12, r.Level) / (double)3);
-                    upgrades += Math.Max(0, tup - cup);
+                    Upgrades += Math.Max(0, tup - cup);
                 }
             }
         }

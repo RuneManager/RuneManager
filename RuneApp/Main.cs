@@ -382,7 +382,7 @@ namespace RuneApp {
 
             l.RecountDiff(b.Mon.Id);
 
-            nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.RunesNew + l.runesChanged).ToString());
+            nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.RunesNew + l.RunesChanged).ToString());
             if (l.Runes.Where(r => r != null && r.IsUnassigned).Any(r => b.Mon.Runes.FirstOrDefault(ru => ru != null && ru.Slot == r.Slot) == null))
                 nli.SubItems[3].ForeColor = Color.Green;
             if (b.Type == BuildType.Lock)
@@ -390,8 +390,8 @@ namespace RuneApp {
             else if (b.Type == BuildType.Link)
                 nli.SubItems[0].ForeColor = Color.Teal;
             if (Program.Settings.SplitAssign)
-                nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.runesChanged.ToString();
-            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.powerup.ToString());
+                nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
+            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
             if (l.Time / (double)1000 > 60)
                 nli.SubItems[5].BackColor = Color.Red;
