@@ -312,7 +312,7 @@ namespace RuneApp {
                             mm.OnRunesChanged += Mm_OnRunesChanged;
                         }
 
-                        checkLocked();
+                        CheckLocked();
                         Invoke((MethodInvoker)delegate {
                             ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
 
@@ -779,7 +779,7 @@ namespace RuneApp {
                                 if (lv1li != null)
                                     lv1li.ForeColor = before.InStorage ? Color.Gray : Color.Black;
 
-                                lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.build.Mon.FullName));
+                                lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.Build.Mon.FullName));
                                 if (lv1li != null)
                                     lv1li.ForeColor = Color.Green;
 
@@ -837,7 +837,7 @@ namespace RuneApp {
             foreach (Rune r in Program.Data.Runes) {
                 r.Locked = false;
             }
-            checkLocked();
+            CheckLocked();
         }
 
         private void tsBtnLoadsRemove_Click(object sender, EventArgs e) {
@@ -845,7 +845,7 @@ namespace RuneApp {
                 Loadout l = (Loadout)li.Tag;
                 Program.RemoveLoad(l);
             }
-            checkLocked();
+            CheckLocked();
         }
 
         private void tsBtnBuildsRunAll_Click(object sender, EventArgs e) {
@@ -899,7 +899,7 @@ namespace RuneApp {
             else if (File.Exists(Program.Settings.SaveLocation)) {
                 Program.LoadSave(Program.Settings.SaveLocation);
                 RebuildLists();
-                refreshLoadouts();
+                RefreshLoadouts();
             }
         }
 
@@ -1040,7 +1040,7 @@ namespace RuneApp {
                 }
             }
 
-            checkLocked();
+            CheckLocked();
         }
 
         private void runetab_savebutton_click(object sender, EventArgs e) {
@@ -1071,7 +1071,7 @@ namespace RuneApp {
             foreach (ListViewItem li in loadoutList.SelectedItems) {
                 Loadout l = (Loadout)li.Tag;
                 l.Lock();
-                checkLocked();
+                CheckLocked();
             }
         }
 
@@ -1175,7 +1175,7 @@ namespace RuneApp {
 
         private void tsBtnLoadsLoad_Click(object sender, EventArgs e) {
             Program.LoadLoadouts();
-            checkLocked();
+            CheckLocked();
         }
 
         private void runeDial1_DoubleClick(object sender, EventArgs e) {
@@ -1370,7 +1370,7 @@ namespace RuneApp {
                         Element = build.Mon.Element,
                     });
                     build.Mon.Current.Lock();
-                    checkLocked();
+                    CheckLocked();
                 }
             }
         }

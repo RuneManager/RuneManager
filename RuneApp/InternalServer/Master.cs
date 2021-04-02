@@ -35,7 +35,7 @@ namespace RuneApp.InternalServer {
 
         bool isRunning = false;
 
-        public static string currentTheme = "/css/none.css";
+        private static string currentTheme = "/css/none.css";
 
         /// <summary>
         /// Dispatches a thread to listen for the incoming Remote App connection
@@ -218,7 +218,7 @@ namespace RuneApp.InternalServer {
             }
         }
 
-        public HttpResponseMessage getResponse(HttpListenerRequest req) {
+        private HttpResponseMessage getResponse(HttpListenerRequest req) {
             if (req.AcceptTypes == null) {
                 //TODO: topkek return new HttpResponseMessage(HttpStatusCode.NotAcceptable);
             }
@@ -253,7 +253,7 @@ namespace RuneApp.InternalServer {
 
         public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
             if (uri == null || uri.Length == 0 || uri[0] == "/") {
-                return returnHtml(null, "Check my thingo!<br/>",
+                return ReturnHtml(null, "Check my thingo!<br/>",
                     new ServedResult("a") { contentDic = { { "href", "api" } }, contentList = { "Api docs" } }, "<br/>",
                     new ServedResult("a") { contentDic = { { "href", "runes" } }, contentList = { "Rune list" } }, "<br/>",
                     new ServedResult("a") { contentDic = { { "href", "monsters" } }, contentList = { "Monster list" } }, "<br/>",
@@ -279,7 +279,7 @@ namespace RuneApp.InternalServer {
                 }
                 catch (Exception e) {
                     Program.LineLog.Error(e.GetType() + " " + e.Message);
-                    return returnException(e);
+                    return ReturnException(e);
                 }
             }
             else {
@@ -287,17 +287,17 @@ namespace RuneApp.InternalServer {
             }
         }
 
-        protected static HttpResponseMessage return404() {
+        protected static HttpResponseMessage Return404() {
             // TODO:
             return new HttpResponseMessage(HttpStatusCode.NotFound) { Content = new StringContent("404 lol") };
         }
 
-        protected static HttpResponseMessage returnException(Exception e) {
+        protected static HttpResponseMessage ReturnException(Exception e) {
             // TODO:
             return new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = new StringContent("500! " + e.GetType() + ": " + e.Message + "<br/>" + e.StackTrace) };
         }
 
-        protected static HttpResponseMessage returnHtml(ServedResult[] head = null, params ServedResult[] body) {
+        protected static HttpResponseMessage ReturnHtml(ServedResult[] head = null, params ServedResult[] body) {
             var bb = new StringBuilder();
             if (body != null)
                 foreach (var b in body)

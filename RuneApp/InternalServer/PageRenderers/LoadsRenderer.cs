@@ -71,7 +71,7 @@ namespace RuneApp.InternalServer {
                 string message = "";
 
                 if (Program.Data == null)
-                    return return404();
+                    return Return404();
 
                 // make a copy of all the data to mess around with
                 foreach (var m in Program.Data.Monsters) {
@@ -369,7 +369,7 @@ namespace RuneApp.InternalServer {
                     actList.Remove(nact);
                 }
 
-                return returnHtml(new ServedResult[] {
+                return ReturnHtml(new ServedResult[] {
                         new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
                         new ServedResult("style") {
                         contentList = {

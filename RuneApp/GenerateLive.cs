@@ -768,9 +768,9 @@ namespace RuneApp {
                 }
 
                 using (var qq = new RuneSelect()) {
-                    qq.runes = lrunes;
-                    qq.sortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
-                    qq.runeStatKey = "besttestscore";
+                    qq.Runes = lrunes;
+                    qq.SortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
+                    qq.RuneStatKey = "besttestscore";
                     qq.ShowDialog();
                 }
             }

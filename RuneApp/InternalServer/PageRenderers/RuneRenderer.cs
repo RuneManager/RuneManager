@@ -56,7 +56,7 @@ namespace RuneApp.InternalServer {
                     .ThenByDescending(r => r.BarionEfficiency * (12 - Math.Min(12, r.Level)))
                     .Select(r => renderRune(r)).ToArray());
 
-                return returnHtml(new ServedResult[] {
+                return ReturnHtml(new ServedResult[] {
                     new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
                     new ServedResult("script") {contentDic = { { "type", "\"text/css\"" } }, contentList = { @"@media only screen and (min-resolution: 192dpi),
        only screen and (min-resolution: 2dppx) {

@@ -6,7 +6,7 @@ namespace RuneOptim.Tests
     public class BuildTests
     {
         [TestMethod()]
-        public void sortTest()
+        public void SortTest()
         {
             Assert.Inconclusive();
         }

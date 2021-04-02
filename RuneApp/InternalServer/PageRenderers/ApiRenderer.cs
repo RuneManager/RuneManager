@@ -22,7 +22,7 @@ namespace RuneApp.InternalServer {
                 }
                 // yaml?
 
-                return returnHtml(
+                return ReturnHtml(
                     new ServedResult[] {
                         new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"/css/reset.css\"" } } },
                         new ServedResult("link") { contentDic = { { "type", "\"text/css\"" }, { "rel", "\"stylesheet\"" }, { "href", "\"https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/2.2.4/css/screen.css\"" } } },
@@ -280,7 +280,7 @@ function log() {
                 [HttpMethod("POST")]
                 public HttpResponseMessage PostMethod(HttpListenerRequest req, string[] uri) {
                     if (Program.Data == null) {
-                        return return404();
+                        return Return404();
                     }
                     Rune rune = null;
                     ulong id = 0;

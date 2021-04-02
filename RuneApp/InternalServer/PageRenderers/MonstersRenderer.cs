@@ -16,7 +16,7 @@ namespace RuneApp.InternalServer {
         public class MonstersRenderer : PageRenderer {
             public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
                 if (uri.Length == 0) {
-                    return returnHtml(new ServedResult[]{
+                    return ReturnHtml(new ServedResult[]{
                         new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
                         new ServedResult("script")
                         {
@@ -66,12 +66,12 @@ function closeBox() {{
                 ulong mid = 0;
                 if (ulong.TryParse(uri[0], out mid)) {
                     if (Program.Data == null)
-                        return returnHtml(null, "missingdata");
+                        return ReturnHtml(null, "missingdata");
                     // got Monster Id
                     var m = Program.Data.GetMonster(mid);
                     if (m == null)
-                        return returnHtml(null, "missingno");
-                    return returnHtml(new ServedResult[] {
+                        return ReturnHtml(null, "missingno");
+                    return ReturnHtml(new ServedResult[] {
                         new ServedResult("script") {
                             contentDic = { { "type", "\"application/javascript\"" } },
                             contentList = { $@"function performAction(action, params) {{
@@ -94,13 +94,13 @@ http.send(params);
                 }
                 else {
                     if (Program.Data == null)
-                        return returnHtml(null, "missingdata");
+                        return ReturnHtml(null, "missingdata");
 
                     var m = Program.Data.GetMonster(uri[0]);
                     if (m != null)
                         return new HttpResponseMessage(HttpStatusCode.SeeOther) { Headers = { { "Location", "monsters/" + m.Id } } };
                 }
-                return return404();
+                return Return404();
             }
         }
 

@@ -9,16 +9,16 @@ using RuneOptim.swar;
 
 namespace RuneApp {
     public partial class RuneSelect : Form {
-        public IEnumerable<Rune> runes;
+        public IEnumerable<Rune> Runes;
 
-        public Rune returnedRune = null;
+        public Rune ReturnedRune = null;
 
-        public Build build = null;
+        public Build Build = null;
 
-        public Func<Rune, long> sortFunc = r => (long)r.Id;
-        public string runeStatKey = null;
+        public Func<Rune, long> SortFunc = r => (long)r.Id;
+        public string RuneStatKey = null;
 
-        public SlotIndex slot = SlotIndex.Global;
+        public SlotIndex Slot = SlotIndex.Global;
 
         public RuneSelect() {
             InitializeComponent();
@@ -31,16 +31,16 @@ namespace RuneApp {
         }
 
         void RuneSelect_Shown(object sender, EventArgs e) {
-            if (runeStatKey == null)
+            if (RuneStatKey == null)
                 this.runeStats.Width = 0;
 
             // dump out the rune details
-            foreach (Rune rune in runes.OrderBy(sortFunc)) {
+            foreach (Rune rune in Runes.OrderBy(SortFunc)) {
                 double points = 0;
-                if (build != null) {
-                    points = build.ScoreRune(rune, build.GetFakeLevel(rune), false);
+                if (Build != null) {
+                    points = Build.ScoreRune(rune, Build.GetFakeLevel(rune), false);
 
-                    if (rune.Slot % 2 == 0 && build.SlotStats[rune.Slot - 1].Any() && !build.SlotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
+                    if (rune.Slot % 2 == 0 && Build.SlotStats[rune.Slot - 1].Any() && !Build.SlotStats[rune.Slot - 1].Contains(rune.Main.Type.ToForms()))
                         continue;
                 }
 
@@ -51,9 +51,9 @@ namespace RuneApp {
                     Rune.StringIt(rune.Main.Type, true),
                     rune.Main.Value.ToString(),
                     points.ToString(),
-                    runeStatKey == null ? null : rune.ManageStats.GetOrAdd(runeStatKey, 0).ToString()
+                    RuneStatKey == null ? null : rune.ManageStats.GetOrAdd(RuneStatKey, 0).ToString()
                 });
-                if (build != null)
+                if (Build != null)
                     item.ForeColor = Color.Gray;
                 if ((rune.IsUnassigned) && !Program.Settings.UseEquipped)
                     item.ForeColor = Color.Red;
@@ -63,49 +63,49 @@ namespace RuneApp {
 
                 listRunes.Items.Add(item);
             }
-            if (build != null) {
+            if (Build != null) {
                 listRunes.Columns[5].Width = 50;
 
                 // Find all the runes in the build for the slot
                 List<Rune> fr = new List<Rune>();
-                switch (slot) {
+                switch (Slot) {
                     case SlotIndex.Even:
-                        fr.AddRange(build.Runes[1]);
-                        fr.AddRange(build.Runes[3]);
-                        fr.AddRange(build.Runes[5]);
+                        fr.AddRange(Build.Runes[1]);
+                        fr.AddRange(Build.Runes[3]);
+                        fr.AddRange(Build.Runes[5]);
                         break;
                     case SlotIndex.Odd:
-                        fr.AddRange(build.Runes[0]);
-                        fr.AddRange(build.Runes[2]);
-                        fr.AddRange(build.Runes[4]);
+                        fr.AddRange(Build.Runes[0]);
+                        fr.AddRange(Build.Runes[2]);
+                        fr.AddRange(Build.Runes[4]);
                         break;
                     case SlotIndex.Global:
-                        fr.AddRange(build.Runes[0]);
-                        fr.AddRange(build.Runes[1]);
-                        fr.AddRange(build.Runes[2]);
-                        fr.AddRange(build.Runes[3]);
-                        fr.AddRange(build.Runes[4]);
-                        fr.AddRange(build.Runes[5]);
+                        fr.AddRange(Build.Runes[0]);
+                        fr.AddRange(Build.Runes[1]);
+                        fr.AddRange(Build.Runes[2]);
+                        fr.AddRange(Build.Runes[3]);
+                        fr.AddRange(Build.Runes[4]);
+                        fr.AddRange(Build.Runes[5]);
                         break;
                     default:
-                        fr.AddRange(build.Runes[(int)slot - 1]);
+                        fr.AddRange(Build.Runes[(int)Slot - 1]);
                         break;
                 }
                 // find the chosen runes in the list and colour them in
                 foreach (ListViewItem li in listRunes.Items) {
                     Rune rt = (Rune)li.Tag;
-                    if (rt != null && fr.Contains(rt) && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == build.MonName)) {
+                    if (rt != null && fr.Contains(rt) && (Program.Settings.UseEquipped || (rt.IsUnassigned) || rt.AssignedName == Build.MonName)) {
                         li.ForeColor = Color.Black;
                     }
                 }
             }
 
             // if we are given a rune, see if we can pre-select it
-            if (returnedRune != null) {
-                ShowRune(returnedRune);
+            if (ReturnedRune != null) {
+                ShowRune(ReturnedRune);
                 // find the precious
                 foreach (ListViewItem li in listRunes.Items) {
-                    if (li.Tag != null && ((Rune)li.Tag).Equals(returnedRune))
+                    if (li.Tag != null && ((Rune)li.Tag).Equals(ReturnedRune))
                         listRunes.SelectedIndices.Add(li.Index);
                 }
             }
@@ -134,7 +134,7 @@ namespace RuneApp {
         // return the highlighted rune
         private void button3_Click(object sender, EventArgs e) {
             if (listRunes.SelectedItems.Count > 0) {
-                returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
+                ReturnedRune = (Rune)listRunes.SelectedItems[0].Tag;
                 DialogResult = DialogResult.OK;
                 Close();
             }
@@ -149,7 +149,7 @@ namespace RuneApp {
         // return the selected rune
         private void listView2_DoubleClick(object sender, EventArgs e) {
             if (listRunes.SelectedItems.Count > 0) {
-                returnedRune = (Rune)listRunes.SelectedItems[0].Tag;
+                ReturnedRune = (Rune)listRunes.SelectedItems[0].Tag;
                 DialogResult = DialogResult.OK;
                 Close();
             }

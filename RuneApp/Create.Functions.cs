@@ -26,8 +26,8 @@ namespace RuneApp {
                 page.Controls.MakeControl<Label>(tab, "curprompt", 60, 14, 214, 6, "Current");
                 
                 FilterType filter = FilterType.None;
-                if (build.RuneScoring.ContainsKey(tabIndexes[t]))
-                    filter = build.RuneScoring[tabIndexes[t]].Type;
+                if (Build.RuneScoring.ContainsKey(tabIndexes[t]))
+                    filter = Build.RuneScoring[tabIndexes[t]].Type;
 
                 ComboBox filterJoin = new ComboBox {
                     DropDownStyle = ComboBoxStyle.DropDownList,
@@ -279,16 +279,16 @@ namespace RuneApp {
                 statRows[stat].Min.Tag = new KeyValuePair<Label, Label>(statRows[stat].Base, statRows[stat].Bonus);
                 statRows[stat].Current.Text = cur[stat].ToString();
 
-                if (build.Minimum[stat] > 0)
-                    statRows[stat].Min.Text = build.Minimum[stat].ToString();
-                if (!build.Goal[stat].EqualTo(0))
-                    statRows[stat].Goal.Text = build.Goal[stat].ToString();
-                if (!build.Sort[stat].EqualTo(0))
-                    statRows[stat].Worth.Text = build.Sort[stat].ToString();
-                if (!build.Maximum[stat].EqualTo(0))
-                    statRows[stat].Max.Text = build.Maximum[stat].ToString();
-                if (!build.Threshold[stat].EqualTo(0))
-                    statRows[stat].Thresh.Text = build.Threshold[stat].ToString();
+                if (Build.Minimum[stat] > 0)
+                    statRows[stat].Min.Text = Build.Minimum[stat].ToString();
+                if (!Build.Goal[stat].EqualTo(0))
+                    statRows[stat].Goal.Text = Build.Goal[stat].ToString();
+                if (!Build.Sort[stat].EqualTo(0))
+                    statRows[stat].Worth.Text = Build.Sort[stat].ToString();
+                if (!Build.Maximum[stat].EqualTo(0))
+                    statRows[stat].Max.Text = Build.Maximum[stat].ToString();
+                if (!Build.Threshold[stat].EqualTo(0))
+                    statRows[stat].Thresh.Text = Build.Threshold[stat].ToString();
             }
 
             foreach (var extra in Build.ExtraEnums) {
@@ -296,39 +296,39 @@ namespace RuneApp {
                 statRows[extra].Min.Tag = new KeyValuePair<Label, Label>(statRows[extra].Base, statRows[extra].Bonus);
                 statRows[extra].Current.Text = cur.ExtraValue(extra).ToString();
 
-                if (build.Minimum.ExtraGet(extra) > 0)
-                    statRows[extra].Min.Text = build.Minimum.ExtraGet(extra).ToString();
-                if (!build.Goal.ExtraGet(extra).EqualTo(0))
-                    statRows[extra].Goal.Text = build.Goal.ExtraGet(extra).ToString();
-                if (!build.Sort.ExtraGet(extra).EqualTo(0))
-                    statRows[extra].Worth.Text = build.Sort.ExtraGet(extra).ToString();
-                if (!build.Maximum.ExtraGet(extra).EqualTo(0))
-                    statRows[extra].Max.Text = build.Maximum.ExtraGet(extra).ToString();
-                if (!build.Threshold.ExtraGet(extra).EqualTo(0))
-                    statRows[extra].Thresh.Text = build.Threshold.ExtraGet(extra).ToString();
+                if (Build.Minimum.ExtraGet(extra) > 0)
+                    statRows[extra].Min.Text = Build.Minimum.ExtraGet(extra).ToString();
+                if (!Build.Goal.ExtraGet(extra).EqualTo(0))
+                    statRows[extra].Goal.Text = Build.Goal.ExtraGet(extra).ToString();
+                if (!Build.Sort.ExtraGet(extra).EqualTo(0))
+                    statRows[extra].Worth.Text = Build.Sort.ExtraGet(extra).ToString();
+                if (!Build.Maximum.ExtraGet(extra).EqualTo(0))
+                    statRows[extra].Max.Text = Build.Maximum.ExtraGet(extra).ToString();
+                if (!Build.Threshold.ExtraGet(extra).EqualTo(0))
+                    statRows[extra].Thresh.Text = Build.Threshold.ExtraGet(extra).ToString();
             }
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillsFunction?[i] != null) {
+                if (Build?.Mon?.SkillsFunction?[i] != null) {
                     Attr aaa = Attr.Skill1 + i;
 
-                    double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i);
-                    double cc = build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i);
+                    double aa = Build.Mon.GetSkillDamage(Attr.AverageDamage, i);
+                    double cc = Build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i);
 
                     statRows[aaa].Base.Text = aa.ToString();
                     statRows[aaa].Min.Tag = new KeyValuePair<Label, Label>(statRows[aaa].Base, statRows[aaa].Bonus);
                     statRows[aaa].Current.Text = cc.ToString();
 
-                    if (build.Minimum.DamageSkillups[i] > 0)
-                        statRows[aaa].Min.Text = build.Minimum.DamageSkillups[i].ToString();
-                    if (!build.Goal.DamageSkillups[i].EqualTo(0))
-                        statRows[aaa].Goal.Text = build.Goal.DamageSkillups[i].ToString();
-                    if (!build.Sort.DamageSkillups[i].EqualTo(0))
-                        statRows[aaa].Worth.Text = build.Sort.DamageSkillups[i].ToString();
-                    if (!build.Maximum.DamageSkillups[i].EqualTo(0))
-                        statRows[aaa].Max.Text = build.Maximum.DamageSkillups[i].ToString();
-                    if (!build.Threshold.DamageSkillups[i].EqualTo(0))
-                        statRows[aaa].Thresh.Text = build.Threshold.DamageSkillups[i].ToString();
+                    if (Build.Minimum.DamageSkillups[i] > 0)
+                        statRows[aaa].Min.Text = Build.Minimum.DamageSkillups[i].ToString();
+                    if (!Build.Goal.DamageSkillups[i].EqualTo(0))
+                        statRows[aaa].Goal.Text = Build.Goal.DamageSkillups[i].ToString();
+                    if (!Build.Sort.DamageSkillups[i].EqualTo(0))
+                        statRows[aaa].Worth.Text = Build.Sort.DamageSkillups[i].ToString();
+                    if (!Build.Maximum.DamageSkillups[i].EqualTo(0))
+                        statRows[aaa].Max.Text = Build.Maximum.DamageSkillups[i].ToString();
+                    if (!Build.Threshold.DamageSkillups[i].EqualTo(0))
+                        statRows[aaa].Thresh.Text = Build.Threshold.DamageSkillups[i].ToString();
                 }
             }
         }
@@ -337,34 +337,34 @@ namespace RuneApp {
         private void ChangeBroken(bool state) {
             tBtnBreak.Tag = state;
             tBtnBreak.Image = state ? App.broken : App.whole;
-            if (build != null)
-                build.AllowBroken = state;
+            if (Build != null)
+                Build.AllowBroken = state;
         }
 
         void RegenSetList() {
-            if (build == null)
+            if (Build == null)
                 return;
 
             foreach (var sl in setList.Items.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (build.RequiredSets.Contains(ss)) {
+                if (Build.RequiredSets.Contains(ss)) {
                     sl.Group = setList.Groups[0];
-                    int num = build.RequiredSets.Count(s => s == ss);
+                    int num = Build.RequiredSets.Count(s => s == ss);
                     sl.Text = ss.ToString() + (num > 1 ? " x" + num : "");
                     sl.ForeColor = Color.Black;
-                    if (Rune.SetRequired(ss) == 4 && build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+                    if (Rune.SetRequired(ss) == 4 && Build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
                         sl.ForeColor = Color.Red;
                     // TODO: too many twos
                 }
-                else if (build.BuildSets.Contains(ss)) {
+                else if (Build.BuildSets.Contains(ss)) {
                     sl.Group = setList.Groups[1];
                     sl.Text = ss.ToString();
                     sl.ForeColor = Color.Black;
-                    if (Rune.SetRequired(ss) == 4 && build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+                    if (Rune.SetRequired(ss) == 4 && Build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
                         sl.ForeColor = Color.Red;
                 }
-                else if ((Rune.SetRequired(ss) == 2 && build.BuildSets.All(s => Rune.SetRequired(s) == 4) && build.RequiredSets.All(s => Rune.SetRequired(s) == 4))
-                    || (Rune.SetRequired(ss) == 4 && build.BuildSets.Count == 0 && build.RequiredSets.Count == 0)
+                else if ((Rune.SetRequired(ss) == 2 && Build.BuildSets.All(s => Rune.SetRequired(s) == 4) && Build.RequiredSets.All(s => Rune.SetRequired(s) == 4))
+                    || (Rune.SetRequired(ss) == 4 && Build.BuildSets.Count == 0 && Build.RequiredSets.Count == 0)
                     ) {
                     sl.Group = setList.Groups[1];
                     sl.Text = ss.ToString();
@@ -390,15 +390,15 @@ namespace RuneApp {
                     UpdateStat(tab, stat);
                 }
 
-                if (!build.RuneScoring.ContainsKey(tabdex) && build.RuneFilters.ContainsKey(tabdex)) {
+                if (!Build.RuneScoring.ContainsKey(tabdex) && Build.RuneFilters.ContainsKey(tabdex)) {
                     // if there is a non-zero
-                    if (build.RuneFilters[tabdex].Any(r => r.Value.NonZero)) {
-                        build.RuneScoring.Add(tabdex, new Build.RuneScoreFilter());
+                    if (Build.RuneFilters[tabdex].Any(r => r.Value.NonZero)) {
+                        Build.RuneScoring.Add(tabdex, new Build.RuneScoreFilter());
                     }
                 }
 
-                if (build.RuneScoring.ContainsKey(tabdex)) {
-                    var kv = build.RuneScoring[tabdex];
+                if (Build.RuneScoring.ContainsKey(tabdex)) {
+                    var kv = Build.RuneScoring[tabdex];
                     var ctrlTest = Controls.Find(tab + "test", true).FirstOrDefault();
                     var ctrlCount = Controls.Find(tab + "count", true).FirstOrDefault();
 
@@ -411,7 +411,7 @@ namespace RuneApp {
                     if (double.TryParse(ctrlCount?.Text, out tempval))
                         count = (int)tempval;
 
-                    build.RuneScoring[tabdex] = new Build.RuneScoreFilter(kv.Type, testVal, count);
+                    Build.RuneScoring[tabdex] = new Build.RuneScoreFilter(kv.Type, testVal, count);
 
                 }
 
@@ -422,11 +422,11 @@ namespace RuneApp {
                 CheckBox cb = (CheckBox)Controls.Find(tab + "bonus", true).FirstOrDefault();
 
                 if (raiseLevel == -1 && !cb.Checked)
-                    build.RunePrediction.Remove(tabdex);
+                    Build.RunePrediction.Remove(tabdex);
                 else
-                    build.RunePrediction[tabdex] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
+                    Build.RunePrediction[tabdex] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
 
-                build.GetPrediction(tabdex, out int? raise, out bool pred);
+                Build.GetPrediction(tabdex, out int? raise, out bool pred);
                 var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
                 ctrlRaise.Text = raise?.ToString();
                 var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
@@ -435,19 +435,19 @@ namespace RuneApp {
 
             foreach (var stat in Build.StatEnums) {
                 double.TryParse(statRows[stat].Min.Text, out double min);
-                build.Minimum[stat] = min;
+                Build.Minimum[stat] = min;
 
                 double.TryParse(statRows[stat].Goal.Text, out double goal);
-                build.Goal[stat] = goal;
+                Build.Goal[stat] = goal;
 
                 double.TryParse(statRows[stat].Worth.Text, out double worth);
-                build.Sort[stat] = worth;
+                Build.Sort[stat] = worth;
 
                 double.TryParse(statRows[stat].Max.Text, out double max);
-                build.Maximum[stat] = max;
+                Build.Maximum[stat] = max;
 
                 double.TryParse(statRows[stat].Thresh.Text, out double thr);
-                build.Threshold[stat] = thr;
+                Build.Threshold[stat] = thr;
 
                 if (min > max && !string.IsNullOrWhiteSpace(statRows[stat].Max.Text)) {
                     statRows[stat].Min.BackColor = Color.Red;
@@ -493,27 +493,27 @@ namespace RuneApp {
                 double total = 0;
                 if (double.TryParse(statRows[extra].Min.Text, out val))
                     total = val;
-                build.Minimum.ExtraSet(extra, total);
+                Build.Minimum.ExtraSet(extra, total);
 
                 double goal = 0;
                 if (double.TryParse(statRows[extra].Goal.Text, out val))
                     goal = val;
-                build.Goal.ExtraSet(extra, goal);
+                Build.Goal.ExtraSet(extra, goal);
 
                 double worth = 0;
                 if (double.TryParse(statRows[extra].Worth.Text, out val))
                     worth = val;
-                build.Sort.ExtraSet(extra, worth);
+                Build.Sort.ExtraSet(extra, worth);
 
                 double max = 0;
                 if (double.TryParse(statRows[extra].Max.Text, out val))
                     max = val;
-                build.Maximum.ExtraSet(extra, max);
+                Build.Maximum.ExtraSet(extra, max);
 
                 double thr = 0;
                 if (double.TryParse(statRows[extra].Thresh.Text, out val))
                     thr = val;
-                build.Threshold.ExtraSet(extra, thr);
+                Build.Threshold.ExtraSet(extra, thr);
 
                 double current = 0;
                 if (double.TryParse(statRows[extra].Current.Text, out val))
@@ -532,8 +532,8 @@ namespace RuneApp {
             }
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillsFunction?[i] != null) {
-                    var ff = build.Mon.SkillsFunction[i];
+                if (Build?.Mon?.SkillsFunction?[i] != null) {
+                    var ff = Build.Mon.SkillsFunction[i];
                     string stat = "Skill" + i;
                     Attr aaa = Attr.Skill1 + i;
 
@@ -541,27 +541,27 @@ namespace RuneApp {
                     double total = 0;
                     if (double.TryParse(statRows[aaa].Min.Text, out val))
                         total = val;
-                    build.Minimum.ExtraSet(aaa, total);
+                    Build.Minimum.ExtraSet(aaa, total);
 
                     double goal = 0;
                     if (double.TryParse(statRows[aaa].Goal.Text, out val))
                         goal = val;
-                    build.Goal.ExtraSet(aaa, goal);
+                    Build.Goal.ExtraSet(aaa, goal);
 
                     double worth = 0;
                     if (double.TryParse(statRows[aaa].Worth.Text, out val))
                         worth = val;
-                    build.Sort.ExtraSet(aaa, worth);
+                    Build.Sort.ExtraSet(aaa, worth);
 
                     double max = 0;
                     if (double.TryParse(statRows[aaa].Max.Text, out val))
                         max = val;
-                    build.Maximum.ExtraSet(aaa, max);
+                    Build.Maximum.ExtraSet(aaa, max);
 
                     double thr = 0;
                     if (double.TryParse(statRows[aaa].Thresh.Text, out val))
                         thr = val;
-                    build.Threshold.ExtraSet(aaa, thr);
+                    Build.Threshold.ExtraSet(aaa, thr);
 
                     double current = 0;
                     if (double.TryParse(statRows[aaa].Current.Text, out val))
@@ -583,7 +583,7 @@ namespace RuneApp {
             var lists = new ListView[] { priStat2, priStat4, priStat6 };
             for (int j = 0; j < lists.Length; j++) {
                 var lv = lists[j];
-                var bl = build.SlotStats[(j + 1) * 2 - 1];
+                var bl = Build.SlotStats[(j + 1) * 2 - 1];
                 bl.Clear();
 
                 for (int i = 0; i < Build.StatNames.Length; i++) {
@@ -628,10 +628,10 @@ namespace RuneApp {
             if (ctest.Text.Length == 0)
                 test = null;
 
-            if (!build.RuneFilters.ContainsKey(tabdex)) {
-                build.RuneFilters.Add(tabdex, new Dictionary<string, RuneFilter>());
+            if (!Build.RuneFilters.ContainsKey(tabdex)) {
+                Build.RuneFilters.Add(tabdex, new Dictionary<string, RuneFilter>());
             }
-            var fd = build.RuneFilters[tabdex];
+            var fd = Build.RuneFilters[tabdex];
             if (!fd.ContainsKey(stat)) {
                 fd.Add(stat, new RuneFilter());
             }
@@ -746,17 +746,17 @@ namespace RuneApp {
         void TestRuneTab(Rune rune, string tab) {
             bool res = false;
             SlotIndex tabdex = LibExtensionMethods.GetIndex(tab);
-            if (!build.RuneScoring.ContainsKey(tabdex))
+            if (!Build.RuneScoring.ContainsKey(tabdex))
                 return;
 
             int? fake = 0;
             bool pred = false;
-            if (build.RunePrediction.ContainsKey(tabdex)) {
-                fake = build.RunePrediction[tabdex].Key;
-                pred = build.RunePrediction[tabdex].Value;
+            if (Build.RunePrediction.ContainsKey(tabdex)) {
+                fake = Build.RunePrediction[tabdex].Key;
+                pred = Build.RunePrediction[tabdex].Value;
             }
 
-            var kv = build.RuneScoring[tabdex];
+            var kv = Build.RuneScoring[tabdex];
             FilterType scoring = kv.Type;
             if (scoring == FilterType.And)
                 res = true;
@@ -779,7 +779,7 @@ namespace RuneApp {
                 ctrl.Text = points.ToString("#.##");
             if (scoring == FilterType.Sum) {
                 ctrl.ForeColor = Color.Red;
-                if (points >= build.RuneScoring[tabdex].Value)
+                if (points >= Build.RuneScoring[tabdex].Value)
                     ctrl.ForeColor = Color.Green;
             }
         }
@@ -787,12 +787,12 @@ namespace RuneApp {
 
         // Returns if to abort that operation
         bool AnnoyUser() {
-            if (build == null)
+            if (Build == null)
                 return true;
 
-            foreach (var tbf in build.RuneFilters) {
-                if (build.RuneScoring.ContainsKey(tbf.Key)) {
-                    FilterType and = build.RuneScoring[tbf.Key].Type;
+            foreach (var tbf in Build.RuneFilters) {
+                if (Build.RuneScoring.ContainsKey(tbf.Key)) {
+                    FilterType and = Build.RuneScoring[tbf.Key].Type;
                     double sum = 0;
 
                     foreach (var rbf in tbf.Value) {
@@ -833,7 +833,7 @@ namespace RuneApp {
                     switch (and) {
                         case FilterType.Sum:
                         case FilterType.SumN:
-                            if (sum > 0 && build.RuneScoring[tbf.Key].Value == 0) {
+                            if (sum > 0 && Build.RuneScoring[tbf.Key].Value == 0) {
                                 if (tabControl1.TabPages.ContainsKey("tab" + tbf.Key)) {
                                     var tab = tabControl1.TabPages["tab" + tbf.Key];
                                     tabControl1.SelectTab(tab);
@@ -849,7 +849,7 @@ namespace RuneApp {
                 }
             }
 
-            if (!build.Sort.IsNonZero) {
+            if (!Build.Sort.IsNonZero) {
                 tooltipNoSorting.IsBalloon = true;
                 tooltipNoSorting.Show(string.Empty, statRows[Attr.Speed].Worth);
                 tooltipNoSorting.Show("Enter a value somewhere, please.\nLike 1 or 3.14", statRows[Attr.Speed].Worth, 0);
@@ -870,22 +870,22 @@ namespace RuneApp {
 
             await Task.Run(() => {
                 // good idea, generate right now whenever the user clicks a... whatever
-                build.RunesUseLocked = false;
-                build.RunesUseEquipped = Program.Settings.UseEquipped;
-                build.RunesDropHalfSetStat = Program.GoFast;
-                build.RunesOnlyFillEmpty = Program.FillRunes;
-                build.BuildSaveStats = false;
-                build.GenRunes(Program.Data);
+                Build.RunesUseLocked = false;
+                Build.RunesUseEquipped = Program.Settings.UseEquipped;
+                Build.RunesDropHalfSetStat = Program.GoFast;
+                Build.RunesOnlyFillEmpty = Program.FillRunes;
+                Build.BuildSaveStats = false;
+                Build.GenRunes(Program.Data);
             });
 
             // figure stuff out
             long perms = 0;
             Label ctrl;
             for (int i = 0; i < 6; i++) {
-                if (build.Runes[i] == null)
+                if (Build.Runes[i] == null)
                     continue;
 
-                int num = build.Runes[i].Length;
+                int num = Build.Runes[i].Length;
 
                 if (i == 0)
                     perms = num;

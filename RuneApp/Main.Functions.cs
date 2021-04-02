@@ -365,7 +365,7 @@ namespace RuneApp {
             foreach (Rune rune in Program.Data.Runes) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
-            checkLocked();
+            CheckLocked();
             ColorMonsWithBuilds();
 
             foreach (ListViewItem lvi in buildList.Items) {
@@ -388,7 +388,7 @@ namespace RuneApp {
                 dataRuneList.Sort();
             }
         }
-        public void refreshLoadouts()
+        public void RefreshLoadouts()
         {
             foreach (ListViewItem item in loadoutList.Items)
             {
@@ -401,7 +401,7 @@ namespace RuneApp {
             }
         }
 
-        public void checkLocked() {
+        public void CheckLocked() {
             if (Program.Data?.Runes == null)
                 return;
 

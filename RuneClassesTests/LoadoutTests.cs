@@ -105,8 +105,8 @@ namespace RuneOptim.Tests {
             load.AddRune(TestData.Rune5());
             load.AddRune(TestData.Rune6());
 
-            var statsComp = TestData.statsFull();
-            var statRhs = load.GetStats(TestData.statsBase());
+            var statsComp = TestData.StatsFull();
+            var statRhs = load.GetStats(TestData.StatsBase());
 
             Assert.AreEqual(statsComp.Health, statRhs.Health);
             Assert.AreEqual(statsComp.Attack, statRhs.Attack);

@@ -91,10 +91,10 @@ namespace RuneApp.InternalServer {
 
                         sr.Add(table);
                     }
-                    return returnHtml(new ServedResult[] { new ServedResult("style") { contentList = { "td {border: 1px solid black;}" } } }, sr.ToArray());
+                    return ReturnHtml(new ServedResult[] { new ServedResult("style") { contentList = { "td {border: 1px solid black;}" } } }, sr.ToArray());
                 }
                 else {
-                    return returnHtml(null, "Please put GetBestClearRiftDungeon_*.resp.json");
+                    return ReturnHtml(null, "Please put GetBestClearRiftDungeon_*.resp.json");
                 }
             }
         }

@@ -9,7 +9,7 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void StatsTest()
         {
-            var stat1 = TestData.statsFull();
+            var stat1 = TestData.StatsFull();
             var stat2 = new Stats(stat1);
             Assert.AreEqual(stat1.Health, stat2.Health);
             Assert.AreEqual(stat1.Attack, stat2.Attack);
@@ -31,7 +31,7 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void SetZeroTest()
         {
-            var stat1 = TestData.statsFull();
+            var stat1 = TestData.StatsFull();
             var stat2 = new Stats();
             stat1.SetTo(0);
             Assert.AreEqual(stat2, stat2);
@@ -40,22 +40,22 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void SumTest()
         {
-            var stat = TestData.statsBase();
+            var stat = TestData.StatsBase();
             Assert.AreEqual(1365, stat.Sum());
         }
 
         [TestMethod()]
         public void GreaterEqualTest()
         {
-            var stat1 = TestData.statsBase();
-            var stat2 = TestData.statsFull();
+            var stat1 = TestData.StatsBase();
+            var stat2 = TestData.StatsFull();
             Assert.IsTrue(stat2.GreaterEqual(stat1));
         }
 
         [TestMethod()]
         public void DivisionTest()
         {
-            var stat1 = TestData.statsBase();
+            var stat1 = TestData.StatsBase();
             var stat2 = new Stats()
             {
                 Attack = 200,
@@ -85,8 +85,8 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void OfTest()
         {
-            var stat1 = TestData.statsBase();
-            var stat2 = TestData.statsFull();
+            var stat1 = TestData.StatsBase();
+            var stat2 = TestData.StatsFull();
             Assert.AreEqual(3.02, stat2.Of(stat1).Health);
             Assert.AreEqual(2.22, stat2.Of(stat1).Attack);
             Assert.AreEqual(2.34, stat2.Of(stat1).Defense);
@@ -95,7 +95,7 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void BoostTest()
         {
-            var stat1 = TestData.statsBase().Boost(new Stats()
+            var stat1 = TestData.StatsBase().Boost(new Stats()
             {
                 Attack = 40,
                 Health = 30,

@@ -47,7 +47,7 @@ namespace RuneAppTests
 
 
         [TestMethod]
-        public async Task _99_RefreshBreaksLockedLoadouts()
+        public async Task Issue_99_RefreshBreaksLockedLoadouts()
         {
 
             // load the save?
@@ -55,7 +55,7 @@ namespace RuneAppTests
             {
                 Program.LoadSave(Program.Settings.SaveLocation);
                 main.RebuildLists();
-                main.refreshLoadouts();
+                main.RefreshLoadouts();
             }
             else
                 Assert.Fail("No save");
@@ -73,7 +73,7 @@ namespace RuneAppTests
             {
                 Program.LoadSave(Program.Settings.SaveLocation);
                 main.RebuildLists();
-                main.refreshLoadouts();
+                main.RefreshLoadouts();
             }
 
             
@@ -82,7 +82,7 @@ namespace RuneAppTests
         }
 
         [TestMethod]
-        public void _45_BuildNamesDontRefresh()
+        public void Issue_45_BuildNamesDontRefresh()
         {
             // get a non-homu build, and check that the LVI has the correct name
             var build = Program.Builds.FirstOrDefault(b => !b.Mon.IsHomunculus);
@@ -100,7 +100,7 @@ namespace RuneAppTests
             // pretend to click the "refresh" button
             Program.Data = Program.LoadSaveData(JsonConvert.SerializeObject(ddat), Program.Loads);
             main.RebuildLists();
-            main.refreshLoadouts();
+            main.RefreshLoadouts();
 
             // the monster has a new ref, but the lvi is same.
             var updatedMonster = Program.Data.GetMonster(build.MonId);
