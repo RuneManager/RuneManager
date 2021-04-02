@@ -303,7 +303,7 @@ namespace RuneApp {
             loading = true;
 
             if (Program.Settings.ShowIreneOnStart)
-                Main.irene.Show();
+                Main.Irene.Show();
 
             Monster mon = build.Mon;
             mon.Current.Leader = build.Leader;
@@ -977,12 +977,12 @@ namespace RuneApp {
         }
 
         void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\build.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\build.html";
+            Main.Help.Show();
         }
 
         void button4_Click_1(object sender, EventArgs e) {

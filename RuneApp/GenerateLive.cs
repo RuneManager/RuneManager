@@ -727,12 +727,12 @@ namespace RuneApp {
         }
 
         private void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
+            Main.Help.Show();
         }
 
         private void loadoutList_SelectedIndexChanged(object sender, EventArgs e) {
@@ -741,14 +741,14 @@ namespace RuneApp {
                 if (item.Tag != null) {
                     Monster mon = item.Tag as Monster;
                     if (mon != null) {
-                        if (Main.runeDisplay == null || Main.runeDisplay.IsDisposed)
-                            Main.runeDisplay = new RuneDisplay();
-                        if (!Main.runeDisplay.Visible) {
-                            Main.runeDisplay.Show(this);
+                        if (Main.RuneDisplay == null || Main.RuneDisplay.IsDisposed)
+                            Main.RuneDisplay = new RuneDisplay();
+                        if (!Main.RuneDisplay.Visible) {
+                            Main.RuneDisplay.Show(this);
                         }
-                        Main.runeDisplay.Owner = this;
-                        Main.runeDisplay.Location = new Point(0, 0);
-                        Main.runeDisplay.UpdateRunes(mon.Current.Runes);
+                        Main.RuneDisplay.Owner = this;
+                        Main.RuneDisplay.Location = new Point(0, 0);
+                        Main.RuneDisplay.UpdateRunes(mon.Current.Runes);
                     }
                 }
             }
@@ -777,9 +777,9 @@ namespace RuneApp {
         }
 
         private void Generate_FormClosing(object sender, FormClosingEventArgs e) {
-            if (Main.runeDisplay != null && !Main.runeDisplay.IsDisposed && Main.runeDisplay.Owner == this) {
-                Main.runeDisplay.Owner = Main.currentMain;
-                Main.runeDisplay.Location = new Point(Main.currentMain.Location.X + Main.currentMain.Width, Main.currentMain.Location.Y);
+            if (Main.RuneDisplay != null && !Main.RuneDisplay.IsDisposed && Main.RuneDisplay.Owner == this) {
+                Main.RuneDisplay.Owner = Main.CurrentMain;
+                Main.RuneDisplay.Location = new Point(Main.CurrentMain.Location.X + Main.CurrentMain.Width, Main.CurrentMain.Location.Y);
             }
         }
     }

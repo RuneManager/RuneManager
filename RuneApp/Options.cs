@@ -89,8 +89,8 @@ namespace RuneApp {
             if (loading)
                 return;
 
-            if (Main.help != null)
-                Main.help.SetStartupCheck(cHelpStart.Checked);
+            if (Main.Help != null)
+                Main.Help.SetStartupCheck(cHelpStart.Checked);
         }
 
         private void Options_FormClosing(object sender, FormClosingEventArgs e) {
@@ -126,10 +126,10 @@ namespace RuneApp {
         }
 
         private void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
+            Main.Help = new Help();
             Main.Instance.OpenHelp(Environment.CurrentDirectory + "\\User Manual\\options.html");//, this);
         }
 

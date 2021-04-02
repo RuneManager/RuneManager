@@ -292,12 +292,12 @@ namespace RuneApp {
         }
 
         private void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
+            Main.Help.Show();
         }
 
         private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {

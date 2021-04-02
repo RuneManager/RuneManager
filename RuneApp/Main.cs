@@ -178,10 +178,10 @@ namespace RuneApp {
             if (Program.Settings.StartUpHelp)
                 OpenHelp();
 
-            if (irene == null)
-                irene = new Irene(this);
+            if (Irene == null)
+                Irene = new Irene(this);
             if (Program.Settings.ShowIreneOnStart)
-                irene.Show(this);
+                Irene.Show(this);
 
             await loadTask;
 
@@ -1179,31 +1179,31 @@ namespace RuneApp {
         }
 
         private void runeDial1_DoubleClick(object sender, EventArgs e) {
-            if (runeDisplay == null || runeDisplay.IsDisposed)
-                runeDisplay = new RuneDisplay();
-            if (!runeDisplay.Visible) {
-                runeDisplay.Show(this);
+            if (RuneDisplay == null || RuneDisplay.IsDisposed)
+                RuneDisplay = new RuneDisplay();
+            if (!RuneDisplay.Visible) {
+                RuneDisplay.Show(this);
                 var xx = Location.X + 1105 + 8 - 271;//271, 213
                 var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
 
-                runeDisplay.Location = new Point(xx, yy);
-                runeDisplay.Location = new Point(Location.X + Width, Location.Y);
+                RuneDisplay.Location = new Point(xx, yy);
+                RuneDisplay.Location = new Point(Location.X + Width, Location.Y);
             }
             if (displayMon != null)
-                runeDisplay.UpdateLoad(displayMon.Current);
+                RuneDisplay.UpdateLoad(displayMon.Current);
             if (loadoutList.SelectedItems.Count == 1) {
                 var ll = loadoutList.SelectedItems[0].Tag as Loadout;
-                runeDisplay.UpdateLoad(ll);
+                RuneDisplay.UpdateLoad(ll);
             }
         }
 
         private void findGoodRunes_CheckedChanged(object sender, EventArgs e) {
             if (findGoodRunes.Checked && MessageBox.Show("This runs each test multiple times.\r\nThat means leaving it overnight or something.", "Warning", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.OK) {
-                goodRunes = true;
+                GoodRunes = true;
             }
             else
                 findGoodRunes.Checked = false;
-            goodRunes = findGoodRunes.Checked;
+            GoodRunes = findGoodRunes.Checked;
         }
 
         private void tsBtnFindSpeed_Click(object sender, EventArgs e) {
@@ -1351,11 +1351,11 @@ namespace RuneApp {
         }
 
         private void cbGoFast_CheckedChanged(object sender, EventArgs e) {
-            goFast = cbGoFast.Checked;
+            GoFast = cbGoFast.Checked;
         }
 
         private void cbFillRunes_CheckedChanged(object sender, EventArgs e) {
-            fillRunes = cbFillRunes.Checked;
+            FillRunes = cbFillRunes.Checked;
         }
 
         private void tsBtnSkip_Click(object sender, EventArgs e) {
