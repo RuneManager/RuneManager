@@ -65,9 +65,9 @@ namespace RuneApp
             if (currentBuild == null)
                 return;
             runSource?.Cancel();
-            if (currentBuild.runner != null)
+            if (currentBuild.Runner != null)
             {
-                currentBuild.runner.Cancel();
+                currentBuild.Runner.Cancel();
             }
         }
 
@@ -84,9 +84,9 @@ namespace RuneApp
                 else
                 {
                     runSource.Cancel();
-                    if (currentBuild.runner != null)
+                    if (currentBuild.Runner != null)
                     {
-                        currentBuild.runner.Cancel();
+                        currentBuild.Runner.Cancel();
                     }
                     return;
                 }
@@ -164,9 +164,9 @@ namespace RuneApp
 
                 #region Check enough runes
                 string nR = "";
-                for (int i = 0; i < build.runes.Length; i++)
+                for (int i = 0; i < build.Runes.Length; i++)
                 {
-                    if (build.runes[i] != null && build.runes[i].Length == 0)
+                    if (build.Runes[i] != null && build.Runes[i].Length == 0)
                         nR += (i + 1) + " ";
                 }
 

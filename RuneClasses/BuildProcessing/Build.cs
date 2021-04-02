@@ -33,7 +33,7 @@ namespace RuneOptim.BuildProcessing {
         /// Current running build strategy, ask it for progress?
         /// </summary>
         [JsonIgnore]
-        public IBuildRunner runner;
+        public IBuildRunner Runner;
 
         [JsonIgnore]
         private TaskCompletionSource<IBuildRunner> tcs = new TaskCompletionSource<IBuildRunner>();
@@ -42,12 +42,12 @@ namespace RuneOptim.BuildProcessing {
         /// awaitable for when the build actually starts running
         /// </summary>
         [JsonIgnore]
-        public Task<IBuildRunner> startedBuild => tcs.Task;
+        public Task<IBuildRunner> StartedBuild => tcs.Task;
 
         /// <summary>
         /// Store the score of the last run in here for loading?
         /// </summary>
-        public double lastScore = float.MinValue;
+        private double lastScore = float.MinValue;
 
         public Build() {
             // for all 6 slots, init the list
@@ -460,10 +460,10 @@ namespace RuneOptim.BuildProcessing {
         /// The runes to be used to generate builds
         /// </summary>
         [JsonIgnore]
-        public Rune[][] runes { get; set; } = new Rune[6][];
+        public Rune[][] Runes { get; set; } = new Rune[6][];
 
         [JsonIgnore]
-        public Craft[] grinds { get; set; }
+        public Craft[] Grinds { get; set; }
 
         // ----------------
 
@@ -471,7 +471,7 @@ namespace RuneOptim.BuildProcessing {
         /// How to sort the stats
         /// </summary>
         [JsonIgnore]
-        public Func<Stats, int> sortFunc { get; set; }
+        public Func<Stats, int> SortFunc { get; set; }
 
         [JsonIgnore]
         public long Time { get; set; }
@@ -601,15 +601,15 @@ namespace RuneOptim.BuildProcessing {
 
         public BuildResult RunUsingStrategy(Type strategy, BuildSettings settings) {
             var def = (IBuildStrategyDefinition)Activator.CreateInstance(strategy);
-            runner = null;
+            Runner = null;
             try {
-                runner = def.GetRunner();
+                Runner = def.GetRunner();
                 // TODO: fixme
 
-                if (runner != null) {
-                    runner.Setup(this, settings);
-                    tcs.TrySetResult(runner);
-                    this.Best = runner.Run(runes.SelectMany(r => r)).Result;
+                if (Runner != null) {
+                    Runner.Setup(this, settings);
+                    tcs.TrySetResult(Runner);
+                    this.Best = Runner.Run(Runes.SelectMany(r => r)).Result;
 
                     return BuildResult.Success;
                 }
@@ -623,8 +623,8 @@ namespace RuneOptim.BuildProcessing {
             finally {
                 tcs = new TaskCompletionSource<IBuildRunner>();
                 IsRunning = false;
-                runner?.TearDown();
-                runner = null;
+                Runner?.TearDown();
+                Runner = null;
             }
 
         }
@@ -886,6 +886,12 @@ namespace RuneOptim.BuildProcessing {
             }
 
             return v2;
+        }
+
+        public double LastScore() {
+            if (lastScore == float.MinValue)
+                CalcScore(this.Best ?? this.Mon ?? throw new NullReferenceException("No monster to calculate score for build " + ID + ": " + MonName));
+            return lastScore;
         }
 
         /// <summary>
@@ -1211,18 +1217,18 @@ namespace RuneOptim.BuildProcessing {
         /// </summary>
         /// <param name="slotFakes"></param>
         /// <param name="slotPred"></param>
-        public void getPrediction(int?[] slotFakes, bool[] slotPred) {
+        public void GetPrediction(int?[] slotFakes, bool[] slotPred) {
             // crank the rune prediction
             for (int i = 0; i < 6; i++) {
 
-                getPrediction((SlotIndex)(i + 1), out int? raiseTo, out bool predictSubs);
+                GetPrediction((SlotIndex)(i + 1), out int? raiseTo, out bool predictSubs);
 
                 slotFakes[i] = raiseTo;
                 slotPred[i] = predictSubs;
             }
         }
 
-        public void getPrediction(SlotIndex ind, out int? raiseTo, out bool predictSubs) {
+        public void GetPrediction(SlotIndex ind, out int? raiseTo, out bool predictSubs) {
             raiseTo = null;
             predictSubs = false;
 
@@ -1479,7 +1485,7 @@ namespace RuneOptim.BuildProcessing {
         /// <param name="slotPred"></param>
         /// <returns></returns>
         public Stats NeededForMin(int?[] slotFakes, bool[] slotPred) {
-            foreach (var rs in runes) {
+            foreach (var rs in Runes) {
                 if (rs.Length <= 0)
                     return null;
             }
@@ -1489,9 +1495,9 @@ namespace RuneOptim.BuildProcessing {
 
             Stats ret = smin - smon;
 
-            var avATK = runes[0].Average(r => r.GetValue(Attr.AttackFlat, slotFakes[0] ?? 0, slotPred[0]));
-            var avDEF = runes[2].Average(r => r.GetValue(Attr.DefenseFlat, slotFakes[2] ?? 0, slotPred[2]));
-            var avHP = runes[4].Average(r => r.GetValue(Attr.HealthFlat, slotFakes[4] ?? 0, slotPred[4]));
+            var avATK = Runes[0].Average(r => r.GetValue(Attr.AttackFlat, slotFakes[0] ?? 0, slotPred[0]));
+            var avDEF = Runes[2].Average(r => r.GetValue(Attr.DefenseFlat, slotFakes[2] ?? 0, slotPred[2]));
+            var avHP = Runes[4].Average(r => r.GetValue(Attr.HealthFlat, slotFakes[4] ?? 0, slotPred[4]));
 
             ret.Attack -= avATK;
             ret.Defense -= avDEF;
@@ -1512,15 +1518,15 @@ namespace RuneOptim.BuildProcessing {
             Attr[] evenSlots = new Attr[] { Attr.Null, Attr.Null, Attr.Null };
 
             // get the average MainStats for slots
-            var avSel = runes[1].Where(r => r.Main.Type == Attr.Speed).ToArray();
+            var avSel = Runes[1].Where(r => r.Main.Type == Attr.Speed).ToArray();
             var avmSpeed = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Speed, slotFakes[1] ?? 0, slotPred[1]));
-            avSel = runes[3].Where(r => r.Main.Type == Attr.CritRate).ToArray();
+            avSel = Runes[3].Where(r => r.Main.Type == Attr.CritRate).ToArray();
             var avmCRate = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritRate, slotFakes[3] ?? 0, slotPred[3]));
-            avSel = runes[3].Where(r => r.Main.Type == Attr.CritDamage).ToArray();
+            avSel = Runes[3].Where(r => r.Main.Type == Attr.CritDamage).ToArray();
             var avmCDam = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.CritDamage, slotFakes[3] ?? 0, slotPred[3]));
-            avSel = runes[5].Where(r => r.Main.Type == Attr.Accuracy).ToArray();
+            avSel = Runes[5].Where(r => r.Main.Type == Attr.Accuracy).ToArray();
             var avmAcc = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Accuracy, slotFakes[5] ?? 0, slotPred[5]));
-            avSel = runes[5].Where(r => r.Main.Type == Attr.Resistance).ToArray();
+            avSel = Runes[5].Where(r => r.Main.Type == Attr.Resistance).ToArray();
             var avmRes = !avSel.Any() ? 0 : avSel.Average(r => r.GetValue(Attr.Resistance, slotFakes[5] ?? 0, slotPred[5]));
 
             if (avmSpeed > 20 && ret.Speed > avmSpeed + 10) {
@@ -1663,9 +1669,9 @@ namespace RuneOptim.BuildProcessing {
             int?[] fake = new int?[6];
             bool[] pred = new bool[6];
 
-            getPrediction(fake, pred);
+            GetPrediction(fake, pred);
 
-            var hasSets = runes.SelectMany(r => r).Select(r => r.Set).Distinct();
+            var hasSets = Runes.SelectMany(r => r).Select(r => r.Set).Distinct();
 
             bool removedOne = true;
             while (removedOne) {
@@ -1691,7 +1697,7 @@ namespace RuneOptim.BuildProcessing {
                             double maxEff = 0;
 
                             double eff = 0;
-                            foreach (var u in runes[j]) {
+                            foreach (var u in Runes[j]) {
                                 var p = u[attr, fake[j] ?? 0, pred[j]];
                                 var f = u[attr - 1, fake[j] ?? 0, pred[j]];
                                 if (attr == Attr.Speed) {
@@ -1708,12 +1714,12 @@ namespace RuneOptim.BuildProcessing {
                         }
 
                         // pick the runes which really won't make the cut
-                        var garbo = runes[i].Where(r => bb * ( 0.01 * (r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }))) + r[attr - 1, fake[i] ?? 0, pred[i]] + totEff < Minimum[attr]).ToArray();
+                        var garbo = Runes[i].Where(r => bb * ( 0.01 * (r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }))) + r[attr - 1, fake[i] ?? 0, pred[i]] + totEff < Minimum[attr]).ToArray();
 
                         if (garbo.Length > 0)
                             removedOne = true;
 
-                        runes[i] = runes[i].Except(garbo).ToArray();
+                        Runes[i] = Runes[i].Except(garbo).ToArray();
                     }
                 }
 
@@ -1734,7 +1740,7 @@ namespace RuneOptim.BuildProcessing {
                             double maxEff = 0;
 
                             double eff = 0;
-                            foreach (var u in runes[j]) {
+                            foreach (var u in Runes[j]) {
                                 var f = u[attr, fake[j] ?? 0, pred[j]];
                                 eff = bb + f;
 
@@ -1745,12 +1751,12 @@ namespace RuneOptim.BuildProcessing {
                             totEff += maxEff;
                         }
 
-                        var garbo = runes[i].Where(r => bb + r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }) + totEff < Minimum[attr]).ToArray();
+                        var garbo = Runes[i].Where(r => bb + r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }) + totEff < Minimum[attr]).ToArray();
 
                         if (garbo.Length > 0)
                             removedOne = true;
 
-                        runes[i] = runes[i].Except(garbo).ToArray();
+                        Runes[i] = Runes[i].Except(garbo).ToArray();
                     }
                 }
             }
@@ -1763,20 +1769,20 @@ namespace RuneOptim.BuildProcessing {
         /// </summary>
         private void cleanBroken() {
             if (!AllowBroken) {
-                var used = runes[0].Concat(runes[1]).Concat(runes[2]).Concat(runes[3]).Concat(runes[4]).Concat(runes[5]).Select(r => r.Set).Distinct();
+                var used = Runes[0].Concat(Runes[1]).Concat(Runes[2]).Concat(Runes[3]).Concat(Runes[4]).Concat(Runes[5]).Select(r => r.Set).Distinct();
 
                 foreach (RuneSet s in used) {
                     // find how many slots have acceptable runes for it
                     int slots = 0;
                     for (int i = 0; i < 6; i++) {
-                        if (runes[i].Any(r => r.Set == s))
+                        if (Runes[i].Any(r => r.Set == s))
                             slots += 1;
                     }
                     // if there isn't enough slots
                     if (slots < Rune.SetRequired(s)) {
                         // remove that set
                         for (int i = 0; i < 6; i++) {
-                            runes[i] = runes[i].Where(r => r.Set != s).ToArray();
+                            Runes[i] = Runes[i].Where(r => r.Set != s).ToArray();
                         }
                     }
                 }

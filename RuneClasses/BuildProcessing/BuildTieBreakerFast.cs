@@ -65,7 +65,7 @@ namespace RuneOptim.BuildProcessing {
             int?[] fakes = new int?[6];
             bool[] pred = new bool[6];
 
-            build.getPrediction(fakes, pred);
+            build.GetPrediction(fakes, pred);
 
             var hps = inRunes.StdDev(out double hpa, r => r[Attr.HealthPercent, fakes[r.Slot - 1] ?? 0, pred[r.Slot - 1]]);
             var hfs = inRunes.StdDev(out double hfa, r => r[Attr.HealthFlat, fakes[r.Slot - 1] ?? 0, pred[r.Slot - 1]]);

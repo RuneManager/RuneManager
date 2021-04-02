@@ -782,7 +782,7 @@ namespace RuneApp {
                 rs.returnedRune = build.Mon.Current.Runes[e.Slot - 1];
                 rs.build = build;
                 rs.slot = (SlotIndex)e.Slot;
-                rs.runes = build.runes[e.Slot - 1];
+                rs.runes = build.Runes[e.Slot - 1];
                 rs.ShowDialog();
             }
         }

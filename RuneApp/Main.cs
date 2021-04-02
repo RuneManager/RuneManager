@@ -226,13 +226,13 @@ namespace RuneApp {
                 //lastPrint = null;
             }*/
 
-            if (Program.CurrentBuild?.runner is IBuildRunner br) {
+            if (Program.CurrentBuild?.Runner is IBuildRunner br) {
                 toolStripBuildStatus.Text = $"Build Status: {br.Good:N0} ~ {br.Completed:N0} - {br.Skipped:N0}";
                 ProgressToList(Program.CurrentBuild, ((double)br.Completed / (double)br.Expected).ToString("P2"));
             }
             else if (Program.CurrentBuild != null && Program.CurrentBuild.IsRunning) {
-                toolStripBuildStatus.Text = $"Build Status: {(Program.CurrentBuild.BuildUsage?.passed ?? 0):N0} ~ {Program.CurrentBuild.count:N0} - {Program.CurrentBuild.skipped:N0}";
-                ProgressToList(Program.CurrentBuild, ((double)Program.CurrentBuild.count / (double)Program.CurrentBuild.total).ToString("P2"));
+                toolStripBuildStatus.Text = $"Build Status: {(Program.CurrentBuild.BuildUsage?.passed ?? 0):N0} ~ {Program.CurrentBuild.Count:N0} - {Program.CurrentBuild.Skipped:N0}";
+                ProgressToList(Program.CurrentBuild, ((double)Program.CurrentBuild.Count / (double)Program.CurrentBuild.Total).ToString("P2"));
             }
         }
 
@@ -1215,14 +1215,14 @@ namespace RuneApp {
                     b.RunesDropHalfSetStat = Program.GoFast;
                     b.RunesOnlyFillEmpty = Program.FillRunes;
                     b.GenRunes(Program.Data);
-                    if (b.runes.Any(rr => rr == null))
+                    if (b.Runes.Any(rr => rr == null))
                         continue;
-                    long c = b.runes[0].Length;
-                    c *= b.runes[1].Length;
-                    c *= b.runes[2].Length;
-                    c *= b.runes[3].Length;
-                    c *= b.runes[4].Length;
-                    c *= b.runes[5].Length;
+                    long c = b.Runes[0].Length;
+                    c *= b.Runes[1].Length;
+                    c *= b.Runes[2].Length;
+                    c *= b.Runes[3].Length;
+                    c *= b.Runes[4].Length;
+                    c *= b.Runes[5].Length;
 
                     // I get about 4mil/sec, and can be bothered to wait 10 - 25 seconds
                     li.SubItems[0].ForeColor = Color.Black;

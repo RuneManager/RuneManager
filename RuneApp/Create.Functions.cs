@@ -426,7 +426,7 @@ namespace RuneApp {
                 else
                     build.RunePrediction[tabdex] = new KeyValuePair<int?, bool>(raiseLevel, cb.Checked);
 
-                build.getPrediction(tabdex, out int? raise, out bool pred);
+                build.GetPrediction(tabdex, out int? raise, out bool pred);
                 var ctrlRaise = Controls.Find(tab + "raiseInherit", true).FirstOrDefault();
                 ctrlRaise.Text = raise?.ToString();
                 var ctrlPred = Controls.Find(tab + "bonusInherit", true).FirstOrDefault();
@@ -882,10 +882,10 @@ namespace RuneApp {
             long perms = 0;
             Label ctrl;
             for (int i = 0; i < 6; i++) {
-                if (build.runes[i] == null)
+                if (build.Runes[i] == null)
                     continue;
 
-                int num = build.runes[i].Length;
+                int num = build.Runes[i].Length;
 
                 if (i == 0)
                     perms = num;

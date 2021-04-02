@@ -70,25 +70,25 @@ namespace RuneApp {
                 List<Rune> fr = new List<Rune>();
                 switch (slot) {
                     case SlotIndex.Even:
-                        fr.AddRange(build.runes[1]);
-                        fr.AddRange(build.runes[3]);
-                        fr.AddRange(build.runes[5]);
+                        fr.AddRange(build.Runes[1]);
+                        fr.AddRange(build.Runes[3]);
+                        fr.AddRange(build.Runes[5]);
                         break;
                     case SlotIndex.Odd:
-                        fr.AddRange(build.runes[0]);
-                        fr.AddRange(build.runes[2]);
-                        fr.AddRange(build.runes[4]);
+                        fr.AddRange(build.Runes[0]);
+                        fr.AddRange(build.Runes[2]);
+                        fr.AddRange(build.Runes[4]);
                         break;
                     case SlotIndex.Global:
-                        fr.AddRange(build.runes[0]);
-                        fr.AddRange(build.runes[1]);
-                        fr.AddRange(build.runes[2]);
-                        fr.AddRange(build.runes[3]);
-                        fr.AddRange(build.runes[4]);
-                        fr.AddRange(build.runes[5]);
+                        fr.AddRange(build.Runes[0]);
+                        fr.AddRange(build.Runes[1]);
+                        fr.AddRange(build.Runes[2]);
+                        fr.AddRange(build.Runes[3]);
+                        fr.AddRange(build.Runes[4]);
+                        fr.AddRange(build.Runes[5]);
                         break;
                     default:
-                        fr.AddRange(build.runes[(int)slot - 1]);
+                        fr.AddRange(build.Runes[(int)slot - 1]);
                         break;
                 }
                 // find the chosen runes in the list and colour them in

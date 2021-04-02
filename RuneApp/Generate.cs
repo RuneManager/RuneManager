@@ -362,7 +362,7 @@ namespace RuneApp {
                         }
                     });
 
-                    var runner = await build.startedBuild;
+                    var runner = await build.StartedBuild;
 
                     if (runner != null) {
                         while (build.IsRunning) {

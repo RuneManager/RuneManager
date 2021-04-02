@@ -177,7 +177,7 @@ namespace RuneApp {
 
                 build.GenRunes(Program.Data);
 
-                if (build.runes.Any(rs => rs.Length > 10))
+                if (build.Runes.Any(rs => rs.Length > 10))
                     return;
                 var res = build.GenBuilds();
 

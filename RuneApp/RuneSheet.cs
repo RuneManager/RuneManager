@@ -185,12 +185,12 @@ namespace RuneApp {
                     runeSheet.Cells[build.Priority + 1, linkCol + 1].Style.Fill.BackgroundColor.SetColor(Color.Red);
                 }
 
-                int combinations = build.runes[0].Length;
-                combinations *= build.runes[1].Length;
-                combinations *= build.runes[2].Length;
-                combinations *= build.runes[3].Length;
-                combinations *= build.runes[4].Length;
-                combinations *= build.runes[5].Length;
+                int combinations = build.Runes[0].Length;
+                combinations *= build.Runes[1].Length;
+                combinations *= build.Runes[2].Length;
+                combinations *= build.Runes[3].Length;
+                combinations *= build.Runes[4].Length;
+                combinations *= build.Runes[5].Length;
 
                 runeSheet.Cells[build.Priority + 1, linkCol + 2].Value = load.ActualTests;
                 runeSheet.Cells[build.Priority + 1, linkCol + 3].Value = combinations;

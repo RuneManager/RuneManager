@@ -126,7 +126,7 @@ namespace RuneOptim.BuildProcessing {
 
                         int?[] slotFakesTemp = new int?[6];
                         bool[] slotPred = new bool[6];
-                        build.getPrediction(slotFakesTemp, slotPred);
+                        build.GetPrediction(slotFakesTemp, slotPred);
 
                         int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 

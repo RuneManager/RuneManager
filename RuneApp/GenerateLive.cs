@@ -432,12 +432,12 @@ namespace RuneApp {
         }
 
         private int getTotal() {
-            return build.runes[0].Length
-                * build.runes[1].Length
-                * build.runes[2].Length
-                * build.runes[3].Length
-                * build.runes[4].Length
-                * build.runes[5].Length;
+            return build.Runes[0].Length
+                * build.Runes[1].Length
+                * build.Runes[2].Length
+                * build.Runes[3].Length
+                * build.Runes[4].Length
+                * build.Runes[5].Length;
         }
 
         public void RegenSets() {
@@ -462,7 +462,7 @@ namespace RuneApp {
                     long total = getTotal();
                     DateTime start = DateTime.Now;
 
-                    var pfer = Parallel.ForEach(build.runes[0], (r0, loop) =>
+                    var pfer = Parallel.ForEach(build.Runes[0], (r0, loop) =>
                     {
                         if (monSetsCancelled)
                             loop.Break();
@@ -471,7 +471,7 @@ namespace RuneApp {
                         if (!build.AllowBroken && r0.SetIs4)
                             c4set = r0.Set;
 
-                        foreach (var r1 in build.runes[1])
+                        foreach (var r1 in build.Runes[1])
                         {
                             if (monSetsCancelled)
                                 break;
@@ -484,7 +484,7 @@ namespace RuneApp {
                                     continue;
                             }
 
-                            foreach (var r2 in build.runes[2])
+                            foreach (var r2 in build.Runes[2])
                             {
                                 if (monSetsCancelled)
                                     break;
@@ -497,7 +497,7 @@ namespace RuneApp {
                                         continue;
                                 }
 
-                                foreach (var r3 in build.runes[3])
+                                foreach (var r3 in build.Runes[3])
                                 {
                                     if (monSetsCancelled)
                                         break;
@@ -508,7 +508,7 @@ namespace RuneApp {
                                             continue;
                                     }
 
-                                    foreach (var r4 in build.runes[4])
+                                    foreach (var r4 in build.Runes[4])
                                     {
                                         if (monSetsCancelled)
                                             break;
@@ -519,7 +519,7 @@ namespace RuneApp {
                                                 continue;
                                         }
 
-                                        foreach (var r5 in build.runes[5])
+                                        foreach (var r5 in build.Runes[5])
                                         {
                                             if (monSetsCancelled)
                                                 break;
