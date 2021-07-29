@@ -13,6 +13,7 @@ namespace RuneApp {
             new LeaderType(Attr.Resistance).AddRange(new int[] { 0, 15, 20, 25, 26, 28, 30, 33, 38, 40, 41, 48, 50, 55 }),
             new LeaderType(Attr.CritRate).AddRange(new int[] { 0, 10, 15, 16, 17, 19, 23, 24, 28, 33, 38 }),
             new LeaderType(Attr.CritDamage).AddRange(new int[] { 0, 25 }),
+            new LeaderType(Attr.Accuracy).AddRange(new int[] { 15, 26, 30, 40, 41, 48, 50, 55 }),
         };
 
         public class LeaderType {
