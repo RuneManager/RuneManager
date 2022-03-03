@@ -109,14 +109,14 @@ namespace RuneApp {
                 ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
             waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
                 this.Invoke((MethodInvoker)delegate {
-                    for (int i = 0; i < 11; i++) {
+                    for (int i = 0; i < 21; i++) {
                         for (int j = 0; j < Deco.ShrineStats.Length; j++) {
                             if (j < 4)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
                             else if (j < 9)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
                             else
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j]), shrineMenu[j]);
+                                addShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
                         }
                     }
                 });
