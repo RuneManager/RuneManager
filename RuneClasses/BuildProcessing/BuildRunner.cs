@@ -99,7 +99,7 @@ namespace RuneOptim.BuildProcessing {
             currentScore = build.CalcScore(build.Mon);
 
             var s = build.Mon.GetStats(true);
-            var d = build.Mon.DamageFormula;
+            var d = build.Mon.DamageMethod;
 
             preRun();
 
@@ -126,7 +126,7 @@ namespace RuneOptim.BuildProcessing {
 
                         int?[] slotFakesTemp = new int?[6];
                         bool[] slotPred = new bool[6];
-                        build.getPrediction(slotFakesTemp, slotPred);
+                        build.GetPrediction(slotFakesTemp, slotPred);
 
                         int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
@@ -147,7 +147,7 @@ namespace RuneOptim.BuildProcessing {
                         lock (bag.SyncRoot) {
                             var tn = Math.Max(settings.BuildGenerate, 250000);
                             if (bag.Count > tn) {
-                                var bb = bag.OrderByDescending(b => b.score).Take(25000).ToList();
+                                var bb = bag.OrderByDescending(b => b.Score).Take(25000).ToList();
                                 bag.Clear();
                                 bag.AddRange(bb);
 
@@ -200,7 +200,7 @@ namespace RuneOptim.BuildProcessing {
                 // we found an okay build!
                 data.plus++;
                 var mm = new Monster(data.Mon, true);
-                mm.score = curScore;
+                mm.Score = curScore;
                 data.list.Add(mm);
             }
             else {

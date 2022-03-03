@@ -41,13 +41,13 @@ namespace RuneApp.InternalServer {
                     });
                 }
 
-                return returnHtml(null, sr.ToArray());
+                return ReturnHtml(null, sr.ToArray());
             }
 
             [PageAddressRender("preview.html")]
             public class ThemePreviewer : PageRenderer {
                 public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
-                    return returnHtml(null, new ThemePreview());
+                    return ReturnHtml(null, new ThemePreview());
                 }
             }
 
@@ -97,7 +97,7 @@ namespace RuneApp.InternalServer {
             [PageAddressRender("light.html")]
             public class LightPreview : PageRenderer {
                 public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
-                    return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "light.css" } } } }, new ThemePreview());
+                    return ReturnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "light.css" } } } }, new ThemePreview());
                 }
             }
 
@@ -111,7 +111,7 @@ namespace RuneApp.InternalServer {
             [PageAddressRender("dark.html")]
             public class DarkPreview : PageRenderer {
                 public override HttpResponseMessage Render(HttpListenerRequest req, string[] uri) {
-                    return returnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "dark.css" } } } }, new ThemePreview());
+                    return ReturnHtml(new[] { new ServedResult("link") { contentDic = { { "rel", "stylesheet" }, { "type", "text/css" }, { "href", "dark.css" } } } }, new ThemePreview());
                 }
             }
         }

@@ -93,17 +93,17 @@ namespace SWFarmLoader {
                     Console.WriteLine("\nGetting names.");
                     i = 0;
                     SortedDictionary<int, string> monstersJSON = new SortedDictionary<int, string>();
-                    foreach (var mon in monsters.OrderBy(m => m.monsterTypeId)) {
+                    foreach (var mon in monsters.OrderBy(m => m.MonsterTypeId)) {
                         prog.Report(i / (double)monsters.Count);
                         i++;
-                        if (mon.monsterTypeId % 100 == 1) {
-                            monstersJSON.Add(mon.monsterTypeId / 100, mon.name);
+                        if (mon.MonsterTypeId % 100 == 1) {
+                            monstersJSON.Add(mon.MonsterTypeId / 100, mon.Name);
                         }
-                        else if (mon.monsterTypeId % 100 / 10 == 0) {
+                        else if (mon.MonsterTypeId % 100 / 10 == 0) {
                             // duplicate so skip
                         }
                         else {
-                            monstersJSON.Add(mon.monsterTypeId, mon.name);
+                            monstersJSON.Add(mon.MonsterTypeId, mon.Name);
                         }
                     };
 
@@ -134,7 +134,7 @@ namespace RuneOptim.Monsters {{
 }}");
                     */
 
-                    File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.monsterTypeId), Formatting.Indented), Encoding.UTF8);
+                    File.WriteAllText("skills.json", JsonConvert.SerializeObject(monsters.OrderBy(m => m.MonsterTypeId), Formatting.Indented), Encoding.UTF8);
                     File.WriteAllText("monsters.json", JsonConvert.SerializeObject(monstersJSON, Formatting.Indented), Encoding.UTF8);
                 }
                 catch (Exception e) {
@@ -145,10 +145,10 @@ namespace RuneOptim.Monsters {{
 
         private static string writeGroup(IGrouping<int, MonsterStat> g, string offset) {
             string s = offset + "public static class ";
-            s += g.FirstOrDefault(m => !m.Awakened).name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "")
+            s += g.FirstOrDefault(m => !m.Awakened).Name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "")
                 + "{" + Environment.NewLine;
 
-            foreach (var eg in g.GroupBy(m => m.element)) {
+            foreach (var eg in g.GroupBy(m => m.Element)) {
 
             }
 
@@ -156,7 +156,7 @@ namespace RuneOptim.Monsters {{
         }
 
         public static string writeSMonCS(MonsterStat mon) {
-            var vname = mon.name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "") + "_" + mon.element;
+            var vname = mon.Name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "") + "_" + mon.Element;
             string s = $@"      private static {nameof(MonsterStat)} _{vname} = null;
         public static {nameof(MonsterStat)} {vname} {{
             get {{
@@ -169,13 +169,13 @@ namespace RuneOptim.Monsters {{
         }
 
         public static string writeMonCS(MonsterStat mon) {
-            string s = $@"      public static {nameof(MonsterStat)} {mon.name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "")}_{mon.element} = new {nameof(MonsterStat)}() {{
+            string s = $@"      public static {nameof(MonsterStat)} {mon.Name.Replace(" ", "").Replace("(", "_").Replace(")", "_").Replace("-", "").Replace("'", "")}_{mon.Element} = new {nameof(MonsterStat)}() {{
             {nameof(mon.URL)} = ""{mon.URL}"",
-            {nameof(mon.pk)} = {mon.pk},
-            {nameof(mon.name)} = ""{mon.name}"",
-            {nameof(mon.monsterTypeId)} = {mon.monsterTypeId},
-            {nameof(mon.imageFileName)} = ""{mon.imageFileName}"",
-            {nameof(mon.element)} = {nameof(Element)}.{mon.element},
+            {nameof(mon.Pk)} = {mon.Pk},
+            {nameof(mon.Name)} = ""{mon.Name}"",
+            {nameof(mon.MonsterTypeId)} = {mon.MonsterTypeId},
+            {nameof(mon.ImageFileName)} = ""{mon.ImageFileName}"",
+            {nameof(mon.Element)} = {nameof(Element)}.{mon.Element},
             {nameof(mon.Health)} = {mon.Health},
             {nameof(mon.Attack)} = {mon.Attack},
             {nameof(mon.Defense)} = {mon.Defense},
@@ -183,9 +183,9 @@ namespace RuneOptim.Monsters {{
             {nameof(mon.CritDamage)} = {mon.CritDamage},
             {nameof(mon.Resistance)} = {mon.Resistance},
             {nameof(mon.Accuracy)} = {mon.Accuracy},
-            {nameof(mon.archetype)} = {nameof(Archetype)}.{mon.archetype},
-            {nameof(mon.grade)} = {mon.grade},
-            {nameof(mon.isFusion)} = {mon.isFusion.ToString().ToLower()},
+            {nameof(mon.Archetype)} = {nameof(Archetype)}.{mon.Archetype},
+            {nameof(mon.Grade)} = {mon.Grade},
+            {nameof(mon.IsFusion)} = {mon.IsFusion.ToString().ToLower()},
             {nameof(mon.obtainable)} = {mon.obtainable.ToString().ToLower()},
             {nameof(mon.Awakened)} = {mon.Awakened.ToString().ToLower()},
             {nameof(mon.base_hp)} = {mon.base_hp},

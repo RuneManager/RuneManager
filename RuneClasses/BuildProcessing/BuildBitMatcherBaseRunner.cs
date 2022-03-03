@@ -59,12 +59,12 @@ namespace RuneOptim.BuildProcessing {
         /// <param name="b2"></param>
         /// <param name="b4"></param>
         /// <returns></returns>
-        public IEnumerable<LoadBits> getMatches(IEnumerable<BitLoad> b2, IEnumerable<BitLoad> b4) {
+        public IEnumerable<LoadBits> GetMatches(IEnumerable<BitLoad> b2, IEnumerable<BitLoad> b4) {
 
             foreach (var b_2 in b2) {
                 foreach (var b_4 in b4) {
-                    if ((b_2.bit | b_4.bit) == 63)
-                        yield return new LoadBits() { a = b_2, b = b_4 };
+                    if ((b_2.Bit | b_4.Bit) == 63)
+                        yield return new LoadBits() { A = b_2, B = b_4 };
                 }
             }
 
@@ -74,7 +74,7 @@ namespace RuneOptim.BuildProcessing {
 
             // try to get 3 sets of 2s
             if (doTwos) {
-                var group2s = b2.GroupBy(k => k.bit).ToArray();
+                var group2s = b2.GroupBy(k => k.Bit).ToArray();
                 if (group2s.Length < 3)
                     yield break;
 
@@ -83,7 +83,7 @@ namespace RuneOptim.BuildProcessing {
                         foreach (var a in thar[0]) {
                             foreach (var b in thar[1]) {
                                 foreach (var c in thar[2])
-                                    yield return new LoadBits() { a = a, b = b, c = c };
+                                    yield return new LoadBits() { A = a, B = b, C = c };
                             }
                         }
                     }
@@ -91,21 +91,21 @@ namespace RuneOptim.BuildProcessing {
             }
         }
 
-        protected loopData runPicker(LoadBits load, ParallelLoopState state, loopData data) {
+        protected loopData RunPicker(LoadBits load, ParallelLoopState state, loopData data) {
 
             if (!isRunning || state.IsStopped || state.ShouldExitCurrentIteration || state.IsExceptional) {
                 state.Stop();
                 return data;
             }
 
-            foreach (var rune in load.a.Runes) {
+            foreach (var rune in load.A.Runes) {
                 data.Mon.ApplyRune(rune, 7);
             }
-            foreach (var rune in load.b.Runes) {
+            foreach (var rune in load.B.Runes) {
                 data.Mon.ApplyRune(rune, 7);
             }
-            if (load.c != null)
-                foreach (var rune in load.c.Runes) {
+            if (load.C != null)
+                foreach (var rune in load.C.Runes) {
                     data.Mon.ApplyRune(rune, 7);
                 }
 
@@ -134,9 +134,9 @@ namespace RuneOptim.BuildProcessing {
                     var bl = new BitLoad(gb.Key);
                     bl.Runes = rc;
                     foreach (var r in rc) {
-                        bl.bit |= 1 << (r.Slot - 1);
+                        bl.Bit |= 1 << (r.Slot - 1);
                     }
-                    if (NumberOfSetBits(bl.bit) == ii) {
+                    if (NumberOfSetBits(bl.Bit) == ii) {
                         a.Add(bl);
                         this.plus++;
                     }
@@ -167,7 +167,7 @@ namespace RuneOptim.BuildProcessing {
 
             long tt = 0;
 
-            skip = b2.AsParallel().Sum(__b => b4.Count(__c => (__b.bit | __c.bit) == 63));
+            skip = b2.AsParallel().Sum(__b => b4.Count(__c => (__b.Bit | __c.Bit) == 63));
 
             var doTwos = !build.BuildSets.Any(se => Rune.SetRequired(se) == 4);
             if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => Rune.SetRequired(se) == 4))
@@ -176,7 +176,7 @@ namespace RuneOptim.BuildProcessing {
 
             if (doTwos) {
 
-                var qrhad = b2.GroupBy(k => k.bit).ToArray();
+                var qrhad = b2.GroupBy(k => k.Bit).ToArray();
 
                 if (qrhad.Length >= 3) {
 
@@ -190,7 +190,7 @@ namespace RuneOptim.BuildProcessing {
             tt = skip;
             total = tt;
 
-            var matches = getMatches(b2, b4);
+            var matches = GetMatches(b2, b4);
 
             cts = new CancellationTokenSource();
 
@@ -230,7 +230,7 @@ namespace RuneOptim.BuildProcessing {
 
                         int?[] slotFakesTemp = new int?[6];
                         bool[] slotPred = new bool[6];
-                        build.getPrediction(slotFakesTemp, slotPred);
+                        build.GetPrediction(slotFakesTemp, slotPred);
 
                         int[] slotFakes = slotFakesTemp.Select(i => i ?? 0).ToArray();
 
@@ -245,7 +245,7 @@ namespace RuneOptim.BuildProcessing {
 
                         return data;
                     },
-                    runPicker,
+                    RunPicker,
                     data => {
                         progIt(data);
                         foreach (var m in data.list) {
@@ -256,7 +256,7 @@ namespace RuneOptim.BuildProcessing {
                         lock (bag.SyncRoot) {
                             var tn = Math.Max(settings.BuildGenerate, 250000);
                             if (bag.Count > tn) {
-                                var bb = bag.OrderByDescending(b => b.score).Take(25000).ToList();
+                                var bb = bag.OrderByDescending(b => b.Score).Take(25000).ToList();
                                 bag.Clear();
                                 bag.AddRange(bb);
 
@@ -290,7 +290,7 @@ namespace RuneOptim.BuildProcessing {
     /// Turn the slots the given runes into a bitmask
     /// </summary>
     public class BitLoad {
-        public int bit;
+        public int Bit;
 
         public Rune[] Runes;
 
@@ -313,7 +313,7 @@ namespace RuneOptim.BuildProcessing {
         }
 
         public override string ToString() {
-            return bit + ":" + (Runes?.FirstOrDefault()?.Set.ToString() ?? "") + " " + string.Join(", ", Runes?.Select(r => r.Id));
+            return Bit + ":" + (Runes?.FirstOrDefault()?.Set.ToString() ?? "") + " " + string.Join(", ", Runes?.Select(r => r.Id));
         }
 
     }
@@ -322,9 +322,9 @@ namespace RuneOptim.BuildProcessing {
     /// A set of runes which bitmask is 111111 => 63
     /// </summary>
     public class LoadBits {
-        public BitLoad a;
-        public BitLoad b;
-        public BitLoad c;
+        public BitLoad A;
+        public BitLoad B;
+        public BitLoad C;
     }
 
 }

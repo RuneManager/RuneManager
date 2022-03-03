@@ -1,7 +1,7 @@
 ﻿using RuneOptim.swar;
 
 namespace RuneOptim.Tests {
-    static class TestData
+    public static class TestData
     {
         #region Runes
         public static Rune Rune1()
@@ -109,7 +109,7 @@ namespace RuneOptim.Tests {
         #endregion
 
         #region Stats
-        public static Stats statsBase()
+        public static Stats StatsBase()
         {
             return new Stats()
             {
@@ -124,7 +124,7 @@ namespace RuneOptim.Tests {
             };
         }
 
-        public static Stats statsFull()
+        public static Stats StatsFull()
         {
             return new Stats()
             {

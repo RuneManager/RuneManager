@@ -26,23 +26,20 @@ namespace RuneApp {
         bool loading = true;
         bool isClosing = false;
 
-        public static Help help;
-        public static Irene irene;
+        public static Help Help;
+        public static Irene Irene;
 
-        public static bool goodRunes { get { return Program.goodRunes; } set { Program.goodRunes = value; } }
-        public static bool goFast { get { return Program.goFast; } set { Program.goFast = value; } }
-        public static bool fillRunes { get { return Program.fillRunes; } set { Program.fillRunes = value; } }
+        public static bool GoodRunes { get { return Program.GoodRunes; } set { Program.GoodRunes = value; } }
+        public static bool GoFast { get { return Program.GoFast; } set { Program.GoFast = value; } }
+        public static bool FillRunes { get { return Program.FillRunes; } set { Program.FillRunes = value; } }
 
-        public static Main currentMain;
-        public static RuneDisplay runeDisplay;
+        public static Main CurrentMain;
+        public static RuneDisplay RuneDisplay;
         Monster displayMon;
 
         
         public static Main Instance;
 
-        //public static Configuration config {  get { return Program.config; } }
-        [Obsolete("Try using LineLog instead")]
-        public static log4net.ILog Log { [DebuggerStepThrough] get { return Program.log; } }
         public static LineLogger LineLog { [DebuggerStepThrough] get { return Program.LineLog; } }
 
         private ListViewItem lastFocused = null;
@@ -55,7 +52,7 @@ namespace RuneApp {
             LineLog.Info("Initialized Main");
             Instance = this;
 
-            currentMain = this;
+            CurrentMain = this;
 
             useRunesCheck.Checked = Program.Settings.UseEquipped;
 

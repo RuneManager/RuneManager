@@ -21,7 +21,7 @@ namespace RuneApp {
     partial class Main {
         // TODO: shuffle these under custom controls?
 
-
+        public IEnumerable<ListViewItem> BuildListViewItems => buildList.Items.OfType<ListViewItem>();
 
         private DateTime resumeTime = DateTime.MinValue;
 
@@ -101,7 +101,7 @@ namespace RuneApp {
 
             var lviList = new List<ListViewItem>();
 
-            foreach (var b in Program.builds) {
+            foreach (var b in Program.Builds) {
                 ListViewItem li = new ListViewItem();
                 this.Invoke((MethodInvoker)delegate {
                     ListViewItemBuild(li, b);

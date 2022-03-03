@@ -116,7 +116,7 @@ namespace RuneApp {
             }
             else if (e.LinkText.Contains("[Help]")) {
                 var ss = e.LinkText.Substring(e.LinkText.IndexOf("[Help]") + 6);
-                RuneApp.Main.help.Url = ss;
+                RuneApp.Main.Help.Url = ss;
             }
             else if (e.LinkText.Contains("[Window]")) {
                 var ss = e.LinkText.Substring(e.LinkText.IndexOf("[Window]") + 8);

@@ -177,19 +177,19 @@ namespace RuneApp {
                     bool hasChanged = false;
                     Monster fresh;
                     if (freshMons.TryTake(out fresh)) {
-                        if (fresh.score == 0)
-                            fresh.score = build.CalcScore(fresh);
+                        if (fresh.Score == 0)
+                            fresh.Score = build.CalcScore(fresh);
                         //Console.WriteLine("Checking build " + string.Join(",", fresh.Current.Runes.Select(r => r.ID.ToString())));
-                        if (currentList.Count < Program.Settings.TestShow || fresh.score > currentList.Min(qq => qq.score)) {
+                        if (currentList.Count < Program.Settings.TestShow || fresh.Score > currentList.Min(qq => qq.Score)) {
                             currentList.Add(fresh); //.Where(IsOkayBuild)
-                            currentList = currentList.OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
+                            currentList = currentList.OrderByDescending(m => m.Score).Take(Program.Settings.TestShow).ToList();
                             hasChanged = true;
                         }
                     }
 
                     if (changedSpec && monsList.Count > 0) {
                         // todo: recheck min/max //  && IsOkayBuild(m.Value)
-                        currentList = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow).ToList();
+                        currentList = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.Score).Take(Program.Settings.TestShow).ToList();
                         if (currentList.Count > 0)
                             hasChanged = true;
                     }
@@ -250,13 +250,13 @@ namespace RuneApp {
 
                         li.SubItems.Add(underSpec + "/" + under12);
                         double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-                        b.score = pts;
+                        b.Score = pts;
 
                         // put the sum points into the first item
                         li.SubItems[0].Text = pts.ToString("0.##");
 
                         li.Tag = b;
-                        if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.Locked))
+                        if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.UsedInBuild))
                             li.ForeColor = Color.Gray;
                         else {
                             if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
@@ -432,12 +432,12 @@ namespace RuneApp {
         }
 
         private int getTotal() {
-            return build.runes[0].Length
-                * build.runes[1].Length
-                * build.runes[2].Length
-                * build.runes[3].Length
-                * build.runes[4].Length
-                * build.runes[5].Length;
+            return build.Runes[0].Length
+                * build.Runes[1].Length
+                * build.Runes[2].Length
+                * build.Runes[3].Length
+                * build.Runes[4].Length
+                * build.Runes[5].Length;
         }
 
         public void RegenSets() {
@@ -454,15 +454,15 @@ namespace RuneApp {
                     monSetsCancelled = false;
                     build.RunesUseLocked = Program.Settings.LockTest;
                     build.RunesUseEquipped = Program.Settings.UseEquipped;
-                    build.RunesDropHalfSetStat = Program.goFast;
-                    build.RunesOnlyFillEmpty = Program.fillRunes;
-                    build.GenRunes(Program.data);
+                    build.RunesDropHalfSetStat = Program.GoFast;
+                    build.RunesOnlyFillEmpty = Program.FillRunes;
+                    build.GenRunes(Program.Data);
 
                     long num = 0;
                     long total = getTotal();
                     DateTime start = DateTime.Now;
 
-                    var pfer = Parallel.ForEach(build.runes[0], (r0, loop) =>
+                    var pfer = Parallel.ForEach(build.Runes[0], (r0, loop) =>
                     {
                         if (monSetsCancelled)
                             loop.Break();
@@ -471,7 +471,7 @@ namespace RuneApp {
                         if (!build.AllowBroken && r0.SetIs4)
                             c4set = r0.Set;
 
-                        foreach (var r1 in build.runes[1])
+                        foreach (var r1 in build.Runes[1])
                         {
                             if (monSetsCancelled)
                                 break;
@@ -484,7 +484,7 @@ namespace RuneApp {
                                     continue;
                             }
 
-                            foreach (var r2 in build.runes[2])
+                            foreach (var r2 in build.Runes[2])
                             {
                                 if (monSetsCancelled)
                                     break;
@@ -497,7 +497,7 @@ namespace RuneApp {
                                         continue;
                                 }
 
-                                foreach (var r3 in build.runes[3])
+                                foreach (var r3 in build.Runes[3])
                                 {
                                     if (monSetsCancelled)
                                         break;
@@ -508,7 +508,7 @@ namespace RuneApp {
                                             continue;
                                     }
 
-                                    foreach (var r4 in build.runes[4])
+                                    foreach (var r4 in build.Runes[4])
                                     {
                                         if (monSetsCancelled)
                                             break;
@@ -519,7 +519,7 @@ namespace RuneApp {
                                                 continue;
                                         }
 
-                                        foreach (var r5 in build.runes[5])
+                                        foreach (var r5 in build.Runes[5])
                                         {
                                             if (monSetsCancelled)
                                                 break;
@@ -634,7 +634,7 @@ namespace RuneApp {
                 listGenCancelled = true;
                 lock (listGenLock) {
                     listGenCancelled = false;
-                    var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.score).Take(Program.Settings.TestShow);
+                    var llist = monsList.Where(m => m.Value != null).Select(m => m.Value).OrderByDescending(m => m.Score).Take(Program.Settings.TestShow);
                     var ilist = loadoutList.Items.OfType<ListViewItem>();
 
                     int num = 0;
@@ -687,13 +687,13 @@ namespace RuneApp {
 
                         li.SubItems.Add(underSpec + "/" + under12);
                         double pts = GetPoints(Cur, (str, i) => { li.SubItems.Add(str); });
-                        b.score = pts;
+                        b.Score = pts;
 
                         // put the sum points into the first item
                         li.SubItems[0].Text = pts.ToString("0.##");
 
                         li.Tag = b;
-                        if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.Locked))
+                        if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.UsedInBuild))
                             li.ForeColor = Color.Gray;
                         else {
                             if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
@@ -727,12 +727,12 @@ namespace RuneApp {
         }
 
         private void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
+            Main.Help.Show();
         }
 
         private void loadoutList_SelectedIndexChanged(object sender, EventArgs e) {
@@ -741,14 +741,14 @@ namespace RuneApp {
                 if (item.Tag != null) {
                     Monster mon = item.Tag as Monster;
                     if (mon != null) {
-                        if (Main.runeDisplay == null || Main.runeDisplay.IsDisposed)
-                            Main.runeDisplay = new RuneDisplay();
-                        if (!Main.runeDisplay.Visible) {
-                            Main.runeDisplay.Show(this);
+                        if (Main.RuneDisplay == null || Main.RuneDisplay.IsDisposed)
+                            Main.RuneDisplay = new RuneDisplay();
+                        if (!Main.RuneDisplay.Visible) {
+                            Main.RuneDisplay.Show(this);
                         }
-                        Main.runeDisplay.Owner = this;
-                        Main.runeDisplay.Location = new Point(0, 0);
-                        Main.runeDisplay.UpdateRunes(mon.Current.Runes);
+                        Main.RuneDisplay.Owner = this;
+                        Main.RuneDisplay.Location = new Point(0, 0);
+                        Main.RuneDisplay.UpdateRunes(mon.Current.Runes);
                     }
                 }
             }
@@ -760,7 +760,7 @@ namespace RuneApp {
                 List<Rune> lrunes = new List<Rune>();
                 foreach (var g in mons) {
                     foreach (var r in g.Current.Runes) {
-                        r.manageStats.AddOrUpdate("besttestscore", g.score, (k, v) => v < g.score ? g.score : v);
+                        r.ManageStats.AddOrUpdate("besttestscore", g.Score, (k, v) => v < g.Score ? g.Score : v);
 
                         if (!lrunes.Contains(r) && (r.Level < 12 || r.Level < build.GetFakeLevel(r)))
                             lrunes.Add(r);
@@ -768,18 +768,18 @@ namespace RuneApp {
                 }
 
                 using (var qq = new RuneSelect()) {
-                    qq.runes = lrunes;
-                    qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
-                    qq.runeStatKey = "besttestscore";
+                    qq.Runes = lrunes;
+                    qq.SortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
+                    qq.RuneStatKey = "besttestscore";
                     qq.ShowDialog();
                 }
             }
         }
 
         private void Generate_FormClosing(object sender, FormClosingEventArgs e) {
-            if (Main.runeDisplay != null && !Main.runeDisplay.IsDisposed && Main.runeDisplay.Owner == this) {
-                Main.runeDisplay.Owner = Main.currentMain;
-                Main.runeDisplay.Location = new Point(Main.currentMain.Location.X + Main.currentMain.Width, Main.currentMain.Location.Y);
+            if (Main.RuneDisplay != null && !Main.RuneDisplay.IsDisposed && Main.RuneDisplay.Owner == this) {
+                Main.RuneDisplay.Owner = Main.CurrentMain;
+                Main.RuneDisplay.Location = new Point(Main.CurrentMain.Location.X + Main.CurrentMain.Width, Main.CurrentMain.Location.Y);
             }
         }
     }

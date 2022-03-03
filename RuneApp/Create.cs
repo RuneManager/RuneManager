@@ -12,7 +12,7 @@ using RuneOptim.swar;
 namespace RuneApp {
     // Specifying a new build, are we?
     public partial class Create : Form {
-        public Build build = null;
+        public Build Build = null;
 
         // controls builds version numbers
         public static readonly int VERSIONNUM = 3;
@@ -75,7 +75,7 @@ namespace RuneApp {
                 return;
             }
 
-            build = bb;
+            Build = bb;
 
             // declare the truthyness of the groups and track them
             setList.Groups[1].Tag = true;
@@ -170,10 +170,10 @@ namespace RuneApp {
             }
             #endregion
 
-            build.Mon.GetStats();
+            Build.Mon.GetStats();
 
             for (int i = 0; i < 4; i++) {
-                if (build?.Mon?.SkillFunc?[i] != null) {
+                if (Build?.Mon?.SkillsFunction?[i] != null) {
                     statRows[Attr.Skill1 + i] = new StatRow();
 
                     //var ff = build.mon.SkillFunc[i]; build.mon.GetSkillDamage(Attr.AverageDamage, i);
@@ -182,8 +182,8 @@ namespace RuneApp {
                     statRows[Attr.Skill1 + i].Label = groupBox1.Controls.MakeControl<Label>(stat, "Label", x, y, 50, 20, "Skill " + (i + 1));
                     x += colWidth;
 
-                    double aa = build.Mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
-                    double cc = build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
+                    double aa = Build.Mon.GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon);
+                    double cc = Build.Mon.GetStats().GetSkillDamage(Attr.AverageDamage, i); //ff(build.mon.GetStats());
 
                     statRows[Attr.Skill1 + i].Base = groupBox1.Controls.MakeControl<Label>(stat, "Base", x, y, 50, 20, aa.ToString());
                     x += colWidth;
@@ -244,7 +244,7 @@ namespace RuneApp {
                 .ToList();
 
             cbBuildStrat.Items.AddRange(types.ToArray());
-            var ind = types.FindIndex(bs => bs.GetType().AssemblyQualifiedName == build.BuildStrategy);
+            var ind = types.FindIndex(bs => bs.GetType().AssemblyQualifiedName == Build.BuildStrategy);
             cbBuildStrat.SelectedIndex = ind;
 
             ResumeLayout();
@@ -276,9 +276,9 @@ namespace RuneApp {
             if (double.TryParse(ctrl?.Text, out temp))
                 count = (int)temp;
 
-            if (!build.RuneScoring.ContainsKey(ExtensionMethods.GetIndex(tabName)))
-                build.RuneScoring.Add(ExtensionMethods.GetIndex(tabName), new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count));
-            build.RuneScoring[ExtensionMethods.GetIndex(tabName)] = new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count);
+            if (!Build.RuneScoring.ContainsKey(LibExtensionMethods.GetIndex(tabName)))
+                Build.RuneScoring.Add(LibExtensionMethods.GetIndex(tabName), new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count));
+            Build.RuneScoring[LibExtensionMethods.GetIndex(tabName)] = new Build.RuneScoreFilter((FilterType)box.SelectedItem, test, count);
 
             // TODO: trim the ZERO nodes on the tree
 
@@ -290,7 +290,7 @@ namespace RuneApp {
 
         // When the window is told to appear (hopefully we have everything)
         async void Create_Shown(object sender, EventArgs e) {
-            if (build == null) {
+            if (Build == null) {
                 // don't have. :(
                 Close();
                 return;
@@ -303,54 +303,54 @@ namespace RuneApp {
             loading = true;
 
             if (Program.Settings.ShowIreneOnStart)
-                Main.irene.Show();
+                Main.Irene.Show();
 
-            Monster mon = build.Mon;
-            mon.Current.Leader = build.Leader;
-            mon.Current.Shrines = build.Shrines;
+            Monster mon = Build.Mon;
+            mon.Current.Leader = Build.Leader;
+            mon.Current.Shrines = Build.Shrines;
             Stats cur = mon.GetStats();
             if (mon.Id != 0)
                 monLabel.Text = "Build for " + mon.FullName + " (" + mon.Id + ")";
             else
-                monLabel.Text = "Build for " + build.MonName + " (" + mon.Id + ")";
+                monLabel.Text = "Build for " + Build.MonName + " (" + mon.Id + ")";
 
-            build.VERSIONNUM = VERSIONNUM;
+            Build.VERSIONNUM = VERSIONNUM;
 
-            checkDL6star.Checked = build.DownloadStats;
-            checkDLawake.Checked = build.DownloadAwake;
+            checkDL6star.Checked = Build.DownloadStats;
+            checkDLawake.Checked = Build.DownloadAwake;
             checkDL6star.Enabled = !checkDLawake.Checked;
-            extraCritBox.SelectedIndex = build.ExtraCritRate / 15;
+            extraCritBox.SelectedIndex = Build.ExtraCritRate / 15;
 
-            check_autoRunes.Checked = build.AutoRuneSelect;
+            check_autoRunes.Checked = Build.AutoRuneSelect;
 
-            if (build.Leader.IsNonZero) {
-                Attr a = build.Leader.NonZeroStats.FirstOrDefault();
+            if (Build.Leader.IsNonZero) {
+                Attr a = Build.Leader.NonZeroStats.FirstOrDefault();
                 if (a != Attr.Null) {
                     leaderTypeBox.SelectedIndex = leadTypes.ToList().FindIndex(lt => lt.type == a);
                 }
             }
 
             // move the sets around in the list a little
-            foreach (RuneSet s in build.BuildSets) {
+            foreach (RuneSet s in Build.BuildSets) {
                 ListViewItem li = setList.Items.Find(s.ToString(), true).FirstOrDefault();
                 //if (li == null)
                 //    li.Group = rsExc;
                 if (li != null)
                     li.Group = rsInc;
             }
-            foreach (RuneSet s in build.RequiredSets) {
+            foreach (RuneSet s in Build.RequiredSets) {
                 ListViewItem li = setList.Items.Find(s.ToString(), true).FirstOrDefault();
                 if (li != null)
                     li.Group = rsReq;
-                int num = build.RequiredSets.Count(r => r == s);
+                int num = Build.RequiredSets.Count(r => r == s);
                 if (num > 1)
                     li.Text = s.ToString() + " x" + num;
 
             }
 
-            build.BuildSets.CollectionChanged += BuildSets_CollectionChanged;
+            Build.BuildSets.CollectionChanged += BuildSets_CollectionChanged;
 
-            build.RequiredSets.CollectionChanged += RequiredSets_CollectionChanged;
+            Build.RequiredSets.CollectionChanged += RequiredSets_CollectionChanged;
 
             // for 2,4,6 - make sure that the Attrs are set up
             var lists = new ListView[] { priStat2, priStat4, priStat6 };
@@ -359,7 +359,7 @@ namespace RuneApp {
 
                 var attrs = Enum.GetValues(typeof(Attr));
                 for (int i = 0; i < Build.StatNames.Length; i++) {
-                    var bl = build.SlotStats[(j + 1) * 2 - 1];
+                    var bl = Build.SlotStats[(j + 1) * 2 - 1];
 
                     string stat = Build.StatNames[i];
                     if (i < 3) {
@@ -388,10 +388,10 @@ namespace RuneApp {
             RegenSetList();
 
             // do we allow broken sets?
-            ChangeBroken(build.AllowBroken);
+            ChangeBroken(Build.AllowBroken);
 
             // for each tabs filter
-            foreach (var rs in build.RuneFilters) {
+            foreach (var rs in Build.RuneFilters) {
                 var tab = rs.Key;
                 TabPage ctab = GetTab(tab.ToString());
                 // for each stats filter
@@ -416,7 +416,7 @@ namespace RuneApp {
                 }
             }
 
-            foreach (var tab in build.RunePrediction) {
+            foreach (var tab in Build.RunePrediction) {
                 TabPage ctab = GetTab(tab.Key.ToString());
                 TextBox tb = (TextBox)ctab.Controls.Find(ctab.Tag + "raise", true).FirstOrDefault();
                 if (tab.Value.Key != 0)
@@ -426,7 +426,7 @@ namespace RuneApp {
             }
 
             // for each tabs scoring
-            foreach (var tab in build.RuneScoring) {
+            foreach (var tab in Build.RuneScoring) {
                 TabPage ctab = GetTab(tab.Key.ToString());
                 // find that box
                 ComboBox box = (ComboBox)ctab.Controls.Find(ctab.Tag + "join", true).FirstOrDefault();
@@ -457,11 +457,11 @@ namespace RuneApp {
                     tb.Text = tab.Value.Count.ToString();
             }
 
-            checkBuffAtk.Checked = build.Buffs.Attack;
+            checkBuffAtk.Checked = Build.Buffs.Attack;
 
-            tcATK.Gamma = build.Buffs.Attack ? 1.0f : 0.2f;
-            tcDEF.Gamma = build.Buffs.Defense ? 1.0f : 0.2f;
-            tcSPD.Gamma = build.Buffs.Speed ? 1.0f : 0.2f;
+            tcATK.Gamma = Build.Buffs.Attack ? 1.0f : 0.2f;
+            tcDEF.Gamma = Build.Buffs.Defense ? 1.0f : 0.2f;
+            tcSPD.Gamma = Build.Buffs.Speed ? 1.0f : 0.2f;
 
             var t = Task.Delay(200).ContinueWith(i => {
                 tcATK.Invalidate();
@@ -472,7 +472,7 @@ namespace RuneApp {
             // done loading!
             loading = false;
             // this build is no longer considered new
-            build.New = false;
+            Build.New = false;
             // oh yeah, update everything now that it's finally loaded
             UpdateGlobal();
             //CalcPerms();
@@ -584,22 +584,22 @@ namespace RuneApp {
         }
 
         void tBtnSetMore_Click(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (build.RequiredSets.Contains(ss)) {
-                    int num = build.RequiredSets.Count(s => s == ss);
+                if (Build.RequiredSets.Contains(ss)) {
+                    int num = Build.RequiredSets.Count(s => s == ss);
                     if (Rune.SetRequired(ss) == 2 && num < 3) {
-                        build.RequiredSets.Add(ss);
+                        Build.RequiredSets.Add(ss);
                     }
                 }
-                else if (build.BuildSets.Contains(ss)) {
-                    build.AddRequiredSet(ss);
+                else if (Build.BuildSets.Contains(ss)) {
+                    Build.AddRequiredSet(ss);
                 }
                 else {
-                    build.AddIncludedSet(ss);
+                    Build.AddIncludedSet(ss);
                 }
             }
 
@@ -607,17 +607,17 @@ namespace RuneApp {
         }
 
         void tBtnSetLess_Click(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (build.RequiredSets.Contains(ss)) {
-                    build.RemoveRequiredSet(ss);
-                    build.AddIncludedSet(ss);
+                if (Build.RequiredSets.Contains(ss)) {
+                    Build.RemoveRequiredSet(ss);
+                    Build.AddIncludedSet(ss);
                 }
-                else if (build.BuildSets.Contains(ss)) {
-                    build.ToggleIncludedSet(ss);
+                else if (Build.BuildSets.Contains(ss)) {
+                    Build.ToggleIncludedSet(ss);
                 }
             }
 
@@ -625,25 +625,25 @@ namespace RuneApp {
         }
 
         void tBtnSetShuffle(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (build.RequiredSets.Contains(ss)) {
-                    int num = build.RequiredSets.Count(s => s == ss);
+                if (Build.RequiredSets.Contains(ss)) {
+                    int num = Build.RequiredSets.Count(s => s == ss);
                     if (Rune.SetRequired(ss) == 2 && num < 3) {
-                        build.RequiredSets.Add(ss);
+                        Build.RequiredSets.Add(ss);
                     }
                     else {
-                        build.RemoveRequiredSet(ss);
+                        Build.RemoveRequiredSet(ss);
                     }
                 }
-                else if (build.BuildSets.Contains(ss)) {
-                    build.AddRequiredSet(ss);
+                else if (Build.BuildSets.Contains(ss)) {
+                    Build.AddRequiredSet(ss);
                 }
                 else {
-                    build.AddIncludedSet(ss);
+                    Build.AddIncludedSet(ss);
                 }
             }
 
@@ -652,7 +652,7 @@ namespace RuneApp {
 
         // shuffle runesets between: included <-> excluded
         void tBtnInclude_Click(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             var list = setList;
@@ -667,7 +667,7 @@ namespace RuneApp {
             // shift all the selected things to the place
             foreach (ListViewItem item in items) {
                 var set = (RuneSet)item.Tag;
-                build.ToggleIncludedSet(set);
+                Build.ToggleIncludedSet(set);
                 /*if (build.BuildSets.Contains(set))
                 {
                     build.BuildSets.Remove(set);
@@ -707,7 +707,7 @@ namespace RuneApp {
                 var li = setList.SelectedItems[0];
                 RuneSet set = (RuneSet)li.Tag;
                 // whatever, just add it to required if not
-                int num = build.AddRequiredSet(set);
+                int num = Build.AddRequiredSet(set);
                 /*if (num > 1)
                     li.Text = set.ToString() + " x" + num;
                 if (num > 3 || num <= 1)
@@ -717,7 +717,7 @@ namespace RuneApp {
 
         // shuffle rnuesets between: excluded > required <-> included
         void tBtnShuffle_Click(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             var list = setList;
@@ -732,14 +732,14 @@ namespace RuneApp {
             foreach (ListViewItem item in items) {
                 var set = (RuneSet)item.Tag;
 
-                if (build.RemoveRequiredSet(set) > 0) {
-                    build.AddIncludedSet(set);
+                if (Build.RemoveRequiredSet(set) > 0) {
+                    Build.AddIncludedSet(set);
                 }
                 else {
-                    build.AddRequiredSet(set);
+                    Build.AddRequiredSet(set);
                 }
 
-                if (build.RequiredSets.Contains(set)) {
+                if (Build.RequiredSets.Contains(set)) {
                     item.Group = rsInc;
                     item.Text = set.ToString();
                 }
@@ -771,60 +771,60 @@ namespace RuneApp {
         }
 
         private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {
-            build.RunesUseEquipped = Program.Settings.UseEquipped;
-            build.RunesUseLocked = false;
-            build.RunesDropHalfSetStat = Program.goFast;
-            build.RunesOnlyFillEmpty = Program.fillRunes;
+            Build.RunesUseEquipped = Program.Settings.UseEquipped;
+            Build.RunesUseLocked = false;
+            Build.RunesDropHalfSetStat = Program.GoFast;
+            Build.RunesOnlyFillEmpty = Program.FillRunes;
             // good idea, generate right now whenever the user clicks a... whatever
-            build.GenRunes(Program.data);
+            Build.GenRunes(Program.Data);
 
             using (RuneSelect rs = new RuneSelect()) {
-                rs.returnedRune = build.Mon.Current.Runes[e.Slot - 1];
-                rs.build = build;
-                rs.slot = (SlotIndex)e.Slot;
-                rs.runes = build.runes[e.Slot - 1];
+                rs.ReturnedRune = Build.Mon.Current.Runes[e.Slot - 1];
+                rs.Build = Build;
+                rs.Slot = (SlotIndex)e.Slot;
+                rs.Runes = Build.Runes[e.Slot - 1];
                 rs.ShowDialog();
             }
         }
 
         void button1_Click(object sender, EventArgs e) {
-            build.RunesUseLocked = false;
-            build.RunesUseEquipped = true;
-            build.RunesDropHalfSetStat = Program.goFast;
-            build.RunesOnlyFillEmpty = Program.fillRunes;
-            build.GenRunes(Program.data);
+            Build.RunesUseLocked = false;
+            Build.RunesUseEquipped = true;
+            Build.RunesDropHalfSetStat = Program.GoFast;
+            Build.RunesOnlyFillEmpty = Program.FillRunes;
+            Build.GenRunes(Program.Data);
             using (var ff = new RuneSelect()) {
-                ff.returnedRune = runeTest;
-                ff.build = build;
+                ff.ReturnedRune = runeTest;
+                ff.Build = Build;
 
                 switch (tabControl1.SelectedTab.Text) {
                     case "Evens":
-                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 0);
+                        ff.Runes = Program.Data.Runes.Where(r => r.Slot % 2 == 0);
                         List<Rune> fr = new List<Rune>();
-                        fr.AddRange(ff.runes.Where(r => r.Slot == 2 && build.SlotStats[1].Contains(r.Main.Type.ToForms())));
-                        fr.AddRange(ff.runes.Where(r => r.Slot == 4 && build.SlotStats[3].Contains(r.Main.Type.ToForms())));
-                        fr.AddRange(ff.runes.Where(r => r.Slot == 6 && build.SlotStats[5].Contains(r.Main.Type.ToForms())));
-                        ff.runes = fr;
+                        fr.AddRange(ff.Runes.Where(r => r.Slot == 2 && Build.SlotStats[1].Contains(r.Main.Type.ToForms())));
+                        fr.AddRange(ff.Runes.Where(r => r.Slot == 4 && Build.SlotStats[3].Contains(r.Main.Type.ToForms())));
+                        fr.AddRange(ff.Runes.Where(r => r.Slot == 6 && Build.SlotStats[5].Contains(r.Main.Type.ToForms())));
+                        ff.Runes = fr;
                         break;
                     case "Odds":
-                        ff.runes = Program.data.Runes.Where(r => r.Slot % 2 == 1);
+                        ff.Runes = Program.Data.Runes.Where(r => r.Slot % 2 == 1);
                         break;
                     case "Global":
-                        ff.runes = Program.data.Runes;
+                        ff.Runes = Program.Data.Runes;
                         break;
                     default:
                         int slot = int.Parse(tabControl1.SelectedTab.Text);
-                        ff.runes = Program.data.Runes.Where(r => r.Slot == slot);
+                        ff.Runes = Program.Data.Runes.Where(r => r.Slot == slot);
                         break;
                 }
 
-                ff.slot = (SlotIndex)Enum.Parse(typeof(SlotIndex), tabControl1.SelectedTab.Text);
+                ff.Slot = (SlotIndex)Enum.Parse(typeof(SlotIndex), tabControl1.SelectedTab.Text);
 
-                ff.runes = ff.runes.Where(r => build.BuildSets.Contains(r.Set));
+                ff.Runes = ff.Runes.Where(r => Build.BuildSets.Contains(r.Set));
 
                 var res = ff.ShowDialog();
                 if (res == DialogResult.OK) {
-                    Rune rune = ff.returnedRune;
+                    Rune rune = ff.ReturnedRune;
                     if (rune != null) {
                         runeTest = rune;
                         TestRune(rune);
@@ -853,7 +853,7 @@ namespace RuneApp {
         }
 
         void testBuildClick(object sender, EventArgs e) {
-            if (build == null)
+            if (Build == null)
                 return;
 
             if (AnnoyUser()) return;
@@ -863,22 +863,22 @@ namespace RuneApp {
             // sort live on change
             // copy weights back to here
 
-            if (!Program.config.AppSettings.Settings.AllKeys.Contains("generateLive")) {
-                var ff = new Generate(build);
-                var backupSort = new Stats(build.Sort);
+            if (!Program.Config.AppSettings.Settings.AllKeys.Contains("generateLive")) {
+                var ff = new Generate(Build);
+                var backupSort = new Stats(Build.Sort);
                 var res = ff.ShowDialog();
                 if (res == DialogResult.OK) {
                     loading = true;
                     foreach (var stat in Build.StatEnums) {
-                        statRows[stat].Worth.Text = build.Sort[stat] != 0 ? build.Sort[stat].ToString() : "";
+                        statRows[stat].Worth.Text = Build.Sort[stat] != 0 ? Build.Sort[stat].ToString() : "";
                     }
                     foreach (var extra in Build.ExtraEnums) {
-                        statRows[extra].Worth.Text = build.Sort.ExtraGet(extra) != 0 ? build.Sort.ExtraGet(extra).ToString() : "";
+                        statRows[extra].Worth.Text = Build.Sort.ExtraGet(extra) != 0 ? Build.Sort.ExtraGet(extra).ToString() : "";
                     }
                     for (int i = 0; i < 4; i++) {
-                        if (build?.Mon?.SkillFunc?[i] != null) {
+                        if (Build?.Mon?.SkillsFunction?[i] != null) {
                             var skilla = Attr.Skill1 + i;
-                            statRows[skilla].Worth.Text = build.Sort.DamageSkillups[i] != 0 ? build.Sort.DamageSkillups[i].ToString() : "";
+                            statRows[skilla].Worth.Text = Build.Sort.DamageSkillups[i] != 0 ? Build.Sort.DamageSkillups[i].ToString() : "";
                         }
                     }
                     loading = false;
@@ -887,17 +887,17 @@ namespace RuneApp {
                     double val;
                     foreach (var stat in Build.StatEnums) {
                         double.TryParse(statRows[stat].Worth.Text, out val);
-                        build.Sort[stat] = val;
+                        Build.Sort[stat] = val;
                     }
                     foreach (var extra in Build.ExtraEnums) {
                         double.TryParse(statRows[extra].Worth.Text, out val);
-                        build.Sort.ExtraSet(extra, val);
+                        Build.Sort.ExtraSet(extra, val);
                     }
                     for (int i = 0; i < 4; i++) {
-                        if (build?.Mon?.SkillFunc?[i] != null) {
+                        if (Build?.Mon?.SkillsFunction?[i] != null) {
                             var skilla = Attr.Skill1 + i;
                             double.TryParse(statRows[skilla].Worth.Text, out val);
-                            build.Sort.DamageSkillupsSet(i, val);
+                            Build.Sort.DamageSkillupsSet(i, val);
                         }
                     }
 
@@ -906,7 +906,7 @@ namespace RuneApp {
             }
             else {
                 if (testWindow == null || testWindow.IsDisposed) {
-                    testWindow = new GenerateLive(build);
+                    testWindow = new GenerateLive(Build);
                     testWindow.Owner = this;
                 }
                 if (!testWindow.Visible)
@@ -938,7 +938,7 @@ namespace RuneApp {
             leaderAmountBox.Items.Clear();
             if (leaderTypeBox.SelectedIndex == 0) {
                 leaderAmountBox.Enabled = false;
-                build.Leader.SetTo(0);
+                Build.Leader.SetTo(0);
             }
             else {
                 LeaderType lt = (LeaderType)leaderTypeBox.SelectedItem;
@@ -946,7 +946,7 @@ namespace RuneApp {
                     leaderAmountBox.Items.Add(o);
                 leaderAmountBox.Enabled = true;
                 if (loading)
-                    leaderAmountBox.SelectedIndex = lt.values.FindIndex(l => l.value == build.Leader.Sum());
+                    leaderAmountBox.SelectedIndex = lt.values.FindIndex(l => l.value == Build.Leader.Sum());
                 else
                     leaderAmountBox.SelectedIndex = 0;
             }
@@ -955,43 +955,43 @@ namespace RuneApp {
         void leaderAmountBox_SelectedIndexChanged(object sender, EventArgs e) {
             if (loading)
                 return;
-            build.Leader.SetTo(0);
+            Build.Leader.SetTo(0);
             var lv = (LeaderType.LeaderValue)leaderAmountBox.SelectedItem;
             switch (lv.type) {
                 case Attr.Speed:
-                    build.Leader.Speed = lv.value;
+                    Build.Leader.Speed = lv.value;
                     break;
                 case Attr.HealthPercent:
-                    build.Leader.Health = lv.value;
+                    Build.Leader.Health = lv.value;
                     break;
                 case Attr.AttackPercent:
-                    build.Leader.Attack = lv.value;
+                    Build.Leader.Attack = lv.value;
                     break;
                 default:
-                    build.Leader[lv.type] = lv.value;
+                    Build.Leader[lv.type] = lv.value;
                     break;
             }
-            var mon = build.Mon;
-            mon.Current.Leader = build.Leader;
+            var mon = Build.Mon;
+            mon.Current.Leader = Build.Leader;
             refreshStats(mon, mon.GetStats());
         }
 
         void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\build.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\build.html";
+            Main.Help.Show();
         }
 
         void button4_Click_1(object sender, EventArgs e) {
             btnDL6star.Enabled = false;
-            var mref = MonsterStat.FindMon(build.Mon);
+            var mref = MonsterStat.FindMon(Build.Mon);
             if (mref != null) {
                 var mstat = mref.Download();
-                var newmon = mstat.GetMon(build.Mon);
-                build.Mon = newmon;
+                var newmon = mstat.GetMon(Build.Mon);
+                Build.Mon = newmon;
                 refreshStats(newmon, newmon.GetStats());
             }
             btnDL6star.Enabled = true;
@@ -999,13 +999,13 @@ namespace RuneApp {
 
         void button5_Click_1(object sender, EventArgs e) {
             btnDLawake.Enabled = false;
-            var mref = MonsterStat.FindMon(build.Mon);
+            var mref = MonsterStat.FindMon(Build.Mon);
             if (mref != null) {
                 var mstat = mref.Download();
                 if (!mstat.Awakened && mstat.AwakenTo != null) {
                     mstat = mstat.AwakenTo.Download();
-                    var newmon = mstat.GetMon(build.Mon);
-                    build.Mon = newmon;
+                    var newmon = mstat.GetMon(Build.Mon);
+                    Build.Mon = newmon;
                     refreshStats(newmon, newmon.GetStats());
                 }
             }
@@ -1014,30 +1014,30 @@ namespace RuneApp {
 
         void checkBox1_CheckedChanged(object sender, EventArgs e) {
             if (loading) return;
-            build.DownloadStats = checkDL6star.Checked;
+            Build.DownloadStats = checkDL6star.Checked;
         }
 
         void checkBox2_CheckedChanged(object sender, EventArgs e) {
             if (loading) return;
-            build.DownloadAwake = checkDLawake.Checked;
+            Build.DownloadAwake = checkDLawake.Checked;
             checkDL6star.Enabled = !checkDLawake.Checked;
         }
 
         void monLabel_Click(object sender, EventArgs e) {
-            using (MonSelect ms = new MonSelect(build.Mon)) {
+            using (MonSelect ms = new MonSelect(Build.Mon)) {
                 if (ms.ShowDialog() == DialogResult.OK) {
-                    build.Mon = ms.retMon;
-                    build.MonId = build.Mon.Id;
-                    build.MonName = build.Mon.FullName;
-                    monLabel.Text = "Build for " + build.Mon.FullName + " (" + build.Mon.Id + ")";
-                    refreshStats(build.Mon, build.Mon.GetStats());
+                    Build.Mon = ms.retMon;
+                    Build.MonId = Build.Mon.Id;
+                    Build.MonName = Build.Mon.FullName;
+                    monLabel.Text = "Build for " + Build.Mon.FullName + " (" + Build.Mon.Id + ")";
+                    refreshStats(Build.Mon, Build.Mon.GetStats());
                 }
             }
         }
 
         void check_magic_CheckedChanged(object sender, EventArgs e) {
             btnPerms.Visible = check_autoRunes.Checked;
-            build.AutoRuneSelect = check_autoRunes.Checked;
+            Build.AutoRuneSelect = check_autoRunes.Checked;
             updatePerms();
         }
 
@@ -1049,69 +1049,69 @@ namespace RuneApp {
         private void Create_FormClosing(object sender, FormClosingEventArgs e) {
             if (testWindow != null && !testWindow.IsDisposed)
                 testWindow.Close();
-            build.RequiredSets.CollectionChanged -= RequiredSets_CollectionChanged;
-            build.BuildSets.CollectionChanged -= BuildSets_CollectionChanged;
+            Build.RequiredSets.CollectionChanged -= RequiredSets_CollectionChanged;
+            Build.BuildSets.CollectionChanged -= BuildSets_CollectionChanged;
         }
 
         private void extraCritBox_SelectedIndexChanged(object sender, EventArgs e) {
             // TODO: uncheese
-            var mon = build.Mon;
-            build.ExtraCritRate = extraCritBox.SelectedIndex * 15;
-            mon.ExtraCritRate = build.ExtraCritRate;
+            var mon = Build.Mon;
+            Build.ExtraCritRate = extraCritBox.SelectedIndex * 15;
+            mon.ExtraCritRate = Build.ExtraCritRate;
             refreshStats(mon, mon.GetStats());
         }
 
         private void checkBuffAtk_CheckedChanged(object sender, EventArgs e) {
             if (loading)
                 return;
-            var buffs = build.Buffs;
+            var buffs = Build.Buffs;
             buffs.Attack = checkBuffAtk.Checked;
-            build.Buffs = buffs;
+            Build.Buffs = buffs;
         }
 
         private void tcATK_Click(object sender, EventArgs e) {
-            var buffs = build.Buffs;
-            buffs.Attack = !build.Buffs.Attack;
-            build.Buffs = buffs;
-            checkBuffAtk.Checked = build.Buffs.Attack;
-            tcATK.Gamma = build.Buffs.Attack ? 1.0f : 0.2f;
+            var buffs = Build.Buffs;
+            buffs.Attack = !Build.Buffs.Attack;
+            Build.Buffs = buffs;
+            checkBuffAtk.Checked = Build.Buffs.Attack;
+            tcATK.Gamma = Build.Buffs.Attack ? 1.0f : 0.2f;
             tcATK.Invalidate();
 
-            Monster mon = build.Mon;
-            mon.Current.Buffs = build.Buffs;
+            Monster mon = Build.Mon;
+            mon.Current.Buffs = Build.Buffs;
             Stats cur = mon.GetStats(true);
             refreshStats(mon, cur);
         }
 
         private void tcDEF_Click(object sender, EventArgs e) {
-            var buffs = build.Buffs;
-            buffs.Defense = !build.Buffs.Defense;
-            build.Buffs = buffs;
-            tcDEF.Gamma = build.Buffs.Defense ? 1.0f : 0.2f;
+            var buffs = Build.Buffs;
+            buffs.Defense = !Build.Buffs.Defense;
+            Build.Buffs = buffs;
+            tcDEF.Gamma = Build.Buffs.Defense ? 1.0f : 0.2f;
             tcDEF.Invalidate();
 
-            Monster mon = build.Mon;
-            mon.Current.Buffs = build.Buffs;
+            Monster mon = Build.Mon;
+            mon.Current.Buffs = Build.Buffs;
             Stats cur = mon.GetStats(true);
             refreshStats(mon, cur);
         }
 
         private void tcSPD_Click(object sender, EventArgs e) {
-            var buffs = build.Buffs;
-            buffs.Speed = !build.Buffs.Speed;
-            build.Buffs = buffs;
-            tcSPD.Gamma = build.Buffs.Speed ? 1.0f : 0.2f;
+            var buffs = Build.Buffs;
+            buffs.Speed = !Build.Buffs.Speed;
+            Build.Buffs = buffs;
+            tcSPD.Gamma = Build.Buffs.Speed ? 1.0f : 0.2f;
             tcSPD.Invalidate();
 
-            Monster mon = build.Mon;
-            mon.Current.Buffs = build.Buffs;
+            Monster mon = Build.Mon;
+            mon.Current.Buffs = Build.Buffs;
             Stats cur = mon.GetStats(true);
             refreshStats(mon, cur);
         }
 
         private void CbBuildStrat_SelectedIndexChanged(object sender, EventArgs e) {
             var bs = cbBuildStrat.SelectedItem as IBuildStrategyDefinition;
-            build.BuildStrategy = bs.GetType().AssemblyQualifiedName;
+            Build.BuildStrategy = bs.GetType().AssemblyQualifiedName;
         }
 
 
@@ -1129,7 +1129,7 @@ namespace RuneApp {
             if (string.IsNullOrWhiteSpace(nn))
                 nn = item.GetType().Name;
 
-            if (!item.IsValid(build)) //We are disabling item based on Index, you can have your logic here
+            if (!item.IsValid(Build)) //We are disabling item based on Index, you can have your logic here
             {
                 e.Graphics.FillRectangle(Brushes.PaleVioletRed, e.Bounds);
                 e.Graphics.DrawString(nn, cbBuildStrat.Font, Brushes.DimGray, e.Bounds);

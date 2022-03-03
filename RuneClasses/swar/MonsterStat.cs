@@ -12,6 +12,7 @@ using System.Threading;
 
 namespace RuneOptim.swar {
     public class MonsterStat : StatLoader {
+#pragma warning disable IDE1006 // Naming Styles
         [JsonProperty("skills")]
         public SkillDef[] Skills;
         [JsonProperty("homunculus_skills")]
@@ -76,6 +77,7 @@ namespace RuneOptim.swar {
         public int awaken_mats_magic_low;
         public int awaken_mats_magic_mid;
         public int awaken_mats_magic_high;
+#pragma warning restore IDE1006 // Naming Styles
 
         [JsonIgnore]
         private static List<StatLoader> monStats = null;
@@ -90,33 +92,33 @@ namespace RuneOptim.swar {
         }
 
         public static int BaseStars(string familyName) {
-            var m = MonStats.FirstOrDefault(ms => ms.name == familyName);
+            var m = MonStats.FirstOrDefault(ms => ms.Name == familyName);
             if (m != null)
-                return m.grade;
+                return m.Grade;
             // TODO: lookup?
             return 4; // close enough
         }
 
         public static StatLoader FindMon(Monster mon) {
-            return FindMon(mon.monsterTypeId) ?? FindMon(mon.Name, mon.Element.ToString());
+            return FindMon(mon.MonsterTypeId) ?? FindMon(mon.Name, mon.Element.ToString());
         }
 
         public static StatLoader FindMon(int monsterTypeId) {
-            return MonStats.FirstOrDefault(m => m.monsterTypeId == monsterTypeId);
+            return MonStats.FirstOrDefault(m => m.MonsterTypeId == monsterTypeId);
         }
 
         public static StatLoader FindMon(string name, string element = null) {
             RuneLog.Info($"searching for \"{name} ({element})\"");
             if (element == null)
-                return MonStats.FirstOrDefault(m => m.name == name);
+                return MonStats.FirstOrDefault(m => m.Name == name);
             else
-                return MonStats.FirstOrDefault(m => m.name == name && m.element.ToString() == element);
+                return MonStats.FirstOrDefault(m => m.Name == name && m.Element.ToString() == element);
         }
 
         public Monster GetMon(Monster mon) {
             return new Monster() {
                 Id = mon.Id,
-                priority = mon.priority,
+                Priority = mon.Priority,
                 Current = mon.Current,
                 Accuracy = Accuracy,
                 Attack = Attack,
@@ -124,23 +126,25 @@ namespace RuneOptim.swar {
                 CritRate = CritRate,
                 Defense = Defense,
                 Health = Health,
-                level = 40,
+                Level = 40,
                 Resistance = Resistance,
                 Speed = Speed,
-                Element = element,
-                Name = name,
-                downloaded = true,
-                monsterTypeId = monsterTypeId,
-                _SkillList = mon._SkillList.ToList()
+                Element = Element,
+                Name = Name,
+                Downloaded = true,
+                MonsterTypeId = MonsterTypeId,
+                SkillList = mon.SkillList.ToList()
             };
         }
     }
 
     public class LeaderSkill {
+#pragma warning disable IDE1006 // Naming Styles
         public string attribute;
         public int amount;
         public string area;
         public Element? element;
+#pragma warning restore IDE1006 // Naming Styles
     }
 
     public class SkillDef {
@@ -239,13 +243,13 @@ namespace RuneOptim.swar {
         public string URL;
 
         [JsonProperty("pk")]
-        public int pk;
+        public int Pk;
 
         [JsonProperty("name")]
-        public string name;
+        public string Name;
 
         [JsonProperty("element")]
-        public Element element;
+        public Element Element;
 
         readonly static Dictionary<string, object> apiObjs = new Dictionary<string, object>();
         readonly static object objLock = new object();
@@ -343,24 +347,24 @@ namespace RuneOptim.swar {
         }
 
         public override string ToString() {
-            return name + " (" + element + ")";
+            return Name + " (" + Element + ")";
         }
     }
 
     public class StatLoader : StatReference {
         [JsonProperty("image_filename")]
-        public string imageFileName;
+        public string ImageFileName;
 
         [JsonProperty("archetype")]
-        public Archetype archetype;
+        public Archetype Archetype;
 
         [JsonProperty("base_stars")]
-        public int grade;
+        public int Grade;
 
         [JsonProperty("fusion_food")]
-        public bool isFusion;
+        public bool IsFusion;
 
         [JsonProperty("com2us_id")]
-        public int monsterTypeId;
+        public int MonsterTypeId;
     }
 }

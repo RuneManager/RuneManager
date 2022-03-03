@@ -22,7 +22,7 @@ namespace RuneOptim.swar {
         };
 
         [JsonIgnore]
-        public ConcurrentDictionary<string, double> manageStats = new ConcurrentDictionary<string, double>();
+        public ConcurrentDictionary<string, double> ManageStats = new ConcurrentDictionary<string, double>();
 
         [JsonIgnore]
         private bool? setIs4;
@@ -48,7 +48,7 @@ namespace RuneOptim.swar {
         public event EventHandler<EventArgs> OnUpdate;
 
         public void ResetStats() {
-            manageStats.Clear();
+            ManageStats.Clear();
         }
 
         protected void Freeze() {
@@ -111,7 +111,7 @@ namespace RuneOptim.swar {
                     val += this[attr, fake, pred] / rFlat[attr];
                 }
             }
-            manageStats.AddOrUpdate("testScore", val, (k, v) => val);
+            ManageStats.AddOrUpdate("testScore", val, (k, v) => val);
             return val;
         }
 
@@ -184,7 +184,7 @@ namespace RuneOptim.swar {
             // assume craft is valid
             var r = new Rune();
             this.CopyTo(r, true, null);
-            r.manageStats = new ConcurrentDictionary<string, double>(this.manageStats);
+            r.ManageStats = new ConcurrentDictionary<string, double>(this.ManageStats);
             if (craft.Type == CraftType.Grind) {
                 var sub = r.Subs.FirstOrDefault(s => s.Type == craft.Stat);
                 if (sub != null) {

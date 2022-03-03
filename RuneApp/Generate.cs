@@ -56,7 +56,7 @@ namespace RuneApp {
 
             statColScore.Stats = build.Sort;
             build.Sort.OnStatChanged += Sort_OnStatChanged;
-            statColScore.SetSkills(build.Mon._SkillList.Count);
+            statColScore.SetSkills(build.Mon.SkillList.Count);
 
             // Disregard locked, but honor equippedness checking
             build.BuildPrintTo += Build_BuildPrintTo;
@@ -140,13 +140,13 @@ namespace RuneApp {
 
             li.SubItems.Add(underSpec + "/" + under12);
             double pts = build.CalcScore(Cur, (str, i) => { li.SubItems.Add(str); });
-            m.score = pts;
+            m.Score = pts;
 
             // put the sum points into the first item
             li.SubItems[0].Text = pts.ToString("0.##");
 
             li.Tag = m;
-            if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.Locked))
+            if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.UsedInBuild))
                 li.ForeColor = Color.Gray;
             else {
                 if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
@@ -292,12 +292,12 @@ namespace RuneApp {
         }
 
         private void btnHelp_Click(object sender, EventArgs e) {
-            if (Main.help != null)
-                Main.help.Close();
+            if (Main.Help != null)
+                Main.Help.Close();
 
-            Main.help = new Help();
-            Main.help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
-            Main.help.Show();
+            Main.Help = new Help();
+            Main.Help.url = Environment.CurrentDirectory + "\\User Manual\\test.html";
+            Main.Help.Show();
         }
 
         private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {
@@ -327,9 +327,9 @@ namespace RuneApp {
         private void btn_powerrunes_Click(object sender, EventArgs e) {
             if (!building) {
                 using (var qq = new RuneSelect()) {
-                    qq.runes = build.GetPowerupRunes();
-                    qq.sortFunc = r => -(int)r.manageStats.GetOrAdd("besttestscore", 0);
-                    qq.runeStatKey = "besttestscore";
+                    qq.Runes = build.GetPowerupRunes();
+                    qq.SortFunc = r => -(int)r.ManageStats.GetOrAdd("besttestscore", 0);
+                    qq.RuneStatKey = "besttestscore";
                     qq.ShowDialog();
                 }
             }
@@ -362,7 +362,7 @@ namespace RuneApp {
                         }
                     });
 
-                    var runner = await build.startedBuild;
+                    var runner = await build.StartedBuild;
 
                     if (runner != null) {
                         while (build.IsRunning) {

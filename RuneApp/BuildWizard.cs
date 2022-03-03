@@ -88,7 +88,7 @@ namespace RuneApp {
 
         void pullTemplates(IEnumerable<Build> templates, int forceGroup = 0) {
             // load more
-            foreach (var b in templates.Where(t => t.MonId == 0 || MatchMostlyId((int)t.MonId, build.Mon.monsterTypeId))) {
+            foreach (var b in templates.Where(t => t.MonId == 0 || MatchMostlyId((int)t.MonId, build.Mon.MonsterTypeId))) {
                 if (b.ID == -1) {
                     try {
                         IEnumerable<Build> temps = null;
@@ -175,9 +175,9 @@ namespace RuneApp {
                 build.RunesUseEquipped = true;
                 build.AutoRuneAmount = 8;
 
-                build.GenRunes(Program.data);
+                build.GenRunes(Program.Data);
 
-                if (build.runes.Any(rs => rs.Length > 10))
+                if (build.Runes.Any(rs => rs.Length > 10))
                     return;
                 var res = build.GenBuilds();
 

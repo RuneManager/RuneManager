@@ -20,8 +20,8 @@ namespace RuneApp.InternalServer {
             int StoreNum { get { return mons.Count(m => m.storage); } }
             int RuneNum { get { return runes.Count(r => r.current == null) + crafts.Count(c => c.grindOn == null); } }
 
-            bool HasStoreSpace { get { return StoreNum < Program.data.WizardInfo.UnitDepositorySlots.Number; } }
-            bool HasBoxSpace { get { return BoxNum < Program.data.WizardInfo.UnitSlots.Number; } }
+            bool HasStoreSpace { get { return StoreNum < Program.Data.WizardInfo.UnitDepositorySlots.Number; } }
+            bool HasBoxSpace { get { return BoxNum < Program.Data.WizardInfo.UnitSlots.Number; } }
             bool HasRuneSpace { get { return RuneNum < 600; } }
 
 
@@ -70,14 +70,14 @@ namespace RuneApp.InternalServer {
 
                 string message = "";
 
-                if (Program.data == null)
-                    return return404();
+                if (Program.Data == null)
+                    return Return404();
 
                 // make a copy of all the data to mess around with
-                foreach (var m in Program.data.Monsters) {
-                    mons.Add(new MiniMon() { mon = m, storage = m.inStorage, lockedOut = m.OnDefense || m.IsRep || (m.BuildingId != 0 && !m.inStorage) });
+                foreach (var m in Program.Data.Monsters) {
+                    mons.Add(new MiniMon() { mon = m, storage = m.InStorage, lockedOut = m.OnDefense || m.IsRep || (m.BuildingId != 0 && !m.InStorage) });
                 }
-                foreach (var r in Program.data.Runes) {
+                foreach (var r in Program.Data.Runes) {
                     var mr = new MiniRune() { rune = r };
                     if (r.Assigned != null) {
                         mr.current = mons.FirstOrDefault(mm => mm.Id == r.AssignedId);
@@ -85,13 +85,13 @@ namespace RuneApp.InternalServer {
                     }
                     runes.Add(mr);
                 }
-                foreach (var b in Program.builds) {
+                foreach (var b in Program.Builds) {
                     var mm = mons.FirstOrDefault(m => m.Id == b.MonId);
                     if (mm != null)
                         mm.priority = b.Priority;
                 }
-                foreach (var l in Program.loads) {
-                    var b = Program.builds.FirstOrDefault(bb => bb.ID == l.BuildID);
+                foreach (var l in Program.Loads) {
+                    var b = Program.Builds.FirstOrDefault(bb => bb.ID == l.BuildID);
                     foreach (var r in l.Runes) {
                         var mm = mons.FirstOrDefault(mo => mo.Id == b.MonId);
                         mm.runesDesired[r.Slot - 1] = runes.FirstOrDefault(mr => mr.Id == r.Id);
@@ -106,8 +106,8 @@ namespace RuneApp.InternalServer {
                     actList.Add(new RuneAction(ActionType.MonIn) {
                         mon = mo.mon,
                         amount = StoreNum,
-                        maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                        message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                        maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                        message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                     });
                     mo.storage = true;
                 }
@@ -120,7 +120,7 @@ namespace RuneApp.InternalServer {
                         break;
 
                     // put the mons we don't need into storage
-                    if (HasStoreSpace && BoxNum >= Program.data.WizardInfo.UnitSlots.Number / 10 * 9) {
+                    if (HasStoreSpace && BoxNum >= Program.Data.WizardInfo.UnitSlots.Number / 10 * 9) {
                         while (mons.Any(m => m.ActionsLeft == 0 && !m.storage && !m.lockedOut)) {
                             if (!HasStoreSpace)
                                 break;
@@ -130,22 +130,22 @@ namespace RuneApp.InternalServer {
                             actList.Add(new RuneAction(ActionType.MonIn) {
                                 mon = mo.mon,
                                 amount = StoreNum,
-                                maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                                message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                                maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                                message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                             });
                             mo.storage = true;
                         }
                     }
                     var monPlist = mons.Where(m => m.ActionsLeft > 0).OrderBy(m => m.Score);
-                    if (BoxNum < Program.data.WizardInfo.UnitSlots.Number / 10 * 7) {
-                        while (BoxNum < Program.data.WizardInfo.UnitSlots.Number / 10 * 9 - 1 && monPlist.Any(m => m.storage)) {
+                    if (BoxNum < Program.Data.WizardInfo.UnitSlots.Number / 10 * 7) {
+                        while (BoxNum < Program.Data.WizardInfo.UnitSlots.Number / 10 * 9 - 1 && monPlist.Any(m => m.storage)) {
                             var qqlist = monPlist.OrderByDescending(m => m.runesCurrent.Sum(r => r?.desired == null ? 0 : 1 / (double)r.desired.Score));
                             var tmon = qqlist.FirstOrDefault(m => m.storage);
                             actList.Add(new RuneAction(ActionType.MonOut) {
                                 mon = tmon.mon,
                                 amount = BoxNum,
-                                maximum = Program.data.WizardInfo.UnitSlots.Number,
-                                message = "Not Good (" + tmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.data.WizardInfo.UnitDepositorySlots.Number
+                                maximum = Program.Data.WizardInfo.UnitSlots.Number,
+                                message = "Not Good (" + tmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.Data.WizardInfo.UnitDepositorySlots.Number
                             });
                             tmon.storage = false;
                         }
@@ -160,8 +160,8 @@ namespace RuneApp.InternalServer {
                         actList.Add(new RuneAction(ActionType.MonOut) {
                             mon = cmon.mon,
                             amount = BoxNum,
-                            maximum = Program.data.WizardInfo.UnitSlots.Number,
-                            message = "Not Good (" + cmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.data.WizardInfo.UnitDepositorySlots.Number
+                            maximum = Program.Data.WizardInfo.UnitSlots.Number,
+                            message = "Not Good (" + cmon.ActionsLeft + ") {0}/{1}, " + StoreNum + "/" + Program.Data.WizardInfo.UnitDepositorySlots.Number
                         });
                         cmon.storage = false;
                     }
@@ -270,8 +270,8 @@ namespace RuneApp.InternalServer {
                     actList.Add(new RuneAction(ActionType.MonIn) {
                         mon = mo.mon,
                         amount = StoreNum,
-                        maximum = Program.data.WizardInfo.UnitDepositorySlots.Number,
-                        message = "Is Good " + BoxNum + "/" + Program.data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
+                        maximum = Program.Data.WizardInfo.UnitDepositorySlots.Number,
+                        message = "Is Good " + BoxNum + "/" + Program.Data.WizardInfo.UnitSlots.Number + ", {0}/{1}"
                     });
                     mo.storage = true;
                 }
@@ -369,7 +369,7 @@ namespace RuneApp.InternalServer {
                     actList.Remove(nact);
                 }
 
-                return returnHtml(new ServedResult[] {
+                return ReturnHtml(new ServedResult[] {
                         new ServedResult("link") { contentDic = { { "rel", "\"stylesheet\"" }, { "type", "\"text/css\"" }, { "href", "\"/css/runes.css\"" } } },
                         new ServedResult("style") {
                         contentList = {
@@ -493,7 +493,7 @@ function hackLots(prop, num, on) {
 
                     if (action == ActionType.MonIn) {
                         foreach (var m in manyMons)
-                            ret.contentList.Add(ServeImageClass($"monsters/{m.monsterTypeId}.png", "mon-portrait"));
+                            ret.contentList.Add(ServeImageClass($"monsters/{m.MonsterTypeId}.png", "mon-portrait"));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
                         ret.contentList.Add(ServeImageClass($"loads/building_store_small.png", "storage"));
                     }
@@ -501,13 +501,13 @@ function hackLots(prop, num, on) {
                         ret.contentList.Add(ServeImageClass($"loads/building_store_small.png", "storage"));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
                         foreach (var m in manyMons)
-                            ret.contentList.Add(ServeImageClass($"monsters/{m.monsterTypeId}.png", "mon-portrait"));
+                            ret.contentList.Add(ServeImageClass($"monsters/{m.MonsterTypeId}.png", "mon-portrait"));
                     }
                     else if (action == ActionType.RuneIn) {
                         foreach (var r in manyRunes)
                             ret.contentList.Add(RuneRenderer.renderRune(r, true));
                         ret.contentList.Add(ServeImageClass($"loads/move_right.png", "action-arrow"));
-                        ret.contentList.Add(ServeImageClass($"monsters/{mon.monsterTypeId}.png", "mon-portrait"));
+                        ret.contentList.Add(ServeImageClass($"monsters/{mon.MonsterTypeId}.png", "mon-portrait"));
                     }
                     else if (action == ActionType.RuneOut) {
                         return new ServedResult("span");

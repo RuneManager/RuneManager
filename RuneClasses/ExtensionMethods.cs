@@ -77,7 +77,7 @@ namespace RuneOptim {
         }
     }
 
-    public static class ExtensionMethods {
+    public static class LibExtensionMethods {
         public static void AddRange<T>(this Collection<T> lhs, IEnumerable<T> rhs) {
             foreach (var t in rhs)
                 lhs.Add(t);

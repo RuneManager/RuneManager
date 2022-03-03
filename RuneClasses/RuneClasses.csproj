@@ -77,6 +77,7 @@
     <Compile Include="BuildProcessing\ProgToEventArgs.cs" />
     <Compile Include="BuildProcessing\RuneUsage.cs" />
     <Compile Include="Management\ILoadout.cs" />
+    <Compile Include="swar\Guild.cs" />
     <Compile Include="swar\IRune.cs" />
     <Compile Include="swar\Rift.cs" />
     <Compile Include="swar\Attr.cs" />

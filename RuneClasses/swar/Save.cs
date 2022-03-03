@@ -5,7 +5,9 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace RuneOptim.swar {
+namespace RuneOptim.swar
+{
+
     // Deserializes the .json into this
     public class Save {
         [JsonProperty("unit_list")]
@@ -26,6 +28,9 @@ namespace RuneOptim.swar {
         [JsonProperty("unit_lock_list")]
         public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
+        [JsonProperty("rune_lock_list")]
+        public readonly ObservableCollection<ulong> LockedRunes = new ObservableCollection<ulong>();
+
         [JsonProperty("building_list")]
         public readonly ObservableCollection<Building> Buildings = new ObservableCollection<Building>();
 
@@ -38,16 +43,19 @@ namespace RuneOptim.swar {
         [JsonProperty("wizard_info")]
         public WizardInfo WizardInfo;
 
+        [JsonProperty("guild")]
+        public Guild Guild;
+
         // builds from rune optimizer don't match mine.
         // Don't care right now, perhaps a fuzzy-import later?
         [JsonProperty("savedBuilds")]
         public IList<object> Builds;
 
         [JsonIgnore]
-        public readonly Stats shrines = new Stats();
+        public readonly Stats Shrines = new Stats();
 
         [JsonProperty("modified")]
-        public bool isModified = false;
+        public bool IsModified = false;
 
         [JsonIgnore]
         static Dictionary<int, string> monIdNames = null;
@@ -61,7 +69,7 @@ namespace RuneOptim.swar {
         }
 
         [JsonIgnore]
-        public int priority = 1;
+        public int Priority = 1;
 
         [JsonIgnore]
         private int monLoaded = 0;
@@ -71,12 +79,31 @@ namespace RuneOptim.swar {
             Monsters.CollectionChanged += Monsters_CollectionChanged;
             Decorations.CollectionChanged += Decorations_CollectionChanged;
             LockedUnits.CollectionChanged += LockedUnits_CollectionChanged;
+            LockedRunes.CollectionChanged += LockedRunes_CollectionChanged;
             Buildings.CollectionChanged += Buildings_CollectionChanged;
             DefenseUnits.CollectionChanged += DefenseUnits_CollectionChanged;
             GuildDefenseUnits.CollectionChanged += GuildDefenseUnits_CollectionChanged;
         }
 
-        public static int getPiecesRequired(int monsterTypeId) {
+        public Save(Save rhs) : this()
+        {
+            Runes.AddRange(rhs.Runes);
+            Monsters.AddRange(rhs.Monsters);
+            Crafts.AddRange(rhs.Crafts);
+            InventoryItems.AddRange(rhs.InventoryItems);
+            Decorations.AddRange(rhs.Decorations);
+            LockedUnits.AddRange(rhs.LockedUnits);
+            LockedRunes.AddRange(rhs.LockedRunes);
+            Buildings.AddRange(rhs.Buildings);
+            DefenseUnits.AddRange(rhs.DefenseUnits);
+            GuildDefenseUnits.AddRange(rhs.GuildDefenseUnits);
+            Priority = rhs.Priority;
+            IsModified = rhs.IsModified;
+            Shrines.CopyFrom(rhs.Shrines, true);
+            WizardInfo = rhs.WizardInfo;
+        }
+
+        public static int GetPiecesRequired(int monsterTypeId) {
             var a = monsterTypeId / 100;
             var b = MonIdNames[a];
             var c = MonsterStat.BaseStars(b);
@@ -128,7 +155,7 @@ namespace RuneOptim.swar {
                     foreach (var b in e.NewItems.Cast<Building>()) {
                         if (b.BuildingType == BuildingType.MonsterStorage) {
                             foreach (var m in Monsters.Where(mo => mo.BuildingId == b.Id)) {
-                                m.inStorage = true;
+                                m.InStorage = true;
                             }
                         }
                     }
@@ -166,6 +193,30 @@ namespace RuneOptim.swar {
             }
         }
 
+        private void LockedRunes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+            switch (e.Action) {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
+                    foreach (var i in e.NewItems.Cast<ulong>()) {
+                        var rune = GetRune(i);
+                        if (rune != null)
+                            rune.Locked = true;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var i in e.OldItems.Cast<ulong>()) {
+                        var rune = GetRune(i);
+                        if (rune != null)
+                            rune.Locked = false;
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
         private void Decorations_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
@@ -176,7 +227,7 @@ namespace RuneOptim.swar {
                             v = (int)Math.Ceiling(shr.Level * Deco.ShrineLevel[i]);
                         else if (i < 9)
                             v = (int)Math.Ceiling(1 + shr.Level * Deco.ShrineLevel[i]);
-                        shrines[shr.Shrine.ToString()] = v;
+                        Shrines[shr.Shrine.ToString()] = v;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
@@ -191,11 +242,12 @@ namespace RuneOptim.swar {
         private void Monsters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (Monster mon in e.NewItems.Cast<Monster>()) {
-                        mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId).Value;
-                        mon.loadOrder = monLoaded++;
+                    foreach (Monster mon in e.NewItems) {
+                        if (mon.Name == null)
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId).Value;
+                        mon.LoadOrder = monLoaded++;
                         if (mon.Name == null) {
-                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.monsterTypeId / 100).Value;
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value;
                         }
                         if (mon.Name == null) {
                             mon.Name = "MissingNo";
@@ -205,10 +257,10 @@ namespace RuneOptim.swar {
                             if (!Runes.Any(ru => ru.Id == r.Id))
                                 Runes.Add(r);
                         }
-                        mon.Current.Shrines = shrines;
+                        mon.Current.Shrines = Shrines;
 
                         if (mon.BuildingId == Buildings.FirstOrDefault(b => b.BuildingType == BuildingType.MonsterStorage)?.Id)
-                            mon.inStorage = true;
+                            mon.InStorage = true;
 
                         // Add all the Runes in the pool assigned to the monster to it's current loadout
                         foreach (Rune rune in Runes.Where(r => r.AssignedId == mon.Id)) {
@@ -238,11 +290,13 @@ namespace RuneOptim.swar {
                         }
                     }
                     break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    // todo: looks like collection is dead at this point :(
+                    break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException("" + e.Action);
             }
         }
 
@@ -263,6 +317,8 @@ namespace RuneOptim.swar {
                             }
                         }
                         r.PrebuildAttributes();
+                        if (LockedRunes.Contains(r.Id))
+                            r.Locked = true;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:

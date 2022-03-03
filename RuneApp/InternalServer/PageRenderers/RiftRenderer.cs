@@ -24,7 +24,7 @@ namespace RuneApp.InternalServer {
                     Master.LineLog.Debug("deserialised " + bestRift.BestDeckRiftDungeons.Count() + " best teams");
 
                     Master.LineLog.Debug("can do name " + RuneOptim.swar.Save.MonIdNames.FirstOrDefault());
-                    Master.LineLog.Debug("can do mon " + Program.data.Monsters.FirstOrDefault());
+                    Master.LineLog.Debug("can do mon " + Program.Data.Monsters.FirstOrDefault());
                     var sr = new List<ServedResult>();
                     foreach (var br in bestRift.BestDeckRiftDungeons) {
                         sr.Add("<h1>" + br.RiftDungeonId + "</h1>");
@@ -40,7 +40,7 @@ namespace RuneApp.InternalServer {
                             var mp = br.Monsters.FirstOrDefault(p => p.Position == i);
                             Master.LineLog.Debug("retrieving " + i + " mon " + mp?.MonsterId);
                             if (mp != null) {
-                                var mon = Program.data.GetMonster((ulong)mp.MonsterId);
+                                var mon = Program.Data.GetMonster((ulong)mp.MonsterId);
                                 Master.LineLog.Debug("mon " + mon?.FullName);
                                 if (mon == null) {
                                     var name = mp.MonsterTypeId.ToString();
@@ -68,7 +68,7 @@ namespace RuneApp.InternalServer {
                             var mp = br.Monsters.FirstOrDefault(p => p.Position == i);
                             Master.LineLog.Debug("retrieving " + i + " mon " + mp?.MonsterId);
                             if (mp != null) {
-                                var mon = Program.data.GetMonster((ulong)mp.MonsterId);
+                                var mon = Program.Data.GetMonster((ulong)mp.MonsterId);
                                 Master.LineLog.Debug("mon " + mon?.FullName);
                                 if (mon == null) {
                                     var name = mp.MonsterTypeId.ToString();
@@ -91,10 +91,10 @@ namespace RuneApp.InternalServer {
 
                         sr.Add(table);
                     }
-                    return returnHtml(new ServedResult[] { new ServedResult("style") { contentList = { "td {border: 1px solid black;}" } } }, sr.ToArray());
+                    return ReturnHtml(new ServedResult[] { new ServedResult("style") { contentList = { "td {border: 1px solid black;}" } } }, sr.ToArray());
                 }
                 else {
-                    return returnHtml(null, "Please put GetBestClearRiftDungeon_*.resp.json");
+                    return ReturnHtml(null, "Please put GetBestClearRiftDungeon_*.resp.json");
                 }
             }
         }

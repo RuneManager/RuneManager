@@ -15,7 +15,7 @@ namespace RuneOptim.swar {
 
             var i = Enum.GetValues(typeof(RuneSet)).OfType<RuneSet>().ToList().IndexOf(date) - 2;
 
-            writer.WriteValue(i.ToString());
+            writer.WriteValue((int)i);
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer) {
@@ -25,8 +25,12 @@ namespace RuneOptim.swar {
             else if (reader.Value is Int64 l) {
                 return (RuneSet)(1 << (int)(l - 1));
             }
+            else if (reader.Value is string s && int.TryParse(s, out var n))
+            {
+                return (RuneSet)(1 << (int)(n - 1));
+            }
             else {
-                throw new Exception();
+                throw new TypeLoadException("I don't like " + reader.Value + " (" + reader.Value?.GetType() +")");
             }
 
         }
@@ -59,20 +63,26 @@ namespace RuneOptim.swar {
         public int Level;
 
         [JsonProperty("rank")]
-        public int _rank;
+        public int Rank;
 
+        /// <summary>
+        /// In-game lock status
+        /// </summary>
         [JsonProperty("locked")]
-        protected bool locked;
+        public bool Locked;
+
+        [JsonProperty("used_in_build")]
+        private bool usedInBuild;
 
         [JsonIgnore]
-        public bool Locked {
+        public bool UsedInBuild {
             get {
-                return locked;
+                return usedInBuild;
             }
             set {
-                locked = value;
+                usedInBuild = value;
                 if (EnchantOf != null)
-                    EnchantOf.locked = value;
+                    EnchantOf.usedInBuild = value;
             }
         }
 
@@ -80,7 +90,7 @@ namespace RuneOptim.swar {
         public Rune EnchantOf;
 
         [JsonProperty("occupied_type")]
-        public int _occupiedType;
+        public int OccupiedType;
 
         [JsonProperty("sell_value")]
         public int SellValue;
@@ -101,7 +111,7 @@ namespace RuneOptim.swar {
         public ulong WizardId = 0;
 
         [JsonProperty("extra")]
-        public int _extra;
+        public int Extra;
 
         #endregion
 
@@ -163,10 +173,10 @@ namespace RuneOptim.swar {
             rhs.Grade = Grade;
             rhs.Slot = Slot;
             rhs.Level = Level;
-            rhs._rank = _rank;
+            rhs.Rank = Rank;
             if (!keepLocked)
-                rhs.Locked = Locked;
-            rhs._occupiedType = _occupiedType;
+                rhs.UsedInBuild = UsedInBuild;
+            rhs.OccupiedType = OccupiedType;
             rhs.SellValue = SellValue;
 
             Main.CopyTo(ref rhs.Main);

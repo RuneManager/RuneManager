@@ -121,6 +121,7 @@
       <DependentUpon>Create.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="Generate.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -226,6 +227,9 @@
       <DependentUpon>Options.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Program.Builds.cs" />
+    <Compile Include="Program.Saves.cs" />
+    <Compile Include="Program.Operation.cs" />
     <Compile Include="progWriter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\RuneBox.cs">
@@ -4218,4 +4222,44 @@
   <Target Name="CopyLinkedContentFiles" BeforeTargets="Build">
     <Copy SourceFiles="%(Content.Identity)" DestinationFiles="$(OutputPath)%(Content.Link)" SkipUnchangedFiles="false" OverwriteReadOnlyFiles="true" Condition="'%(Content.Link)' != ''" />
   </Target>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="PreBuildEvent">
+    <!--ZipDir ZipFileName="adb.zip" DirectoryName="adb" /-->
+  </Target>
+  <UsingTask TaskName="ZipDir" TaskFactory="CodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v12.0.dll">
+    <ParameterGroup>
+      <ZipFileName ParameterType="System.String" Required="true" />
+      <DirectoryName ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.IO.Compression" />
+      <Reference Include="System.IO.Compression.FileSystem" />
+      <Using Namespace="System.IO.Compression" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+      try
+      {
+	
+		var zz = new FileInfo( ZipFileName );
+		bool doZip = !zz.Exists || Directory.GetFiles( DirectoryName ).Any( f => File.GetLastWriteTime( f ) > zz.LastWriteTime );
+		if ( !doZip )
+			using ( var za = ZipFile.Open( ZipFileName, 0 ) )
+				doZip = za.Entries.Any( z => !File.Exists( Path.Combine( DirectoryName, z.FullName ) ) );
+
+		if (doZip)
+		{
+			File.Delete(ZipFileName);
+			Log.LogMessage(MessageImportance.High, string.Format("Zipping Directory {0} to {1}", DirectoryName, ZipFileName));
+			ZipFile.CreateFromDirectory( DirectoryName, ZipFileName );
+		}
+
+        return true;
+      }
+      catch(Exception ex)
+      {
+        Log.LogErrorFromException(ex);
+        return false;
+      }
+    ]]></Code>
+    </Task>
+  </UsingTask>
 </Project>

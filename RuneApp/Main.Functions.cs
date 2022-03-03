@@ -52,7 +52,7 @@ namespace RuneApp {
             if (!shrineMap.ContainsKey(stat))
                 shrineMap.Add(stat, new List<ToolStripMenuItem>());
             shrineMap[stat].Add(it);
-            if (Program.data.shrines[stat].EqualTo(value))
+            if (Program.Data.Shrines[stat].EqualTo(value))
                 it.Checked = true;
         }
 
@@ -66,14 +66,14 @@ namespace RuneApp {
                     i.Checked = false;
                 }
                 it.Checked = true;
-                if (Program.data == null)
+                if (Program.Data == null)
                     return;
 
                 if (string.IsNullOrWhiteSpace(stat))
                     return;
 
-                Program.data.shrines[stat] = tag.Value;
-                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.data.shrines));
+                Program.Data.Shrines[stat] = tag.Value;
+                File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
             }
         }
 
@@ -81,14 +81,14 @@ namespace RuneApp {
             if (nli == null)
                 nli = new ListViewItem();
             nli.Tag = rune;
-            nli.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+            nli.BackColor = rune.UsedInBuild ? Color.Red : Color.Transparent;
 
             while (nli.SubItems.Count < 8)
                 nli.SubItems.Add("");
 
             nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, rune.Set.ToString());
-            if (RuneProperties.setUnicode.ContainsKey(rune.Set))
-                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, RuneProperties.setUnicode[rune.Set]);
+            if (RuneProperties.SetUnicode.ContainsKey(rune.Set))
+                nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, RuneProperties.SetUnicode[rune.Set]);
             nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, rune.Id.ToString());
             nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, rune.Grade.ToString());
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, Rune.StringIt(rune.Main.Type, true));
@@ -111,13 +111,13 @@ namespace RuneApp {
 
             nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, mon.FullName);
             nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, mon.Grade.ToString());
-            nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.priority.ToString("#"));
+            nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, mon.Priority.ToString("#"));
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, mon.Id.ToString());
-            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.monsterTypeId.ToString());
-            nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.level.ToString());
-            if (Program.builds.Any(b => b.MonId == mon.Id))
+            nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, mon.MonsterTypeId.ToString());
+            nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, mon.Level.ToString());
+            if (Program.Builds.Any(b => b.MonId == mon.Id))
                 nli.ForeColor = Color.Green;
-            else if (mon.inStorage)
+            else if (mon.InStorage)
                 nli.ForeColor = Color.Gray;
             return nli;
         }
@@ -125,15 +125,15 @@ namespace RuneApp {
         private void filterRunesList(Predicate<object> p) {
             dataRuneList.Items.Clear();
 
-            if (Program.data?.Runes == null) return;
+            if (Program.Data?.Runes == null) return;
 
-            foreach (Rune rune in Program.data.Runes.Where(p.Invoke)) {
+            foreach (Rune rune in Program.Data.Runes.Where(p.Invoke)) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
         }
 
         private DialogResult CheckSaveChanges() {
-            if (!Program.data.isModified)
+            if (Program.Data == null || !Program.Data.IsModified)
                 return DialogResult.Yes;
 
             var res = MessageBox.Show("Would you like to save changes to your imported data?", "Save Data", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
@@ -152,18 +152,18 @@ namespace RuneApp {
         }
 
         public void OpenHelp(string url = null, Form owner = null) {
-            if (help == null || help.IsDisposed)
-                help = new Help();
-            help.url = url;
+            if (Help == null || Help.IsDisposed)
+                Help = new Help();
+            Help.url = url;
 
-            if (!help.Visible)
-                help.Show(owner ?? this);
+            if (!Help.Visible)
+                Help.Show(owner ?? this);
 
             var xx = Location.X + 1105 + 8 - 271;//271, 213
             var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
-            help.Height = this.Height;
-            help.Location = new Point(xx, yy);
-            help.Location = new Point(Location.X + Width, Location.Y);
+            Help.Height = this.Height;
+            Help.Location = new Point(xx, yy);
+            Help.Location = new Point(Location.X + Width, Location.Y);
         }
 
         private void ShowMon(Monster mon, Stats cur = null) {
@@ -173,12 +173,12 @@ namespace RuneApp {
 
                 statName.Text = mon.FullName;
                 statID.Text = mon.Id.ToString();
-                statLevel.Text = mon.level.ToString();
+                statLevel.Text = mon.Level.ToString();
 
                 ShowStats(cur, mon);
                 ShowLoadout(mon.Current);
 
-                var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.monsterTypeId) + ".png";
+                var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.MonsterTypeId) + ".png";
                 if (File.Exists(fname))
                     monImage.ImageLocation = fname;
                 else
@@ -198,8 +198,8 @@ namespace RuneApp {
         private void ShowLoadout(Loadout l) {
             runeDial.Loadout = l;
 
-            if (runeDisplay != null && !runeDisplay.IsDisposed)
-                runeDisplay.UpdateLoad(l);
+            if (RuneDisplay != null && !RuneDisplay.IsDisposed)
+                RuneDisplay.UpdateLoad(l);
         }
 
         private void ShowStats(Stats cur, Monster mon) {
@@ -341,17 +341,17 @@ namespace RuneApp {
             dataMonsterList.Items.Clear();
             dataRuneList.Items.Clear();
             listView4.Items.Clear();
-            if (Program.data == null)
+            if (Program.Data == null)
                 return;
             int maxPri = 0;
-            if (Program.builds.Count > 0)
-                maxPri = Program.builds.Max(b => b.Priority) + 1;
-            foreach (var mon in Program.data.Monsters) {
-                mon.priority = (Program.builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
+            if (Program.Builds.Count > 0)
+                maxPri = Program.Builds.Max(b => b.Priority) + 1;
+            foreach (var mon in Program.Data.Monsters) {
+                mon.Priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
             }
-            dataMonsterList.Items.AddRange(Program.data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
+            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
-            dataCraftList.Items.AddRange(Program.data.Crafts.Select(craft => new ListViewItem() {
+            dataCraftList.Items.AddRange(Program.Data.Crafts.Select(craft => new ListViewItem() {
                 Text = craft.ItemId.ToString(),
                 SubItems =
                 {
@@ -362,11 +362,17 @@ namespace RuneApp {
                 }
             }).ToArray());
 
-            foreach (Rune rune in Program.data.Runes) {
+            foreach (Rune rune in Program.Data.Runes) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
-            checkLocked();
+            CheckLocked();
             ColorMonsWithBuilds();
+
+            foreach (ListViewItem lvi in buildList.Items) {
+                // regenerate the Build list text
+                if (lvi.Tag is Build b)
+                    ListViewItemBuild(lvi, b);
+            } 
 
             dataMonsterList.ListViewItemSorter = oldMonSort;
             if (dataMonsterList.ListViewItemSorter != null) {
@@ -382,7 +388,7 @@ namespace RuneApp {
                 dataRuneList.Sort();
             }
         }
-        public void refreshLoadouts()
+        public void RefreshLoadouts()
         {
             foreach (ListViewItem item in loadoutList.Items)
             {
@@ -395,15 +401,15 @@ namespace RuneApp {
             }
         }
 
-        public void checkLocked() {
-            if (Program.data?.Runes == null)
+        public void CheckLocked() {
+            if (Program.Data?.Runes == null)
                 return;
 
             Invoke((MethodInvoker)delegate {
-                toolStripStatusLabel1.Text = "Locked: " + Program.data.Runes.Count(r => r.Locked);
+                toolStripStatusLabel1.Text = "Locked: " + Program.Data.Runes.Count(r => r.UsedInBuild);
                 foreach (ListViewItem li in dataRuneList.Items) {
                     if (li.Tag is Rune rune)
-                        li.BackColor = rune.Locked ? Color.Red : Color.Transparent;
+                        li.BackColor = rune.UsedInBuild ? Color.Red : Color.Transparent;
                 }
             });
         }
@@ -425,7 +431,7 @@ namespace RuneApp {
             }
             resumeTimer = null;
 
-            var fb = Program.builds.FirstOrDefault(b => b.Best == null);
+            var fb = Program.Builds.FirstOrDefault(b => b.Best == null);
             var lvi = this.buildList.Items.OfType<ListViewItem>().FirstOrDefault(b => b.Tag == fb);
             if (lvi != null) {
                 // TODO: rename build columns

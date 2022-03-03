@@ -93,8 +93,8 @@ namespace RuneApp {
         }
 
         private void btnGrind_Click(object sender, EventArgs e) {
-            var gr = rune.FilterGrinds(Program.data.Crafts);
-            var en = rune.FilterEnchants(Program.data.Crafts);
+            var gr = rune.FilterGrinds(Program.Data.Crafts);
+            var en = rune.FilterEnchants(Program.Data.Crafts);
             using (var f = new GrindPreview()) {
                 f.Rune = this.rune;
                 f.Crafts = gr.Concat(en);
