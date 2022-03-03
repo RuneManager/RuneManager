@@ -24,13 +24,15 @@ namespace RuneApp {
         bool teamChecking;
         Build teamBuild;
         Dictionary<string, List<string>> toolmap = new Dictionary<string, List<string>>() {
-            { "PvE", new List<string> { "Farmer", "World Boss", "ToA" } },
-            { "Dungeon", new List<string> { "Giant", "Dragon", "Necro", "Secret", "HoH", "Elemental" } },
-            { "Raid", new List<string> {"Group", "Light R", "Dark R", "Fire R", "Water R", "Wind R" } },
-            { "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA" } },
-
-            { "Elemental", new List<string> {"Magic", "Light D", "Dark D", "Fire D", "Water D", "Wind D" } },
-            { "ToA", new List<string> { "ToAN", "ToAH" } }
+            { "PvE", new List<string> { "Farmer", "World" } },
+            { "Dungeon", new List<string> { "GB", "DB", "NB", "PC", "SF", "Secret", "HoH" } },
+            { "Halls", new List<string> {"H-Magic", "H-Light", "H-Dark", "H-Fire", "H-Water", "H-Wind" } },
+            { "Rift", new List<string> {"Raid", "R-Light", "R-Dark", "R-Fire", "R-Water", "R-Wind" } },
+            { "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA", "SD", "SO"} },
+            { "Lab", new List<string> { "Tartarus", "Leos", "Guilles", "Kotos", "L-Norm", "L-Resc", "L-Expl", "L-Cool", "L-SL", "L-TL" } },
+            { "ToA", new List<string> { "ToAN", "ToAH", "ToAHell" } },
+            { "2A", new List<string> { "Griffon", "Inugami", "Warbear", "High Elem", "Fairy", "Pixie", "Werewolf", "Martial Cat", "Howl", "Grim R" } },
+            { "DimH", new List<string> { "Karzan", "Ellunia", "Lumel", "Khalderun" } }
         };
 
         List<string> knownTeams = new List<string>();
