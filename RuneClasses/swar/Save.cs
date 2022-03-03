@@ -100,6 +100,7 @@ namespace RuneOptim.swar
             Priority = rhs.Priority;
             IsModified = rhs.IsModified;
             Shrines.CopyFrom(rhs.Shrines, true);
+            Guild.CopyFrom(rhs.Guild, true);
             WizardInfo = rhs.WizardInfo;
         }
 
@@ -258,6 +259,7 @@ namespace RuneOptim.swar
                                 Runes.Add(r);
                         }
                         mon.Current.Shrines = Shrines;
+                        mon.Current.Guild = Guild;
 
                         if (mon.BuildingId == Buildings.FirstOrDefault(b => b.BuildingType == BuildingType.MonsterStorage)?.Id)
                             mon.InStorage = true;

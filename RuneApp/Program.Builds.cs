@@ -45,6 +45,7 @@ namespace RuneApp
                 build.BuildTake = Program.Settings.TestShow;
                 build.BuildTimeout = Program.Settings.TestTime;
                 build.Shrines = Program.Data.Shrines;
+                build.Guild = Program.Data.Guild;
                 build.BuildDumpBads = false;
                 build.BuildSaveStats = false;
                 build.BuildGoodRunes = false;
@@ -106,6 +107,7 @@ namespace RuneApp
                 BuildSaveStats = saveStats,
                 RunesUseEquipped = Program.Settings.UseEquipped,
                 Shrines = Program.Data.Shrines,
+                Guild = Program.Data.Guild,
                 RunesOnlyFillEmpty = Program.FillRunes,
                 RunesDropHalfSetStat = Program.GoFast,
                 IgnoreLess5 = Program.Settings.IgnoreLess5,
@@ -141,6 +143,7 @@ namespace RuneApp
                 build.BuildTake = bSettings.BuildTake;
                 build.BuildTimeout = bSettings.BuildTimeout;
                 build.Shrines = bSettings.Shrines;
+                build.Guild = bSettings.Guild;
                 build.BuildDumpBads = bSettings.BuildDumpBads;
                 build.BuildSaveStats = bSettings.BuildSaveStats;
                 build.BuildGoodRunes = bSettings.BuildGoodRunes;
@@ -210,8 +213,10 @@ namespace RuneApp
 
                     var dmonld = dmon.Current.Leader;
                     var dmonsh = dmon.Current.Shrines;
+                    var dmongu = dmon.Current.Guild;
                     dmon.Current.Leader = build.Best.Current.Leader;
                     dmon.Current.Shrines = build.Best.Current.Shrines;
+                    dmon.Current.Guild = build.Best.Current.Guild;
                     var dmonfl = dmon.Current.FakeLevel;
                     var dmonps = dmon.Current.PredictSubs;
                     dmon.Current.FakeLevel = build.Best.Current.FakeLevel;
@@ -225,6 +230,7 @@ namespace RuneApp
 
                     dmon.Current.Leader = dmonld;
                     dmon.Current.Shrines = dmonsh;
+                    dmon.Current.Guild = dmongu;
                     dmon.Current.FakeLevel = dmonfl;
                     dmon.Current.PredictSubs = dmonps;
                     dmon.Current.Buffs = dmonbf;

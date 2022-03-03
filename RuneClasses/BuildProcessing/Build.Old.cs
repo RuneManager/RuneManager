@@ -344,6 +344,7 @@ namespace RuneOptim.BuildProcessing {
             Mon.ExtraCritRate = extraCritRate;
             Monster test = new Monster(Mon);
             test.Current.Shrines = Shrines;
+            test.Current.Guild = Guild;
             test.Current.Leader = Leader;
 
             test.Current.FakeLevel = slotFakes.Select(i => i ?? 0).ToArray();
@@ -523,6 +524,7 @@ namespace RuneOptim.BuildProcessing {
                 currentLoad.Current.TempLoad = true;
                 currentLoad.Current.Buffs = Buffs;
                 currentLoad.Current.Shrines = Shrines;
+                currentLoad.Current.Guild = Guild;
                 currentLoad.Current.Leader = Leader;
 
                 currentLoad.Current.FakeLevel = slotFakes;
@@ -654,6 +656,7 @@ namespace RuneOptim.BuildProcessing {
                     test.Current.TempLoad = true;
                     test.Current.Buffs = Buffs;
                     test.Current.Shrines = Shrines;
+                    test.Current.Guild = Guild;
                     test.Current.Leader = Leader;
 
                     test.Current.FakeLevel = slotFakes;

@@ -319,6 +319,7 @@ namespace RuneApp {
                                 b.Mon = Program.Data.GetMonster(b.MonName, bnum + 1);
                             }
                             b.Shrines = Program.Data.Shrines;
+                            b.Guild = Program.Data.Guild;
                         }
                         else {
                             b.Mon = new Monster();
@@ -420,6 +421,15 @@ namespace RuneApp {
                     foreach (var m in dat.Monsters)
                         m.Current.Shrines = dat.Shrines;
                 }
+
+                /* TODO
+                if (File.Exists("guild_overwrite.json"))
+                {
+                    dat.Guild.SetTo(JsonConvert.DeserializeObject<Guild>(File.ReadAllText("guild_overwrite.json")));
+                    foreach (var m in dat.Monsters)
+                        m.Current.Shrines = dat.Shrines;
+                }
+                */
 
                 return dat;
 #if !DEBUG

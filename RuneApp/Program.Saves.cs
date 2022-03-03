@@ -243,6 +243,7 @@ namespace RuneApp
                         }
                     }
                     load.Shrines = Data.Shrines;
+                    load.Guild = Data.Guild;
                     Loads.Add(load);
                 }
                 return LoadSaveResult.Success;

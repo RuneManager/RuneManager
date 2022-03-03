@@ -9,6 +9,7 @@ namespace RuneOptim.BuildProcessing {
         public int BuildTake;
         public int BuildTimeout;
         public Stats Shrines;
+        public Guild Guild;
         public bool BuildDumpBads;
         public bool BuildSaveStats;
         public bool BuildGoodRunes;
@@ -25,6 +26,7 @@ namespace RuneOptim.BuildProcessing {
                 BuildTake = 0,
                 BuildTimeout = 0,
                 Shrines = new Stats(),
+                Guild = new Guild(),
                 BuildDumpBads = false,
                 BuildSaveStats = false,
                 BuildGoodRunes = false,
@@ -44,6 +46,7 @@ namespace RuneOptim.BuildProcessing {
                 build.BuildTake = 0;
                 build.BuildTimeout = 0;
                 build.Shrines = Program.data.shrines;
+                build.Guild = Program.data.guild;
                 build.BuildDumpBads = true;
                 build.BuildSaveStats = saveStats;
                 build.BuildGoodRunes = false;
