@@ -166,8 +166,13 @@ namespace RuneApp {
 
             tsTeamAdd(teamToolStripMenuItem, "PvE");
             tsTeamAdd(teamToolStripMenuItem, "Dungeon");
-            tsTeamAdd(teamToolStripMenuItem, "Raid");
+            tsTeamAdd(teamToolStripMenuItem, "Halls");
             tsTeamAdd(teamToolStripMenuItem, "PvP");
+            tsTeamAdd(teamToolStripMenuItem, "Lab");
+            tsTeamAdd(teamToolStripMenuItem, "ToA");
+            tsTeamAdd(teamToolStripMenuItem, "2A");
+            tsTeamAdd(teamToolStripMenuItem, "DimH");
+
 
             var tsnone = new ToolStripMenuItem("(Clear)");
             tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
