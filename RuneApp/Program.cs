@@ -379,48 +379,57 @@ namespace RuneApp {
 
 #if !DEBUG
             try
+            {
 #endif
 
-            var dat = JsonConvert.DeserializeObject<Save>(text);
+                var dat = JsonConvert.DeserializeObject<Save>(text);
 
-            // TODO: temp fix
-            // this probably is somewhat of a leak, as the loadouts will have references to runes no-longer in the save (because the list was recreated in-place).
-            foreach (var l in matchLoads) {
-                for (int i = 0; i < 6; i++) {
-                    if (l.Runes[i] == null)
-                        continue;
-                    var rr = dat.Runes.FirstOrDefault(r => r.Id == l.Runes[i].Id);
-                    if (rr != null) {
-                        l.Runes[i] = rr;
+                // TODO: temp fix
+                // this probably is somewhat of a leak, as the loadouts will have references to runes no-longer in the save (because the list was recreated in-place).
+                foreach (var l in matchLoads)
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        if (l.Runes[i] == null)
+                            continue;
+                        var rr = dat.Runes.FirstOrDefault(r => r.Id == l.Runes[i].Id);
+                        if (rr != null)
+                        {
+                            l.Runes[i] = rr;
+                        }
+                        else
+                        {
+                            l.Runes[i].AssignedId = 0;
+                            l.Runes[i].AssignedName = "RUNE MISSING";
+                        }
                     }
-                    else {
-                        l.Runes[i].AssignedId = 0;
-                        l.Runes[i].AssignedName = "RUNE MISSING";
-                    }
+                    l.Lock();
                 }
-                l.Lock();
-            }
 
-            //var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
+                //var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
 
-            if (dat.IsModified) {
-                Console.WriteLine("Loaded data has been touched, untouching...");
-                dat.IsModified = false;
-            }
+                if (dat.IsModified)
+                {
+                    Console.WriteLine("Loaded data has been touched, untouching...");
+                    dat.IsModified = false;
+                }
 
-            if (File.Exists("shrine_overwrite.json")) {
-                dat.Shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
-                foreach (var m in dat.Monsters)
-                    m.Current.Shrines = dat.Shrines;
-            }
+                if (File.Exists("shrine_overwrite.json"))
+                {
+                    dat.Shrines.SetTo(JsonConvert.DeserializeObject<Stats>(File.ReadAllText("shrine_overwrite.json")));
+                    foreach (var m in dat.Monsters)
+                        m.Current.Shrines = dat.Shrines;
+                }
 
+                return dat;
 #if !DEBUG
-            catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 File.WriteAllText("error_save.txt", e.ToString());
                 throw new Exception("Error occurred loading Save JSON.\r\n" + e.GetType() + "\r\nInformation is saved to error_save.txt");
             }
 #endif
-            return dat;
         }
 
         private static void watchSave() {
