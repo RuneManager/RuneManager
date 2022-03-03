@@ -237,6 +237,7 @@ namespace RuneOptim.BuildProcessing {
 
                         data.Mon.Current.Buffs = build.Buffs;
                         data.Mon.Current.Shrines = data.settings.Shrines;
+                        data.Mon.Current.Guild = data.settings.Guild;
                         data.Mon.Current.Leader = build.Leader;
 
                         data.Mon.Current.FakeLevel = slotFakes;

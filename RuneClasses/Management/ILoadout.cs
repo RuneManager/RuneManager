@@ -26,6 +26,7 @@ namespace RuneOptim.Management {
         RuneSet[] Sets { get; }
         bool SetsFull { get; }
         Stats Shrines { get; set; }
+        Guild Guild { get; set; }
         int Speed { get; }
         int SpeedPercent { get; }
         bool TempLoad { get; set; }

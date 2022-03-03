@@ -308,6 +308,7 @@ namespace RuneApp {
             Monster mon = Build.Mon;
             mon.Current.Leader = Build.Leader;
             mon.Current.Shrines = Build.Shrines;
+            mon.Current.Guild = Build.Guild;
             Stats cur = mon.GetStats();
             if (mon.Id != 0)
                 monLabel.Text = "Build for " + mon.FullName + " (" + mon.Id + ")";

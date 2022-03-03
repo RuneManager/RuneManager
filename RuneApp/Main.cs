@@ -658,9 +658,11 @@ namespace RuneApp {
                     if (dmon != null) {
                         var dmonld = dmon.Current.Leader;
                         var dmonsh = dmon.Current.Shrines;
+                        var dmongu = dmon.Current.Guild;
                         var dmonbu = dmon.Current.Buffs;
                         dmon.Current.Leader = load.Leader;
                         dmon.Current.Shrines = load.Shrines;
+                        dmon.Current.Guild = load.Guild;
                         dmon.Current.Buffs = load.Buffs;
                         var dmonfl = dmon.Current.FakeLevel;
                         var dmonps = dmon.Current.PredictSubs;
@@ -684,6 +686,7 @@ namespace RuneApp {
 
                         dmon.Current.Leader = dmonld;
                         dmon.Current.Shrines = dmonsh;
+                        dmon.Current.Guild = dmongu;
                         dmon.Current.Buffs = dmonbu;
                         dmon.Current.FakeLevel = dmonfl;
                         dmon.Current.PredictSubs = dmonps;
@@ -1371,6 +1374,7 @@ namespace RuneApp {
                         BuildID = build.ID,
                         Leader = build.Leader,
                         Shrines = build.Shrines,
+                        Guild = build.Guild,
                         Buffs = build.Buffs,
                         Element = build.Mon.Element,
                     });

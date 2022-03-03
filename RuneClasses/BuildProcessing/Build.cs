@@ -478,6 +478,7 @@ namespace RuneOptim.BuildProcessing {
 
         [JsonIgnore]
         public Stats Shrines { get; set; } = new Stats();
+        public Guild Guild { get; set; }
 
         [JsonProperty("LeaderBonus")]
         public Stats Leader { get; set; } = new Stats();
@@ -516,6 +517,7 @@ namespace RuneOptim.BuildProcessing {
 
             Leader = rhs.Leader;
             Shrines = rhs.Shrines;
+            Guild = rhs.Guild;
 
             Goal.CopyFrom(rhs.Goal, true);
             Maximum.CopyFrom(rhs.Maximum, true);
@@ -569,7 +571,8 @@ namespace RuneOptim.BuildProcessing {
                 RunesOnlyFillEmpty = RunesOnlyFillEmpty,
                 RunesUseEquipped = RunesUseEquipped,
                 RunesUseLocked = RunesUseLocked,
-                Shrines = Shrines
+                Shrines = Shrines,
+                Guild = Guild
             });
         }
 

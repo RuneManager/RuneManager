@@ -11,7 +11,32 @@ namespace RuneOptim.swar
         public int Price;
 
         [JsonProperty("guild_info")]
-        public GuildInfo GuildInfo;
+        public GuildInfo GuildInfo = new GuildInfo();
+
+        public Guild() { }
+
+        // copy constructor, amrite?
+        public Guild(Guild rhs, bool copyExtra = false)
+        {
+            CopyFrom(rhs, copyExtra);
+        }
+
+        public void CopyFrom(Guild rhs, bool copyExtra = false)
+        {
+            Price = rhs.Price;
+            GuildInfo = new GuildInfo(rhs.GuildInfo);
+
+        }
+
+        [JsonIgnore]
+        public long Health => GuildInfo.Health;
+        public long Defense => GuildInfo.Defense;
+        public long Attack => GuildInfo.Attack;
+        public long Speed => GuildInfo.Speed;
+        public long CritRate => GuildInfo.CritRate;
+        public long CritDamage => GuildInfo.CritDamage;
+        public long Accuracy => GuildInfo.Accuracy;
+        public long Resistance => GuildInfo.Resistance;
 
     }
 
@@ -36,6 +61,31 @@ namespace RuneOptim.swar
         [JsonIgnore]
         public GuildSkill RiftRaid => Skills["4001"];
 
+        [JsonIgnore]
+        public long Health => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Hp;
+        public long Defense => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Def;
+        public long Attack => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Atk;
+        public long Speed = 0;
+        public long CritRate = 0;
+        public long CritDamage = 0;
+        public long Accuracy = 0;
+        public long Resistance = 0;
+
+        public GuildInfo() { }
+
+        // copy constructor, amrite?
+        public GuildInfo(GuildInfo rhs, bool copyExtra = false)
+        {
+            CopyFrom(rhs, copyExtra);
+        }
+
+        public void CopyFrom(GuildInfo rhs, bool copyExtra = false)
+        {
+            Id = rhs.Id;
+            Skills = rhs.Skills.ToDictionary(entry => entry.Key,
+                                             entry => new GuildSkill(entry.Value));
+        }
+
     }
 
     [JsonConverter(typeof(GuildSkillConverter))]
@@ -48,6 +98,23 @@ namespace RuneOptim.swar
         public long Hp;
         public long Def;
         public long Atk;
+
+        public GuildSkill() { }
+
+        // copy constructor, amrite?
+        public GuildSkill(GuildSkill rhs, bool copyExtra = false)
+        {
+            CopyFrom(rhs, copyExtra);
+        }
+
+        public void CopyFrom(GuildSkill rhs, bool copyExtra = false)
+        {
+            HasStats = rhs.HasStats;
+            Amount = rhs.Amount;
+            Hp = rhs.Hp;
+            Def = rhs.Def;
+            Atk = rhs.Atk;
+        }
     }
 
 

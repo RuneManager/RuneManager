@@ -74,6 +74,8 @@ namespace RuneApp {
 
                 Program.Data.Shrines[stat] = tag.Value;
                 File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
+                // TODO: support guild
+                // File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
             }
         }
 

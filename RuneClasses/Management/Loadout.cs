@@ -249,6 +249,7 @@ namespace RuneOptim.Management {
         }
 
         private Stats shrines = new Stats();
+        private Guild guild = new Guild();
         private Stats leader = new Stats();
 
         private bool changed = false;
@@ -274,6 +275,22 @@ namespace RuneOptim.Management {
                 changed = true;
             }
         }
+        public Guild Guild
+        {
+            get
+            {
+                return guild;
+            }
+            set
+            {
+                guild = value;
+
+                if (guild == null)
+                    guild = new Guild();
+
+                changed = true;
+            }
+        }
         public Stats Leader {
             get {
                 return leader;
@@ -287,7 +304,6 @@ namespace RuneOptim.Management {
                 changed = true;
             }
         }
-
         public Loadout(Loadout rhs = null, int[] fake = null, bool[] predict = null) {
             if (fake != null)
                 fake.CopyTo(fakeLevel, 0);
@@ -296,6 +312,7 @@ namespace RuneOptim.Management {
 
             if (rhs != null) {
                 Shrines = rhs.shrines;
+                Guild = rhs.guild;
                 Leader = rhs.leader;
                 fakeLevel = rhs.fakeLevel;
                 predictSubs = rhs.predictSubs;
@@ -406,11 +423,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.HealthPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.HealthPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.Health +
+                    (int)guild.Health +
                     (int)leader.Health +
                     SetStat(Attr.HealthPercent);
 #endif
 #if ATTR_CACHE
-                var c = healthPercentCache + (int)shrines.Health +
+                var c = healthPercentCache + (int)shrines.Health + 
+                    (int)guild.Health +
                     (int)leader.Health;
 #if DEBUG
                 if (v != c)
@@ -461,11 +480,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] + //(int)shrines[Element + "ATK"] +
+                    (int)guild.Attack +
                     (int)leader.Attack +
                     SetStat(Attr.AttackPercent);
 #endif
 #if ATTR_CACHE
                 var c = attackPercentCache + (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] +
+                    (int)guild.Attack +
                     (int)leader.Attack;
 #if DEBUG
                 if (v != c)
@@ -515,11 +536,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.DefensePercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.DefensePercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.Defense +
+                    (int)guild.Defense +
                     (int)leader.Defense +
                     SetStat(Attr.DefensePercent);
 #endif
 #if ATTR_CACHE
                 var c = defensePercentCache + (int)shrines.Defense +
+                    (int)guild.Defense +
                     (int)leader.Defense;
 #if DEBUG
                 if (v != c)
@@ -563,10 +586,11 @@ namespace RuneOptim.Management {
         public int SpeedPercent {
             get {
 #if !ATTR_CACHE || DEBUG
-                var v = SetStat(Attr.SpeedPercent) + (int)shrines.Speed + (int)leader.Speed;
+                var v = SetStat(Attr.SpeedPercent) + (int)shrines.Speed + (int)guild.Speed + (int)leader.Speed;
 #endif
 #if ATTR_CACHE
                 var c = speedPercentCache + (int)shrines.Speed +
+                    (int)guild.Speed +
                     (int)leader.Speed;
 #if DEBUG
                 if (v != c)
@@ -591,11 +615,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.CritRate[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.CritRate[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.CritRate +
+                    (int)guild.CritRate +
                     (int)leader.CritRate +
                     SetStat(Attr.CritRate);
 #endif
 #if ATTR_CACHE
                 var c = critRateCache + (int)shrines.CritRate +
+                    (int)guild.CritRate +
                     (int)leader.CritRate;
 #if DEBUG
                 if (v != c)
@@ -620,11 +646,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.CritDamage[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.CritDamage[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.CritDamage +
+                    (int)guild.CritDamage +
                     (int)leader.CritDamage +
                     SetStat(Attr.CritDamage);
 #endif
 #if ATTR_CACHE
                 var c = critDamageCache + (int)shrines.CritDamage +
+                    (int)guild.CritDamage +
                     (int)leader.CritDamage;
 #if DEBUG
                 if (v != c)
@@ -649,11 +677,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.Accuracy[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.Accuracy[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.Accuracy +
+                    (int)guild.Accuracy +
                     (int)leader.Accuracy +
                     SetStat(Attr.Accuracy);
 #endif
 #if ATTR_CACHE
                 var c = accuracyCache + (int)shrines.Accuracy +
+                    (int)guild.Accuracy +
                     (int)leader.Accuracy;
 #if DEBUG
                 if (v != c)
@@ -678,11 +708,13 @@ namespace RuneOptim.Management {
                     (runes[4]?.Resistance[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
                     (runes[5]?.Resistance[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
                     (int)shrines.Resistance +
+                    (int)guild.Resistance +
                     (int)leader.Resistance +
                     SetStat(Attr.Resistance);
 #endif
 #if ATTR_CACHE
                 var c = resistanceCache + (int)shrines.Resistance +
+                    (int)guild.Resistance +
                     (int)leader.Resistance;
 #if DEBUG
                 if (v != c)
