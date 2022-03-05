@@ -392,7 +392,13 @@ namespace RuneApp {
                 nli.SubItems[0].ForeColor = Color.Teal;
             if (Program.Settings.SplitAssign)
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
+            // Dim loadouts with no changes
+            if (l.RunesNew + l.RunesChanged == 0)
+                nli.SubItems[3].ForeColor = Color.DimGray;
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
+            // Highlight upgrades that have additional substat improvements
+            if (l.Powerup > 0 && l.HasRunesUnder12())
+                nli.SubItems[4].ForeColor = Color.Red;
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
             if (l.Time / (double)1000 > 60)
                 nli.SubItems[5].BackColor = Color.Red;
@@ -1242,6 +1248,11 @@ namespace RuneApp {
             GoodRunes = findGoodRunes.Checked;
         }
 
+        /// <summary>
+        /// Highlights builds that have a large number of permustations (currently rune dial icon above builds)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsBtnFindSpeed_Click(object sender, EventArgs e) {
             foreach (var li in buildList.Items.OfType<ListViewItem>()) {
                 if (li.Tag is Build b) {
@@ -1411,6 +1422,12 @@ namespace RuneApp {
                 }
             }
         }
+
+        /// <summary>
+        /// Method to decide whether or not to resume builds after specified delay
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResumeTimer_Tick(object sender, EventArgs e) {
             if (resumeTime <= DateTime.MinValue) return;
             if (DateTime.Now >= resumeTime) {

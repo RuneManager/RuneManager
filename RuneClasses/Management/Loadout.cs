@@ -43,6 +43,17 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public Rune[] Runes => runes;
 
+        public bool HasRunesUnder12()
+        {
+            foreach (var rune in Runes)
+            {
+                if (rune.Level < 12) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         [JsonIgnore]
         public int RuneCount => runeCount;
 
