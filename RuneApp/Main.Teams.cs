@@ -27,7 +27,7 @@ namespace RuneApp {
             { "Dungeon", new List<string> { "GB", "DB", "NB", "PC", "SF", "Secret", "HoH" } },
             { "Halls", new List<string> {"H-Magic", "H-Light", "H-Dark", "H-Fire", "H-Water", "H-Wind" } },
             { "Rift", new List<string> {"Raid", "R-Light", "R-Dark", "R-Fire", "R-Water", "R-Wind" } },
-            { "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA", "SD", "SO"} },
+            { "PvP", new List<string> { "AO", "AD", "GWO", "GWD", "RTA", "SO", "SD"} },
             { "Lab", new List<string> { "Tartarus", "Leos", "Guilles", "Kotos", "L-Norm", "L-Resc", "L-Expl", "L-Cool", "L-SL", "L-TL" } },
             { "ToA", new List<string> { "ToAN", "ToAH", "ToAHell" } },
             { "2A", new List<string> { "Griffon", "Inugami", "Warbear", "High Elem", "Fairy", "Pixie", "Werewolf", "Martial Cat", "Howl", "Grim R" } },
