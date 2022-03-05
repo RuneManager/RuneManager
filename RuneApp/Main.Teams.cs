@@ -20,7 +20,6 @@ namespace RuneApp {
     partial class Main {
 
         // Teams are an experimental way of grouping together monsters, so that you can keep them together
-
         bool teamChecking;
         Build teamBuild;
         Dictionary<string, List<string>> toolmap = new Dictionary<string, List<string>>() {
@@ -35,9 +34,11 @@ namespace RuneApp {
             { "DimH", new List<string> { "Karzan", "Ellunia", "Lumel", "Khalderun" } }
         };
 
-        List<string> knownTeams = new List<string>();
-
-
+        /// <summary>
+        /// Compacts all teams into a string, truncating long entries
+        /// </summary>
+        /// <param name="b"></param>
+        /// <returns></returns>
         private string getTeamStr(Build b) {
             if (b.Teams == null || b.Teams.Count == 0)
                 return "";
@@ -58,79 +59,107 @@ namespace RuneApp {
             return str;
         }
 
-        private void tsTeamAdd(ToolStripMenuItem parent, string item) {
-            knownTeams.Add(item);
-            ToolStripMenuItem n = new ToolStripMenuItem(item);
-            parent.DropDownItems.Add(n);
-            n.CheckedChanged += tsTeamHandler;
-            n.CheckOnClick = true;
-
-            if (toolmap[item] != null) {
-                foreach (var smi in toolmap[item]) {
-                    if (toolmap.ContainsKey(smi)) {
-                        tsTeamAdd(n, smi);
-                    }
-                    else {
-                        ToolStripMenuItem s = new ToolStripMenuItem(smi);
-                        s.CheckedChanged += tsTeamHandler;
-                        s.CheckOnClick = true;
-                        n.DropDownItems.Add(s);
-                    }
+        /// <summary>
+        /// Add teams from toolmap to the UI element <c>parent</c>
+        /// </summary>
+        /// <param name="parent"></param>
+        private void tsTeamsAdd(ToolStripMenuItem parent)
+        {
+            foreach (var item in toolmap)
+            {
+                ToolStripMenuItem n = tsTeamAdd(parent, item.Key);
+                foreach (var smi in item.Value)
+                {
+                    tsTeamAdd(n, smi);
                 }
             }
         }
 
+        /// <summary>
+        /// Add a toolstrip item to <c>parent</c> with value <c>value</c>
+        /// </summary>
+        /// <param name="parent"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        private ToolStripMenuItem tsTeamAdd(ToolStripMenuItem parent, string value) {
+            ToolStripMenuItem n = new ToolStripMenuItem(value);
+            parent.DropDownItems.Add(n);
+            n.CheckedChanged += tsTeamHandler;
+            n.CheckOnClick = true;
+            return n;
+        }
+
+        /// <summary>
+        /// Marks teams on Teams menu if it's included in TeamBuilds.Teams
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns>bool indicating whether the item was found</returns>
         private bool tsTeamCheck(ToolStripMenuItem t) {
             bool ret = false;
             t.Checked = false;
             t.Image = null;
-            if (teamBuild.Teams.Contains(t.Text)) {
-                t.Checked = true;
-                ret = true;
-            }
             foreach (ToolStripMenuItem smi in t.DropDownItems) {
                 if (tsTeamCheck(smi)) {
+                    // indicate that a nested team is in use
                     t.Image = App.add;
                     ret = true;
                 }
             }
+            if (teamBuild.Teams.Contains(t.Text))
+            {
+                // indicate that the team is in use
+                t.Checked = true;
+                ret = true;
+            }
             return ret;
         }
 
+        /// <summary>
+        /// Determines the amount of separation between two strings in the teams list.
+        /// </summary>
+        /// <param name="first">team name</param>
+        /// <param name="second">team name</param>
+        /// <returns>Degrees of separation between keys</returns>
         int GetRel(string first, string second) {
+            // same
             if (first == second)
                 return 0;
 
-            string p1 = null;
-            string p2 = null;
-
-            if (toolmap.Keys.Contains(first) && toolmap.Keys.Contains(second))
-                return 1;
-
-            foreach (var k in toolmap) {
-                if (k.Value.Contains(first) && k.Value.Contains(second))
-                    return 1;
-                if (k.Value.Contains(first))
-                    p1 = k.Key;
-                if (k.Value.Contains(second))
-                    p2 = k.Key;
-            }
-
+            // parent or child
             if (toolmap.Keys.Contains(first) && toolmap[first].Contains(second))
                 return 1;
             if (toolmap.Keys.Contains(second) && toolmap[second].Contains(first))
                 return 1;
 
-            if (p2 != null && toolmap[p2].Contains(p1))
+            // siblings (top level)
+            if (toolmap.Keys.Contains(first) && toolmap.Keys.Contains(second))
+                return 1;
+
+            // are either of the values nested?
+            string parent_first = null;
+            string parent_second = null;
+
+            foreach (var k in toolmap) {
+                if (k.Value.Contains(first))
+                    parent_first = k.Key;
+                if (k.Value.Contains(second))
+                    parent_second = k.Key;
+                // siblings (shortcutting loop)
+                if (parent_first != null && parent_first == parent_second)
+                    return 1;
+            }
+
+            // aunt/uncle
+            if (parent_second != null && toolmap.Keys.Contains(first))
                 return 2;
-            if (p1 != null && toolmap[p1].Contains(p2))
+            if (parent_first != null && toolmap.Keys.Contains(second))
                 return 2;
 
-            if (p2 != null && toolmap[p2].Contains(first))
-                return 3;
-            if (p1 != null && toolmap[p1].Contains(second))
+            // counsins
+            if (parent_first != null && parent_second != null)
                 return 3;
 
+            // one or both not found
             return -1;
         }
 

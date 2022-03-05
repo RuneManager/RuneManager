@@ -1,6 +1,4 @@
-﻿#define ATTR_CACHE
-
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,13 +44,13 @@ namespace RuneOptim.Management {
         public Rune[] Runes => runes;
 
         [JsonIgnore]
-        public int RuneCount { get { return runeCount; } }
+        public int RuneCount => runeCount;
 
         [JsonIgnore]
-        public RuneSet[] Sets { get { return sets; } }
+        public RuneSet[] Sets => sets;
 
         [JsonIgnore]
-        public bool SetsFull { get { return setsFull; } }
+        public bool SetsFull => setsFull;
 
         public Element Element = Element.Pure;
 
@@ -141,7 +139,6 @@ namespace RuneOptim.Management {
         public int[] FakeLevel {
             get { return fakeLevel; }
             set {
-#if ATTR_CACHE
                 foreach (var rune in Runes) {
                     if (rune == null)
                         continue;
@@ -163,10 +160,8 @@ namespace RuneOptim.Management {
                     accuracyCache -= rune.Accuracy[ind];
                     resistanceCache -= rune.Resistance[ind];
                 }
-#endif
                 fakeLevel = value;
 
-#if ATTR_CACHE
                 foreach (var rune in Runes) {
                     if (rune == null)
                         continue;
@@ -188,7 +183,6 @@ namespace RuneOptim.Management {
                     accuracyCache += rune.Accuracy[ind];
                     resistanceCache += rune.Resistance[ind];
                 }
-#endif
                 changed = true;
             }
         }
@@ -196,7 +190,6 @@ namespace RuneOptim.Management {
         public bool[] PredictSubs {
             get { return predictSubs; }
             set {
-#if ATTR_CACHE
                 foreach (var rune in Runes) {
                     if (rune == null)
                         continue;
@@ -218,10 +211,8 @@ namespace RuneOptim.Management {
                     accuracyCache -= rune.Accuracy[ind];
                     resistanceCache -= rune.Resistance[ind];
                 }
-#endif
                 predictSubs = value;
 
-#if ATTR_CACHE
                 foreach (var rune in Runes) {
                     if (rune == null)
                         continue;
@@ -243,7 +234,6 @@ namespace RuneOptim.Management {
                     accuracyCache += rune.Accuracy[ind];
                     resistanceCache += rune.Resistance[ind];
                 }
-#endif
                 changed = true;
             }
         }
@@ -275,6 +265,7 @@ namespace RuneOptim.Management {
                 changed = true;
             }
         }
+        [JsonIgnore]
         public Guild Guild
         {
             get
@@ -342,13 +333,18 @@ namespace RuneOptim.Management {
             return str.ToString();
         }
 
-        // Lock all the runes on the build
+        /// <summary>
+        /// Lock all the runes on the loadout
+        /// </summary>
         public void Lock() {
             foreach (Rune r in runes) {
                 if (r != null)
                     r.UsedInBuild = true;
             }
         }
+        /// <summary>
+        /// Lock all the runes on the loadout
+        /// </summary>
         public void Unlock()
         {
             foreach (Rune r in runes)
@@ -360,8 +356,7 @@ namespace RuneOptim.Management {
 
         #region AttrGetters
 
-#if ATTR_CACHE
-
+        // When runes are equipped, these are updated with the stat effects of those runes
         private int healthFlatCache = 0;
         private int healthPercentCache = 0;
 
@@ -374,210 +369,73 @@ namespace RuneOptim.Management {
         private int speedFlatCache = 0;
         private int speedPercentCache = 0;
 
-
         private int critRateCache = 0;
         private int critDamageCache = 0;
-
 
         private int accuracyCache = 0;
         private int resistanceCache = 0;
 
-
-#endif
-
+        // This section calculates the final effects of a loadout, including shrines, leaders, and guild bonuses
         [JsonIgnore]
         public int HealthFlat {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.HealthFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.HealthFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.HealthFlat[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.HealthFlat[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.HealthFlat[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.HealthFlat[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    SetStat(Attr.HealthFlat);
-#endif
-#if ATTR_CACHE
                 var c = healthFlatCache;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int HealthPercent {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v = 
-                    (runes[0]?.HealthPercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.HealthPercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.HealthPercent[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.HealthPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.HealthPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.HealthPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.Health +
-                    (int)guild.Health +
-                    (int)leader.Health +
-                    SetStat(Attr.HealthPercent);
-#endif
-#if ATTR_CACHE
+
                 var c = healthPercentCache + (int)shrines.Health + 
                     (int)guild.Health +
                     (int)leader.Health;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
-
             }
         }
 
         [JsonIgnore]
         public int AttackFlat {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.AttackFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.AttackFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.AttackFlat[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.AttackFlat[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.AttackFlat[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.AttackFlat[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    SetStat(Attr.AttackFlat);
-#endif
-#if ATTR_CACHE
                 var c = attackFlatCache;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
+
         [JsonIgnore]
         public int AttackPercent {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.AttackPercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.AttackPercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.AttackPercent[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.AttackPercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.AttackPercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.AttackPercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] + //(int)shrines[Element + "ATK"] +
-                    (int)guild.Attack +
-                    (int)leader.Attack +
-                    SetStat(Attr.AttackPercent);
-#endif
-#if ATTR_CACHE
                 var c = attackPercentCache + (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] +
                     (int)guild.Attack +
                     (int)leader.Attack;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int DefenseFlat {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.DefenseFlat[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.DefenseFlat[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.DefenseFlat[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.DefenseFlat[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.DefenseFlat[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.DefenseFlat[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    SetStat(Attr.DefenseFlat);
-#endif
-#if ATTR_CACHE
                 var c = defenseFlatCache;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
+
         [JsonIgnore]
         public int DefensePercent {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.DefensePercent[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.DefensePercent[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.DefensePercent[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.DefensePercent[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.DefensePercent[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.DefensePercent[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.Defense +
-                    (int)guild.Defense +
-                    (int)leader.Defense +
-                    SetStat(Attr.DefensePercent);
-#endif
-#if ATTR_CACHE
                 var c = defensePercentCache + (int)shrines.Defense +
                     (int)guild.Defense +
                     (int)leader.Defense;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int Speed {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.Speed[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.Speed[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.Speed[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.Speed[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.Speed[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.Speed[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    SetStat(Attr.Speed);
-#endif
-#if ATTR_CACHE
                 var c = speedFlatCache;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
@@ -585,151 +443,57 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int SpeedPercent {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v = SetStat(Attr.SpeedPercent) + (int)shrines.Speed + (int)guild.Speed + (int)leader.Speed;
-#endif
-#if ATTR_CACHE
                 var c = speedPercentCache + (int)shrines.Speed +
                     (int)guild.Speed +
                     (int)leader.Speed;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int CritRate {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.CritRate[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.CritRate[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.CritRate[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.CritRate[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.CritRate[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.CritRate[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.CritRate +
-                    (int)guild.CritRate +
-                    (int)leader.CritRate +
-                    SetStat(Attr.CritRate);
-#endif
-#if ATTR_CACHE
                 var c = critRateCache + (int)shrines.CritRate +
                     (int)guild.CritRate +
                     (int)leader.CritRate;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
+
             }
         }
 
         [JsonIgnore]
         public int CritDamage {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.CritDamage[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.CritDamage[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.CritDamage[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.CritDamage[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.CritDamage[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.CritDamage[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.CritDamage +
-                    (int)guild.CritDamage +
-                    (int)leader.CritDamage +
-                    SetStat(Attr.CritDamage);
-#endif
-#if ATTR_CACHE
                 var c = critDamageCache + (int)shrines.CritDamage +
                     (int)guild.CritDamage +
                     (int)leader.CritDamage;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int Accuracy {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.Accuracy[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.Accuracy[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.Accuracy[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.Accuracy[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.Accuracy[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.Accuracy[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.Accuracy +
-                    (int)guild.Accuracy +
-                    (int)leader.Accuracy +
-                    SetStat(Attr.Accuracy);
-#endif
-#if ATTR_CACHE
                 var c = accuracyCache + (int)shrines.Accuracy +
                     (int)guild.Accuracy +
                     (int)leader.Accuracy;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
         [JsonIgnore]
         public int Resistance {
             get {
-#if !ATTR_CACHE || DEBUG
-                var v =
-                    (runes[0]?.Resistance[predictSubs[0] ? fakeLevel[0] + 16 : fakeLevel[0]] ?? 0) +
-                    (runes[1]?.Resistance[predictSubs[1] ? fakeLevel[1] + 16 : fakeLevel[1]] ?? 0) +
-                    (runes[2]?.Resistance[predictSubs[2] ? fakeLevel[2] + 16 : fakeLevel[2]] ?? 0) +
-                    (runes[3]?.Resistance[predictSubs[3] ? fakeLevel[3] + 16 : fakeLevel[3]] ?? 0) +
-                    (runes[4]?.Resistance[predictSubs[4] ? fakeLevel[4] + 16 : fakeLevel[4]] ?? 0) +
-                    (runes[5]?.Resistance[predictSubs[5] ? fakeLevel[5] + 16 : fakeLevel[5]] ?? 0) +
-                    (int)shrines.Resistance +
-                    (int)guild.Resistance +
-                    (int)leader.Resistance +
-                    SetStat(Attr.Resistance);
-#endif
-#if ATTR_CACHE
                 var c = resistanceCache + (int)shrines.Resistance +
                     (int)guild.Resistance +
                     (int)leader.Resistance;
-#if DEBUG
-                if (v != c)
-                    throw new InvalidOperationException();
-#endif
                 return c;
-#else
-                return v;
-#endif
             }
         }
 
 #endregion
 
-        // Put the rune on the build
+        // Put the rune on the build, updating the Cache values
         public Rune AddRune(Rune rune, int checkOn = 2) {
             // don't bother if not a rune
             if (rune == null)
@@ -740,7 +504,6 @@ namespace RuneOptim.Management {
             var slot = rune.Slot;
             var old = RemoveRune(slot, checkOn);
 
-#if ATTR_CACHE
             int ind = predictSubs[slot - 1] ? fakeLevel[slot - 1] + 16 : fakeLevel[slot - 1];
             healthFlatCache += rune.HealthFlat[ind];
             healthPercentCache += rune.HealthPercent[ind];
@@ -756,7 +519,6 @@ namespace RuneOptim.Management {
             critDamageCache += rune.CritDamage[ind];
             accuracyCache += rune.Accuracy[ind];
             resistanceCache += rune.Resistance[ind];
-#endif
 
             runes[slot - 1] = rune;
             runeCount++;
@@ -769,7 +531,7 @@ namespace RuneOptim.Management {
             return old;
         }
 
-        // Removes the rune from slot
+        // Removes the rune from slot, updating Cache values
         public Rune RemoveRune(int slot, int checkOn = 2) {
             // don't bother if there was none
             if (runes[slot - 1] == null)
@@ -779,7 +541,6 @@ namespace RuneOptim.Management {
 
             var rune = runes[slot - 1];
 
-#if ATTR_CACHE
             int ind = predictSubs[slot - 1] ? fakeLevel[slot - 1] + 16 : fakeLevel[slot - 1];
             healthFlatCache -= rune.HealthFlat[ind];
             healthPercentCache -= rune.HealthPercent[ind];
@@ -795,7 +556,6 @@ namespace RuneOptim.Management {
             critDamageCache -= rune.CritDamage[ind];
             accuracyCache -= rune.Accuracy[ind];
             resistanceCache -= rune.Resistance[ind];
-#endif
 
             if (!tempLoad)
                 rune.OnUpdate -= Rune_OnUpdate;
@@ -816,8 +576,6 @@ namespace RuneOptim.Management {
 
         public void CheckSets() {
 
-#if ATTR_CACHE
-
             healthFlatCache -= SetStat(Attr.HealthFlat);
             healthPercentCache -= SetStat(Attr.HealthPercent);
             attackFlatCache -= SetStat(Attr.AttackFlat);
@@ -831,7 +589,6 @@ namespace RuneOptim.Management {
             critDamageCache -= SetStat(Attr.CritDamage);
             accuracyCache -= SetStat(Attr.Accuracy);
             resistanceCache -= SetStat(Attr.Resistance);
-#endif
 
             int ind = 0;
             RuneSet flag2 = 0;
@@ -877,7 +634,6 @@ namespace RuneOptim.Management {
 
             setsFull = setNum == 6;
 
-#if ATTR_CACHE
             healthFlatCache += SetStat(Attr.HealthFlat);
             healthPercentCache += SetStat(Attr.HealthPercent);
             attackFlatCache += SetStat(Attr.AttackFlat);
@@ -891,7 +647,6 @@ namespace RuneOptim.Management {
             critDamageCache += SetStat(Attr.CritDamage);
             accuracyCache += SetStat(Attr.Accuracy);
             resistanceCache += SetStat(Attr.Resistance);
-#endif
 
         }
 
@@ -1030,8 +785,8 @@ namespace RuneOptim.Management {
             }
         }
 
-        private static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
-        private static Func<Stats, Stats> _getStats;
+        //private static ParameterExpression statType = Expression.Parameter(typeof(Stats), "stats");
+        //private static Func<Stats, Stats> _getStats;
 
         // Using the given stats as a base, apply the modifiers
         public Stats GetStats(Stats baseStats) {

@@ -9,8 +9,10 @@ using System.Collections.Generic;
 
 namespace RuneOptim.swar {
 
+    /// <summary>
+    /// Maps save.json structures (see Monster) into the program
+    /// </summary>
     public class Stats {
-        // allows mapping save.json into the program via Monster
         [JsonProperty("con")]
         public double Con = 0;
 
@@ -146,6 +148,11 @@ namespace RuneOptim.swar {
             CopyFrom(rhs, copyExtra);
         }
 
+        /// <summary>
+        /// Explicit deepcopy method
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="copyExtra"></param>
         public void CopyFrom(Stats rhs, bool copyExtra = false) {
             Health = rhs.Health;
             attack = rhs.Attack;
