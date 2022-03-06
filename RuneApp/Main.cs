@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -106,17 +107,23 @@ namespace RuneApp {
 
                 #region Shrines
 
-                ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
-            waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
+                List<KeyValuePair<string, ToolStripMenuItem>> shrineMenus = new List<KeyValuePair<string, ToolStripMenuItem>> () {
+                    new KeyValuePair<string, ToolStripMenuItem> ("SPD", speedToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem> ("DEF", defenseToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem> ("ATK", attackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("HP", healthToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("WaterATK", waterAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("FireATK", fireAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("WindATK", windAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("LightATK", lightAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("DarkATK", darkAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>("CD", criticalDamageToolStripMenuItem),
+                };
+
                 this.Invoke((MethodInvoker)delegate {
                     for (int i = 0; i < 21; i++) {
-                        for (int j = 0; j < Deco.ShrineStats.Length; j++) {
-                            if (j < 4)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
-                            else if (j < 9)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
-                            else
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
+                        foreach (KeyValuePair<string, ToolStripMenuItem> item in shrineMenus) {
+                            addShrine(item.Key, i, Deco.ShrineStats[item.Key][i], item.Value);
                         }
                     }
                 });

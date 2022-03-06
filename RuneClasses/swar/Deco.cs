@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -36,8 +37,29 @@ namespace RuneOptim.swar {
     }
 
     public class Deco {
-        public readonly static string[] ShrineStats = new string[] { "SPD", "DEF", "ATK", "HP", "WaterATK", "FireATK", "WindATK", "LightATK", "DarkATK", "CD" };
-        public readonly static double[] ShrineLevel = new double[] { 1.5, 2, 2, 2, 2, 2, 2, 2, 2, 2.5 };
+        public static readonly string SPD = Stats.SPD;
+        public static readonly string DEF = Stats.DEF;
+        public static readonly string ATK = Stats.ATK;
+        public static readonly string HP = Stats.HP;
+        public static readonly string CD = Stats.CD;
+        public static readonly string WATER_ATK = "Water" + ATK;
+        public static readonly string FIRE_ATK = "Fire" + ATK;
+        public static readonly string WIND_ATK = "Wind" + ATK;
+        public static readonly string LIGHT_ATK = "Light" + ATK;
+        public static readonly string DARK_ATK = "Dark" + ATK;
+
+        public readonly static Dictionary<string, List<double>> ShrineStats = new Dictionary<string, List<double>>() {
+            { SPD, new List<double> { 0, 1, 2, 3, 4, 4.5, 5, 5.5, 6, 6.5, 7, 8, 9, 10, 11, 11.5, 13, 13.5, 14, 14.5, 15 } },
+            { DEF, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 } },
+            { ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 } },
+            { HP, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 } },
+            { WATER_ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 } },
+            { FIRE_ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 } },
+            { WIND_ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 } },
+            { LIGHT_ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 } },
+            { DARK_ATK, new List<double> { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21 } },
+            { CD, new List<double> { 0, 1, 2, 3, 5, 6, 7, 9, 10, 11, 12, 13, 15, 16, 18, 19, 20, 22, 23, 24, 25} },
+        };
 
         [JsonProperty("pos_x")]
         public int X = 0;

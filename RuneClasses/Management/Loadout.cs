@@ -250,6 +250,7 @@ namespace RuneOptim.Management {
         }
 
         private Stats shrines = new Stats();
+        [JsonIgnore]
         private Guild guild = new Guild();
         private Stats leader = new Stats();
 

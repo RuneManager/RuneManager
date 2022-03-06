@@ -160,25 +160,25 @@ namespace RuneApp {
                 // mess 'em up
                 ListViewItem li;
 
-                addRuneMainToList(lv, "HP", "flat");
-                li = addRuneMainToList(lv, "HP", "perc");
+                addRuneMainToList(lv, Stats.HP, "flat");
+                li = addRuneMainToList(lv, Stats.HP, "perc");
                 li.Text = "HP%";
-                addRuneMainToList(lv, "ATK", "flat");
-                li = addRuneMainToList(lv, "ATK", "perc");
+                addRuneMainToList(lv, Stats.ATK, "flat");
+                li = addRuneMainToList(lv, Stats.ATK, "perc");
                 li.Text = "ATK%";
-                addRuneMainToList(lv, "DEF", "flat");
-                li = addRuneMainToList(lv, "DEF", "perc");
+                addRuneMainToList(lv, Stats.DEF, "flat");
+                li = addRuneMainToList(lv, Stats.DEF, "perc");
                 li.Text = "DEF%";
 
                 if (lv == priStat2)
-                    addRuneMainToList(lv, "SPD", "flat");
+                    addRuneMainToList(lv, Stats.SPD, "flat");
                 if (lv == priStat4) {
-                    addRuneMainToList(lv, "CR", "perc");
-                    addRuneMainToList(lv, "CD", "perc");
+                    addRuneMainToList(lv, Stats.CR, "perc");
+                    addRuneMainToList(lv, Stats.CD, "perc");
                 }
                 if (lv == priStat6) {
-                    addRuneMainToList(lv, "RES", "perc");
-                    addRuneMainToList(lv, "ACC", "perc");
+                    addRuneMainToList(lv, Stats.RES, "perc");
+                    addRuneMainToList(lv, Stats.ACC, "perc");
                 }
             }
         }

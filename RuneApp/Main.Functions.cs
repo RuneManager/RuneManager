@@ -42,9 +42,9 @@ namespace RuneApp {
             return loadres;
         }
 
-        private void addShrine(string stat, int num, int value, ToolStripMenuItem owner) {
+        private void addShrine(string stat, int num, double value, ToolStripMenuItem owner) {
             ToolStripMenuItem it = new ToolStripMenuItem(num.ToString() + (num > 0 ? " (" + value + "%)" : "")) {
-                Tag = new KeyValuePair<string, int>(stat, value)
+                Tag = new KeyValuePair<string, double>(stat, value)
             };
             it.Click += ShrineClick;
             owner.DropDownItems.Add(it);
