@@ -81,6 +81,7 @@ namespace MonsterDefinitions {
 
         [EnumMember(Value = "SPD")]
         [SkillAttr("ATTACK_SPEED")]
+        [SkillAttr("RIDER_SPEED")]
         Speed = 8,
 
         [EnumMember(Value = "CRate")]
@@ -124,14 +125,13 @@ namespace MonsterDefinitions {
         DiceAverage,
 
         [SkillAttr("DICE_MIN")]
-        [SkillAttr("TARGET_ALIVE_CNT")]
         DiceAverageTwoMin,
 
-        [SkillAttr("RIDER_SPEED")]
-        RiderSpeed,
+        [SkillAttr("TARGET_ALIVE_CNT")]
+        TargetAliveCount,
 
         [SkillAttr("ALIVE_RATE")]
-        PercentageOfEnemiesAlive,
+        PercentOfEnemiesAlive,
     }
 
     abstract public class MultiplierBase {
@@ -208,6 +208,8 @@ namespace MonsterDefinitions {
                 case MultiAttr.MonsterLevel:
                 case MultiAttr.DiceAverage:
                 case MultiAttr.DiceAverageTwoMin:
+                case MultiAttr.TargetAliveCount:
+                case MultiAttr.PercentOfEnemiesAlive:
                 default:
                     return RuneOptim.swar.Attr.Null;
                 case MultiAttr.MissingHealth:
@@ -216,6 +218,12 @@ namespace MonsterDefinitions {
             }
         }
 
+        /// <summary>
+        /// Provide reasonable default values for dynamic skills
+        /// </summary>
+        /// <param name="mattr"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
         public double GetAttrValue(MultiAttr mattr) {
             switch (mattr) {
                 case MultiAttr.Neg:
@@ -235,15 +243,14 @@ namespace MonsterDefinitions {
                 case MultiAttr.Accuracy:
                     return 0;
                 case MultiAttr.PercentOfAlliesAlive:
+                case MultiAttr.PercentOfEnemiesAlive:
                     return 0.75;
                 case MultiAttr.TargetSpeed:
                     return 200;
                 case MultiAttr.TargetHealth:
                     return 200000; // If you're max-healthing, probably Giants/Dragon/Water dungeon
-                case MultiAttr.MissingHealth:
-                    return 0.66;
+                case MultiAttr.MissingHealth: // TODO: Should TargetHealthPercent and MissingHealth be symetric?
                 case MultiAttr.CurrentHealth:
-                    return 0.66;
                 case MultiAttr.CurrentHealthPercent:
                     return 0.66;
                 case MultiAttr.TargetHealthPercent:
@@ -253,6 +260,7 @@ namespace MonsterDefinitions {
                 case MultiAttr.DiceAverage:
                     return 3.5;
                 case MultiAttr.DiceAverageTwoMin:
+                case MultiAttr.TargetAliveCount:
                     return 2.5;
                 default:
                     break;
@@ -388,10 +396,19 @@ namespace MonsterDefinitions {
             return typeof(MultiplierGroup).IsAssignableFrom(objectType);
         }
 
+        /// <summary>
+        /// This method converts skill strings into mathematical operations.
+        /// </summary>
+        /// <param name="jarray"></param>
+        /// <returns></returns>
         private MultiplierGroup GetProp(JArray jarray) {
             MultiplierGroup multiGroup = new MultiplierGroup();
             for (int i = 0; i < jarray.Count; i += 2) {
                 JToken jvalue = jarray[i];
+                // Christina (wind cannon girl) has a formula without an operator 
+                // "[[\"ATK\", \"*\", 1.0], [\"*\"], [5.4, \"ALIVE_RATE\"]]"
+                if (jvalue.Count() == 2)
+                    jvalue.First.AddAfterSelf("*");
                 JToken joperator = (i + 1 < jarray.Count) ? jarray[i + 1] : "=";
                 MultiplierValue value = new MultiplierValue();
                 if (joperator is JArray) {
