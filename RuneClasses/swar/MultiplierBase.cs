@@ -81,7 +81,6 @@ namespace MonsterDefinitions {
 
         [EnumMember(Value = "SPD")]
         [SkillAttr("ATTACK_SPEED")]
-        [SkillAttr("RIDER_SPEED")]
         Speed = 8,
 
         [EnumMember(Value = "CRate")]
@@ -127,6 +126,12 @@ namespace MonsterDefinitions {
         [SkillAttr("DICE_MIN")]
         [SkillAttr("TARGET_ALIVE_CNT")]
         DiceAverageTwoMin,
+
+        [SkillAttr("RIDER_SPEED")]
+        RiderSpeed,
+
+        [SkillAttr("ALIVE_RATE")]
+        PercentageOfEnemiesAlive,
     }
 
     abstract public class MultiplierBase {
