@@ -375,7 +375,11 @@ namespace RuneApp {
             });
         }
 
-
+        /// <summary>
+        /// Adds an item to the Loadout list, colorizing as approprite
+        /// </summary>
+        /// <param name="nli"></param>
+        /// <param name="l"></param>
         private void ListViewItemLoad(ListViewItem nli, Loadout l) {
             Build b = Program.Builds.FirstOrDefault(bu => bu.ID == l.BuildID);
             nli.Tag = l;
@@ -390,27 +394,54 @@ namespace RuneApp {
 
             l.RecountDiff(b.Mon.Id);
 
+            // For colors, see http://www.flounder.com/csharp_color_table.htm
             nli.SubItems[3] = new ListViewItem.ListViewSubItem(nli, (l.RunesNew + l.RunesChanged).ToString());
-            if (l.Runes.Where(r => r != null && r.IsUnassigned).Any(r => b.Mon.Runes.FirstOrDefault(ru => ru != null && ru.Slot == r.Slot) == null))
-                nli.SubItems[3].ForeColor = Color.Green;
+            // Colorize name if build is locked or linked
             if (b.Type == BuildType.Lock)
                 nli.SubItems[0].ForeColor = Color.Gray;
             else if (b.Type == BuildType.Link)
                 nli.SubItems[0].ForeColor = Color.Teal;
             if (Program.Settings.SplitAssign)
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
-            // Dim loadouts with no changes
-            if (l.RunesNew + l.RunesChanged == 0)
-                nli.SubItems[3].ForeColor = Color.DimGray;
+            if (Program.Settings.ColorLoadChanges)
+            {
+                int emptySlots = b.Mon.Runes.Count(r => r != null && r.IsUnassigned);
+                int inventoryRunes = l.Runes.Count(r => r != null && r.IsUnassigned);
+                // Dim loadouts with no changes
+                if (l.RunesNew + l.RunesChanged == 0);
+                else if (emptySlots >= l.RunesChanged)
+                    // swap is inventory netural (or better)
+                    nli.SubItems[3].BackColor = Color.LightGreen;
+                else if (emptySlots + inventoryRunes > 2)
+                    // some runes can be swapped without increasing inventory
+                    nli.SubItems[3].BackColor = Color.Khaki;
+                else if (emptySlots + inventoryRunes > 0)
+                    // some runes can be swapped without increasing inventory
+                    nli.SubItems[3].BackColor = Color.Bisque;
+                else
+                    // change that requires inventory space
+                    nli.SubItems[3].BackColor = Color.LightPink;
+                // (LEGACY) Inventory Rune, Empty Slot i.e. always free to equip
+                if (l.Runes.Where(r => r != null && r.IsUnassigned).Any(r => b.Mon.Runes.FirstOrDefault(ru => ru != null && ru.Slot == r.Slot) == null))
+                    nli.SubItems[3].ForeColor = Color.Green;
+            }
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
             // Highlight upgrades that have additional substat improvements
-            if (l.Powerup > 0 && l.HasRunesUnder12())
-                nli.SubItems[4].ForeColor = Color.Red;
+            if (Program.Settings.ColorLoadUpgrades &&  l.Powerup > 0)
+                if (l.HasRunesUnder12())
+                    nli.SubItems[4].BackColor = Color.LightPink;
+                else
+                    nli.SubItems[4].BackColor = Color.LightGreen;
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
-            if (l.Time / (double)1000 > 60)
-                nli.SubItems[5].BackColor = Color.Red;
-            else if (l.Time / (double)1000 > 30)
-                nli.SubItems[5].BackColor = Color.Orange;
+            // Colorize long build times
+            if (Program.Settings.ColorLoadTimes)
+            {
+                var t = l.Time / (double)1000;
+                if (t > 60)
+                    nli.SubItems[5].BackColor = Color.LightPink;
+                else if (t > 30)
+                    nli.SubItems[5].BackColor = Color.Wheat;
+            }
         }
 
         private void Program_OnMonsterUpdate(object sender, bool deleted) {
