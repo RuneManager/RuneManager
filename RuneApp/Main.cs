@@ -108,16 +108,16 @@ namespace RuneApp {
                 #region Shrines
 
                 List<KeyValuePair<string, ToolStripMenuItem>> shrineMenus = new List<KeyValuePair<string, ToolStripMenuItem>> () {
-                    new KeyValuePair<string, ToolStripMenuItem> ("SPD", speedToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem> ("DEF", defenseToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem> ("ATK", attackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("HP", healthToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("WaterATK", waterAttackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("FireATK", fireAttackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("WindATK", windAttackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("LightATK", lightAttackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("DarkATK", darkAttackToolStripMenuItem),
-                    new KeyValuePair<string, ToolStripMenuItem>("CD", criticalDamageToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.SPD, speedToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.DEF, defenseToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.ATK, attackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.HP, healthToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.WATER_ATK, waterAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.FIRE_ATK, fireAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.WIND_ATK, windAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.LIGHT_ATK, lightAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.DARK_ATK, darkAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.CD, criticalDamageToolStripMenuItem),
                 };
 
                 this.Invoke((MethodInvoker)delegate {

@@ -37,11 +37,11 @@ namespace RuneOptim.swar {
     }
 
     public class Deco {
-        public static readonly string SPD = Stats.SPD;
-        public static readonly string DEF = Stats.DEF;
-        public static readonly string ATK = Stats.ATK;
-        public static readonly string HP = Stats.HP;
-        public static readonly string CD = Stats.CD;
+        public static readonly string SPD = AttrStr.SPD;
+        public static readonly string DEF = AttrStr.DEF;
+        public static readonly string ATK = AttrStr.ATK;
+        public static readonly string HP = AttrStr.HP;
+        public static readonly string CD = AttrStr.CD;
         public static readonly string WATER_ATK = "Water" + ATK;
         public static readonly string FIRE_ATK = "Fire" + ATK;
         public static readonly string WIND_ATK = "Wind" + ATK;

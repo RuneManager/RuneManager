@@ -160,25 +160,25 @@ namespace RuneApp {
                 // mess 'em up
                 ListViewItem li;
 
-                addRuneMainToList(lv, Stats.HP, "flat");
-                li = addRuneMainToList(lv, Stats.HP, "perc");
+                addRuneMainToList(lv, AttrStr.HP, "flat");
+                li = addRuneMainToList(lv, AttrStr.HP, "perc");
                 li.Text = "HP%";
-                addRuneMainToList(lv, Stats.ATK, "flat");
-                li = addRuneMainToList(lv, Stats.ATK, "perc");
+                addRuneMainToList(lv, AttrStr.ATK, "flat");
+                li = addRuneMainToList(lv, AttrStr.ATK, "perc");
                 li.Text = "ATK%";
-                addRuneMainToList(lv, Stats.DEF, "flat");
-                li = addRuneMainToList(lv, Stats.DEF, "perc");
+                addRuneMainToList(lv, AttrStr.DEF, "flat");
+                li = addRuneMainToList(lv, AttrStr.DEF, "perc");
                 li.Text = "DEF%";
 
                 if (lv == priStat2)
-                    addRuneMainToList(lv, Stats.SPD, "flat");
+                    addRuneMainToList(lv, AttrStr.SPD, "flat");
                 if (lv == priStat4) {
-                    addRuneMainToList(lv, Stats.CR, "perc");
-                    addRuneMainToList(lv, Stats.CD, "perc");
+                    addRuneMainToList(lv, AttrStr.CR, "perc");
+                    addRuneMainToList(lv, AttrStr.CD, "perc");
                 }
                 if (lv == priStat6) {
-                    addRuneMainToList(lv, Stats.RES, "perc");
-                    addRuneMainToList(lv, Stats.ACC, "perc");
+                    addRuneMainToList(lv, AttrStr.RES, "perc");
+                    addRuneMainToList(lv, AttrStr.ACC, "perc");
                 }
             }
         }

@@ -259,25 +259,25 @@ namespace RuneOptim {
                 case Attr.Null:
                     return "-";
                 case Attr.Accuracy:
-                    return "ACC";
+                    return AttrStr.ACC;
                 case Attr.AttackFlat:
                 case Attr.AttackPercent:
-                    return "ATK";
+                    return AttrStr.ATK;
                 case Attr.CritDamage:
-                    return "CD";
+                    return AttrStr.CD;
                 case Attr.CritRate:
-                    return "CR";
+                    return AttrStr.CR;
                 case Attr.DefenseFlat:
                 case Attr.DefensePercent:
-                    return "DEF";
+                    return AttrStr.DEF;
                 case Attr.HealthFlat:
                 case Attr.HealthPercent:
-                    return "HP";
+                    return AttrStr.HP;
                 case Attr.Resistance:
-                    return "RES";
+                    return AttrStr.RES;
                 case Attr.Speed:
                 case Attr.SpeedPercent:
-                    return "SPD";
+                    return AttrStr.SPD;
                 case Attr.ExtraStat:
                     return "Ext";
                 case Attr.EffectiveHP:
