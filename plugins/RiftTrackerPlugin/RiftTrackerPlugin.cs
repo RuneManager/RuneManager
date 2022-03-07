@@ -189,6 +189,7 @@ namespace RiftTrackerPlugin {
                     var stats = mon.GetStats();
                     for (col = 1; col <= colHead.Count; col++)
                     {
+                        // TODO:  Convert to method
                         switch (colHead[col - 1])
                         {
                             case "Raid":

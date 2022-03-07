@@ -21,7 +21,7 @@ namespace RuneOptim.BuildProcessing {
         // allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
         // TODO: have another go at it
         //[Obsolete("Consider changing to statEnums")]
-        public static readonly string[] StatNames = { "HP", "ATK", "DEF", "SPD", "CR", "CD", "RES", "ACC" };
+        public static readonly string[] StatNames = { AttrStr.HP, AttrStr.ATK, AttrStr.DEF, AttrStr.SPD, AttrStr.CR, AttrStr.CD, AttrStr.RES, AttrStr.ACC };
         public static readonly Attr[] StatEnums = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
         public static readonly Attr[] StatBoth = { Attr.HealthFlat, Attr.HealthPercent, Attr.AttackFlat, Attr.AttackPercent, Attr.DefenseFlat, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
         //[Obsolete("Consider changing to extraEnums")]

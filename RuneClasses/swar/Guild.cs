@@ -30,12 +30,19 @@ namespace RuneOptim.swar
 
         [JsonIgnore]
         public long Health => GuildInfo.Health;
+        [JsonIgnore]
         public long Defense => GuildInfo.Defense;
+        [JsonIgnore]
         public long Attack => GuildInfo.Attack;
+        [JsonIgnore]
         public long Speed => GuildInfo.Speed;
+        [JsonIgnore]
         public long CritRate => GuildInfo.CritRate;
+        [JsonIgnore]
         public long CritDamage => GuildInfo.CritDamage;
+        [JsonIgnore]
         public long Accuracy => GuildInfo.Accuracy;
+        [JsonIgnore]
         public long Resistance => GuildInfo.Resistance;
 
     }
@@ -63,12 +70,19 @@ namespace RuneOptim.swar
 
         [JsonIgnore]
         public long Health => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Hp;
+        [JsonIgnore]
         public long Defense => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Def;
+        [JsonIgnore]
         public long Attack => Skills == null ? 0 : Dungeon == null ? 0 : Dungeon.Atk;
+        [JsonIgnore]
         public long Speed = 0;
+        [JsonIgnore]
         public long CritRate = 0;
+        [JsonIgnore]
         public long CritDamage = 0;
+        [JsonIgnore]
         public long Accuracy = 0;
+        [JsonIgnore]
         public long Resistance = 0;
 
         public GuildInfo() { }
@@ -79,6 +93,11 @@ namespace RuneOptim.swar
             CopyFrom(rhs, copyExtra);
         }
 
+        /// <summary>
+        /// Explicit deepcopy method
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="copyExtra"></param>
         public void CopyFrom(GuildInfo rhs, bool copyExtra = false)
         {
             Id = rhs.Id;
@@ -107,6 +126,11 @@ namespace RuneOptim.swar
             CopyFrom(rhs, copyExtra);
         }
 
+        /// <summary>
+        /// Explicit deepcopy method
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="copyExtra"></param>
         public void CopyFrom(GuildSkill rhs, bool copyExtra = false)
         {
             HasStats = rhs.HasStats;

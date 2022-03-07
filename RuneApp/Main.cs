@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
@@ -106,17 +107,23 @@ namespace RuneApp {
 
                 #region Shrines
 
-                ToolStripMenuItem[] shrineMenu = new ToolStripMenuItem[] { speedToolStripMenuItem, defenseToolStripMenuItem , attackToolStripMenuItem, healthToolStripMenuItem,
-            waterAttackToolStripMenuItem, fireAttackToolStripMenuItem, windAttackToolStripMenuItem, lightAttackToolStripMenuItem, darkAttackToolStripMenuItem, criticalDamageToolStripMenuItem};
+                List<KeyValuePair<string, ToolStripMenuItem>> shrineMenus = new List<KeyValuePair<string, ToolStripMenuItem>> () {
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.SPD, speedToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.DEF, defenseToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.ATK, attackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.HP, healthToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.WATER_ATK, waterAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.FIRE_ATK, fireAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.WIND_ATK, windAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.LIGHT_ATK, lightAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.DARK_ATK, darkAttackToolStripMenuItem),
+                    new KeyValuePair<string, ToolStripMenuItem>(Deco.CD, criticalDamageToolStripMenuItem),
+                };
+
                 this.Invoke((MethodInvoker)delegate {
                     for (int i = 0; i < 21; i++) {
-                        for (int j = 0; j < Deco.ShrineStats.Length; j++) {
-                            if (j < 4)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
-                            else if (j < 9)
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Ceiling(1 + i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
-                            else
-                                addShrine(Deco.ShrineStats[j], i, (int)Math.Floor(i * Deco.ShrineLevel[j] / 2), shrineMenu[j]);
+                        foreach (KeyValuePair<string, ToolStripMenuItem> item in shrineMenus) {
+                            addShrine(item.Key, i, Deco.ShrineStats[item.Key][i], item.Value);
                         }
                     }
                 });
@@ -164,20 +171,13 @@ namespace RuneApp {
             timer1.Interval = 5;
             timer1.Start();
 
-            tsTeamAdd(teamToolStripMenuItem, "PvE");
-            tsTeamAdd(teamToolStripMenuItem, "Dungeon");
-            tsTeamAdd(teamToolStripMenuItem, "Halls");
-            tsTeamAdd(teamToolStripMenuItem, "PvP");
-            tsTeamAdd(teamToolStripMenuItem, "Lab");
-            tsTeamAdd(teamToolStripMenuItem, "ToA");
-            tsTeamAdd(teamToolStripMenuItem, "2A");
-            tsTeamAdd(teamToolStripMenuItem, "DimH");
+            // Add (nested) teams to the UI item
+            tsTeamsAdd(teamToolStripMenuItem);
 
-
+            // Add a button to clear tams
             var tsnone = new ToolStripMenuItem("(Clear)");
             tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
             tsnone.Click += tsTeamHandler;
-
             teamToolStripMenuItem.DropDownItems.Add(tsnone);
 
             if (Program.Settings.StartUpHelp)
@@ -198,8 +198,6 @@ namespace RuneApp {
             LineLog.Info("Main form loaded in " + sw.ElapsedMilliseconds + "ms");
             loading = false;
             readyTcs.TrySetResult(sw.ElapsedMilliseconds);
-            
-            
         }
 
         public T Invoke<T>(Func<T> getThis)
@@ -221,6 +219,11 @@ namespace RuneApp {
             return res;
         }
 
+        /// <summary>
+        /// Update the build status value in the bottom bar
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Timer1_Tick(object sender, EventArgs e) {
             /*if (lastProg != null) {
                 toolStripBuildStatus.Text = "Build Status: " + lastProg.Progress;
@@ -396,7 +399,13 @@ namespace RuneApp {
                 nli.SubItems[0].ForeColor = Color.Teal;
             if (Program.Settings.SplitAssign)
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
+            // Dim loadouts with no changes
+            if (l.RunesNew + l.RunesChanged == 0)
+                nli.SubItems[3].ForeColor = Color.DimGray;
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
+            // Highlight upgrades that have additional substat improvements
+            if (l.Powerup > 0 && l.HasRunesUnder12())
+                nli.SubItems[4].ForeColor = Color.Red;
             nli.SubItems[5] = new ListViewItem.ListViewSubItem(nli, (l.Time / (double)1000).ToString("0.##"));
             if (l.Time / (double)1000 > 60)
                 nli.SubItems[5].BackColor = Color.Red;
@@ -1083,6 +1092,11 @@ namespace RuneApp {
             }
         }
 
+        /// <summary>
+        /// Run monsters up to (and including) the selected monster
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsBtnBuildsRunUpTo_Click(object sender, EventArgs e) {
             if (buildList.SelectedItems.Count == 0)
                 MessageBox.Show("Please select a monster to run to.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -1107,13 +1121,9 @@ namespace RuneApp {
 
                     teamBuild = buildList.FocusedItem.Tag as Build;
 
+                    // update the nested tool menu based on the selected build's teams
                     teamChecking = true;
-
-                    foreach (ToolStripMenuItem tsmi in teamToolStripMenuItem.DropDownItems) {
-                        tsmi.Image = null;
-                        if (tsTeamCheck(tsmi))
-                            tsmi.Image = App.add;
-                    }
+                    tsTeamCheck(teamToolStripMenuItem);
                     teamChecking = false;
 
                     menu_buildlist.Show(Cursor.Position);
@@ -1121,47 +1131,69 @@ namespace RuneApp {
             }
         }
 
+        /// <summary>
+        /// Colorize builds and loadoust based on their relationship to the selected
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void buildList_SelectedIndexChanged(object sender, EventArgs e) {
+            // don't colorize if more than one build are selected
+            // don't return because we may need to clear previous colorization
             bool doColor = buildList.SelectedItems.Count == 1;
             var b1 = doColor ? buildList.SelectedItems[0].Tag as Build : null;
 
+            // Highlight the related loadout
             if (b1 != null) {
                 var llvi = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout)?.BuildID == b1.ID);
                 if (llvi != null) {
                     loadoutList.SelectedItems.Clear();
+                    // one of these triggers cascading updates
                     llvi.Selected = true;
                     llvi.Focused = true;
                 }
             }
 
+            // TODO: Highlight the monster in the left column
+
+            // color monters based on the relationship between their teams
             foreach (ListViewItem li in buildList.Items) {
+                // default to white
                 li.BackColor = Color.White;
-                if (Program.Settings.ColorTeams && b1 != null && b1.Teams.Count > 0) {
-                    if (li.Tag is Build b2 && b2.Teams.Count > 0) {
-                        int close = -1;
-                        foreach (var t1 in b1.Teams) {
-                            foreach (var t2 in b2.Teams) {
-                                var c = GetRel(t1, t2);
-                                if (c != -1)
-                                    close = close == -1 ? c : (c < close ? c : close);
-                                if (close == 0)
-                                    break;
-                            }
-                            if (close == 0)
-                                break;
-                        }
-                        if (close == 0)
-                            li.BackColor = Color.Lime;
-                        else if (close == 1)
-                            li.BackColor = Color.LightGreen;
-                        else if (close == 2)
-                            li.BackColor = Color.DimGray;
-                        else if (close == 3)
-                            li.BackColor = Color.LightGray;
+                // conditions requiring no additional colorization
+                if (!Program.Settings.ColorTeams || b1 == null || b1.Teams.Count == 0)
+                    continue;
+                if (li.Tag == null)
+                    continue;
+                Build b2 = li.Tag as Build;
+                if (b2.Teams.Count == 0)
+                    continue;
+
+                // determine closest pair of teams between both builds
+                int closest = int.MaxValue;
+                foreach (var t1 in b1.Teams) {
+                    foreach (var t2 in b2.Teams) {
+                        var c = GetRel(t1, t2);
+                        if (c != -1)
+                            closest = Math.Min(c, closest);
+                        if (closest == 0)
+                            break;
                     }
+                    if (closest == 0)
+                        break;
                 }
+
+                // colorize based on closeness
+                if (closest == 0)
+                    li.BackColor = Color.Lime;
+                else if (closest == 1)
+                    li.BackColor = Color.LightGreen;
+                else if (closest == 2)
+                    li.BackColor = Color.LightGray;
+                else if (closest == 3)
+                    li.BackColor = Color.DimGray;
             }
 
+            // color linked builds
             if (b1 != null && b1.Type == BuildType.Link) {
                 var lis = buildList.Items.OfType<ListViewItem>();
                 lis = lis.Where(l => l?.Tag == b1.LinkBuild);
@@ -1186,10 +1218,19 @@ namespace RuneApp {
             CheckLocked();
         }
 
+        /// <summary>
+        /// Toggle the large rune display window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void runeDial1_DoubleClick(object sender, EventArgs e) {
             if (RuneDisplay == null || RuneDisplay.IsDisposed)
                 RuneDisplay = new RuneDisplay();
-            if (!RuneDisplay.Visible) {
+            if (RuneDisplay.Visible) {
+                RuneDisplay.Hide();
+            }
+            else
+            {
                 RuneDisplay.Show(this);
                 var xx = Location.X + 1105 + 8 - 271;//271, 213
                 var yy = Location.Y + 49 + 208 - 213;// 8, 208 1105, 49
@@ -1214,6 +1255,11 @@ namespace RuneApp {
             GoodRunes = findGoodRunes.Checked;
         }
 
+        /// <summary>
+        /// Highlights builds that have a large number of permustations (currently rune dial icon above builds)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void tsBtnFindSpeed_Click(object sender, EventArgs e) {
             foreach (var li in buildList.Items.OfType<ListViewItem>()) {
                 if (li.Tag is Build b) {
@@ -1383,6 +1429,12 @@ namespace RuneApp {
                 }
             }
         }
+
+        /// <summary>
+        /// Method to decide whether or not to resume builds after specified delay
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ResumeTimer_Tick(object sender, EventArgs e) {
             if (resumeTime <= DateTime.MinValue) return;
             if (DateTime.Now >= resumeTime) {

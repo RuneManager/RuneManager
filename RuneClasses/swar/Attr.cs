@@ -82,4 +82,19 @@ namespace RuneOptim.swar {
         [EnumMember(Value = "Skill4")]
         Skill4 = 4 | SkillStat,
     }
+
+    /// <summary>
+    /// Provides string constants for basic stats to prevent local coding
+    /// </summary>
+    public class AttrStr
+    {
+        public const string SPD = "SPD";
+        public const string DEF = "DEF";
+        public const string ATK = "ATK";
+        public const string HP = "HP";
+        public const string CR = "CR";
+        public const string CD = "CD";
+        public const string RES = "RES";
+        public const string ACC = "ACC";
+    }
 }

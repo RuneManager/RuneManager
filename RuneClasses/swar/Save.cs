@@ -222,12 +222,8 @@ namespace RuneOptim.swar
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var shr in e.NewItems.Cast<Deco>().Where(d => d.Shrine != Shrine.Unknown)) {
-                        var i = Deco.ShrineStats.ToList().IndexOf(shr.Shrine.ToString());
-                        int v = (int)Math.Floor(shr.Level * Deco.ShrineLevel[i]);
-                        if (i < 4)
-                            v = (int)Math.Ceiling(shr.Level * Deco.ShrineLevel[i]);
-                        else if (i < 9)
-                            v = (int)Math.Ceiling(1 + shr.Level * Deco.ShrineLevel[i]);
+                        var i = Deco.ShrineStats.Keys.ToList().IndexOf(shr.Shrine.ToString());
+                        double v = Deco.ShrineStats[shr.Shrine.ToString()][shr.Level];
                         Shrines[shr.Shrine.ToString()] = v;
                     }
                     break;

@@ -1,16 +1,19 @@
 ﻿//#define FOR_THREADS
 
-using System;
-using System.Linq;
 using Newtonsoft.Json;
-using System.Linq.Expressions;
 using RuneOptim.BuildProcessing;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
-namespace RuneOptim.swar {
+namespace RuneOptim.swar
+{
 
+    /// <summary>
+    /// Maps save.json structures (see Monster) into the program
+    /// </summary>
     public class Stats {
-        // allows mapping save.json into the program via Monster
         [JsonProperty("con")]
         public double Con = 0;
 
@@ -146,6 +149,11 @@ namespace RuneOptim.swar {
             CopyFrom(rhs, copyExtra);
         }
 
+        /// <summary>
+        /// Explicit deepcopy method
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="copyExtra"></param>
         public void CopyFrom(Stats rhs, bool copyExtra = false) {
             Health = rhs.Health;
             attack = rhs.Attack;
@@ -453,21 +461,21 @@ namespace RuneOptim.swar {
             get {
                 // TODO: switch from using [string] to [Attr]
                 switch (stat) {
-                    case "HP":
+                    case AttrStr.HP:
                         return Health;
-                    case "ATK":
+                    case AttrStr.ATK:
                         return Attack;
-                    case "DEF":
+                    case AttrStr.DEF:
                         return Defense;
-                    case "SPD":
+                    case AttrStr.SPD:
                         return Speed;
-                    case "CD":
+                    case AttrStr.CD:
                         return CritDamage;
-                    case "CR":
+                    case AttrStr.CR:
                         return CritRate;
-                    case "ACC":
+                    case AttrStr.ACC:
                         return Accuracy;
-                    case "RES":
+                    case AttrStr.RES:
                         return Resistance;
                     case "WaterATK":
                         return DamageSkillups[(int)Element.Water - 1];
@@ -487,38 +495,38 @@ namespace RuneOptim.swar {
 
             set {
                 switch (stat) {
-                    case "HP":
+                    case AttrStr.HP:
                         Health = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.HealthFlat, value));
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.HealthPercent, value));
                         break;
-                    case "ATK":
+                    case AttrStr.ATK:
                         Attack = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackFlat, value));
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.AttackPercent, value));
                         break;
-                    case "DEF":
+                    case AttrStr.DEF:
                         Defense = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.DefenseFlat, value));
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.DefensePercent, value));
                         break;
-                    case "SPD":
+                    case AttrStr.SPD:
                         Speed = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Speed, value));
                         break;
-                    case "CD":
+                    case AttrStr.CD:
                         CritDamage = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.CritDamage, value));
                         break;
-                    case "CR":
+                    case AttrStr.CR:
                         CritRate = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.CritRate, value));
                         break;
-                    case "ACC":
+                    case AttrStr.ACC:
                         Accuracy = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Accuracy, value));
                         break;
-                    case "RES":
+                    case AttrStr.RES:
                         Resistance = value;
                         OnStatChanged?.Invoke(this, new StatModEventArgs(Attr.Resistance, value));
                         break;

@@ -9,7 +9,6 @@ using RuneOptim;
 using System.Threading;
 using System.Diagnostics;
 using System.Net;
-using System.Windows.Forms;
 using System.Reflection;
 using Newtonsoft.Json;
 using System.Text;
@@ -43,9 +42,9 @@ namespace RuneApp {
             return loadres;
         }
 
-        private void addShrine(string stat, int num, int value, ToolStripMenuItem owner) {
+        private void addShrine(string stat, int num, double value, ToolStripMenuItem owner) {
             ToolStripMenuItem it = new ToolStripMenuItem(num.ToString() + (num > 0 ? " (" + value + "%)" : "")) {
-                Tag = new KeyValuePair<string, int>(stat, value)
+                Tag = new KeyValuePair<string, double>(stat, value)
             };
             it.Click += ShrineClick;
             owner.DropDownItems.Add(it);
@@ -74,10 +73,10 @@ namespace RuneApp {
 
                 Program.Data.Shrines[stat] = tag.Value;
                 File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
-                // TODO: support guild
-                // File.WriteAllText("shrine_overwrite.json", JsonConvert.SerializeObject(Program.Data.Shrines));
             }
         }
+
+        // TODO: Permit manual guild level configuration
 
         private ListViewItem ListViewItemRune(Rune rune, ListViewItem nli = null) {
             if (nli == null)
