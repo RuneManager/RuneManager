@@ -272,10 +272,11 @@ namespace RuneApp
 
         public static void RemoveLoad(Loadout l)
         {
-            Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
-            BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
             l.Unlock();
             Loads.Remove(l);
+            Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
+            if (build != null)
+                BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
         }
 
         public static LoadSaveResult SaveGoals(string filename = "goals.json")
