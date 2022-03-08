@@ -405,24 +405,24 @@ namespace RuneApp {
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
             if (Program.Settings.ColorLoadChanges)
             {
-                int emptySlots = b.Mon.Runes.Count(r => r != null && r.IsUnassigned);
-                int inventoryRunes = l.Runes.Count(r => r != null && r.IsUnassigned);
+                List<Rune> emptySlots = b.Mon.Runes.Where(r => r == null).ToList();
+                List<Rune> inventoryRunes = l.Runes.Where(r => r != null && r.IsUnassigned).ToList();
                 // Dim loadouts with no changes
-                if (l.RunesNew + l.RunesChanged == 0);
-                else if (emptySlots >= l.RunesChanged)
+                if (l.RunesNew + l.RunesChanged == 0); // no coloring exit condition
+                else if (emptySlots.Count >= l.RunesChanged)
                     // swap is inventory netural (or better)
                     nli.SubItems[3].BackColor = Color.LightGreen;
-                else if (emptySlots + inventoryRunes > 2)
-                    // some runes can be swapped without increasing inventory
+                else if (emptySlots.Count + inventoryRunes.Count > 2)
+                    // many runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.Khaki;
-                else if (emptySlots + inventoryRunes > 0)
-                    // some runes can be swapped without increasing inventory
+                else if (emptySlots.Count + inventoryRunes.Count > 0)
+                    // few runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.Bisque;
                 else
-                    // change that requires inventory space
+                    // no runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.LightPink;
-                // (LEGACY) Inventory Rune, Empty Slot i.e. always free to equip
-                if (l.Runes.Where(r => r != null && r.IsUnassigned).Any(r => b.Mon.Runes.FirstOrDefault(ru => ru != null && ru.Slot == r.Slot) == null))
+                // (LEGACY) Has Inventory Rune going into Empty Slot i.e. always free to equip
+                if (emptySlots.Any(r => inventoryRunes.FirstOrDefault(ru => ru.Slot == r.Slot) == null))
                     nli.SubItems[3].ForeColor = Color.Green;
             }
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
