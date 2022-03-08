@@ -32,9 +32,12 @@ namespace RuneApp {
 
         private async void Main_Load(object sender, EventArgs e) {
 
+            // DEBUG Initialization Timer
             Stopwatch sw = new Stopwatch();
             sw.Start();
+
             #region Watch collections and try loading
+
             Program.SaveFileTouched += Program_saveFileTouched;
             //Program.data.Runes.CollectionChanged += Runes_CollectionChanged;
             Program.OnRuneUpdate += Program_OnRuneUpdate;
@@ -90,7 +93,6 @@ namespace RuneApp {
                     } while (loadResult != LoadSaveResult.Success);
 
                     this.Invoke((MethodInvoker)delegate {
-
                         RebuildLists();
                     });
 
@@ -117,6 +119,7 @@ namespace RuneApp {
                     new KeyValuePair<string, ToolStripMenuItem>(Deco.CD, criticalDamageToolStripMenuItem),
                 };
 
+                // Create level entries (0-20) for each shrine
                 this.Invoke((MethodInvoker)delegate {
                     for (int i = 0; i < 21; i++) {
                         foreach (KeyValuePair<string, ToolStripMenuItem> item in shrineMenus) {
@@ -127,11 +130,19 @@ namespace RuneApp {
                 #endregion
 
                 #region Sorter
+                // initialize sorters (with sane ordering)
                 var sorter = new ListViewSort();
                 this.Invoke((MethodInvoker)delegate {
                     dataMonsterList.ListViewItemSorter = sorter;
-                    sorter.OnColumnClick(colMonGrade.Index);
-                    sorter.OnColumnClick(colMonPriority.Index);
+                    // work backwards; like clicking, the last sort is the most prominent
+                    // seems to support only two levels without calling `Sort`
+                    sorter.OnColumnClick(colMonID.Index); // ascending ID (so first acquired is earlier among non-prioritized units)
+                    dataMonsterList.Sort();
+                    sorter.OnColumnClick(colMonName.Index); // ascending name
+                    dataMonsterList.Sort();
+                    sorter.OnColumnClick(colMonLevel.Index, false); // descending level
+                    dataMonsterList.Sort();
+                    sorter.OnColumnClick(colMonPriority.Index); // ascending priority
                     dataMonsterList.Sort();
 
                     dataRuneList.ListViewItemSorter = new ListViewSort();
@@ -154,8 +165,6 @@ namespace RuneApp {
 
             //buildList.SelectedIndexChanged += buildList_SelectedIndexChanged;
 
-            LineLog.Debug("Preparing teams");
-
             this.FormClosing += (a, b) => {
                 blockCol.CompleteAdding();
             };
@@ -168,14 +177,18 @@ namespace RuneApp {
             timer1.Interval = 5;
             timer1.Start();
 
-            // Add (nested) teams to the UI item
+            #region Teams
+            LineLog.Debug("Preparing teams context menu");
+
+            // Add teams tree to the UI item
             tsTeamsAdd(teamToolStripMenuItem);
 
-            // Add a button to clear tams
+            // Add a button to clear teams
             var tsnone = new ToolStripMenuItem("(Clear)");
             tsnone.Font = new Font(tsnone.Font, FontStyle.Italic);
             tsnone.Click += tsTeamHandler;
             teamToolStripMenuItem.DropDownItems.Add(tsnone);
+            #endregion
 
             if (Program.Settings.StartUpHelp)
                 OpenHelp();
