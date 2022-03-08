@@ -98,8 +98,9 @@ namespace RuneOptim.swar {
 
         public static ParallelQuery<Rune> FilterBySets (ParallelQuery<Rune> rsGlobal, ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
         {
+
             var validSets = ValidSets(RequiredSets, IncludeSets, AllowBroken);
-            return rsGlobal.Where(r => RequiredSets.Contains(r.Set));
+            return rsGlobal.Where(r => validSets.Contains(r.Set));
         }
 
         [JsonIgnore]
