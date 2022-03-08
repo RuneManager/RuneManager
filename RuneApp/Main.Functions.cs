@@ -58,7 +58,7 @@ namespace RuneApp {
         private void ShrineClick(object sender, EventArgs e) {
             var it = (ToolStripMenuItem)sender;
             if (it != null) {
-                var tag = (KeyValuePair<string, int>)it.Tag;
+                var tag = (KeyValuePair<string, double>)it.Tag;
                 var stat = tag.Key;
 
                 foreach (ToolStripMenuItem i in shrineMap[stat]) {
