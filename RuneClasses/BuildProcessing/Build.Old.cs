@@ -99,7 +99,7 @@ namespace RuneOptim.BuildProcessing {
                         // leaving the rune null is "code" for an intentionally absent rune
                         if (r == null)
                             continue;
-                        // make sure to use runes out of rsGlobal (vs. orphaned monster.current runes)
+                        // make sure to use runes out of rsGlobal (vs. potentially orphaned monster.current runes)
                         Rune rune = rsGlobal.FirstOrDefault(rn => rn.Id == r.Id);
                         if (rune.UsedInBuild)
                             // an empty set will produce an error for a missing rune, appropriate if a rune in a locked build was somehow applied elsewhere
@@ -170,7 +170,7 @@ namespace RuneOptim.BuildProcessing {
                 // clean out runes which won't make complete sets
                 cleanBroken();
 
-                // clean out runes which won't pass the minimum
+                // clean out runes which cannot meet stat minimums in combination with the maximum value of other slots
                 cleanMinimum();
 
                 if (AutoRuneSelect) {
@@ -200,8 +200,7 @@ namespace RuneOptim.BuildProcessing {
 
                         cleanBroken();
                     }
-                }
-                if (!AutoRuneSelect) {
+                } else { // !AutoSelect
                     // Filter each runeslot
                     for (int i = 0; i < 6; i++) {
                         // default fail OR
@@ -214,10 +213,10 @@ namespace RuneOptim.BuildProcessing {
                             var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
                             var reqWeight = RequiredSets.Count;
                             // if we only counted required sets, but no 2-size sets
-                            if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.SetRequired(s) == 2)) {
+                            if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.Set2.Contains(s))) {
                                 reqWeight += 1;
                                 reqWeight *= 2;
-                                tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.SetRequired(s) == 2).Count();
+                                tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.Set2.Contains(s)).Count();
                             }
                             var perc = reqWeight / (float)tSets;
                             var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));

@@ -374,8 +374,8 @@ namespace RuneApp {
                     sl.Group = setList.Groups[2];
                 }
             }
-            
-            //CalcPerms();
+
+            CalcPerms();
         }
 
         void UpdateGlobal() {
@@ -784,7 +784,7 @@ namespace RuneApp {
         }
 
 
-        // Returns if to abort that operation
+        // Returns true to abort that operation
         bool AnnoyUser() {
             if (Build == null)
                 return true;
@@ -865,6 +865,10 @@ namespace RuneApp {
                 await CalcPerms();
         }
 
+        /// <summary>
+        /// Populate the Rune Dial using the Runes as filtered by Build
+        /// </summary>
+        /// <returns></returns>
         async Task<long> CalcPerms() {
 
             await Task.Run(() => {
@@ -893,6 +897,7 @@ namespace RuneApp {
                 if (num == 0)
                     perms = 0;
 
+                // Find rune UI object by name
                 ctrl = (Label)Controls.Find("runeNum" + (i + 1).ToString(), true).FirstOrDefault();
                 if (ctrl == null) continue;
                 ctrl.Text = num.ToString();
