@@ -93,24 +93,26 @@ namespace RuneOptim.BuildProcessing {
 
                 if (Type == BuildType.Lock)
                 {
-                    foreach (var r in Mon.Current.Runes)
+                    for (int index = 0; index < Mon.Current.Runes.Count(); index++)
                     {
+                        Rune r = Mon.Current.Runes[index];
+                        // leaving the rune null is "code" for an intentionally absent rune
+                        if (r == null)
+                            continue;
                         // make sure to use runes out of rsGlobal (vs. orphaned monster.current runes)
                         Rune rune = rsGlobal.FirstOrDefault(rn => rn.Id == r.Id);
-                        if (rune != null)
-                        {
-                           if (rune.UsedInBuild)
-                                Runes[rune.Slot - 1] = new Rune[0];
-                            else
-                                Runes[rune.Slot - 1] = new Rune[] { rune };
-                        }
+                        if (rune.UsedInBuild)
+                            // an empty set will produce an error for a missing rune, appropriate if a rune in a locked build was somehow applied elsewhere
+                            Runes[index] = new Rune[0];
+                        else
+                            Runes[index] = new Rune[] { rune };
                     }
                     return;
                 }
 
                 // if not saving stats, cull unusable here
                 if (!BuildSaveStats) {
-                    // Only using 'inventory' or runes on mon
+                    // Only using 'inventory' or runes on current mon
                     // also, include runes which have been unequipped (should only look above)
                     if (!RunesUseEquipped || RunesOnlyFillEmpty)
                         rsGlobal = rsGlobal.Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped);
@@ -125,8 +127,16 @@ namespace RuneOptim.BuildProcessing {
                     rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
                 }
                 else if (BuildSets.Any() || RequiredSets.Any()) {
-                    rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
-                    // Only runes which we've included
+                    // Double check that RequiredSets doesn't exhaust the slots i.e. that BuildSets should be excluded
+                    var required_4set = RequiredSets.Count(r => (r & RuneSet.Set4) == 0 );
+                    var required_2set = RequiredSets.Count(r => (r & RuneSet.Set4) != 0);
+                    var required_runes = required_2set * 2 + required_4set * 4;
+                    if (required_runes < 6)
+                        rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
+                    else if (required_runes == 6)
+                        rsGlobal = rsGlobal.Where(r => RequiredSets.Contains(r.Set));
+                    else
+                        throw new IndexOutOfRangeException("Required sets exceed 6 runes");
                 }
 
                 if (BuildSaveStats) {
@@ -205,54 +215,44 @@ namespace RuneOptim.BuildProcessing {
                     }
                 }
                 if (!AutoRuneSelect) {
-                    // TODO: Remove
-#if BUILD_RUNE_LOGGING
-                    //var tmp = RuneLog.logTo;
-                    //using (var fs = new System.IO.FileStream("sampleselect.log", System.IO.FileMode.Create))
-                    //using (var sw = new System.IO.StreamWriter(fs)) {
-                        RuneLog.logTo = sw;
-#else
-                    {
-#endif
-                        // Filter each runeslot
-                        for (int i = 0; i < 6; i++) {
-                            // default fail OR
-                            Predicate<Rune> slotTest = MakeRuneScoring(i + 1, slotFakes[i] ?? 0, slotPred[i]);
+                    // Filter each runeslot
+                    for (int i = 0; i < 6; i++) {
+                        // default fail OR
+                        Predicate<Rune> slotTest = MakeRuneScoring(i + 1, slotFakes[i] ?? 0, slotPred[i]);
 
-                            Runes[i] = Runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.ManageStats.GetOrAdd("testScore", 0)).ToArray();
-                            var filt = LoadFilters(i + 1);
-                            if (filt.Count != null || filt.Type == FilterType.SumN) {
+                        Runes[i] = Runes[i].AsParallel().Where(r => slotTest.Invoke(r)).OrderByDescending(r => r.ManageStats.GetOrAdd("testScore", 0)).ToArray();
+                        var filt = LoadFilters(i + 1);
+                        if (filt.Count != null || filt.Type == FilterType.SumN) {
 
-                                var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
-                                var reqWeight = RequiredSets.Count;
-                                // if we only counted required sets, but no 2-size sets
-                                if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.SetRequired(s) == 2)) {
-                                    reqWeight += 1;
-                                    reqWeight *= 2;
-                                    tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.SetRequired(s) == 2).Count();
-                                }
-                                var perc = reqWeight / (float)tSets;
-                                var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
-
-                                var rr = Runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
-
-                                var incLoad = (filt.Count ?? AutoRuneAmount) - rr.Count();
-                                Runes[i] = rr.Concat(Runes[i].AsParallel().Where(r => !RequiredSets.Contains(r.Set)).Take(incLoad)).ToArray();
-
-                                // TODO: pick 20% per required set
-                                // Then fill remaining with the best from included
-                                // Go around checking if there are enough runes from each set to complete it (if NonBroken)
-                                // Check if removing N other runes of SCORE will permit finishing set
-                                // Remove rune add next best in slot
+                            var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
+                            var reqWeight = RequiredSets.Count;
+                            // if we only counted required sets, but no 2-size sets
+                            if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.SetRequired(s) == 2)) {
+                                reqWeight += 1;
+                                reqWeight *= 2;
+                                tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.SetRequired(s) == 2).Count();
                             }
+                            var perc = reqWeight / (float)tSets;
+                            var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
 
-                            if (BuildSaveStats) {
-                                foreach (Rune r in Runes[i]) {
-                                    if (!BuildGoodRunes)
-                                        r.ManageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
-                                    else
-                                        r.ManageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
-                                }
+                            var rr = Runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
+
+                            var incLoad = (filt.Count ?? AutoRuneAmount) - rr.Count();
+                            Runes[i] = rr.Concat(Runes[i].AsParallel().Where(r => !RequiredSets.Contains(r.Set)).Take(incLoad)).ToArray();
+
+                            // TODO: pick 20% per required set
+                            // Then fill remaining with the best from included
+                            // Go around checking if there are enough runes from each set to complete it (if NonBroken)
+                            // Check if removing N other runes of SCORE will permit finishing set
+                            // Remove rune add next best in slot
+                        }
+
+                        if (BuildSaveStats) {
+                            foreach (Rune r in Runes[i]) {
+                                if (!BuildGoodRunes)
+                                    r.ManageStats.AddOrUpdate("RuneFilt", 1, (s, d) => d + 1);
+                                else
+                                    r.ManageStats.AddOrUpdate("RuneFilt", 0.001, (s, d) => d + 0.001);
                             }
                         }
                     }
@@ -302,6 +302,10 @@ namespace RuneOptim.BuildProcessing {
                 }
 
                 Grinds = Runes.SelectMany(rg => rg.SelectMany(r => r.FilterGrinds(save.Crafts).Concat(r.FilterEnchants(save.Crafts)))).Distinct().ToArray();
+            }
+            catch {
+                // cascade the error since higher-level processes update the UI
+                throw;
             }
             finally {
                 IsRunning = false;
@@ -414,7 +418,9 @@ namespace RuneOptim.BuildProcessing {
                 Monster temp = new Monster(Mon);
                 foreach (var slot in Runes)
                 {
-                    if (slot.Length > 0)
+                    // null indicates an intentionally empty slot
+                    // a zero length slot is a rune that is needed but is not available
+                    if (slot != null && slot.Length > 0)
                         temp.ApplyRune(slot[0]);
                 }
                 Best = new Monster(temp, true);
