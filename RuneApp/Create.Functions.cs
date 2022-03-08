@@ -352,19 +352,19 @@ namespace RuneApp {
                 var ss = (RuneSet)sl.Tag;
 
                 sl.Text = ss.ToString();
-                if (validSets.Contains(ss))
-                    sl.ForeColor = Color.Black;
-                else
-                    sl.ForeColor = Color.Red;
+                sl.ForeColor = Color.Black;
 
                 if (Build.RequiredSets.Contains(ss)) {
                     sl.Group = setList.Groups[0];
                     int num = Build.RequiredSets.Count(s => s == ss);
                     sl.Text = ss.ToString() + (num > 1 ? " x" + num : "");
-                    // TODO: too many twos
+                    if (!validSets.Contains(ss))
+                        sl.ForeColor = Color.Red;
                 }
                 else if (Build.BuildSets.Contains(ss)) {
                     sl.Group = setList.Groups[1];
+                    if (!validSets.Contains(ss))
+                        sl.ForeColor = Color.Red;
                 }
                 else if (validSets.Contains(ss)) {
                     sl.Group = setList.Groups[1];
@@ -374,6 +374,7 @@ namespace RuneApp {
                     sl.Group = setList.Groups[2];
                 }
             }
+            
             //CalcPerms();
         }
 

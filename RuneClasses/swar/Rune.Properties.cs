@@ -70,25 +70,30 @@ namespace RuneOptim.swar {
             int required_4set = RequiredSets.Count(r => Rune.Set4.Contains(r));
             int required_2set = RequiredSets.Count(r => Rune.Set2.Contains(r));
             var required_runes = required_2set * 2 + required_4set * 4;
+            if (required_runes > 6)
+                // invalid so send an empty set
+                return new RuneSet[0];
             if (required_runes == 6)
-                // included sets cannot be used
+                // requires 6 runes so IncludeSets cannot be used
                 return RequiredSets;
-
-            int included_4set = IncludeSets.Count(r => Rune.Set4.Contains(r));
-            int included_2set = IncludeSets.Count(r => Rune.Set2.Contains(r));
-            // TODO: Delegate to the same code that manages the UI (where a broken 4-set is still prohibited)
-            if (!AllowBroken && required_4set + included_4set > 0 && required_2set + included_2set == 0)
+            bool hasInclude2 = IncludeSets.Any(s => Rune.Set2.Contains(s));
+            bool hasInclude4 = IncludeSets.Any(s => Rune.Set4.Contains(s));
+            if (required_runes == 4)
             {
-                //UI implicitly includes 2-sets so we must do the same here
-                return IncludeSets.Union(RequiredSets).Union(Rune.Set2);
-                //throw new RuneSetException("Must allow a 2-set or broken");
+                if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                    // no 2-sets or broken so automatically supplement required 4-set with all 2-sets
+                    return RequiredSets.Union(Rune.Set2);
+                else
+                    // requires 4 runes so only allows 2 sets from includes
+                    return RequiredSets.Union(IncludeSets.Where(s => Rune.Set2.Contains(s)));
             }
-            if (required_runes < 6)
-                // required and included sets may be used
+            // requires 2 or fewer runes so all includes are valid
+            if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                // no 2-sets or broken are available so implicitly supplement the 4-set(s) with 2-sets
+                return IncludeSets.Union(RequiredSets).Union(Rune.Set2);
+            else
+                // the sets are comprehensive
                 return IncludeSets.Union(RequiredSets);
-
-            // The combination is invalide (i.e. >6 rune required)
-            return new RuneSet[0];
         }
 
         public static ParallelQuery<Rune> FilterBySets (ParallelQuery<Rune> rsGlobal, ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
