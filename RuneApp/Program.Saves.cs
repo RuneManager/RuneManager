@@ -40,6 +40,8 @@ namespace RuneApp
                 bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
                 bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
                 bstr = bstr.Replace("\"b_res\"", "\"res\"");
+                // remove fake (<0.7.3) set if it's present
+                bstr = bstr.Replace("\"Set4\",", "");
 
                 var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
                 foreach (var b in bs.OrderBy(b => b.Priority))

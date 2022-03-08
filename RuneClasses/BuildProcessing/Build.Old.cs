@@ -121,22 +121,9 @@ namespace RuneOptim.BuildProcessing {
                         rsGlobal = rsGlobal.Where(r => !r.UsedInBuild);
                     rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !BannedRunesTemp.Any(b => b == r.Id));
                 }
-
-                if ((BuildSets.Any() || RequiredSets.Any()) && BuildSets.All(s => Rune.SetRequired(s) == 4) && RequiredSets.All(s => Rune.SetRequired(s) == 4)) {
-                    // if only include/req 4 sets, include all 2 sets autoRuneSelect && ()
-                    rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set) || Rune.SetRequired(r.Set) == 2);
-                }
-                else if (BuildSets.Any() || RequiredSets.Any()) {
-                    // Double check that RequiredSets doesn't exhaust the slots i.e. that BuildSets should be excluded
-                    var required_4set = RequiredSets.Count(r => (r & RuneSet.Set4) == 0 );
-                    var required_2set = RequiredSets.Count(r => (r & RuneSet.Set4) != 0);
-                    var required_runes = required_2set * 2 + required_4set * 4;
-                    if (required_runes < 6)
-                        rsGlobal = rsGlobal.Where(r => BuildSets.Contains(r.Set) || RequiredSets.Contains(r.Set));
-                    else if (required_runes == 6)
-                        rsGlobal = rsGlobal.Where(r => RequiredSets.Contains(r.Set));
-                    else
-                        throw new IndexOutOfRangeException("Required sets exceed 6 runes");
+                if (BuildSets.Any() || RequiredSets.Any()) {
+                    // filter based on sets
+                    rsGlobal = Rune.FilterBySets(rsGlobal, RequiredSets, BuildSets, AllowBroken);
                 }
 
                 if (BuildSaveStats) {
@@ -303,9 +290,9 @@ namespace RuneOptim.BuildProcessing {
 
                 Grinds = Runes.SelectMany(rg => rg.SelectMany(r => r.FilterGrinds(save.Crafts).Concat(r.FilterEnchants(save.Crafts)))).Distinct().ToArray();
             }
-            catch {
+            catch (Exception e) {
                 // cascade the error since higher-level processes update the UI
-                throw;
+                throw e;
             }
             finally {
                 IsRunning = false;

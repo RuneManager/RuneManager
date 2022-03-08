@@ -49,9 +49,7 @@ namespace RuneApp {
             var loadTask = Task.Run(() =>
             {
                 // TODO: this is slow during profiling
-#if !DEBUG
                 try
-#endif
                 {
                     // WIZARD DATA
                     LoadSaveResult loadResult = 0;
@@ -97,12 +95,11 @@ namespace RuneApp {
                     });
 
                 }
-#if !DEBUG
                 catch (Exception ex) {
                     MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
                     LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
+                    throw ex;
                 }
-#endif
 
 
                 #region Shrines

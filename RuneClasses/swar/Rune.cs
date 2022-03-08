@@ -289,10 +289,11 @@ namespace RuneOptim.swar {
         // todo: consider hashSet.Contains
         // Number of runes required for set to be complete
         public static int SetRequired(RuneSet set) {
-            if ((set & RuneSet.Set4) == set)
+            if (Rune.Set4.Contains(set))
                 return 4;
-            // Not a 4 set => is a 2 set
-            return 2;
+            else if (Rune.Set2.Contains(set))
+                return 2;
+            throw new Rune.RuneSetException("Unknown Set: " + set);
         }
 
         // Format rune values okayish

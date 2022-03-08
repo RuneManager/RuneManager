@@ -118,6 +118,8 @@ namespace RuneApp
         // TODO: pull more of the App-dependant stuff out
         private static void runBuild(Build build, Save data, BuildSettings bSettings)
         {
+            // If we fail to update the result, we had an error
+            BuildResult result = BuildResult.Failure;
             try
             {
                 if (build == null)
@@ -158,10 +160,13 @@ namespace RuneApp
                     build.CopyFrom(build.LinkBuild);
                 }
 
-                // unlock runes on current loadout (if present)
+                // unlock runes on current load (if present)
                 var load = Loads.FirstOrDefault(l => l.BuildID == build.ID);
                 if (load != null)
                     load.Unlock();
+                // a new is created each time so it may make sense to clean this up
+                // this will also cause the right list to reorder (is that desirable?)
+                // Loads.Remove(load);
 
                 build.GenRunes(data);
 
@@ -169,6 +174,7 @@ namespace RuneApp
                 string nR = "";
                 for (int i = 0; i < build.Runes.Length; i++)
                 {
+                    // null check allows intentionally empty slots (e.g. locked builds)
                     if (build.Runes[i] != null && build.Runes[i].Length == 0)
                         nR += (i + 1) + " ";
                 }
@@ -189,7 +195,7 @@ namespace RuneApp
                 };
                 build.BuildProgTo += qw;
 
-                var result = build.GenBuilds();
+                result = build.GenBuilds();
 
                 buildTime.Stop();
                 build.Time = buildTime.ElapsedMilliseconds;
@@ -280,17 +286,7 @@ namespace RuneApp
                 build.BuildProgTo -= qw;
                 build.BuildProgTo -= BuildsProgressTo;
 
-                //if (plsDie)
-                //    printTo?.Invoke("Canned");
-                //else 
-                if (build.Best != null)
-                    BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Done"));
-                else
-                    BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, result + " :("));
-
                 LineLog.Info("Cleaning up");
-                //b.isRun = false;
-                //currentBuild = null;
             }
             catch (Exception e)
             {
@@ -298,6 +294,10 @@ namespace RuneApp
             }
             finally
             {
+                if (build.Best != null)
+                    BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Done"));
+                else
+                    BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, result + " :("));
                 currentBuild = null;
                 LineLog.Info("Cleaned");
             }
