@@ -415,24 +415,24 @@ namespace RuneApp {
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
             if (Program.Settings.ColorLoadChanges)
             {
-                List<Rune> emptySlots = b.Mon.Runes.Where(r => r == null).ToList();
+                int emptySlots = b.Mon.Runes.Count(r => r == null);
                 List<Rune> inventoryRunes = l.Runes.Where(r => r != null && r.IsUnassigned).ToList();
                 // Dim loadouts with no changes
                 if (l.RunesNew + l.RunesChanged == 0); // no coloring exit condition
-                else if (emptySlots.Count >= l.RunesChanged)
+                else if (emptySlots >= l.RunesChanged)
                     // swap is inventory netural (or better)
                     nli.SubItems[3].BackColor = Color.LightGreen;
-                else if (emptySlots.Count + inventoryRunes.Count > 2)
+                else if (emptySlots + inventoryRunes.Count > 2)
                     // many runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.Khaki;
-                else if (emptySlots.Count + inventoryRunes.Count > 0)
+                else if (emptySlots + inventoryRunes.Count > 0)
                     // few runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.Bisque;
                 else
                     // no runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.LightPink;
                 // (LEGACY) Has Inventory Rune going into Empty Slot i.e. always free to equip
-                if (emptySlots.Any(r => inventoryRunes.FirstOrDefault(ru => ru.Slot == r.Slot) == null))
+                if (inventoryRunes.Any(ru => b.Mon.Runes.Count() < ru.Slot - 1 || b.Mon.Runes[ru.Slot - 1] == null))
                     nli.SubItems[3].ForeColor = Color.Green;
             }
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
