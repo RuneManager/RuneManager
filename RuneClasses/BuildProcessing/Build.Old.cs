@@ -190,10 +190,10 @@ namespace RuneOptim.BuildProcessing {
                         foreach (int i in new int[] { 0, 2, 4, 5, 3, 1 }) {
                             Rune[] rr = new Rune[0];
                             foreach (var rs in RequiredSets) {
-                                rr = rr.Concat(Runes[i].AsParallel().Where(r => r.Set == rs).OrderByDescending(r => runeVsStats(r, needRune) * 10 + runeVsStats(r, Sort)).Take(AutoRuneAmount / 2).ToArray()).ToArray();
+                                rr = rr.Concat(Runes[i].AsParallel().Where(r => r.Set == rs).OrderByDescending(r => r.VsStats(needRune) * 10 + r.VsStats(Sort)).Take(AutoRuneAmount / 2).ToArray()).ToArray();
                             }
                             if (rr.Length < AutoRuneAmount)
-                                rr = rr.Concat(Runes[i].AsParallel().Where(r => !rr.Contains(r)).OrderByDescending(r => runeVsStats(r, needRune) * 10 + runeVsStats(r, Sort)).Take(AutoRuneAmount - rr.Length).ToArray()).Distinct().ToArray();
+                                rr = rr.Concat(Runes[i].AsParallel().Where(r => !rr.Contains(r)).OrderByDescending(r => r.VsStats(needRune) * 10 + r.VsStats(Sort)).Take(AutoRuneAmount - rr.Length).ToArray()).Distinct().ToArray();
 
                             Runes[i] = rr;
                         }
