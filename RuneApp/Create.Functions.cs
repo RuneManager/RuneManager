@@ -345,38 +345,37 @@ namespace RuneApp {
             if (Build == null)
                 return;
 
+            // will be empty if the configuration is invalid
+            var validSets = Rune.ValidSets(Build.RequiredSets, Build.BuildSets, Build.AllowBroken);
+
             foreach (var sl in setList.Items.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
+
+                sl.Text = ss.ToString();
+                sl.ForeColor = Color.Black;
+
                 if (Build.RequiredSets.Contains(ss)) {
                     sl.Group = setList.Groups[0];
                     int num = Build.RequiredSets.Count(s => s == ss);
                     sl.Text = ss.ToString() + (num > 1 ? " x" + num : "");
-                    sl.ForeColor = Color.Black;
-                    if (Rune.SetRequired(ss) == 4 && Build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+                    if (!validSets.Contains(ss))
                         sl.ForeColor = Color.Red;
-                    // TODO: too many twos
                 }
                 else if (Build.BuildSets.Contains(ss)) {
                     sl.Group = setList.Groups[1];
-                    sl.Text = ss.ToString();
-                    sl.ForeColor = Color.Black;
-                    if (Rune.SetRequired(ss) == 4 && Build.RequiredSets.Any(s => s != ss && Rune.SetRequired(s) == 4))
+                    if (!validSets.Contains(ss))
                         sl.ForeColor = Color.Red;
                 }
-                else if ((Rune.SetRequired(ss) == 2 && Build.BuildSets.All(s => Rune.SetRequired(s) == 4) && Build.RequiredSets.All(s => Rune.SetRequired(s) == 4))
-                    || (Rune.SetRequired(ss) == 4 && Build.BuildSets.Count == 0 && Build.RequiredSets.Count == 0)
-                    ) {
+                else if (validSets.Contains(ss)) {
                     sl.Group = setList.Groups[1];
-                    sl.Text = ss.ToString();
                     sl.ForeColor = Color.Gray;
                 }
                 else {
                     sl.Group = setList.Groups[2];
-                    sl.Text = ss.ToString();
-                    sl.ForeColor = Color.Black;
                 }
             }
-            //CalcPerms();
+
+            CalcPerms();
         }
 
         void UpdateGlobal() {
@@ -785,7 +784,7 @@ namespace RuneApp {
         }
 
 
-        // Returns if to abort that operation
+        // Returns true to abort that operation
         bool AnnoyUser() {
             if (Build == null)
                 return true;
@@ -866,6 +865,10 @@ namespace RuneApp {
                 await CalcPerms();
         }
 
+        /// <summary>
+        /// Populate the Rune Dial using the Runes as filtered by Build
+        /// </summary>
+        /// <returns></returns>
         async Task<long> CalcPerms() {
 
             await Task.Run(() => {
@@ -894,6 +897,7 @@ namespace RuneApp {
                 if (num == 0)
                     perms = 0;
 
+                // Find rune UI object by name
                 ctrl = (Label)Controls.Find("runeNum" + (i + 1).ToString(), true).FirstOrDefault();
                 if (ctrl == null) continue;
                 ctrl.Text = num.ToString();

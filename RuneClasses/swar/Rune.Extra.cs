@@ -207,5 +207,133 @@ namespace RuneOptim.swar {
             return r;
         }
 
+        /// <summary>
+        /// Checks how many of the stat scores in s are met or exceeded by r. 
+        /// Assumes Stat A/D/H are percent
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public int HasStats(Stats s)
+        {
+            int ret = 0;
+
+            if (HealthPercent[0] >= s.Health)
+                ret++;
+            if (AttackPercent[0] >= s.Attack)
+                ret++;
+            if (DefensePercent[0] >= s.Defense)
+                ret++;
+            if (Speed[0] >= s.Speed)
+                ret++;
+
+            if (CritDamage[0] >= s.CritDamage)
+                ret++;
+            if (CritRate[0] >= s.CritRate)
+                ret++;
+            if (Accuracy[0] >= s.Accuracy)
+                ret++;
+            if (Resistance[0] >= s.Resistance)
+                ret++;
+
+            return ret;
+        }
+
+        /// <summary>
+        /// Returns the sum of how much the rune fufills the Stat requirement.
+        /// Eg. if the stat has 10% ATK & 20% HP, and the rune only has 5% ATK, it will return 0.5.
+        /// Assumes Stat A/D/H are percent
+        /// </summary>
+        /// <param name="r"></param>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public double VsStats(Stats s)
+        {
+            double ret = 0;
+
+            if (s.Health > 0)
+                ret += HealthPercent[0] / s.Health;
+            if (s.Attack > 0)
+                ret += AttackPercent[0] / s.Attack;
+            if (s.Defense > 0)
+                ret += DefensePercent[0] / s.Defense;
+            if (s.Speed > 0)
+                ret += Speed[0] / s.Speed;
+
+            if (s.CritDamage > 0)
+                ret += CritDamage[0] / s.CritDamage;
+            if (s.CritRate > 0)
+                ret += CritRate[0] / s.CritRate;
+            if (s.Accuracy > 0)
+                ret += Accuracy[0] / s.Accuracy;
+            if (s.Resistance > 0)
+                ret += Resistance[0] / s.Resistance;
+
+            //Health / ((1000 / (1000 + Defense * 3)))
+            if (s.EffectiveHP > 0)
+            {
+                var sh = 6000 * (100 + HealthPercent[0] + 20) / 100.0 + HealthFlat[0] + 1200;
+                var sd = 300 * (100 + DefensePercent[0] + 10) / 100.0 + DefenseFlat[0] + 70;
+
+                double delt = 0;
+                delt += sh / (1000 / (1000 + sd * 3));
+                delt -= 6000 / (1000 / (1000 + 300.0 * 3));
+                ret += delt / s.EffectiveHP;
+            }
+
+            //Health / ((1000 / (1000 + Defense * 3 * 0.3)))
+            if (s.EffectiveHPDefenseBreak > 0)
+            {
+                var sh = 6000 * (100 + HealthPercent[0] + 20) / 100.0 + HealthFlat[0] + 1200;
+                var sd = 300 * (100 + DefensePercent[0] + 10) / 100.0 + DefenseFlat[0] + 70;
+
+                double delt = 0;
+                delt += sh / (1000 / (1000 + sd * 0.9));
+                delt -= 6000 / (1000 / (1000 + 300 * 0.9));
+                ret += delt / s.EffectiveHPDefenseBreak;
+            }
+
+            // (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100)
+            if (s.MaxDamage > 0)
+            {
+                var sa = 300 * (100 + AttackPercent[0] + 20) / 100.0 + AttackFlat[0] + 100;
+                var cd = 50 + CritDamage[0] + 20;
+
+                double delt = 0;
+                delt += sa * (1 + cd / 100);
+                delt -= 460 * (1 + 0.7);
+                ret += delt / s.MaxDamage;
+            }
+
+            // (DamageFormula?.Invoke(this) ?? Attack) * (1 + SkillupDamage + CritDamage / 100 * Math.Min(CritRate, 100) / 100)
+            if (s.AverageDamage > 0)
+            {
+                var sa = 300 * (100 + AttackPercent[0] + 20) / 100.0 + AttackFlat[0] + 100;
+                var cd = 50 + CritDamage[0] + 20;
+                var cr = 15 + CritRate[0] + 15;
+
+                double delt = 0;
+                delt += sa * (1 + cd / 100 * Math.Min(cr, 100) / 100);
+                delt -= 460 * (1 + 0.7 * 0.3);
+                ret += delt / s.AverageDamage;
+            }
+
+            // ExtraValue(Attr.AverageDamage) * Speed / 100
+            if (s.DamagePerSpeed > 0)
+            {
+                var sa = 300 * (100 + AttackPercent[0] + 20) / 100.0 + AttackFlat[0] + 100;
+                var cd = 50 + CritDamage[0] + 20;
+                var cr = 15 + CritRate[0] + 15;
+                var sp = 100 + Speed[0] + 15;
+
+                double delt = 0;
+                delt += sa * (1 + cd / 100 * Math.Min(cr, 100) / 100) * sp / 100;
+                delt -= 460 * (1 + 0.70 * 0.30) * 1.15;
+                ret += delt / s.DamagePerSpeed;
+            }
+
+            return ret;
+        }
+
     }
 }

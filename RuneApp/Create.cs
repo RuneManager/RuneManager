@@ -524,19 +524,9 @@ namespace RuneApp {
         private void BuildSets_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    /*foreach (var set in e.NewItems.OfType<RuneSet>())
-                    {
-                        var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
-                        lvi.Group = rsInc;
-                    }*/
                     RegenSetList();
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    /*foreach (var set in e.OldItems.OfType<RuneSet>())
-                    {
-                        var lvi = setList.Items.OfType<ListViewItem>().FirstOrDefault(ll => ((RuneSet)ll.Tag) == set);
-                        lvi.Group = rsExc;
-                    }*/
                     RegenSetList();
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
@@ -582,6 +572,8 @@ namespace RuneApp {
 
         void tBtnBreak_Click(object sender, EventArgs e) {
             ChangeBroken(!(bool)((ToolStripButton)sender).Tag);
+            // This option can now affect the automatic inclusion of 2-sets
+            RegenSetList();
         }
 
         void tBtnSetMore_Click(object sender, EventArgs e) {
@@ -613,45 +605,50 @@ namespace RuneApp {
 
             foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (Build.RequiredSets.Contains(ss)) {
+                var requiredSets = Build.RequiredSets.Count(s => s == ss);
+                if (requiredSets > 1)
+                {
+                    Build.RequiredSets.Remove(ss);
+                }
+                else if (requiredSets == 1) 
+                {
                     Build.RemoveRequiredSet(ss);
                     Build.AddIncludedSet(ss);
                 }
-                else if (Build.BuildSets.Contains(ss)) {
-                    Build.ToggleIncludedSet(ss);
+                else if (Build.BuildSets.Contains(ss)) 
+                {
+                    Build.BuildSets.Remove(ss);
                 }
             }
-
             RegenSetList();
         }
 
+        /// <summary>
+        /// Used on double click, cycles from Exclude => Include => Require => Exclude
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void tBtnSetShuffle(object sender, EventArgs e) {
             if (Build == null)
                 return;
 
             foreach (var sl in setList.SelectedItems.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;
-                if (Build.RequiredSets.Contains(ss)) {
-                    int num = Build.RequiredSets.Count(s => s == ss);
-                    if (Rune.SetRequired(ss) == 2 && num < 3) {
-                        Build.RequiredSets.Add(ss);
-                    }
-                    else {
-                        Build.RemoveRequiredSet(ss);
-                    }
-                }
-                else if (Build.BuildSets.Contains(ss)) {
+                if (Build.RequiredSets.Contains(ss))
+                    Build.RemoveRequiredSet(ss);
+                else if (Build.BuildSets.Contains(ss))
                     Build.AddRequiredSet(ss);
-                }
-                else {
+                else
                     Build.AddIncludedSet(ss);
-                }
             }
-
             RegenSetList();
         }
 
-        // shuffle runesets between: included <-> excluded
+        /// <summary>
+        /// Up arrow above rune sets, moves from Exclude => Include => Required => Required x#
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void tBtnInclude_Click(object sender, EventArgs e) {
             if (Build == null)
                 return;
@@ -669,16 +666,6 @@ namespace RuneApp {
             foreach (ListViewItem item in items) {
                 var set = (RuneSet)item.Tag;
                 Build.ToggleIncludedSet(set);
-                /*if (build.BuildSets.Contains(set))
-                {
-                    build.BuildSets.Remove(set);
-                    item.Group = rsExc;
-                }
-                else
-                {
-                    build.BuildSets.Add(set);
-                    item.Group = rsInc;
-                }*/
             }
 
             var ind = items[0].Index;
@@ -709,66 +696,7 @@ namespace RuneApp {
                 RuneSet set = (RuneSet)li.Tag;
                 // whatever, just add it to required if not
                 int num = Build.AddRequiredSet(set);
-                /*if (num > 1)
-                    li.Text = set.ToString() + " x" + num;
-                if (num > 3 || num <= 1)
-                    li.Text = set.ToString();*/
             }
-        }
-
-        // shuffle rnuesets between: excluded > required <-> included
-        void tBtnShuffle_Click(object sender, EventArgs e) {
-            if (Build == null)
-                return;
-
-            var list = setList;
-
-            var items = list.SelectedItems;
-            if (items.Count == 0)
-                return;
-
-            var selGrp = items[0].Group;
-            var indGrp = selGrp.Items.IndexOf(items[0]);
-
-            foreach (ListViewItem item in items) {
-                var set = (RuneSet)item.Tag;
-
-                if (Build.RemoveRequiredSet(set) > 0) {
-                    Build.AddIncludedSet(set);
-                }
-                else {
-                    Build.AddRequiredSet(set);
-                }
-
-                if (Build.RequiredSets.Contains(set)) {
-                    item.Group = rsInc;
-                    item.Text = set.ToString();
-                }
-                else {
-                    item.Group = rsReq;
-                }
-            }
-
-            var ind = items[0].Index;
-
-            if (selGrp.Items.Count > 0) {
-                int i = indGrp;
-                int selcount = 0;
-                if (i > 0 && (i == selGrp.Items.Count || !(bool)selGrp.Tag))
-                    i -= 1;
-                while (selGrp.Items[i].Selected) {
-                    selcount++;
-                    i++;
-                    i %= selGrp.Items.Count;
-                    if (selcount == selGrp.Items.Count)
-                        break;
-                }
-
-                ind = selGrp.Items[i].Index;
-            }
-            setList.SelectedIndices.Clear();
-
-            setList.SelectedIndices.Add(ind);
         }
 
         private void runeDial_RuneClick(object sender, RuneClickEventArgs e) {

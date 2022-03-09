@@ -5,12 +5,14 @@ using System.Linq;
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
+using System.Collections.ObjectModel;
 
 namespace RuneOptim.swar {
     public partial class Rune
     {
         
-        public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { RuneSet.Energy, // Health
+        public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { 
+            RuneSet.Energy, // Health
             RuneSet.Guard, // Def
             RuneSet.Swift, // Speed
             RuneSet.Blade, // CRate
@@ -37,6 +39,69 @@ namespace RuneOptim.swar {
             RuneSet.Accuracy,
             RuneSet.Tolerance,
         }.ToImmutableArray();
+
+        public static ImmutableArray<RuneSet> Set4 = ImmutableArray.Create(RuneSet.Swift, RuneSet.Rage, RuneSet.Fatal, RuneSet.Despair, RuneSet.Vampire, RuneSet.Violent);
+        public static ImmutableArray<RuneSet> Set2 = ImmutableArray.Create(RuneSet.Energy, RuneSet.Guard, RuneSet.Blade, RuneSet.Focus, RuneSet.Endure, RuneSet.Nemesis, RuneSet.Will, RuneSet.Shield, RuneSet.Revenge, RuneSet.Destroy,
+        RuneSet.Fight, RuneSet.Determination, RuneSet.Enhance, RuneSet.Accuracy, RuneSet.Tolerance);
+
+        class RuneSetException : Exception
+        {
+            public RuneSetException()
+            {
+            }
+
+            public RuneSetException(string message)
+                : base(message)
+            {
+            }
+
+            public RuneSetException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+        };
+
+        public static IEnumerable<RuneSet> ValidSets (ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
+        {
+            if (!RequiredSets.Any() && !IncludeSets.Any())
+                // Everything is valid
+                return Set2.Union(Set4);
+
+            int required_4set = RequiredSets.Count(r => Rune.Set4.Contains(r));
+            int required_2set = RequiredSets.Count(r => Rune.Set2.Contains(r));
+            var required_runes = required_2set * 2 + required_4set * 4;
+            if (required_runes > 6)
+                // invalid so send an empty set
+                return new RuneSet[0];
+            if (required_runes == 6)
+                // requires 6 runes so IncludeSets cannot be used
+                return RequiredSets;
+            bool hasInclude2 = IncludeSets.Any(s => Rune.Set2.Contains(s));
+            bool hasInclude4 = IncludeSets.Any(s => Rune.Set4.Contains(s));
+            if (required_runes == 4)
+            {
+                if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                    // no 2-sets or broken so automatically supplement required 4-set with all 2-sets
+                    return RequiredSets.Union(Rune.Set2);
+                else
+                    // requires 4 runes so only allows 2 sets from includes
+                    return RequiredSets.Union(IncludeSets.Where(s => Rune.Set2.Contains(s)));
+            }
+            // requires 2 or fewer runes so all includes are valid
+            if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                // no 2-sets or broken are available so implicitly supplement the 4-set(s) with 2-sets
+                return IncludeSets.Union(RequiredSets).Union(Rune.Set2);
+            else
+                // the sets are comprehensive
+                return IncludeSets.Union(RequiredSets);
+        }
+
+        public static ParallelQuery<Rune> FilterBySets (ParallelQuery<Rune> rsGlobal, ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
+        {
+
+            var validSets = ValidSets(RequiredSets, IncludeSets, AllowBroken);
+            return rsGlobal.Where(r => validSets.Contains(r.Set));
+        }
 
         [JsonIgnore]
         public double BarionEfficiency
@@ -768,7 +833,6 @@ namespace RuneOptim.swar {
 
         Broken          = 1 << 23,
 
-        Set4 = Swift | Rage | Fatal | Despair | Vampire | Violent,
     }
 
     [JsonConverter(typeof(StringEnumConverter))]

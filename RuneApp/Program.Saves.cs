@@ -40,6 +40,8 @@ namespace RuneApp
                 bstr = bstr.Replace("\"b_cdmg\"", "\"critical_damage\"");
                 bstr = bstr.Replace("\"b_acc\"", "\"accuracy\"");
                 bstr = bstr.Replace("\"b_res\"", "\"res\"");
+                // remove fake (<0.7.3) set if it's present
+                bstr = bstr.Replace("\"Set4\",", "");
 
                 var bs = JsonConvert.DeserializeObject<List<Build>>(bstr);
                 foreach (var b in bs.OrderBy(b => b.Priority))
@@ -270,10 +272,11 @@ namespace RuneApp
 
         public static void RemoveLoad(Loadout l)
         {
-            Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
-            BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
             l.Unlock();
             Loads.Remove(l);
+            Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
+            if (build != null)
+                BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
         }
 
         public static LoadSaveResult SaveGoals(string filename = "goals.json")

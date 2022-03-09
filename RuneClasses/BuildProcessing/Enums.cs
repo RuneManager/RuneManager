@@ -12,6 +12,7 @@
         Or = 0,
         And = 1,
         Sum = 2,
+        // A sum plus an automatic count filter
         SumN = 3
     }
 

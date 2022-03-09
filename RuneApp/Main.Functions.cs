@@ -58,7 +58,7 @@ namespace RuneApp {
         private void ShrineClick(object sender, EventArgs e) {
             var it = (ToolStripMenuItem)sender;
             if (it != null) {
-                var tag = (KeyValuePair<string, int>)it.Tag;
+                var tag = (KeyValuePair<string, double>)it.Tag;
                 var stat = tag.Key;
 
                 foreach (ToolStripMenuItem i in shrineMap[stat]) {
@@ -331,9 +331,11 @@ namespace RuneApp {
             }
         }
 
+        /// <summary>
+        /// (Re)initializes (or clears) all fields (on app start, reload, or load)
+        /// </summary>
         public void RebuildLists() {
-            // TODO: comment it up a little?
-
+            // Grab current sorting (to restore after recreate)
             var oldMonSort = dataMonsterList.ListViewItemSorter;
             dataMonsterList.ListViewItemSorter = null;
             var oldRuneSort = dataRuneList.ListViewItemSorter;
@@ -342,16 +344,33 @@ namespace RuneApp {
             dataMonsterList.Items.Clear();
             dataRuneList.Items.Clear();
             listView4.Items.Clear();
+
             if (Program.Data == null)
                 return;
+
+            // Apply priority to all monsters
             int maxPri = 0;
+            // Next unused priority
             if (Program.Builds.Count > 0)
                 maxPri = Program.Builds.Max(b => b.Priority) + 1;
             foreach (var mon in Program.Data.Monsters) {
+                // Priority is (1) Build priority or (2) if runed, the next priority in sequence
                 mon.Priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
             }
-            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
 
+            // Populate the MonsterList
+            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
+            ColorMonsWithBuilds();
+            // Restore the sort order (and apply it)
+            dataMonsterList.ListViewItemSorter = oldMonSort;
+            if (dataMonsterList.ListViewItemSorter != null)
+            {
+                var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
+                mlvs.ShouldSort = true;
+                dataMonsterList.Sort();
+            }
+
+            // Populate the CraftLIst
             dataCraftList.Items.AddRange(Program.Data.Crafts.Select(craft => new ListViewItem() {
                 Text = craft.ItemId.ToString(),
                 SubItems =
@@ -363,31 +382,25 @@ namespace RuneApp {
                 }
             }).ToArray());
 
+            // Populate the RuneList
             foreach (Rune rune in Program.Data.Runes) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
             CheckLocked();
-            ColorMonsWithBuilds();
-
-            foreach (ListViewItem lvi in buildList.Items) {
-                // regenerate the Build list text
-                if (lvi.Tag is Build b)
-                    ListViewItemBuild(lvi, b);
-            } 
-
-            dataMonsterList.ListViewItemSorter = oldMonSort;
-            if (dataMonsterList.ListViewItemSorter != null) {
-                var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
-                mlvs.ShouldSort = true;
-                mlvs.OrderBy(colMonGrade.Index, false);
-                mlvs.ThenBy(colMonPriority.Index, true);
-                dataMonsterList.Sort();
-            }
+            // Restore the sort order (and apply it)
             dataRuneList.ListViewItemSorter = oldRuneSort;
-            if (dataRuneList.ListViewItemSorter != null) {
+            if (dataRuneList.ListViewItemSorter != null)
+            {
                 ((ListViewSort)dataRuneList.ListViewItemSorter).ShouldSort = true;
                 dataRuneList.Sort();
             }
+
+            // Regenerate the Build list text
+            // TODO: Combine with RebuildBuildList?
+            foreach (ListViewItem lvi in buildList.Items) {
+                if (lvi.Tag is Build b)
+                    ListViewItemBuild(lvi, b);
+            } 
         }
         public void RefreshLoadouts()
         {
