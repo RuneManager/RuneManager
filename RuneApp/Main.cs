@@ -142,6 +142,8 @@ namespace RuneApp {
                     dataMonsterList.Sort();
                     sorter.OnColumnClick(colMonLevel.Index, false); // descending level
                     dataMonsterList.Sort();
+                    sorter.OnColumnClick(colMonGrade.Index, false); // descending grade
+                    dataMonsterList.Sort();
                     sorter.OnColumnClick(colMonPriority.Index); // ascending priority
                     dataMonsterList.Sort();
 
