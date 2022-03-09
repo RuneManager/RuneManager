@@ -83,8 +83,11 @@ namespace RuneOptim.swar {
                 if (required_2set == 0 && !hasInclude2 && !AllowBroken)
                     // no 2-sets or broken so automatically supplement required 4-set with all 2-sets
                     return RequiredSets.Union(Rune.Set2);
+                else if (AllowBroken)
+                    // allow all sets (since broken runes could be pulled from 4-sets)
+                    return RequiredSets.Union(IncludeSets);
                 else
-                    // requires 4 runes so only allows 2 sets from includes
+                    // requires 4 runes and does not allow broken so only allows 2 sets from includes
                     return RequiredSets.Union(IncludeSets.Where(s => Rune.Set2.Contains(s)));
             }
             // requires 2 or fewer runes so all includes are valid
