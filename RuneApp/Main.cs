@@ -417,7 +417,7 @@ namespace RuneApp {
                 nli.SubItems[3].Text = "+" + l.RunesNew.ToString() + " ±" + l.RunesChanged.ToString();
             if (Program.Settings.ColorLoadChanges)
             {
-                int emptySlots = b.Mon.Runes.Count(r => r == null);
+                int emptySlots = 6 - b.Mon.Runes.Count();
                 List<Rune> inventoryRunes = l.Runes.Where(r => r != null && r.IsUnassigned).ToList();
                 // Dim loadouts with no changes
                 if (l.RunesNew + l.RunesChanged == 0); // no coloring exit condition

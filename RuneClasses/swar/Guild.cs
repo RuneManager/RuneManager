@@ -29,21 +29,21 @@ namespace RuneOptim.swar
         }
 
         [JsonIgnore]
-        public long Health => GuildInfo.Health;
+        public long Health => GuildInfo == null ? 0 : GuildInfo.Health;
         [JsonIgnore]
-        public long Defense => GuildInfo.Defense;
+        public long Defense => GuildInfo == null ? 0 : GuildInfo.Defense;
         [JsonIgnore]
-        public long Attack => GuildInfo.Attack;
+        public long Attack => GuildInfo == null ? 0 : GuildInfo.Attack;
         [JsonIgnore]
-        public long Speed => GuildInfo.Speed;
+        public long Speed => GuildInfo == null ? 0 : GuildInfo.Speed;
         [JsonIgnore]
-        public long CritRate => GuildInfo.CritRate;
+        public long CritRate => GuildInfo == null ? 0 : GuildInfo.CritRate;
         [JsonIgnore]
-        public long CritDamage => GuildInfo.CritDamage;
+        public long CritDamage => GuildInfo == null ? 0 : GuildInfo.CritDamage;
         [JsonIgnore]
-        public long Accuracy => GuildInfo.Accuracy;
+        public long Accuracy => GuildInfo == null ? 0 : GuildInfo.Accuracy;
         [JsonIgnore]
-        public long Resistance => GuildInfo.Resistance;
+        public long Resistance => GuildInfo == null ? 0 : GuildInfo.Resistance;
 
     }
 
