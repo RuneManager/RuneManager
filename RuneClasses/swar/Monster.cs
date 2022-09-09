@@ -30,6 +30,11 @@ namespace RuneOptim.swar {
             get {
                 if (IsHomunculus)
                     return HomunculusName;
+                if (MonsterTypeId == 15105) // Don't want a devilmon listed as "Dark Devilmon"                   
+                {
+                    return $"{Name}";
+                }
+                
                 return (Awakened == 1 || Awakened == 3 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
             }
             set {

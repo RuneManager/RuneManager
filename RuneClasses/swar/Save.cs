@@ -240,25 +240,37 @@ namespace RuneOptim.swar
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems) {
+                        // See if this monster has a duplicate and decorate them so we can differentiate          
+                        var existing_count = Monsters.Count(m => m.MonsterTypeId == mon.MonsterTypeId)-1;
+
                         if (mon.Name == null)
                         {
                             mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId).Value;
-                            if (mon.Awakened == 3)
-                            {
-                                mon.Name += " (2A)";
-                            }
                         }
-                        mon.LoadOrder = monLoaded++;
                         if (mon.Name == null) {
                             mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value; 
-                            if (mon.Awakened == 3)
-                            {
-                                mon.Name += " (2A)";
-                            }
+                        }
+                        if (mon.MonsterTypeId == 15105)
+                        {
+                            mon.Name = "Devilmon";  // we really need to special case this?!
                         }
                         if (mon.Name == null) {
                             mon.Name = "MissingNo";
                         }
+
+                        if (mon.Awakened == 3)
+                        {
+                            mon.Name += " (2A)";
+                        }
+
+                        if (existing_count >= 1)
+                        {
+                            mon.Name += $" [{existing_count+1}]";
+                        }
+
+                        mon.LoadOrder = monLoaded++;
+
+
                         // Add the runes contained in the Monsters JSON definition to the Rune pool
                         foreach (var r in mon.Runes) {
                             if (!Runes.Any(ru => ru.Id == r.Id))
