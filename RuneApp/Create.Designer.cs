@@ -551,7 +551,7 @@
             this.label14.Name = "label14";
             this.label14.Size = new System.Drawing.Size(36, 13);
             this.label14.TabIndex = 75;
-            this.label14.Text = "Worth";
+            this.label14.Text = "Priority";
             // 
             // btnSave
             // 
