@@ -53,7 +53,7 @@ namespace RuneAppTests
             // load the save?
             if (File.Exists(Program.Settings.SaveLocation))
             {
-                Program.LoadSave(Program.Settings.SaveLocation);
+                Program.LoadExportedRunesJSON(Program.Settings.SaveLocation);
                 main.RebuildLists();
                 main.RefreshLoadouts();
             }
@@ -71,7 +71,7 @@ namespace RuneAppTests
             // refresh button implementation:
             if (File.Exists(Program.Settings.SaveLocation))
             {
-                Program.LoadSave(Program.Settings.SaveLocation);
+                Program.LoadExportedRunesJSON(Program.Settings.SaveLocation);
                 main.RebuildLists();
                 main.RefreshLoadouts();
             }

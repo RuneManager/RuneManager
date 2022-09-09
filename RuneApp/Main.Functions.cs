@@ -31,7 +31,7 @@ namespace RuneApp {
                 if (lsd.ShowDialog() == DialogResult.OK) // Test result.
                 {
                     try {
-                        loadres = Program.LoadSave(lsd.Filename);
+                        loadres = Program.LoadExportedRunesJSON(lsd.Filename);
                         RebuildLists();
                     }
                     catch (IOException ex) {
