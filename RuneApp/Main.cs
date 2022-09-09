@@ -54,15 +54,15 @@ namespace RuneApp {
                 // TODO: this is slow during profiling
                 try
                 {
-                    // WIZARD DATA
+                    // First load exported runes json file
                     LoadSaveResult loadResult = 0;
                     do {
-                        loadResult = Program.FindSave();
+                        loadResult = Program.FindExportedRunesJSON();
                         switch (loadResult) {
                             case LoadSaveResult.Success:
                                 break;
                             default:
-                                if (MessageBox.Show("Couldn't automatically load save.\r\nManually locate a save file?", "Load Save", MessageBoxButtons.YesNo) == DialogResult.Yes) {
+                                if (MessageBox.Show("Couldn't automatically load exported runes.\r\nManually locate file?\r\n(\"No\" will exit app.)", "Load exported runes", MessageBoxButtons.YesNo) == DialogResult.Yes) {
                                     loadResult = Invoke(loadSaveDialogue);
                                 }
                                 else {
@@ -73,24 +73,9 @@ namespace RuneApp {
                         }
                     } while (loadResult != LoadSaveResult.Success);
 
-                    // BUILDS
-                    loadResult = 0;
-                    do {
-                        loadResult = Program.LoadBuilds();
-                        switch (loadResult) {
-                            case LoadSaveResult.Failure:
-                                if (MessageBox.Show("Save was invalid while loading builds.\r\nManually locate a save file?", "Load Builds", MessageBoxButtons.YesNo) == DialogResult.Yes) {
-                                    loadResult = Invoke(loadSaveDialogue);
-                                }
-                                break;
-                            case LoadSaveResult.EmptyFile:
-                            case LoadSaveResult.FileNotFound:
-                                loadResult = LoadSaveResult.Success;
-                                break;
-                            default:
-                                break;
-                        }
-                    } while (loadResult != LoadSaveResult.Success);
+                    // Then load saved builds (may be empty first time)
+                    Program.LoadBuilds();
+                        // we previously had some ability to load a different build.json file, if we ever want that again, we should build a specific loader dialog for it since the current one is very rune specific
 
                     this.Invoke((MethodInvoker)delegate {
                         RebuildLists();
@@ -98,7 +83,9 @@ namespace RuneApp {
 
                 }
                 catch (Exception ex) {
-                    MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in log file.", "Error");
+                    var logFileName = Program.GetLogFileName("MyFileAppender");
+                    if (string.IsNullOrEmpty(logFileName)) { logFileName = "log file"; }
+                    MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in {logFileName}.", "Error");
                     LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
                     throw ex;
                 }
@@ -957,7 +944,7 @@ namespace RuneApp {
                 MessageBox.Show("Cannot refresh file data while builds are running to avoid corruption.  Pleast stop the running build and try again.", "Error", MessageBoxButtons.OK);
             }
             else if (File.Exists(Program.Settings.SaveLocation)) {
-                Program.LoadSave(Program.Settings.SaveLocation);
+                Program.LoadExportedRunesJSON(Program.Settings.SaveLocation);
                 RebuildLists();
                 RefreshLoadouts();
             }
@@ -1344,7 +1331,7 @@ namespace RuneApp {
         }
 
         private void btnRefreshSave_Click(object sender, EventArgs e) {
-            Program.LoadSave(Program.Settings.SaveLocation);
+            Program.LoadExportedRunesJSON(Program.Settings.SaveLocation);
         }
 
         private void buildList_ColumnWidthChanging(object sender, ColumnWidthChangingEventArgs e) {

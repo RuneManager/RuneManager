@@ -69,7 +69,13 @@ namespace RuneApp {
             if (File.Exists("save.json"))
                 radSave.Enabled = true;
 
-            localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
+            // check the first 3 lines of JSON files for the HubUserLogin command
+            var files = Directory.GetFiles(Environment.CurrentDirectory, "*.json")
+                .Where(f => File.ReadLines(f).Take(3).Any(l => l.Contains("HubUserLogin")));
+
+            localFiles = files.ToArray();
+
+            // localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
 
             bool isLocal = false;
 

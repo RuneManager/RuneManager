@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29209.152
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RuneApp", "RuneApp\RuneApp.csproj", "{6F171B77-CB43-4C73-BFD0-3D7A0CD37013}"
 EndProject
@@ -38,8 +38,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwarfarmLogger", "plugins\SwarfarmLogger\SwarfarmLogger.csproj", "{D270F2BE-26F9-4D6D-A91E-4E0B87D2BBCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SwagLogger", "plugins\SwagLogger\SwagLogger.csproj", "{B19BB288-149C-48E7-BC93-653DCD3AA67E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TrotiNet.Lib", "RuneService\TrotiNet\Lib\TrotiNet.Lib.csproj", "{7FEDA61E-ED0A-4357-932E-746C697E464E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuildBattleExporter", "plugins\GuildBatteExporter\GuildBattleExporter.csproj", "{F65EE267-5889-40D1-936D-C0B21F84BC90}"
 EndProject
@@ -219,16 +217,6 @@ Global
 		{B19BB288-149C-48E7-BC93-653DCD3AA67E}.Release|x64.Build.0 = Release|Any CPU
 		{B19BB288-149C-48E7-BC93-653DCD3AA67E}.Release|x86.ActiveCfg = Release|Any CPU
 		{B19BB288-149C-48E7-BC93-653DCD3AA67E}.Release|x86.Build.0 = Release|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Debug|x64.Build.0 = Debug|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Debug|x86.ActiveCfg = Debug|x86
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Debug|x86.Build.0 = Debug|x86
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Release|x64.ActiveCfg = Release|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Release|x64.Build.0 = Release|Any CPU
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Release|x86.ActiveCfg = Release|x86
-		{7FEDA61E-ED0A-4357-932E-746C697E464E}.Release|x86.Build.0 = Release|x86
 		{F65EE267-5889-40D1-936D-C0B21F84BC90}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F65EE267-5889-40D1-936D-C0B21F84BC90}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{F65EE267-5889-40D1-936D-C0B21F84BC90}.Debug|x64.Build.0 = Debug|Any CPU

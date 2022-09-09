@@ -10,6 +10,8 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using log4net;
+using log4net.Appender;
 using Newtonsoft.Json;
 using RuneOptim;
 using RuneOptim.BuildProcessing;
@@ -89,6 +91,16 @@ namespace RuneApp {
                 Settings.WatchSave = value;
                 Settings.Save();
             }
+        }
+
+        public static string GetLogFileName(string name)
+        {
+            var rootAppender = LogManager.GetRepository()
+                                         .GetAppenders()
+                                         .OfType<FileAppender>()
+                                         .FirstOrDefault(fa => fa.Name == name);
+
+            return rootAppender != null ? rootAppender.File : string.Empty;
         }
 
         public static bool HasActiveBuild
@@ -340,43 +352,55 @@ namespace RuneApp {
         /// <summary>
         /// Checks the Working directory for a supported save file
         /// </summary>
-        public static LoadSaveResult FindSave() {
+        public static LoadSaveResult FindExportedRunesJSON() {
             if (!string.IsNullOrWhiteSpace(Settings.SaveLocation) && File.Exists(Settings.SaveLocation))
-                return LoadSave(Program.Settings.SaveLocation);
+            {
+                try
+                {
+                    return LoadExportedRunesJSON(Program.Settings.SaveLocation);
+                }
+                catch (Exception ex)
+                {
+                    LineLog.Error("Unable to load file that was in Settings.SaveLocation.  Clearing value.");
+                    Settings.SaveLocation = null;
+                    Settings.Save();
+                    throw ex;
+                }
+            }
 
             if (File.Exists("save.json"))
-                return LoadSave("save.json");
+                return LoadExportedRunesJSON("save.json");
 
             // check the first 3 lines of JSON files for the HubUserLogin command
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*.json")
                 .Where(f => File.ReadLines(f).Take(3).Any(l => l.Contains("HubUserLogin")));
 
             if (files.Any() && files.HasCount(1)) 
-                return LoadSave(files.First());
+                return LoadExportedRunesJSON(files.First());
 
             return LoadSaveResult.FileNotFound;
         }
 
-        public static LoadSaveResult LoadSave(string filename) {
+        public static LoadSaveResult LoadExportedRunesJSON(string filename) {
             if (string.IsNullOrWhiteSpace(filename)) {
-                LineLog.Error("Filename for save is null");
+                LineLog.Error("Filename for exported runes is null");
                 return LoadSaveResult.FileNotFound;
             }
             if (!File.Exists(filename)) {
                 LineLog.Error($"File {filename} doesn't exist");
                 return LoadSaveResult.FileNotFound;
             }
-            LineLog.Info("Loading " + filename + " as save.");
+            LineLog.Info("Loading " + filename + " as exported runes.");
             string text = File.ReadAllText(filename);
-            Program.Data = LoadSaveData(text, Program.Loads);
+            Program.Data = LoadExportedRunesData(text, Program.Loads);
             return LoadSaveResult.Success;
         }
 
         /// <summary>
-        /// Takes in a JSON blob as the save
+        /// Takes in a JSON blob as the exported runes
         /// </summary>
         /// <param name="text"></param>
-        public static Save LoadSaveData(string text, IEnumerable<Loadout> matchLoads) {
+        public static Save LoadExportedRunesData(string text, IEnumerable<Loadout> matchLoads) {
 
 #if !DEBUG
             try
@@ -469,7 +493,7 @@ namespace RuneApp {
                 SaveFileTouched.Invoke(Program.Settings.SaveLocation, new EventArgs());
             }
             else {
-                LoadSave(Program.Settings.SaveLocation);
+                LoadExportedRunesJSON(Program.Settings.SaveLocation);
             }
         }
 

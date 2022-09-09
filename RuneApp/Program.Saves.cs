@@ -12,8 +12,9 @@ namespace RuneApp
     public static partial class Program
     {
 
-        public static LoadSaveResult LoadBuilds(string filename = "builds.json")
+        public static LoadSaveResult LoadBuilds()
         {
+            string filename = "builds.json";
             if (!File.Exists(filename))
             {
                 LineLog.Error($"{filename} wasn't found.");

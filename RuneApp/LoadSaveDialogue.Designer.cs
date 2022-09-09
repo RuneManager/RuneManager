@@ -42,7 +42,7 @@
             // radLookup
             // 
             this.radLookup.AutoSize = true;
-            this.radLookup.Location = new System.Drawing.Point(44, 31);
+            this.radLookup.Location = new System.Drawing.Point(12, 12);
             this.radLookup.Name = "radLookup";
             this.radLookup.Size = new System.Drawing.Size(14, 13);
             this.radLookup.TabIndex = 0;
@@ -53,7 +53,7 @@
             // radSwarfarm
             // 
             this.radSwarfarm.AutoSize = true;
-            this.radSwarfarm.Location = new System.Drawing.Point(44, 58);
+            this.radSwarfarm.Location = new System.Drawing.Point(12, 39);
             this.radSwarfarm.Name = "radSwarfarm";
             this.radSwarfarm.Size = new System.Drawing.Size(14, 13);
             this.radSwarfarm.TabIndex = 0;
@@ -65,7 +65,7 @@
             // 
             this.radSave.AutoSize = true;
             this.radSave.Enabled = false;
-            this.radSave.Location = new System.Drawing.Point(44, 82);
+            this.radSave.Location = new System.Drawing.Point(12, 63);
             this.radSave.Name = "radSave";
             this.radSave.Size = new System.Drawing.Size(70, 17);
             this.radSave.TabIndex = 0;
@@ -77,7 +77,7 @@
             // lblFile
             // 
             this.lblFile.AutoSize = true;
-            this.lblFile.Location = new System.Drawing.Point(150, 31);
+            this.lblFile.Location = new System.Drawing.Point(118, 12);
             this.lblFile.Name = "lblFile";
             this.lblFile.Size = new System.Drawing.Size(16, 13);
             this.lblFile.TabIndex = 1;
@@ -85,7 +85,7 @@
             // 
             // btnFile
             // 
-            this.btnFile.Location = new System.Drawing.Point(64, 26);
+            this.btnFile.Location = new System.Drawing.Point(32, 7);
             this.btnFile.Name = "btnFile";
             this.btnFile.Size = new System.Drawing.Size(75, 23);
             this.btnFile.TabIndex = 2;
@@ -98,7 +98,7 @@
             this.cboxSwarfarm.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cboxSwarfarm.Enabled = false;
             this.cboxSwarfarm.FormattingEnabled = true;
-            this.cboxSwarfarm.Location = new System.Drawing.Point(64, 55);
+            this.cboxSwarfarm.Location = new System.Drawing.Point(32, 36);
             this.cboxSwarfarm.Name = "cboxSwarfarm";
             this.cboxSwarfarm.Size = new System.Drawing.Size(182, 21);
             this.cboxSwarfarm.TabIndex = 3;
@@ -108,7 +108,7 @@
             // 
             this.btnOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnOpen.Enabled = false;
-            this.btnOpen.Location = new System.Drawing.Point(267, 113);
+            this.btnOpen.Location = new System.Drawing.Point(63, 88);
             this.btnOpen.Name = "btnOpen";
             this.btnOpen.Size = new System.Drawing.Size(75, 23);
             this.btnOpen.TabIndex = 4;
@@ -119,7 +119,7 @@
             // btnCancel
             // 
             this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.Location = new System.Drawing.Point(348, 113);
+            this.btnCancel.Location = new System.Drawing.Point(144, 88);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 5;
@@ -131,7 +131,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(435, 148);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(231, 123);
             this.Controls.Add(this.btnCancel);
             this.Controls.Add(this.btnOpen);
             this.Controls.Add(this.cboxSwarfarm);
@@ -147,7 +148,7 @@
             this.Name = "LoadSaveDialogue";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "LoadSaveDialogue";
+            this.Text = "Load exported runes JSON";
             this.TopMost = true;
             this.ResumeLayout(false);
             this.PerformLayout();
