@@ -30,7 +30,7 @@ namespace RuneOptim.swar {
             get {
                 if (IsHomunculus)
                     return HomunculusName;
-                return (Awakened == 1 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
+                return (Awakened == 1 || Awakened == 3 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
             }
             set {
                 name = value;

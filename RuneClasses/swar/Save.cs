@@ -241,10 +241,20 @@ namespace RuneOptim.swar
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems) {
                         if (mon.Name == null)
+                        {
                             mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId).Value;
+                            if (mon.Awakened == 3)
+                            {
+                                mon.Name += " (2A)";
+                            }
+                        }
                         mon.LoadOrder = monLoaded++;
                         if (mon.Name == null) {
-                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value;
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value; 
+                            if (mon.Awakened == 3)
+                            {
+                                mon.Name += " (2A)";
+                            }
                         }
                         if (mon.Name == null) {
                             mon.Name = "MissingNo";
