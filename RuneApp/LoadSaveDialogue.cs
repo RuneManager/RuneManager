@@ -72,10 +72,7 @@ namespace RuneApp {
             // check the first 3 lines of JSON files for the HubUserLogin command
             var files = Directory.GetFiles(Environment.CurrentDirectory, "*.json")
                 .Where(f => File.ReadLines(f).Take(3).Any(l => l.Contains("HubUserLogin")));
-
-            localFiles = files.ToArray();
-
-            // localFiles = Directory.GetFiles(Environment.CurrentDirectory, "*.json");
+            localFiles = files.ToArray();            
 
             bool isLocal = false;
 
@@ -108,7 +105,7 @@ namespace RuneApp {
                     Filename = swarfarmFile;
                 else if (radSave.Checked)
                     Filename = "save.json";
-
+                
                 Program.Settings.SaveLocation = Filename;
                 Program.Settings.Save();
 
@@ -125,14 +122,29 @@ namespace RuneApp {
 
         private void btnFile_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            LookupFile = "";
+            while (LookupFile == "")
             {
-                openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
-                openFileDialog.Filter = "JSON Data|*.json|SWarFarm JSON|*-swarfarm.json|All Files|*.*";
-                openFileDialog.Multiselect = false;
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                using (OpenFileDialog openFileDialog = new OpenFileDialog())
                 {
-                    LookupFile = openFileDialog.FileName;
+                    openFileDialog.InitialDirectory = Directory.GetCurrentDirectory();
+                    openFileDialog.Filter = "JSON Data|*.json|SWarFarm JSON|*-swarfarm.json|All Files|*.*";
+                    openFileDialog.Multiselect = false;
+                    if (openFileDialog.ShowDialog() == DialogResult.OK)
+                    {                        
+                        if (File.ReadLines(openFileDialog.FileName).Take(3).Any(l => l.Contains("HubUserLogin")))
+                        {
+                            LookupFile = openFileDialog.FileName;
+                        }
+                        else { 
+                            MessageBox.Show("Selected file is not a valid rune export file.  Please select another.", "Error");
+                            LookupFile = "";
+                        }
+                    }
+                    else
+                    {
+                        return;
+                    }
                 }
             }
         }
