@@ -236,19 +236,42 @@ namespace RuneOptim.swar
             }
         }
 
+        private void FindDuplicateMons(int typeId)
+        {
+            // See if this monster has a duplicate and decorate them so we can differentiate          
+            var sorted_by_acquired = Monsters.Where(m => m.MonsterTypeId == typeId).OrderBy(m => m.Id);
+            if (sorted_by_acquired.Count() > 1) 
+            {
+                int existing_count = 1;
+                foreach (var monster in sorted_by_acquired)
+                {
+                    monster.DuplicateNumber = existing_count++;                    
+                }
+            }
+        }
+
         private void Monsters_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (Monster mon in e.NewItems) {
+                        
+
                         if (mon.Name == null)
+                        {
                             mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId).Value;
-                        mon.LoadOrder = monLoaded++;
+                        }
                         if (mon.Name == null) {
-                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value;
+                            mon.Name = MonIdNames.FirstOrDefault(m => m.Key == mon.MonsterTypeId / 100).Value; 
                         }
                         if (mon.Name == null) {
                             mon.Name = "MissingNo";
                         }
+
+                        FindDuplicateMons(mon.MonsterTypeId);
+
+                        mon.LoadOrder = monLoaded++;
+
+
                         // Add the runes contained in the Monsters JSON definition to the Rune pool
                         foreach (var r in mon.Runes) {
                             if (!Runes.Any(ru => ru.Id == r.Id))
