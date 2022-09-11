@@ -30,12 +30,24 @@ namespace RuneOptim.swar {
             get {
                 if (IsHomunculus)
                     return HomunculusName;
-                if (MonsterTypeId == 15105) // Don't want a devilmon listed as "Dark Devilmon"                   
+                if (MonsterTypeId == 15105) // Feels strange to need to special case this
                 {
-                    return $"{Name}";
+                    return "Devilmon"; // maybe we want to count dupes of these as well?
                 }
+
+                var add2A = (Awakened == 3 ? " [2A]" : "");
+                var dupe = (DuplicateNumber > 0 ? $" ({DuplicateNumber})" : "");
+
                 
-                return (Awakened == 1 || Awakened == 3 ? "" : Element.ToString() + " ") + (Name ?? "Missingno");
+                if (Awakened == 1 || Awakened == 3)
+                {
+                    return $"{Name}{add2A}{dupe}";
+                }
+                else
+                {
+                    return Element.ToString() + " " + (Name ?? "Missingno") + $"{dupe}";
+                }
+
             }
             set {
                 name = value;
@@ -140,6 +152,9 @@ namespace RuneOptim.swar {
         public int Priority = 0;
 
         public bool Locked = false;
+
+        [JsonIgnore]
+        public int DuplicateNumber = 0;  // if there are no other copies of this monster type this will be 0
 
         [JsonIgnore]
         public bool Downloaded = false;
