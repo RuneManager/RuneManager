@@ -386,7 +386,7 @@ namespace RuneApp {
             foreach (Rune rune in Program.Data.Runes) {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
-            CheckLocked();
+            ColorizeRuneList();
             // Restore the sort order (and apply it)
             dataRuneList.ListViewItemSorter = oldRuneSort;
             if (dataRuneList.ListViewItemSorter != null)
@@ -415,7 +415,7 @@ namespace RuneApp {
             }
         }
 
-        public void CheckLocked() {
+        public void ColorizeRuneList() {
             if (Program.Data?.Runes == null)
                 return;
 

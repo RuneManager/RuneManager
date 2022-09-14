@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using Newtonsoft.Json;
@@ -364,6 +365,52 @@ namespace RuneOptim.Management {
                 if (r != null)
                     r.UsedInBuild = false;
             }
+        }
+
+        /// <summary>
+        /// Fills Runes based on RuneIDs and an external Rune list
+        /// </summary>
+        /// <param name="runes"></param>
+        public void LinkRunes(ObservableCollection<Rune> runes)
+        {
+            if (RuneIDs == null)
+                return;
+            for (int i = 0; i < 6; i++)
+            {
+                var ids = RuneIDs[i];
+                Runes[i] = runes.FirstOrDefault(r => r.Id == ids);
+                if (Runes[i] != null)
+                {
+                    Runes[i].UsedInBuild = true;
+                    if (HasManageStats)
+                        foreach (var ms in ManageStats[i])
+                            Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Replaces runes with the copies from 
+        /// </summary>
+        public void RelinkRunes(ObservableCollection<Rune> newRunes)
+        {
+            for (int i = 0; i < 6; i++)
+            {
+                if (Runes[i] == null)
+                    continue;
+                var rr = newRunes.FirstOrDefault(r => r.Id == Runes[i].Id);
+                if (rr != null)
+                {
+                    Runes[i] = rr;
+                }
+                else
+                {
+                    // represent rune no longer available in set
+                    Runes[i].AssignedId = 0;
+                    Runes[i].AssignedName = "RUNE MISSING";
+                }
+            }
+            Lock();
         }
 
         #region AttrGetters
