@@ -234,11 +234,11 @@ namespace RuneApp {
             }*/
 
             if (Program.CurrentBuild?.Runner is IBuildRunner br) {
-                toolStripBuildStatus.Text = $"Build Status: {br.Good:N0} ~ {br.Completed:N0} - {br.Skipped:N0}";
+                SetBuildStatus($"{br.Good:N0} ~ {br.Completed:N0} - {br.Skipped:N0}");
                 ProgressToList(Program.CurrentBuild, ((double)br.Completed / (double)br.Expected).ToString("P2"));
             }
             else if (Program.CurrentBuild != null && Program.CurrentBuild.IsRunning) {
-                toolStripBuildStatus.Text = $"Build Status: {(Program.CurrentBuild.BuildUsage?.passed ?? 0):N0} ~ {Program.CurrentBuild.Count:N0} - {Program.CurrentBuild.Skipped:N0}";
+                SetBuildStatus($"{(Program.CurrentBuild.BuildUsage?.passed ?? 0):N0} ~ {Program.CurrentBuild.Count:N0} - {Program.CurrentBuild.Skipped:N0}");
                 ProgressToList(Program.CurrentBuild, ((double)Program.CurrentBuild.Count / (double)Program.CurrentBuild.Total).ToString("P2"));
             }
         }
@@ -248,7 +248,7 @@ namespace RuneApp {
 
         private void Main_ProgChanged(object a, ProgressChangedEventArgs b) {
             if (b.UserState is ProgToEventArgs e2) {
-                toolStripBuildStatus.Text = "Build Status: " + e2.Progress;
+                SetBuildStatus(e2.Progress.ToString());
                 ProgressToList(e2.build, e2.Percent.ToString("P2"));
             }
             else if (b.UserState is PrintToEventArgs e3) {
@@ -269,10 +269,30 @@ namespace RuneApp {
             if (lastProg == null || e.Progress >= lastProg.Progress)
                 lastProg = e;
             //Application.DoEvents();
-            if (!this.IsDisposed)
-                this.Invoke((MethodInvoker)delegate {
-                    toolStripBuildStatus.Text = "Build Status: " + e.Progress;
-            });
+            SetBuildStatus(e.Progress.ToString());
+        }
+
+        private void SetBuildStatus(string message)
+        {
+            // if the main window is closed while a build is running, UI updates will generate errors
+            // stop the build so the program can cleanup promptly
+            try
+            {
+                this.Invoke((MethodInvoker)delegate
+                {
+                    toolStripBuildStatus.Text = "Build Status: " + message;
+                });
+            }
+            catch (System.InvalidOperationException e)
+            {
+                Program.StopBuild();
+                LineLog.Info("Ignored System.InvalidOperationException, presumably during close");
+            }
+            catch (System.ComponentModel.InvalidAsynchronousStateException e)
+            {
+                Program.StopBuild();
+                LineLog.Info("Ignored System.ComponentModel.InvalidAsynchronousStateException, presumably during close");
+            }
         }
 
         private void Program_BuildsPrintTo(object sender, PrintToEventArgs e) {
@@ -319,7 +339,7 @@ namespace RuneApp {
                             mm.OnRunesChanged += Mm_OnRunesChanged;
                         }
 
-                        CheckLocked();
+                        ColorizeRuneList();
                         Invoke((MethodInvoker)delegate {
                             ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
 
@@ -763,6 +783,11 @@ namespace RuneApp {
             if (dataMonsterList.SelectedItems.Count <= 0) return;
             if (!(dataMonsterList.SelectedItems[0].Tag is Monster mon))
                 return;
+            if (Program.Builds.Any(b => b.MonId == mon.Id))
+            {
+                MessageBox.Show("Error: Monster already has a build.");
+                return;
+            }
 
             var nextId = 1;
             if (Program.Builds.Any())
@@ -884,7 +909,7 @@ namespace RuneApp {
             foreach (Rune r in Program.Data.Runes) {
                 r.UsedInBuild = false;
             }
-            CheckLocked();
+            ColorizeRuneList();
         }
 
         private void tsBtnLoadsRemove_Click(object sender, EventArgs e) {
@@ -892,7 +917,7 @@ namespace RuneApp {
                 Loadout l = (Loadout)li.Tag;
                 Program.RemoveLoad(l);
             }
-            CheckLocked();
+            ColorizeRuneList();
         }
 
         private void tsBtnBuildsRunAll_Click(object sender, EventArgs e) {
@@ -1087,7 +1112,7 @@ namespace RuneApp {
                 }
             }
 
-            CheckLocked();
+            ColorizeRuneList();
         }
 
         private void runetab_savebutton_click(object sender, EventArgs e) {
@@ -1118,7 +1143,7 @@ namespace RuneApp {
             foreach (ListViewItem li in loadoutList.SelectedItems) {
                 Loadout l = (Loadout)li.Tag;
                 l.Lock();
-                CheckLocked();
+                ColorizeRuneList();
             }
         }
 
@@ -1245,7 +1270,7 @@ namespace RuneApp {
 
         private void tsBtnLoadsLoad_Click(object sender, EventArgs e) {
             Program.LoadLoadouts();
-            CheckLocked();
+            ColorizeRuneList();
         }
 
         /// <summary>
@@ -1455,7 +1480,7 @@ namespace RuneApp {
                         Element = build.Mon.Element,
                     });
                     build.Mon.Current.Lock();
-                    CheckLocked();
+                    ColorizeRuneList();
                 }
             }
         }
@@ -1494,6 +1519,12 @@ namespace RuneApp {
             delayedRun(0, 0, 30);
         }
 
+        /// <summary>
+        /// Schedules the run to resume after a certain amount of time.  Implemented instead of a "pause" feature which is what's really needed.
+        /// </summary>
+        /// <param name="hours"></param>
+        /// <param name="minutes"></param>
+        /// <param name="seconds"></param>
         private void delayedRun(int hours, int minutes, int seconds)
         {
             if (Program.HasActiveBuild)

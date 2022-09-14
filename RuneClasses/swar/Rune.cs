@@ -71,9 +71,15 @@ namespace RuneOptim.swar {
         [JsonProperty("locked")]
         public bool Locked;
 
+        /// <summary>
+        /// Internal variable used to track runes already committed to a Loadout (not Build)
+        /// </summary>
         [JsonProperty("used_in_build")]
         private bool usedInBuild;
 
+        /// <summary>
+        /// Public variable used to track whether a rune is already committed to a Loadout (not Build)
+        /// </summary>
         [JsonIgnore]
         public bool UsedInBuild {
             get {
@@ -86,6 +92,9 @@ namespace RuneOptim.swar {
             }
         }
 
+        /// <summary>
+        /// Doesn't appear to be used anywhere
+        /// </summary>
         [JsonIgnore]
         public Rune EnchantOf;
 
@@ -95,6 +104,9 @@ namespace RuneOptim.swar {
         [JsonProperty("sell_value")]
         public int SellValue;
 
+        /// <summary>
+        /// Name of monster to which the Rune was equipped in the import
+        /// </summary>
         [JsonProperty("monster_n")]
         public string AssignedName;
 

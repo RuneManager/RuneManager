@@ -91,6 +91,7 @@ namespace RuneOptim.BuildProcessing {
                 // todo: less .ToArray-ing
                 ParallelQuery<Rune> rsGlobal = save.Runes.AsParallel();
 
+                // The only valid runes for a Locked monster are the runes already on that monster
                 if (Type == BuildType.Lock)
                 {
                     for (int index = 0; index < Mon.Current.Runes.Count(); index++)
@@ -102,9 +103,11 @@ namespace RuneOptim.BuildProcessing {
                         // make sure to use runes out of rsGlobal (vs. potentially orphaned monster.current runes)
                         Rune rune = rsGlobal.FirstOrDefault(rn => rn.Id == r.Id);
                         if (rune.UsedInBuild)
-                            // an empty set will produce an error for a missing rune, appropriate if a rune in a locked build was somehow applied elsewhere
+                            // an empty set will produce an error for a missing rune
+                            // an error is appropriate if a rune in a locked build was somehow applied elsewhere
                             Runes[index] = new Rune[0];
                         else
+                            // we provide the one, available rune in the slot
                             Runes[index] = new Rune[] { rune };
                     }
                     return;
@@ -116,7 +119,7 @@ namespace RuneOptim.BuildProcessing {
                     // also, include runes which have been unequipped (should only look above)
                     if (!RunesUseEquipped || RunesOnlyFillEmpty)
                         rsGlobal = rsGlobal.Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped);
-                    // only if the rune isn't currently locked for another purpose
+                    // in the BuildWizard, we can test using "locked" runes which is operationalized as runes in loadouts
                     if (!RunesUseLocked)
                         rsGlobal = rsGlobal.Where(r => !r.UsedInBuild);
                     rsGlobal = rsGlobal.Where(r => !BannedRuneId.Any(b => b == r.Id) && !BannedRunesTemp.Any(b => b == r.Id));
@@ -160,8 +163,11 @@ namespace RuneOptim.BuildProcessing {
                         }
                         // cull here instead
                         if (!RunesUseEquipped || RunesOnlyFillEmpty)
+                            // Only using 'inventory' or runes on current mon
+                            // also, include runes which have been unequipped (should only look above)
                             Runes[i] = Runes[i].AsParallel().Where(r => r.IsUnassigned || r.AssignedId == Mon.Id || r.Swapped).ToArray();
                         if (!RunesUseLocked)
+                            // in the BuildWizard, we can test using "locked" runes which is operationalized as runes in loadouts
                             Runes[i] = Runes[i].AsParallel().Where(r => !r.UsedInBuild).ToArray();
 
                     }

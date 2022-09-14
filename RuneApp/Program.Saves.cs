@@ -103,6 +103,7 @@ namespace RuneApp
 
                     b.ID = id;
                 }
+                // Locked builds always sit atop the list so they have zero priority and don't take a place in line
                 if (b.Type == BuildType.Lock)
                     b.Priority = 0;
                 else
@@ -125,10 +126,12 @@ namespace RuneApp
                 {
                     switch (b.VERSIONNUM)
                     {
+                        // old maximum was a "soft" maximum that limited points.  added a hard maximum
                         case 0: // unversioned to 1
                             b.Threshold = b.Maximum;
                             b.Maximum = new Stats();
                             break;
+                        // looks like a restructuring of RuneScoring data model
                         case 1:
                             foreach (var tabN in b.RuneScoring.Keys.ToArray())
                             {
@@ -141,6 +144,7 @@ namespace RuneApp
                                 }
                             }
                             break;
+                        // initialize default values
                         case 2:
                             b.AutoRuneAmount = Build.AutoRuneAmountDefault;
                             break;
@@ -226,28 +230,20 @@ namespace RuneApp
             {
                 string text = File.ReadAllText(filename);
                 var lloads = JsonConvert.DeserializeObject<Loadout[]>(text);
-                Loads.Clear();
+                ClearLoadouts();
 
                 foreach (var load in lloads)
                 {
-                    if (load.RuneIDs != null)
-                    {
-                        for (int i = 0; i < 6; i++)
-                        {
-                            var ids = load.RuneIDs[i];
-                            load.Runes[i] = Program.Data.Runes.FirstOrDefault(r => r.Id == ids);
-                            if (load.Runes[i] != null)
-                            {
-                                load.Runes[i].UsedInBuild = true;
-                                if (load.HasManageStats)
-                                    foreach (var ms in load.ManageStats[i])
-                                        load.Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
-                            }
-                        }
-                    }
+                    // inject Rune instances into laodout
+                    load.LinkRunes(Program.Data.Runes);
+                    // inject Shrines and Guilds (for accurate recalculation)
                     load.Shrines = Data.Shrines;
                     load.Guild = Data.Guild;
                     Loads.Add(load);
+                    // restore UI for associated build
+                    Build build = Program.Builds.FirstOrDefault(b => b.ID == load.BuildID);
+                    if (build != null)
+                        BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Done"));
                 }
                 return LoadSaveResult.Success;
             }
@@ -264,9 +260,10 @@ namespace RuneApp
         {
             foreach (Loadout l in Loads)
             {
-                Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
-                BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
                 l.Unlock();
+                Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
+                if (build != null)
+                    BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
             }
             Loads.Clear();
         }
@@ -274,10 +271,10 @@ namespace RuneApp
         public static void RemoveLoad(Loadout l)
         {
             l.Unlock();
-            Loads.Remove(l);
             Build build = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID);
             if (build != null)
                 BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "!"));
+            Loads.Remove(l);
         }
 
         public static LoadSaveResult SaveGoals(string filename = "goals.json")

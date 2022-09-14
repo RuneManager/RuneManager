@@ -9,7 +9,7 @@ namespace RuneApp {
 
         private void ClearLoadouts() {
             Program.ClearLoadouts();
-            CheckLocked();
+            ColorizeRuneList();
         }
 
     }

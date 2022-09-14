@@ -127,6 +127,7 @@ namespace RuneApp {
 
         private static bool isRunning = false;
         private static Build currentBuild = null;
+        public static bool isClosing = false;
         public static Build CurrentBuild => currentBuild;
         private static Task runTask = null;
         public static Task RunTask => runTask;
@@ -290,6 +291,9 @@ namespace RuneApp {
         }
 
         public static void Close() {
+            isClosing = true;
+            if (Program.HasActiveBuild)
+                Program.StopBuild();
             // todo: not do this if headless?
             // is this the nicest way?
             Application.Exit();
@@ -413,22 +417,7 @@ namespace RuneApp {
                 // this probably is somewhat of a leak, as the loadouts will have references to runes no-longer in the save (because the list was recreated in-place).
                 foreach (var l in matchLoads)
                 {
-                    for (int i = 0; i < 6; i++)
-                    {
-                        if (l.Runes[i] == null)
-                            continue;
-                        var rr = dat.Runes.FirstOrDefault(r => r.Id == l.Runes[i].Id);
-                        if (rr != null)
-                        {
-                            l.Runes[i] = rr;
-                        }
-                        else
-                        {
-                            l.Runes[i].AssignedId = 0;
-                            l.Runes[i].AssignedName = "RUNE MISSING";
-                        }
-                    }
-                    l.Lock();
+                    l.RelinkRunes(dat.Runes);
                 }
 
                 //var bakemons = data.Monsters.Where(mo => !data.Monsters.Any(o => o.monsterTypeId == mo.monsterTypeId && o.Grade > 4));
