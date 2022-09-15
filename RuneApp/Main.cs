@@ -1081,7 +1081,7 @@ namespace RuneApp {
             Task.Factory.StartNew(() => {
                 using (WebClient client = new WebClient()) {
                     client.DownloadStringCompleted += client_DownloadStringCompleted;
-                    client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
+                    client.DownloadStringAsync(new Uri("https://raw.github.com/RuneManager/RuneManager/master/version.txt"));
                 }
             });
         }

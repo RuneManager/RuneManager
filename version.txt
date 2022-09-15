@@ -1,4 +1,5 @@
-0.7.1
+0.7.3
+0.7.1 
 https://github.com/Skibisky/RuneManager/releases/latest
 A bunch of UI functions have been made more consistent.
 Less likely to have a bad time when refreshing save data.
