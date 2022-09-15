@@ -290,15 +290,6 @@ namespace RuneApp {
             }
         }
 
-        public static void Close() {
-            isClosing = true;
-            if (Program.HasActiveBuild)
-                Program.StopBuild();
-            // todo: not do this if headless?
-            // is this the nicest way?
-            Application.Exit();
-        }
-
         private static void Loads_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
