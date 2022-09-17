@@ -1010,28 +1010,23 @@ namespace RuneApp {
             Invoke((MethodInvoker)delegate {
                 updateBox.Visible = true;
                 try {
-                    string result = e.Result.Replace("\r\n", "\n");
-                    int firstline = result.IndexOf('\n');
+                    dynamic payload = JsonConvert.DeserializeObject(e.Result);
 
-                    Version newver = new Version((firstline != -1) ? result.Substring(0, firstline) : result);
-
-                    int ind1 = result.IndexOf('\n');
-
-                    if (result.IndexOf('\n') != -1) {
-                        int ind2 = result.IndexOf('\n', ind1 + 1);
-                        if (ind2 == -1)
-                            filelink = e.Result.Substring(ind1 + 1);
-                        else {
-                            filelink = e.Result.Substring(ind1 + 1, ind2 - ind1 - 1);
-                            whatsNewText = e.Result.Substring(ind2 + 1);
-                        }
-
-                    }
-
-                    Version oldver = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion);
-                    updateCurrent.Text = "Current: " + oldver.ToString();
+                    // version number (v#.#.#)
+                    string tag = payload.tag_name;
+                    string result = tag.Replace("v", "");
+                    Version newver = new Version(result);
                     updateNew.Text = "New: " + newver.ToString();
 
+                    // what's new link
+                    whatsNewLink = payload.html_url;
+                    filelink = payload.assets[0].browser_download_url;
+
+                    // local version
+                    Version oldver = new Version(FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).ProductVersion);
+                    updateCurrent.Text = "Current: " + oldver.ToString();
+
+                    // update UI based on versions
                     if (oldver > newver) {
                         updateComplain.Text = "You hacker";
                     }
@@ -1039,7 +1034,7 @@ namespace RuneApp {
                         updateComplain.Text = "Update available!";
                         if (filelink != "") {
                             updateDownload.Enabled = true;
-                            if (whatsNewText != "")
+                            if (whatsNewLink != "")
                                 updateWhat.Visible = true;
                         }
                     }
@@ -1062,8 +1057,8 @@ namespace RuneApp {
         }
 
         private void updateWhat_Click(object sender, EventArgs e) {
-            if (whatsNewText != "") {
-                MessageBox.Show(whatsNewText, "What's New");
+            if (whatsNewLink != "") {
+                Process.Start(new Uri(whatsNewLink).ToString());
             }
         }
 
@@ -1074,16 +1069,23 @@ namespace RuneApp {
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e) {
             ShowOptions();
         }
+        private void checkForUpdates()
+        {
+            Task.Factory.StartNew(() => {
+                using (WebClient client = new WebClient())
+                {
+                    LineLog.Info("Checking for updates");
+                    client.DownloadStringCompleted += client_DownloadStringCompleted;
+                    client.Headers.Add(HttpRequestHeader.UserAgent, "RuneManager");
+                    client.DownloadStringAsync(new Uri("https://api.github.com/repos/RuneManager/RuneManager/releases/latest"));
+                }
+            });
+        }
 
         private void checkForUpdatesToolStripMenuItem_Click(object sender, EventArgs e) {
             updateBox.Show();
             updateComplain.Text = "Checking...";
-            Task.Factory.StartNew(() => {
-                using (WebClient client = new WebClient()) {
-                    client.DownloadStringCompleted += client_DownloadStringCompleted;
-                    client.DownloadStringAsync(new Uri("https://raw.github.com/RuneManager/RuneManager/master/version.txt"));
-                }
-            });
+            checkForUpdates();
         }
 
         private void aboutToolStripMenuItem1_Click(object sender, EventArgs e) {

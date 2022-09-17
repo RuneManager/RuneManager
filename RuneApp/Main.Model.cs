@@ -19,7 +19,7 @@ using RuneOptim.Management;
 namespace RuneApp {
     public partial class Main {
         string filelink = "";
-        string whatsNewText = "";
+        string whatsNewLink = "";
 
         private Dictionary<string, List<ToolStripMenuItem>> shrineMap = new Dictionary<string, List<ToolStripMenuItem>>();
 
@@ -63,13 +63,7 @@ namespace RuneApp {
             #region Update
 
             if (Program.Settings.CheckUpdates) {
-                Task.Factory.StartNew(() => {
-                    using (WebClient client = new WebClient()) {
-                        LineLog.Info("Checking for updates");
-                        client.DownloadStringCompleted += client_DownloadStringCompleted;
-                        client.DownloadStringAsync(new Uri("https://raw.github.com/Skibisky/RuneManager/master/version.txt"));
-                    }
-                });
+                checkForUpdates();
             }
             else {
                 updateBox.Show();

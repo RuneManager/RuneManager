@@ -1,9 +1,0 @@
-0.7.3
-0.7.1 
-https://github.com/Skibisky/RuneManager/releases/latest
-A bunch of UI functions have been made more consistent.
-Less likely to have a bad time when refreshing save data.
-0.6.9: Updated stats/multipliers.
-0.6.8: Bunch of changes and fixes from Github issues.
-0.6.7: 2nd Awakening mons, Build Strategies
-0.6.6: Added Rune efficiency to list.
