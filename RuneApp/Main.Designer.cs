@@ -1806,7 +1806,7 @@
             this.useRunesCheck.TabIndex = 18;
             this.useRunesCheck.Text = "Use Equipped Runes";
             this.useRunesCheck.UseVisualStyleBackColor = true;
-            this.useRunesCheck.CheckedChanged += new System.EventHandler(this.useRunesCheck_CheckedChanged);
+            this.useRunesCheck.CheckedChanged += new System.EventHandler(this.useEquippedRunes_CheckedChanged);
             // 
             // updateBox
             // 
@@ -1834,7 +1834,7 @@
             this.updateWhat.Text = "What\'s New";
             this.updateWhat.UseVisualStyleBackColor = true;
             this.updateWhat.Visible = false;
-            this.updateWhat.Click += new System.EventHandler(this.updateWhat_Click);
+            this.updateWhat.Click += new System.EventHandler(this.updateWhatsNew_Click);
             // 
             // updateComplain
             // 
@@ -1955,7 +1955,7 @@
             this.cbFillRunes.TabIndex = 23;
             this.cbFillRunes.Text = "Fill Only";
             this.cbFillRunes.UseVisualStyleBackColor = true;
-            this.cbFillRunes.CheckedChanged += new System.EventHandler(this.cbFillRunes_CheckedChanged);
+            this.cbFillRunes.CheckedChanged += new System.EventHandler(this.cbFillOnly_CheckedChanged);
             // 
             // runeInventory
             // 
