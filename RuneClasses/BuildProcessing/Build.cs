@@ -20,7 +20,7 @@ namespace RuneOptim.BuildProcessing {
     public partial class Build {
         // allows iterative code, probably slow but nice to write and integrates with WinForms at a moderate speed
         // TODO: have another go at it
-        //[Obsolete("Consider changing to statEnums")]
+        //[Obsolete("Consider changing to statEnums, but HP vs. HP%")]
         public static readonly string[] StatNames = { AttrStr.HP, AttrStr.ATK, AttrStr.DEF, AttrStr.SPD, AttrStr.CR, AttrStr.CD, AttrStr.RES, AttrStr.ACC };
         public static readonly Attr[] StatEnums = { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
         public static readonly Attr[] StatBoth = { Attr.HealthFlat, Attr.HealthPercent, Attr.AttackFlat, Attr.AttackPercent, Attr.DefenseFlat, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy };
@@ -1683,6 +1683,7 @@ namespace RuneOptim.BuildProcessing {
 
                 // go through each non-zero stat
                 foreach( var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed }) {
+                    // these sets are analyzed using a float where 0.01 represents 1%
 
                     if (Minimum[attr].EqualTo(0))
                         continue;
@@ -1727,6 +1728,7 @@ namespace RuneOptim.BuildProcessing {
                 }
 
                 foreach (var attr in new Attr[] {  Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
+                    // these sets are analyzed as integers where 1 represents 1%
 
                     if (Minimum[attr].EqualTo(0))
                         continue;

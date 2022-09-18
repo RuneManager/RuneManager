@@ -164,7 +164,7 @@ namespace RuneApp
                 var load = Loads.FirstOrDefault(l => l.BuildID == build.ID);
                 if (load != null)
                     load.Unlock();
-                // a new is created each time so it may make sense to clean this up
+                // a new load is created each time so it may make sense to clean this up
                 // this will also cause the right list to reorder (is that desirable?)
                 // Loads.Remove(load);
 
@@ -217,23 +217,26 @@ namespace RuneApp
 
                     var dmon = Program.Data.GetMonster(build.Best.Id);
 
+                    // stash old bonuses
                     var dmonld = dmon.Current.Leader;
                     var dmonsh = dmon.Current.Shrines;
                     var dmongu = dmon.Current.Guild;
+                    var dmonfl = dmon.Current.FakeLevel;
+                    var dmonps = dmon.Current.PredictSubs;
+                    var dmonbf = dmon.Current.Buffs;
+                    // calculate the old build using bonuses from Best
                     dmon.Current.Leader = build.Best.Current.Leader;
                     dmon.Current.Shrines = build.Best.Current.Shrines;
                     dmon.Current.Guild = build.Best.Current.Guild;
-                    var dmonfl = dmon.Current.FakeLevel;
-                    var dmonps = dmon.Current.PredictSubs;
                     dmon.Current.FakeLevel = build.Best.Current.FakeLevel;
                     dmon.Current.PredictSubs = build.Best.Current.PredictSubs;
-                    var dmonbf = dmon.Current.Buffs;
                     dmon.Current.Buffs = build.Best.Current.Buffs;
 
                     var ds = build.CalcScore(dmon.GetStats());
                     var cs = build.CalcScore(build.Best.Current.GetStats(build.Best));
                     build.Best.Current.DeltaPoints = cs - ds;
 
+                    // restore old bonuses
                     dmon.Current.Leader = dmonld;
                     dmon.Current.Shrines = dmonsh;
                     dmon.Current.Guild = dmongu;
