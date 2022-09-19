@@ -1603,7 +1603,7 @@ namespace RuneOptim.BuildProcessing {
         }
 
         /// <summary>
-        /// Return the best increase of <paramref name="attr"/> of the subset of RuneSets <paramref name="maxSets"/>
+        /// Return the best increase of <paramref name="attr"/> from the possible RuneSets <paramref name="maxSets"/>
         /// </summary>
         /// <param name="attr"></param>
         /// <param name="maxSets"></param>
@@ -1660,6 +1660,12 @@ namespace RuneOptim.BuildProcessing {
             return 0;
         }
 
+        /// <summary>
+        /// Calculates the maximum number of each set that could be included based on the specific RequiredSets and BuildSets
+        /// </summary>
+        /// <param name="requiredSets"></param>
+        /// <param name="buildSets"></param>
+        /// <returns></returns>
         private Dictionary<RuneSet, int> GetMaxSetCount(IEnumerable<RuneSet> requiredSets, IEnumerable<RuneSet> buildSets)
         {
             Dictionary<RuneSet, int> setCounts = new Dictionary<RuneSet, int>();
