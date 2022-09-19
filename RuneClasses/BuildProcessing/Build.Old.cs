@@ -277,6 +277,7 @@ namespace RuneOptim.BuildProcessing {
                     }
                 }
                 // always try to put the current rune back in
+                /*
                 for (int i = 0; i < 6; i++) {
                     var r = Mon.Current.Runes[i];
                     if (r == null)
@@ -292,6 +293,7 @@ namespace RuneOptim.BuildProcessing {
                         Runes[i] = tl.ToArray();
                     }
                 }
+                */
 
                 Grinds = Runes.SelectMany(rg => rg.SelectMany(r => r.FilterGrinds(save.Crafts).Concat(r.FilterEnchants(save.Crafts)))).Distinct().ToArray();
             }

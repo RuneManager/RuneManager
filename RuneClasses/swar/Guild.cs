@@ -45,6 +45,31 @@ namespace RuneOptim.swar
         [JsonIgnore]
         public long Resistance => GuildInfo == null ? 0 : GuildInfo.Resistance;
 
+        public long ByStat(Attr attr)
+        {
+            switch (attr)
+            {
+                case Attr.HealthPercent:
+                    return Health;
+                case Attr.DefensePercent:
+                    return Defense;
+                case Attr.AttackPercent:
+                    return Attack;
+                case Attr.Speed:
+                    return Speed;
+                case Attr.CritRate:
+                    return CritRate;
+                case Attr.CritDamage:
+                    return CritDamage;
+                case Attr.Accuracy:
+                    return Accuracy;
+                case Attr.Resistance:
+                    return Resistance;
+                default:
+                    return 0;
+            }
+        }
+
     }
 
     public class GuildInfo

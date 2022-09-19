@@ -1603,68 +1603,99 @@ namespace RuneOptim.BuildProcessing {
         }
 
         /// <summary>
-        /// Return the best increase of <paramref name="attr"/> of the subset of RuneSets <paramref name="ofThese"/>
+        /// Return the best increase of <paramref name="attr"/> from the possible RuneSets <paramref name="maxSets"/>
         /// </summary>
         /// <param name="attr"></param>
-        /// <param name="ofThese"></param>
+        /// <param name="maxSets"></param>
         /// <returns>Percentage stat increase</returns>
-        public static double BestEffect(Attr attr, IEnumerable<RuneSet> ofThese = null) {
+        public static double BestSetEffect(Attr attr, Dictionary<RuneSet, int> maxSets = null) {
             switch (attr) {
                 case Attr.HealthFlat:
                 case Attr.HealthPercent:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Energy))
-                        return 15 * 3;
-                    if (ofThese.Contains(RuneSet.Enhance))
-                        return 8 * 3;
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Energy))
+                        return 15 * maxSets[RuneSet.Energy];
+                    if (maxSets.ContainsKey(RuneSet.Enhance))
+                        return 8 * maxSets[RuneSet.Enhance];
                     break;
                 case Attr.AttackFlat:
                 case Attr.AttackPercent:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Fatal))
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Fatal))
                         return 35;
-                    if (ofThese.Contains(RuneSet.Fight))
-                        return 8 * 3;
+                    if (maxSets.ContainsKey(RuneSet.Fight))
+                        return 8 * maxSets[RuneSet.Fight];
                     break;
                 case Attr.DefenseFlat:
                 case Attr.DefensePercent:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Guard))
-                        return 15 * 3;
-                    if (ofThese.Contains(RuneSet.Determination))
-                        return 8 * 3;
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Guard))
+                        return 15 * maxSets[RuneSet.Guard];
+                    if (maxSets.ContainsKey(RuneSet.Determination))
+                        return 8 * maxSets[RuneSet.Guard];
                     break;
                 case Attr.SpeedPercent:
                 case Attr.Speed:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Swift))
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Swift))
                         return 25;
                     break;
                 case Attr.CritRate:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Blade))
-                        return 12 * 3;
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Blade))
+                        return 12 * maxSets[RuneSet.Blade];
                     break;
                 case Attr.CritDamage:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Rage))
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Rage))
                         return 40;
                     break;
                 case Attr.Resistance:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Endure))
-                        return 20 * 3;
-                    if (ofThese.Contains(RuneSet.Tolerance))
-                        return 10 * 3;
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Endure))
+                        return 20 * maxSets[RuneSet.Endure];
+                    if (maxSets.ContainsKey(RuneSet.Tolerance))
+                        return 10 * maxSets[RuneSet.Tolerance];
                     break;
                 case Attr.Accuracy:
-                    if (ofThese == null || ofThese.Contains(RuneSet.Focus))
-                        return 20 * 3;
-                    if (ofThese.Contains(RuneSet.Accuracy))
-                        return 10 * 3;
+                    if (maxSets == null || maxSets.ContainsKey(RuneSet.Focus))
+                        return 20 * maxSets[RuneSet.Focus];
+                    if (maxSets.ContainsKey(RuneSet.Accuracy))
+                        return 10 * maxSets[RuneSet.Accuracy];
                     break;
             }
             return 0;
         }
 
         /// <summary>
+        /// Calculates the maximum number of each set that could be included based on the specific RequiredSets and BuildSets
+        /// </summary>
+        /// <param name="requiredSets"></param>
+        /// <param name="buildSets"></param>
+        /// <returns></returns>
+        private Dictionary<RuneSet, int> GetMaxSetCount(IEnumerable<RuneSet> requiredSets, IEnumerable<RuneSet> buildSets)
+        {
+            Dictionary<RuneSet, int> setCounts = new Dictionary<RuneSet, int>();
+            int required = 0;
+            foreach (var rs in requiredSets)
+            {
+                required += Rune.SetRequired(rs);
+                if (setCounts.ContainsKey(rs))
+                {
+                    setCounts[rs]++;
+                }
+                else
+                {
+                    setCounts[rs] = 1;
+                };
+            }
+            if (required == 6)
+                return setCounts;
+            foreach (var bs in buildSets)
+            {
+                setCounts[bs] = (int)Math.Floor((decimal)(6-required) / Rune.SetRequired(bs));
+            }
+            return setCounts;
+        }
+
+        /// <summary>
         /// This will work through runes[][] to remove runes which would <i>never</i> be able to meet the minimum requirements.
         /// </summary>
         private void cleanMinimum() {
-
+            
             if (Minimum == null || !Minimum.IsNonZero) {
                 return;
             }
@@ -1675,93 +1706,161 @@ namespace RuneOptim.BuildProcessing {
             GetPrediction(fake, pred);
 
             var hasSets = Runes.SelectMany(r => r).Select(r => r.Set).Distinct();
+            var requiredSets = RequiredSets.Where(r => hasSets.Contains(r));
+            var buildSets = BuildSets.Where(r => hasSets.Contains(r));
+
+            var maxSets = GetMaxSetCount(requiredSets, buildSets);
 
             bool removedOne = true;
             while (removedOne) {
                 // we haven't removed any on this pass
                 removedOne = false;
 
-                // go through each non-zero stat
+                // stats that are diven by a flat and a percentage
                 foreach( var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed }) {
                     // these sets are analyzed using a float where 0.01 represents 1%
 
                     if (Minimum[attr].EqualTo(0))
                         continue;
 
-                    var bb = Mon[attr];
+                    var monBase = Mon[attr];
+                    double bestSetEffect = BestSetEffect(attr, maxSets);
+                    double guildEffect = Guild.ByStat(attr);
+                    double towerEffect = Shrines[attr];
+                    double leaderEffect = Leader[attr];
 
+                    // best rune for each slot
+                    double[] bestRuneEffect = new double[] { 0, 0, 0, 0, 0, 0 };
+                    for (int i = 0; i < 6; i++)
+                    {
+                        double maxEff = 0;
+                        double eff = 0;
+                        foreach (var u in Runes[i])
+                        {
+                            var percentageBonus = u[attr, fake[i] ?? 0, pred[i]];
+                            var flatBonus = u[attr - 1, fake[i] ?? 0, pred[i]];
+                            // normally we use a percentage `attr` and the flat `attr - 1`
+                            // speed is only flat but we refer to it as `attr` so we need to move the effect to flat
+                            if (attr == Attr.Speed)
+                            {
+                                flatBonus = percentageBonus;
+                                percentageBonus = 0;
+                            }
+                            eff = monBase * (percentageBonus * 0.01) + flatBonus;
+
+                            if (eff > maxEff)
+                            {
+                                maxEff = eff;
+                            }
+                        }
+                        // cache best effect in slot
+                        bestRuneEffect[i] = maxEff;
+                    }
+
+                    // filter runes in slot
                     for (int i = 0; i < 6; i++) {
-                        // start the counting at the best runeset bonus we could get
-                        double totEff = bb * (1 + BestEffect(attr, hasSets) * 0.01f) ;
 
-                        for (int j = 0; j < 6; j++) {
+                        // get the best runes from other slots
+                        double otherRuneEffect = 0;
+                        for (int j = 0; j < 6; j++)
+                        {
                             if (i == j)
                                 continue;
-
-                            double maxEff = 0;
-
-                            double eff = 0;
-                            foreach (var u in Runes[j]) {
-                                var p = u[attr, fake[j] ?? 0, pred[j]];
-                                var f = u[attr - 1, fake[j] ?? 0, pred[j]];
-                                if (attr == Attr.Speed) {
-                                    f = p;
-                                    p = 0;
-                                }
-                                eff = bb * ( p * 0.01) + f;
-
-                                if (eff > maxEff) {
-                                    maxEff = eff;
-                                }
-                            }
-                            totEff += maxEff;
+                            otherRuneEffect += bestRuneEffect[j];
                         }
 
-                        // pick the runes which really won't make the cut
-                        var garbo = Runes[i].Where(r => bb * ( 0.01 * (r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }))) + r[attr - 1, fake[i] ?? 0, pred[i]] + totEff < Minimum[attr]).ToArray();
+                        // pick the runes which can't achieve the minimum
+                        var insufficientBonus = Runes[i].Where(r =>
+                            // monster base
+                            monBase
+                            // rune percentage bonus
+                            + monBase * r[attr, fake[i] ?? 0, pred[i]] * 0.01f
+                            // rune flat bonus
+                            + r[attr - 1, fake[i] ?? 0, pred[i]] 
+                            // other runes
+                            + otherRuneEffect
+                            // set effect
+                            + monBase * bestSetEffect * 0.01f
+                            // leader effect
+                            + leaderEffect
+                            // guild effect
+                            + monBase * guildEffect * 0.01f
+                            // tower effect
+                            + monBase * towerEffect * 0.01f
+                            < Minimum[attr]
+                        ).ToArray();
 
-                        if (garbo.Length > 0)
+                        if (insufficientBonus.Length > 0)
                             removedOne = true;
 
-                        Runes[i] = Runes[i].Except(garbo).ToArray();
+                        Runes[i] = Runes[i].Except(insufficientBonus).ToArray();
                     }
                 }
 
+                // stats that are only a percentage
                 foreach (var attr in new Attr[] {  Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy }) {
-                    // these sets are analyzed as integers where 1 represents 1%
 
                     if (Minimum[attr].EqualTo(0))
                         continue;
 
-                    var bb = Mon[attr];
+                    var monBase = Mon[attr];
+                    double bestSetEffect = BestSetEffect(attr, maxSets);
+                    double guildEffect = Guild.ByStat(attr);
+                    double shrineEffect = Shrines[attr];
+                    double leaderEffect = Leader[attr];
 
+                    // best rune for each slot
+                    double[] bestRuneEffect = new double[] { 0, 0, 0, 0, 0, 0 };
+                    for (int i = 0; i < 6; i++)
+                    {
+                        double maxEff = 0;
+                        double eff = 0;
+                        foreach (var u in Runes[i])
+                        {
+                            eff = u[attr, fake[i] ?? 0, pred[i]];
+                            if (eff > maxEff)
+                            {
+                                maxEff = eff;
+                            }
+                        }
+                        // cache best effect in slot
+                        bestRuneEffect[i] = maxEff;
+                    }
+
+                    // filter runes in slot
                     for (int i = 0; i < 6; i++) {
-                        double totEff = bb + BestEffect(attr, hasSets);
 
-                        for (int j = 0; j < 6; j++) {
+                        // get the best runes from other slots
+                        double otherRuneEffect = 0;
+                        for (int j = 0; j < 6; j++)
+                        {
                             if (i == j)
                                 continue;
-
-                            double maxEff = 0;
-
-                            double eff = 0;
-                            foreach (var u in Runes[j]) {
-                                var f = u[attr, fake[j] ?? 0, pred[j]];
-                                eff = bb + f;
-
-                                if (eff > maxEff) {
-                                    maxEff = eff;
-                                }
-                            }
-                            totEff += maxEff;
+                            otherRuneEffect += bestRuneEffect[j];
                         }
 
-                        var garbo = Runes[i].Where(r => bb + r[attr, fake[i] ?? 0, pred[i]] + BestEffect(attr, new[] { r.Set }) + totEff < Minimum[attr]).ToArray();
+                        var insufficientBonus = Runes[i].Where(r => 
+                            // monster base
+                            monBase
+                            // flat bonus
+                            + r[attr, fake[i] ?? 0, pred[i]]
+                            // other rune bonus
+                            + otherRuneEffect
+                            // set bonuses
+                            + bestSetEffect
+                            // leader bonus
+                            + leaderEffect
+                            // guild bonus
+                            + guildEffect
+                            // shrine bonus
+                            + shrineEffect
+                            < Minimum[attr]
+                        ).ToArray();
 
-                        if (garbo.Length > 0)
+                        if (insufficientBonus.Length > 0)
                             removedOne = true;
 
-                        Runes[i] = Runes[i].Except(garbo).ToArray();
+                        Runes[i] = Runes[i].Except(insufficientBonus).ToArray();
                     }
                 }
             }
