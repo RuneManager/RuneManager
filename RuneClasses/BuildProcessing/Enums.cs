@@ -5,6 +5,7 @@
         NoPermutations = 2,
         NoSorting = 3,
         BadRune = 4,
+        BadMinMax = 5,
     }
 
     public enum FilterType {

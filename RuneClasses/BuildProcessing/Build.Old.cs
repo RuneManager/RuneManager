@@ -545,6 +545,14 @@ namespace RuneOptim.BuildProcessing {
                     return BuildResult.NoSorting;
                 }
 
+                // quick check that minimums don't exceed maximums
+                if (Minimum.AnyExceedCached(Maximum))
+                {
+                    BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Bad Min/Max"));
+                    RuneLog.Info("Minimums and Maximums are incompatible");
+                    return BuildResult.BadMinMax;
+                }
+
                 DateTime begin = DateTime.Now;
 
                 RuneLog.Debug(Count + "/" + Total + "  " + string.Format("{0:P2}", (Count + Complete - Total) / (double)Complete));
@@ -560,6 +568,7 @@ namespace RuneOptim.BuildProcessing {
 
                 List<Monster> tests = new List<Monster>();
 
+                // start a thread to make asyn updates to single build UI based on build progress
                 timeThread = new Thread(() => {
                     while (IsRunning) {
                         if (RunesOnlyFillEmpty)
@@ -832,9 +841,9 @@ namespace RuneOptim.BuildProcessing {
 
                                         cstats = test.GetStats();
 
-                                        // check if build meets minimum
+                                        // check if build meets requirements
                                         isBad |= !RunesOnlyFillEmpty && !AllowBroken && !test.Current.SetsFull;
-
+                                        // check if build meets max (only filled values)
                                         isBad |= tempMax != null && cstats.AnyExceedCached(tempMax);
 
                                         if (!isBad && GrindLoads) {
@@ -848,8 +857,9 @@ namespace RuneOptim.BuildProcessing {
                                             }
                                         }
 
+                                        // empties defualt to zero so we don't use non-zero "cached" values
                                         isBad |= !RunesOnlyFillEmpty && Minimum != null && !cstats.GreaterEqual(Minimum, true);
-                                        // if no broken sets, check for broken sets
+                                        // if no broken sets, check for broken 11
                                         // if there are required sets, ensure we have them
                                         /*isBad |= (tempReq != null && tempReq.Count > 0
                                             // this Linq adds no overhead compared to GetStats() and ApplyRune()
@@ -857,7 +867,7 @@ namespace RuneOptim.BuildProcessing {
                                             //&& !tempReq.GroupBy(s => s).All(s => test.Current.Sets.Count(q => q == s.Key) >= s.Count())
                                             );*/
                                         // TODO: recheck this code is correct
-                                        if (tempReq != null && tempReq.Count > 0) {
+                                        if (!isBad && tempReq != null && tempReq.Count > 0) {
                                             tempCheck = 0;
                                             foreach (var r in tempReq) {
                                                 int i;
@@ -887,7 +897,7 @@ namespace RuneOptim.BuildProcessing {
                                         }
 
                                         if (!isBad) {
-                                            // we found an okay build!
+                                            // we found a valid build!
                                             plus++;
                                             test.Score = curScore;
 

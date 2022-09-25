@@ -677,9 +677,16 @@ namespace RuneOptim.swar
             return false;
         }
 
+        /// <summary>
+        /// Enforces maximum but only for values that are non-zero in the rhs
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <returns></returns>
         public bool AnyExceedCached(Stats rhs) {
             foreach (var a in rhs.NonZeroCached) {
-                if (this[a] > rhs[a])
+                if (Build.ExtraEnums.Contains(a) && ExtraValue(a) > rhs[a])
+                    return true;
+                else if (this[a] > rhs[a])
                     return true;
             }
 
@@ -690,6 +697,12 @@ namespace RuneOptim.swar
             return rhs != 0 && lhs > rhs;
         }
 
+        /// <summary>
+        /// Underlying comparison operator
+        /// </summary>
+        /// <param name="rhs"></param>
+        /// <param name="extraGet"></param>
+        /// <returns></returns>
         public bool GreaterEqual(Stats rhs, bool extraGet = false) {
             if (Accuracy < rhs.Accuracy)
                 return false;
