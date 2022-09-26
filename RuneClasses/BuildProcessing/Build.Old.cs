@@ -354,7 +354,7 @@ namespace RuneOptim.BuildProcessing {
             test.ApplyRune(runes[3], 7);
             test.ApplyRune(runes[4], 7);
             test.ApplyRune(runes[5], 7);
-            test.Current.CheckSets();
+            test.Current.UpdateSetsAndCache();
 
 
             // TODO: Outsource to whoever wants it
@@ -835,7 +835,7 @@ namespace RuneOptim.BuildProcessing {
                                             break;
 
                                         test.ApplyRune(r5, 7);
-                                        test.Current.CheckSets();
+                                        test.Current.UpdateSetsAndCache();
 #if BUILD_PRECHECK_BUILDS_DEBUG
                                         outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif

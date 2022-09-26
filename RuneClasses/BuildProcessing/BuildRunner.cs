@@ -176,7 +176,7 @@ namespace RuneOptim.BuildProcessing {
 
 
         protected virtual void bake(loopData data, T tdat) {
-            data.Mon.Current.CheckSets();
+            data.Mon.Current.UpdateSetsAndCache();
             var cstats = data.Mon.GetStats();
             bool isBad = false;
 
