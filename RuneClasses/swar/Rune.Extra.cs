@@ -30,7 +30,7 @@ namespace RuneOptim.swar {
         [JsonIgnore]
         public bool SetIs4 {
             get {
-                return setIs4 ?? (setIs4 = (Rune.SetRequired(this.Set) == 4)).Value;
+                return setIs4 ?? (setIs4 = (Rune.SetSize(this.Set) == 4)).Value;
             }
         }
 

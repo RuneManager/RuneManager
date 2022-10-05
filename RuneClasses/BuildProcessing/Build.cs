@@ -7,10 +7,13 @@ using RuneOptim.swar;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
+using Combinatorics.Collections;
 
-namespace RuneOptim.BuildProcessing {
+namespace RuneOptim.BuildProcessing
+{
 
 
     /// <summary>
@@ -1672,7 +1675,7 @@ namespace RuneOptim.BuildProcessing {
             int required = 0;
             foreach (var rs in requiredSets)
             {
-                required += Rune.SetRequired(rs);
+                required += Rune.SetSize(rs);
                 if (setCounts.ContainsKey(rs))
                 {
                     setCounts[rs]++;
@@ -1686,7 +1689,7 @@ namespace RuneOptim.BuildProcessing {
                 return setCounts;
             foreach (var bs in buildSets)
             {
-                setCounts[bs] = (int)Math.Floor((decimal)(6-required) / Rune.SetRequired(bs));
+                setCounts[bs] = (int)Math.Floor((decimal)(6-required) / Rune.SetSize(bs));
             }
             return setCounts;
         }
@@ -1694,7 +1697,391 @@ namespace RuneOptim.BuildProcessing {
         /// <summary>
         /// This will work through runes[][] to remove runes which would <i>never</i> be able to meet the minimum requirements.
         /// </summary>
-        private void cleanMinimum() {
+        private void cleanMinimum()
+        {
+            if (AllowBroken)
+                cleanMinimumLegacy();
+            else
+                cleanMinimumSetAware();
+        }
+
+        /// <summary>
+        /// Issue #197 was accellerated due to some undesirable side-effects from fixes in #200
+        /// </summary>
+        private void cleanMinimumSetAware()
+        {
+            // attributes that require tracking for minimum analysis
+            List<Attr> attrWithMin = AttrWithMin(Minimum);
+            // filtering not practical without minimums
+            if (attrWithMin.Count() == 0)
+                return;
+
+            // split runes by set and slot
+            Dictionary<RuneSet, Rune[][]> runesBySet = SplitRunesBySet(Runes);
+
+            while (true)
+            {
+                // get maximums for each slot combination
+                Dictionary<RuneSet, Stats[]> maxBySlot = new Dictionary<RuneSet, Stats[]>();
+                Dictionary<RuneSet, Stats[]> maxByFullSet = new Dictionary<RuneSet, Stats[]>();
+                foreach (var set in runesBySet)
+                {
+                    maxBySlot[set.Key] = GetMaxBySlot(Runes, attrWithMin.ToArray());
+                    maxByFullSet[set.Key] = GetMaxByFullSet(maxBySlot[set.Key], Rune.SetSize(set.Key) == 4);
+                }
+
+                // deep copy rune lists as set of ineligible runes
+                Dictionary<RuneSet, Rune[][]> ineligible = new Dictionary<RuneSet, Rune[][]>();
+                foreach (var set in runesBySet)
+                {
+                    ineligible[set.Key] = new Rune[6][];
+                    for (var slot = 0; slot < 6; slot++)
+                    {
+                        ineligible[set.Key][slot] = (Rune[])runesBySet[set.Key][slot]?.Clone();
+                    }
+                }
+
+                // iterate through possible set combinations, removing eligible runes from ineligible
+                foreach (var sets in ValidSets(RequiredSets, BuildSets))
+                {
+                    RemoveEligible(sets, maxBySlot, maxByFullSet, ineligible);
+                }
+
+                // break if no changes
+                if (!ineligible.Any(s => s.Value.Any(slot => slot != null && slot.Count() > 0)))
+                {
+                    for (var slot = 0; slot < 6; slot++)
+                    {
+                        Runes[slot] = (Rune[])runesBySet.SelectMany(s => s.Value[slot] == null ? new Rune[0] : s.Value[slot]).ToArray();
+                    }
+                    break;
+                }
+
+                // remove ineligible runes
+                foreach (var entry in ineligible)
+                {
+                    for (var slot = 0; slot < 6; slot++)
+                    {
+                        // if a slot never had runes, ther'es nothing to do
+                        if (runesBySet[entry.Key][slot] == null)
+                            continue;
+                        runesBySet[entry.Key][slot] = runesBySet[entry.Key][slot].Except(ineligible[entry.Key][slot]).ToArray();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Removes any eligible runes from the ineligible list
+        /// </summary>
+        /// <param name="sets"></param>
+        /// <param name="maxBySetAndSlot"></param>
+        /// <param name="ineligible"></param>
+        private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Stats[]> maxBySlot, Dictionary<RuneSet, Stats[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible)
+        {
+            var baseBonus = Shrines + Leader + Guild.AsStats();
+            foreach (var set in sets)
+                baseBonus += set.AsStats();
+
+            if (sets.Any(s => Rune.SetSize(s) == 4))
+            {
+                // 4+2
+                RuneSet set4 = sets.First(s => Rune.SetSize(s) == 4);
+                RuneSet set2 = sets.First(s => Rune.SetSize(s) == 2);
+                for (int first = 0; first < 5; first++)
+                {
+                    for (int second = first+1; second < 6; second++)
+                    {
+                        int index = FullSetIndex(first, second);
+
+                        // one of the sets is missing a rune so nothing can be eligible
+                        if (maxBySetAndSlot[set4][index] == null || maxBySetAndSlot[set2][index] == null)
+                            continue;
+
+                        var setMax = maxBySetAndSlot[set4][index] + maxBySetAndSlot[set2][index];
+                        for (int slot = 0; slot < 6; slot ++)
+                        {
+                            RuneSet slotSet = slot == first || slot == second ? set2 : set4;
+                            if (ineligible[slotSet][slot] == null)
+                                continue;
+                            ineligible[slotSet][slot] = RemoveEligibleBySlot(
+                                ineligible[slotSet][slot],
+                                baseBonus + setMax - maxBySlot[slotSet][slot],
+                                slot
+                            ).ToArray();
+                        }
+                    }
+                }
+            }
+            else
+            {
+                Permutations<int> permutations = new Permutations<int>(new int[] { 0, 1, 2, 3, 4, 5 }, GenerateOption.WithoutRepetition);
+
+                foreach (IList<int> indexes in permutations)
+                {
+                    // we don't care which order the set is presented so ignore "backwards" versions
+                    if (indexes[1] < indexes[0] || indexes[3] < indexes[2] || indexes[5] < indexes[4])
+                        continue;
+                    int set1index = FullSetIndex(indexes[0], indexes[1]);
+                    int set2index = FullSetIndex(indexes[2], indexes[3]);
+                    int set3index = FullSetIndex(indexes[4], indexes[5]);
+
+                    // one of the sets is missing a rune so nothing can be eligible
+                    if (maxBySetAndSlot[sets[0]][set1index] == null || maxBySetAndSlot[sets[1]][set2index] == null || maxBySetAndSlot[sets[2]][set3index] == null)
+                        continue;
+
+                    var setMax = maxBySetAndSlot[sets[0]][set1index] + maxBySetAndSlot[sets[1]][set2index] + maxBySetAndSlot[sets[2]][set3index];
+                    for (int slot = 0; slot < 6; slot++)
+                    {
+                        RuneSet slotSet = sets[(int)indexes.IndexOf(slot) / 2];
+                        if (ineligible[slotSet][slot] == null)
+                            continue;
+                        ineligible[slotSet][slot] = RemoveEligibleBySlot(
+                            ineligible[slotSet][slot],
+                            baseBonus + setMax - maxBySlot[slotSet][slot],
+                            slot
+                        ).ToArray();
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<Rune> RemoveEligibleBySlot(IEnumerable<Rune> ineligible, Stats bonuses, int slot)
+        {
+            if (ineligible == null || ineligible.Count() == 0)
+                return ineligible;
+
+            int?[] fake = new int?[6];
+            bool[] pred = new bool[6];
+            GetPrediction(fake, pred);
+
+            // stats that are diven by a flat and a percentage
+            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed })
+            {
+                // these sets are analyzed using a float where 0.01 represents 1%
+                if (Minimum[attr].EqualTo(0))
+                    continue;
+
+                // pick the runes which can't achieve the minimum
+                var eligible = ineligible.Where(r =>
+                    // monster base
+                    Mon[attr]
+                    // rune percentage bonus
+                    + Mon[attr] * r[attr, fake[slot] ?? 0, pred[slot]] * 0.01f
+                    // rune flat bonus
+                    + r[attr - 1, fake[slot] ?? 0, pred[slot]]
+                    // other percentage bonus
+                    + Mon[attr] * bonuses[attr] * 0.01f
+                    // other flat bonus
+                    + bonuses[attr - 1]
+                    >= Minimum[attr]
+                );
+
+                ineligible = ineligible.Except(eligible);
+            }
+
+            // stats that are only a percentage
+            foreach (var attr in new Attr[] { Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy })
+            {
+
+                if (Minimum[attr].EqualTo(0))
+                    continue;
+
+                var eligible = ineligible.Where(r =>
+                    // monster base
+                    Mon[attr]
+                    // flat bonus
+                    + r[attr, fake[slot] ?? 0, pred[slot]]
+                    // other rune bonus
+                    + bonuses[attr]
+                    >= Minimum[attr]
+                );
+
+                ineligible = ineligible.Except(eligible);
+            }
+
+            return ineligible;
+        }
+
+        /// <summary>
+        /// Gets a list of attributes required to evaluate minimums
+        /// </summary>
+        /// <param name="minimum"></param>
+        /// <returns></returns>
+        private List<Attr> AttrWithMin(Stats minimum)
+        {
+            List<Attr> minStats = new List<Attr>();
+            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy })
+            {
+                // these sets are analyzed using a float where 0.01 represents 1%
+                if (!Minimum[attr].EqualTo(0))
+                {
+                    minStats.Add(attr);
+                    if (attr == Attr.HealthPercent)
+                        minStats.Add(Attr.HealthFlat);
+                    else if (attr == Attr.AttackPercent)
+                        minStats.Add(Attr.AttackFlat);
+                    else if (attr == Attr.DefensePercent)
+                        minStats.Add(Attr.DefenseFlat);
+                }
+            }
+            return minStats;
+        }
+
+        static int[] FirstSlotOffsets = { 0, 5, 9, 12, 14 };
+        int FullSetIndex(int first, int second)
+        {
+            return FirstSlotOffsets[first] + second - first - 1;
+        }
+
+        /// <summary>
+        /// Splits runes by set
+        /// </summary>
+        /// <param name="runes"></param>
+        /// <returns></returns>
+        private Dictionary<RuneSet, Rune[][]> SplitRunesBySet(Rune[][] runes)
+        {
+            Dictionary<RuneSet, Rune[][]> runesBySet = new Dictionary<RuneSet, Rune[][]>();
+
+            // initialize set arrays
+            var hasSets = Runes.SelectMany(r => r).Select(r => r.Set).Distinct();
+            foreach (var set in hasSets)
+            {
+                runesBySet[set] = new Rune[6][];
+            }
+            // split runes by set
+            for (var i = 0; i < 6; i++)
+            {
+                foreach (var runesInSet in Runes[i].GroupBy(r => r.Set))
+                {
+                    runesBySet[runesInSet.Key][i] = runesInSet.ToArray();
+                }
+            }
+
+            return runesBySet;
+        }
+
+        /// <summary>
+        /// Outer set generator converts required and optional sets into valid sets of sets
+        /// </summary>
+        /// <param name="required"></param>
+        /// <param name="included"></param>
+        /// <returns></returns>
+        private IEnumerable<RuneSet[]> ValidSets(IEnumerable<RuneSet> required, IEnumerable<RuneSet> included)
+        {
+            int remaining = 6 - required.Select(s => Rune.SetSize(s)).Sum();
+
+            // required sets exhaust space
+            if (remaining == 0)
+                yield return required.ToArray();
+
+            // conbine required and included
+            RuneSet[] optional = required.ToArray().Concat(included.ToArray()).Distinct().ToArray();
+
+            foreach (var runeSet in ExtendSets(required, optional, remaining))
+                yield return runeSet;
+        }
+
+        /// <summary>
+        /// Inner generator recursively adds optional sets and returns 6-rune sets of sets
+        /// </summary>
+        /// <param name="baseline"></param>
+        /// <param name="optional"></param>
+        /// <param name="remaining"></param>
+        /// <returns></returns>
+        private IEnumerable<RuneSet[]> ExtendSets(IEnumerable<RuneSet> baseline, IEnumerable<RuneSet> optional, int remaining)
+        {
+            if (remaining == 0)
+                yield return baseline.ToArray();
+            List<RuneSet[]> sets = new List<RuneSet[]>();
+            foreach (var set in optional.Where(s => Rune.SetSize(s) <= remaining)) {
+                foreach (var result in ExtendSets(baseline.Concat(new[] { set }), optional, remaining - Rune.SetSize(set)))
+                    yield return result;
+            }
+        }
+
+        private Stats[] GetMaxBySlot(Rune[][] runes, Attr[] attrs)
+        {
+            int?[] fake = new int?[6];
+            bool[] pred = new bool[6];
+
+            GetPrediction(fake, pred);
+
+            // for each slot
+            Stats[] slotMaximums = new Stats[6];
+            for (var i=0; i<6; i++)
+            {
+                // if no rune exist we need to prevent the system from treating the set as completable
+                if (runes[i].Length == 0)
+                    return null;
+                Stats slotMaximum = new Stats();
+                foreach (var rune in runes[i])
+                {
+                    foreach (var attr in attrs)
+                    {
+                        var val = rune[attr, fake[i] ?? 0, pred[i]];
+                        if (slotMaximum[attr] < val)
+                            slotMaximum[attr] = val;
+                    }
+                }
+                slotMaximums[i] = slotMaximum;
+            }
+            return slotMaximums;
+        }
+
+        /// <summary>
+        /// Calculates the maximum possible values of attributes in <paramref name="attrs"/> possible for
+        /// complete sets of <paramref name="set"/> among <paramref name="runes"/> 
+        /// </summary>
+        /// <param name="runes"></param>
+        /// <param name="set"></param>
+        /// <param name="attrs"></param>
+        /// <returns></returns>
+        private Stats[] GetMaxByFullSet(Stats[] slotMaximums, bool set4)
+        {
+
+            Stats[] setMaximums = new Stats[15];
+            // for each set
+            for (var first = 0; first < 5; first ++)
+            {
+                for (var second = first + 1; second < 6; second++)
+                {
+                    // if any of the slots are null, the combination isn't valid
+                    // otherwise, the maximum value is calculated
+                    int index = FullSetIndex(first, second);
+                    if (!set4)
+                    {
+                        if (slotMaximums[first] == null || slotMaximums[second] == null)
+                            // no runes exist in a slot
+                            setMaximums[index] = null;
+                        else
+                            setMaximums[index] = slotMaximums[first] + slotMaximums[second];
+                    } else
+                    {
+                        setMaximums[index] = new Stats();
+                        for (var slot = 0; slot < 6; slot++) {
+                            if (slot == first || slot == second)
+                                continue;
+                            // no runes exist in a slot
+                            if (slotMaximums[slot] == null)
+                            {
+                                setMaximums[index] = null;
+                                break;
+                            }
+                            setMaximums[index] += slotMaximums[slot];
+                        }
+                    }
+                }
+            }
+            return setMaximums;
+
+        }
+
+        /// <summary>
+        /// The version resulting from issue #200 which was intented to address issue #198 but drew attention to missing
+        /// bonuses like leaders and guilds.
+        /// </summary>
+        private void cleanMinimumLegacy() {
             
             if (Minimum == null || !Minimum.IsNonZero) {
                 return;
@@ -1726,7 +2113,7 @@ namespace RuneOptim.BuildProcessing {
                     var monBase = Mon[attr];
                     double bestSetEffect = BestSetEffect(attr, maxSets);
                     double guildEffect = Guild.ByStat(attr);
-                    double towerEffect = Shrines[attr];
+                    double shrineEffect = Shrines[attr];
                     double leaderEffect = Leader[attr];
 
                     // best rune for each slot
@@ -1782,11 +2169,11 @@ namespace RuneOptim.BuildProcessing {
                             // set effect
                             + monBase * bestSetEffect * 0.01f
                             // leader effect
-                            + leaderEffect
+                            + monBase * leaderEffect * 0.01f
                             // guild effect
                             + monBase * guildEffect * 0.01f
                             // tower effect
-                            + monBase * towerEffect * 0.01f
+                            + monBase * shrineEffect * 0.01f
                             < Minimum[attr]
                         ).ToArray();
 
@@ -1872,22 +2259,22 @@ namespace RuneOptim.BuildProcessing {
         /// for each included set
         /// </summary>
         private void cleanBroken() {
-            if (!AllowBroken) {
-                var used = Runes[0].Concat(Runes[1]).Concat(Runes[2]).Concat(Runes[3]).Concat(Runes[4]).Concat(Runes[5]).Select(r => r.Set).Distinct();
+            if (AllowBroken)
+                return;
 
-                foreach (RuneSet s in used) {
-                    // find how many slots have acceptable runes for it
-                    int slots = 0;
+            var used = Runes[0].Concat(Runes[1]).Concat(Runes[2]).Concat(Runes[3]).Concat(Runes[4]).Concat(Runes[5]).Select(r => r.Set).Distinct();
+            foreach (RuneSet s in used) {
+                // find how many slots have acceptable runes for it
+                int slots = 0;
+                for (int i = 0; i < 6; i++) {
+                    if (Runes[i].Any(r => r.Set == s))
+                        slots += 1;
+                }
+                // if there isn't enough slots
+                if (slots < Rune.SetSize(s)) {
+                    // remove that set
                     for (int i = 0; i < 6; i++) {
-                        if (Runes[i].Any(r => r.Set == s))
-                            slots += 1;
-                    }
-                    // if there isn't enough slots
-                    if (slots < Rune.SetRequired(s)) {
-                        // remove that set
-                        for (int i = 0; i < 6; i++) {
-                            Runes[i] = Runes[i].Where(r => r.Set != s).ToArray();
-                        }
+                        Runes[i] = Runes[i].Where(r => r.Set != s).ToArray();
                     }
                 }
             }

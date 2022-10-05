@@ -45,8 +45,8 @@ namespace RuneOptim.Tests {
         [TestMethod()]
         public void SetRequiredTest()
         {
-            Assert.AreEqual(2, Rune.SetRequired(TestData.Rune1().Set));
-            Assert.AreEqual(4, Rune.SetRequired(TestData.Rune2().Set));
+            Assert.AreEqual(2, Rune.SetSize(TestData.Rune1().Set));
+            Assert.AreEqual(4, Rune.SetSize(TestData.Rune2().Set));
         }
 
         [TestMethod()]

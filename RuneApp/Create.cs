@@ -584,7 +584,7 @@ namespace RuneApp {
                 var ss = (RuneSet)sl.Tag;
                 if (Build.RequiredSets.Contains(ss)) {
                     int num = Build.RequiredSets.Count(s => s == ss);
-                    if (Rune.SetRequired(ss) == 2 && num < 3) {
+                    if (Rune.SetSize(ss) == 2 && num < 3) {
                         Build.RequiredSets.Add(ss);
                     }
                 }
@@ -860,7 +860,9 @@ namespace RuneApp {
         }
 
         void button4_Click(object sender, EventArgs e) {
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             CalcPerms();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         void leaderTypeBox_SelectedIndexChanged(object sender, EventArgs e) {
@@ -967,7 +969,9 @@ namespace RuneApp {
         void check_magic_CheckedChanged(object sender, EventArgs e) {
             btnPerms.Visible = check_autoRunes.Checked;
             Build.AutoRuneSelect = check_autoRunes.Checked;
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             updatePerms();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
         }
 
         void check_autoBuild_CheckedChanged(object sender, EventArgs e) {

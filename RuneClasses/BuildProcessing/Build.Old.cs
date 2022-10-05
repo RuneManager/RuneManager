@@ -6,12 +6,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using System.Collections.Concurrent;
-using System.Collections.ObjectModel;
 using RuneOptim.swar;
-using RuneOptim.Management;
 
-namespace RuneOptim.BuildProcessing {
+namespace RuneOptim.BuildProcessing
+{
     public partial class Build {
 
         // stuff that is being phased out in favour of BuildStrategies
@@ -173,6 +171,8 @@ namespace RuneOptim.BuildProcessing {
                     }
                 }
 
+                BuildPrintTo?.Invoke(this, PrintToEventArgs.GetEvent(this, "Filter..."));
+
                 // clean out runes which won't make complete sets
                 cleanBroken();
 
@@ -227,7 +227,9 @@ namespace RuneOptim.BuildProcessing {
                             var perc = reqWeight / (float)tSets;
                             var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
 
-                            var rr = Runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
+                            // old version with GroupBy -> SelectMany seems to unblend sets
+                            // var rr = Runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).GroupBy(r => r.Set).SelectMany(r => r).Take(reqLoad).ToArray();
+                            var rr = Runes[i].AsParallel().Where(r => RequiredSets.Contains(r.Set)).Take(reqLoad).ToArray();
 
                             var incLoad = (filt.Count ?? AutoRuneAmount) - rr.Count();
                             Runes[i] = rr.Concat(Runes[i].AsParallel().Where(r => !RequiredSets.Contains(r.Set)).Take(incLoad)).ToArray();
@@ -268,7 +270,7 @@ namespace RuneOptim.BuildProcessing {
                             Runes[i] = outRunes.ToArray();
                     }
                 }
-                // if we are only to fill empty slots
+                // if we are only to fill empty slots, we need to limit non-empty slots to the current rune
                 if (RunesOnlyFillEmpty) {
                     for (int i = 0; i < 6; i++) {
                         if (Mon.Current.Runes[i] != null && (!Mon.Current.Runes[i]?.UsedInBuild ?? false)) {
@@ -354,7 +356,7 @@ namespace RuneOptim.BuildProcessing {
             test.ApplyRune(runes[3], 7);
             test.ApplyRune(runes[4], 7);
             test.ApplyRune(runes[5], 7);
-            test.Current.CheckSets();
+            test.Current.UpdateSetsAndCache();
 
 
             // TODO: Outsource to whoever wants it
@@ -835,7 +837,7 @@ namespace RuneOptim.BuildProcessing {
                                             break;
 
                                         test.ApplyRune(r5, 7);
-                                        test.Current.CheckSets();
+                                        test.Current.UpdateSetsAndCache();
 #if BUILD_PRECHECK_BUILDS_DEBUG
                                         outstrs.Add($"fine {set4} {set2} | {r0.Set} {r1.Set} {r2.Set} {r3.Set} {r4.Set} {r5.Set}");
 #endif

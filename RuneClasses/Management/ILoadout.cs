@@ -32,7 +32,7 @@ namespace RuneOptim.Management {
         bool TempLoad { get; set; }
 
         Rune AddRune(Rune rune, int checkOn = 2);
-        void CheckSets();
+        void UpdateSetsAndCache();
         Stats GetStats(Stats baseStats);
         Stats GetStats(Stats baseStats, ref Stats value);
         void Lock();

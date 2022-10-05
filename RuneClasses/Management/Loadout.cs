@@ -327,7 +327,7 @@ namespace RuneOptim.Management {
                 foreach (var r in rhs.Runes) {
                     AddRune(r, 7);
                 }
-                CheckSets();
+                UpdateSetsAndCache();
                 // TODO: do we even need to?
                 manageStats = rhs.manageStats;
             }
@@ -585,8 +585,9 @@ namespace RuneOptim.Management {
             if (!tempLoad)
                 rune.OnUpdate += Rune_OnUpdate;
 
+            // see #628 with different formula
             if (runeCount % checkOn == 0)
-                CheckSets();
+                UpdateSetsAndCache();
             return old;
         }
 
@@ -623,8 +624,9 @@ namespace RuneOptim.Management {
             runeCount--;
             
             // todo: spooky?
+            // see #588 with different formula
             if ((runeCount + 1) % checkOn == 0)
-                CheckSets();
+                UpdateSetsAndCache();
             return rune;
         }
 
@@ -633,8 +635,8 @@ namespace RuneOptim.Management {
         }
 
 
-        public void CheckSets() {
-
+        public void UpdateSetsAndCache() {
+            // remove old set bonus(es)
             healthFlatCache -= SetStat(Attr.HealthFlat);
             healthPercentCache -= SetStat(Attr.HealthPercent);
             attackFlatCache -= SetStat(Attr.AttackFlat);
@@ -649,50 +651,62 @@ namespace RuneOptim.Management {
             accuracyCache -= SetStat(Attr.Accuracy);
             resistanceCache -= SetStat(Attr.Resistance);
 
-            int ind = 0;
-            RuneSet flag2 = 0;
-            RuneSet flag4 = 0;
-
+            // refersh sets[]
             sets[0] = 0;
             sets[1] = 0;
             sets[2] = 0;
+            // firist blank set in sets[]
+            int ind = 0;
+            // count of runes in completed sets
             int setNum = 0;
+            // tracks pairs of runes (e.g. complete 2-sets)
+            RuneSet flag2 = 0;
+            // tracks pairs of pairs of runes (i.e. complete 4-sets) 
+            RuneSet flag4 = 0;
 
             for (int i = 0; i < 6; i++) {
                 var r = Runes[i];
                 if (r == null)
                     continue;
 
-                if ((flag2 & r.Set) == r.Set) {
-
-                    if (Rune.SetRequired(r.Set) == 2) {
+                // Very hard to read, but this probably uses bitwise operators for performance reasons
+                // The outer cycle (flag2) finds pairs of runes from the same set
+                // The inner cycle (flag4) finds pairs of pairs for complete 4-sets
+                if ((flag2 & r.Set) != r.Set) {
+                    // found an un-paired rune (first or third or fifth) so track it 
+                    flag2 |= r.Set;
+                }
+                else
+                {
+                    // found a pair (the second or forth or sixth)
+                    if (Rune.SetSize(r.Set) == 2) {
+                        // a pair from a 2-set is a complete set
                         sets[ind] = r.Set;
                         setNum += 2;
                         ind++;
                     }
                     else {
-                        if ((flag4 & r.Set) == r.Set) {
+                        // a 4-set requires two pairs
+                        if ((flag4 & r.Set) != r.Set) {
+                            // first pair from a 4-set so track it
+                            flag4 |= r.Set;
+                        }
+                        else
+                        {
+                            // second pair from a 4-set is a complete set
                             sets[ind] = r.Set;
                             setNum += 4;
                             ind++;
                         }
-                        else {
-                            flag4 |= r.Set;
-                        }
                     }
-
-
+                    // reset "pair" tracker
                     flag2 ^= r.Set;
                 }
-                else {
-                    flag2 |= r.Set;
-                }
-
-
             }
 
             setsFull = setNum == 6;
 
+            // apply new set bonus(es)
             healthFlatCache += SetStat(Attr.HealthFlat);
             healthPercentCache += SetStat(Attr.HealthPercent);
             attackFlatCache += SetStat(Attr.AttackFlat);
@@ -750,7 +764,7 @@ namespace RuneOptim.Management {
                     // look for more in the set
                     set = rune.Set;
                     // how many runes we need to get
-                    getNum = Rune.SetRequired(set);
+                    getNum = Rune.SetSize(set);
                     // how many we got
                     gotNum = 1;
                     // we have now used this slot

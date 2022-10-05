@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 
 namespace RuneOptim.swar
 {
@@ -44,6 +45,20 @@ namespace RuneOptim.swar
         public long Accuracy => GuildInfo == null ? 0 : GuildInfo.Accuracy;
         [JsonIgnore]
         public long Resistance => GuildInfo == null ? 0 : GuildInfo.Resistance;
+
+        public Stats AsStats(string zone = "Dungeon")
+        {
+            Stats stats = new Stats();
+            stats.Attack = Attack;
+            stats.Defense = Defense;
+            stats.Health = Health;
+            stats.Speed = Speed;
+            stats.CritRate = CritRate;
+            stats.CritDamage = CritDamage;
+            stats.Resistance = Resistance;
+            stats.Accuracy = Accuracy;
+            return stats;
+        }
 
         public long ByStat(Attr attr)
         {

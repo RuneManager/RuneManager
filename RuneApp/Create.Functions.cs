@@ -610,7 +610,9 @@ namespace RuneApp {
 
             TestRune(runeTest);
 
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
             updatePerms();
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
             if (testWindow != null && !testWindow.IsDisposed)
                 testWindow.textBox_TextChanged(null, null);

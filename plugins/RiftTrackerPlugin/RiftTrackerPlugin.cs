@@ -233,13 +233,13 @@ namespace RiftTrackerPlugin {
                                 page.Cells[row, col].Value = stats.Accuracy;
                                 break;
                             case "Set1":
-                                if (Rune.SetRequired(mon.Current.Sets[1]) == 4)
+                                if (Rune.SetSize(mon.Current.Sets[1]) == 4)
                                     page.Cells[row, col].Value = mon.Current.Sets[1];
                                 else
                                     page.Cells[row, col].Value = mon.Current.Sets[0];
                                 break;
                             case "Set2":
-                                if (Rune.SetRequired(mon.Current.Sets[1]) == 4)
+                                if (Rune.SetSize(mon.Current.Sets[1]) == 4)
                                     page.Cells[row, col].Value = mon.Current.Sets[0];
                                 else
                                     page.Cells[row, col].Value = mon.Current.Sets[1];
