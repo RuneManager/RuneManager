@@ -300,7 +300,7 @@ namespace RuneOptim.swar {
 
         // todo: consider hashSet.Contains
         // Number of runes required for set to be complete
-        public static int SetRequired(RuneSet set) {
+        public static int SetSize(RuneSet set) {
             if (Rune.Set4.Contains(set))
                 return 4;
             else if (Rune.Set2.Contains(set))

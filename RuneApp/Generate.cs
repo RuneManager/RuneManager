@@ -149,14 +149,14 @@ namespace RuneApp {
             if (Program.Settings.TestGray && m.Current.Runes.Any(r => r.UsedInBuild))
                 li.ForeColor = Color.Gray;
             else {
-                if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2) &&
-                    m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
+                if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2) &&
+                    m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
                     li.ForeColor = Color.Green;
                 }
-                else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 2)) {
+                else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2)) {
                     li.ForeColor = Color.Goldenrod;
                 }
-                else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetRequired(rs) == 4)) {
+                else if (m.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
                     li.ForeColor = Color.DarkBlue;
                 }
             }

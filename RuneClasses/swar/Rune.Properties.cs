@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Runtime.Serialization;
 using Newtonsoft.Json.Converters;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace RuneOptim.swar {
     public partial class Rune
@@ -789,6 +790,58 @@ namespace RuneOptim.swar {
                 else
                     throw new IndexOutOfRangeException("Cannot check grade " + grade + " rune");
             }
+        }
+    }
+
+    // Define an extension method in a non-nested static class.
+    public static class Extensions
+    {
+        public static Stats AsStats(this RuneSet set)
+        {
+            Stats stats = new Stats();
+            switch (set)
+            {
+                case RuneSet.Energy:
+                    stats[Attr.HealthPercent] = 15;
+                    break;
+                case RuneSet.Enhance:
+                    stats[Attr.HealthPercent] = 8;
+                    break;
+                case RuneSet.Fatal:
+                    stats[Attr.AttackPercent] = 35;
+                    break;
+                case RuneSet.Fight:
+                    stats[Attr.AttackPercent] = 8;
+                    break;
+                case RuneSet.Guard:
+                    stats[Attr.DefensePercent] = 15;
+                    break;
+                case RuneSet.Determination:
+                    stats[Attr.DefensePercent] = 8;
+                    break;
+                case RuneSet.Swift:
+                    stats[Attr.Speed] = 25;
+                    break;
+                case RuneSet.Blade:
+                    stats[Attr.CritRate] = 12;
+                    break;
+                case RuneSet.Rage:
+                    stats[Attr.CritDamage] = 40;
+                    break;
+                case RuneSet.Endure:
+                    stats[Attr.Resistance] = 20;
+                    break;
+                case RuneSet.Tolerance:
+                    stats[Attr.Resistance] = 10;
+                    break;
+                case RuneSet.Focus:
+                    stats[Attr.Accuracy] = 20;
+                    break;
+                case RuneSet.Accuracy:
+                    stats[Attr.Accuracy] = 10;
+                    break;
+            }
+            return stats;
         }
     }
 
