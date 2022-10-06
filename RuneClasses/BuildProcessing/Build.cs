@@ -1729,7 +1729,11 @@ namespace RuneOptim.BuildProcessing
                 Dictionary<RuneSet, Stats[]> maxByFullSet = new Dictionary<RuneSet, Stats[]>();
                 foreach (var set in runesBySet)
                 {
-                    maxBySlot[set.Key] = GetMaxBySlot(Runes, attrWithMin.ToArray());
+                    maxBySlot[set.Key] = new Stats[6];
+                    for (var i = 0; i < 6; i++)
+                    {
+                        maxBySlot[set.Key][i] = GetMaxBySlot(runesBySet[set.Key][i], attrWithMin.ToArray(), i);
+                    }
                     maxByFullSet[set.Key] = GetMaxByFullSet(maxBySlot[set.Key], set.Key.Size() == 4);
                 }
 
@@ -1773,6 +1777,7 @@ namespace RuneOptim.BuildProcessing
                     }
                 }
             }
+
         }
 
         /// <summary>
@@ -1783,9 +1788,11 @@ namespace RuneOptim.BuildProcessing
         /// <param name="ineligible"></param>
         private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Stats[]> maxBySlot, Dictionary<RuneSet, Stats[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible)
         {
-            var baseBonus = Shrines + Leader + Guild.AsStats();
+            if (ineligible.Count == 0)
+                return;
+            var percentBonuses = Shrines + Leader + Guild.AsStats();
             foreach (var set in sets)
-                baseBonus += set.AsStats();
+                percentBonuses += set.AsStats();
 
             if (sets.Any(s => s.Size() == 4))
             {
@@ -1802,15 +1809,19 @@ namespace RuneOptim.BuildProcessing
                         if (maxBySetAndSlot[set4][index] == null || maxBySetAndSlot[set2][index] == null)
                             continue;
 
-                        var setMax = maxBySetAndSlot[set4][index] + maxBySetAndSlot[set2][index];
+                        // Mon[attr] already applied to get raw stat numbers
+                        var runeMax = maxBySetAndSlot[set4][index] + maxBySetAndSlot[set2][index];
                         for (int slot = 0; slot < 6; slot ++)
                         {
                             RuneSet slotSet = slot == first || slot == second ? set2 : set4;
-                            if (ineligible[slotSet][slot] == null)
+                            if (ineligible[slotSet][slot] == null || ineligible[slotSet][slot].Length == 0)
                                 continue;
                             ineligible[slotSet][slot] = RemoveEligibleBySlot(
                                 ineligible[slotSet][slot],
-                                baseBonus + setMax - maxBySlot[slotSet][slot],
+                                percentBonuses,
+                                // the best runes for all 6 slots minus the best rune for this slot (so we can test other runes in its place)
+                                runeMax - maxBySlot[slotSet][slot],
+                                // we have to pass around slot numbers for calls to predictions
                                 slot
                             ).ToArray();
                         }
@@ -1842,7 +1853,8 @@ namespace RuneOptim.BuildProcessing
                             continue;
                         ineligible[slotSet][slot] = RemoveEligibleBySlot(
                             ineligible[slotSet][slot],
-                            baseBonus + setMax - maxBySlot[slotSet][slot],
+                            percentBonuses,
+                            setMax - maxBySlot[slotSet][slot],
                             slot
                         ).ToArray();
                     }
@@ -1850,7 +1862,7 @@ namespace RuneOptim.BuildProcessing
             }
         }
 
-        public IEnumerable<Rune> RemoveEligibleBySlot(IEnumerable<Rune> ineligible, Stats bonuses, int slot)
+        public IEnumerable<Rune> RemoveEligibleBySlot(IEnumerable<Rune> ineligible, Stats percentBonuses, Stats flatRuneStats, int slot)
         {
             if (ineligible == null || ineligible.Count() == 0)
                 return ineligible;
@@ -1860,25 +1872,25 @@ namespace RuneOptim.BuildProcessing
             GetPrediction(fake, pred);
 
             // stats that are diven by a flat and a percentage
-            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed })
+            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.SpeedPercent})
             {
                 // these sets are analyzed using a float where 0.01 represents 1%
                 if (Minimum[attr].EqualTo(0))
                     continue;
 
                 // pick the runes which can't achieve the minimum
-                var eligible = ineligible.Where(r =>
+                var eligible = ineligible.Where(r => Math.Ceiling(
                     // monster base
                     Mon[attr]
                     // rune percentage bonus
                     + Mon[attr] * r[attr, fake[slot] ?? 0, pred[slot]] * 0.01f
                     // rune flat bonus
                     + r[attr - 1, fake[slot] ?? 0, pred[slot]]
-                    // other percentage bonus
-                    + Mon[attr] * bonuses[attr] * 0.01f
-                    // other flat bonus
-                    + bonuses[attr - 1]
-                    >= Minimum[attr]
+                    // other runes
+                    + flatRuneStats[attr]
+                    // other (percentage) bonus
+                    + Mon[attr] * percentBonuses[attr] * 0.01f
+                    ) >= Minimum[attr]
                 );
 
                 ineligible = ineligible.Except(eligible);
@@ -1896,8 +1908,10 @@ namespace RuneOptim.BuildProcessing
                     Mon[attr]
                     // flat bonus
                     + r[attr, fake[slot] ?? 0, pred[slot]]
-                    // other rune bonus
-                    + bonuses[attr]
+                    // rune bonus
+                    + flatRuneStats[attr]
+                    // other percentage bonuses
+                    + percentBonuses[attr]
                     >= Minimum[attr]
                 );
 
@@ -1980,9 +1994,7 @@ namespace RuneOptim.BuildProcessing
                 yield return required.ToArray();
 
             // conbine required and included
-            RuneSet[] optional = required.ToArray().Concat(included.ToArray()).Distinct().ToArray();
-
-            foreach (var runeSet in ExtendSets(required, optional, remaining))
+            foreach (var runeSet in ExtendSets(required, included, remaining))
                 yield return runeSet;
         }
 
@@ -2004,33 +2016,28 @@ namespace RuneOptim.BuildProcessing
             }
         }
 
-        private Stats[] GetMaxBySlot(Rune[][] runes, Attr[] attrs)
+        private Stats GetMaxBySlot(Rune[] runes, Attr[] attrs, int slot)
         {
             int?[] fake = new int?[6];
             bool[] pred = new bool[6];
 
             GetPrediction(fake, pred);
 
-            // for each slot
-            Stats[] slotMaximums = new Stats[6];
-            for (var i=0; i<6; i++)
+            // if no rune exist we need to prevent the system from treating the set as completable
+            if (runes == null || runes.Length == 0)
+                return null;
+            Stats slotMaximum = new Stats();
+            foreach (var rune in runes)
             {
-                // if no rune exist we need to prevent the system from treating the set as completable
-                if (runes[i].Length == 0)
-                    return null;
-                Stats slotMaximum = new Stats();
-                foreach (var rune in runes[i])
+                foreach (var attr in attrs)
                 {
-                    foreach (var attr in attrs)
-                    {
-                        var val = rune[attr, fake[i] ?? 0, pred[i]];
-                        if (slotMaximum[attr] < val)
-                            slotMaximum[attr] = val;
-                    }
+                    var val = rune[attr, fake[slot] ?? 0, pred[slot]];
+                    if (slotMaximum[attr] < val)
+                        slotMaximum[attr] = val;
                 }
-                slotMaximums[i] = slotMaximum;
             }
-            return slotMaximums;
+             
+            return slotMaximum;
         }
 
         /// <summary>

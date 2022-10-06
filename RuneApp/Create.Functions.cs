@@ -873,6 +873,23 @@ namespace RuneApp {
         /// <returns></returns>
         async Task<long> CalcPerms() {
 
+            // figure stuff out
+            Label ctrl;
+            for (int i = 0; i < 6; i++)
+            {
+                // Find rune UI object by name
+                ctrl = (Label)Controls.Find("runeNum" + (i + 1).ToString(), true).FirstOrDefault();
+                if (ctrl == null) continue;
+                ctrl.Text = "-";
+                ctrl.ForeColor = Color.Black;
+            }
+            ctrl = (Label)Controls.Find("runeNums", true).FirstOrDefault();
+            if (ctrl != null)
+            {
+                ctrl.Text = "calculating...";
+                ctrl.ForeColor = Color.Black;
+            }
+
             await Task.Run(() => {
                 // good idea, generate right now whenever the user clicks a... whatever
                 Build.RunesUseLocked = false;
@@ -885,7 +902,6 @@ namespace RuneApp {
 
             // figure stuff out
             long perms = 0;
-            Label ctrl;
             for (int i = 0; i < 6; i++) {
                 if (Build.Runes[i] == null)
                     continue;
