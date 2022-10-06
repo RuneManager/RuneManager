@@ -216,15 +216,15 @@ namespace RuneOptim.BuildProcessing
                         var filt = LoadFilters(i + 1);
                         if (filt.Count != null || filt.Type == FilterType.SumN) {
 
-                            var tSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
-                            var reqWeight = RequiredSets.Count;
+                            var requiredSets = RequiredSets.Count;
+                            var eligibleSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
                             // if we only counted required sets, but no 2-size sets
-                            if (tSets == RequiredSets.Count && !RequiredSets.Any(s => Rune.Set2.Contains(s))) {
-                                reqWeight += 1;
-                                reqWeight *= 2;
-                                tSets += Rune.RuneSets.Except(RequiredSets).Where(s => Rune.Set2.Contains(s)).Count();
+                            if (eligibleSets == RequiredSets.Count && !RequiredSets.Any(s => RuneSets.Set2.Contains(s))) {
+                                requiredSets += 1;
+                                requiredSets *= 2;
+                                eligibleSets += RuneSets.All.Except(RequiredSets).Where(s => RuneSets.Set2.Contains(s)).Count();
                             }
-                            var perc = reqWeight / (float)tSets;
+                            var perc = requiredSets / (float)eligibleSets;
                             var reqLoad = Math.Max(2,(int)((filt.Count ?? AutoRuneAmount ) * perc));
 
                             // old version with GroupBy -> SelectMany seems to unblend sets

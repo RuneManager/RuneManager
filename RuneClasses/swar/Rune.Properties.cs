@@ -11,99 +11,11 @@ using System.Runtime.CompilerServices;
 namespace RuneOptim.swar {
     public partial class Rune
     {
-        
-        public static readonly ImmutableArray<RuneSet> RuneSets = new RuneSet[] { 
-            RuneSet.Energy, // Health
-            RuneSet.Guard, // Def
-            RuneSet.Swift, // Speed
-            RuneSet.Blade, // CRate
-            RuneSet.Rage, // CDmg
-            RuneSet.Focus, // Acc
-            RuneSet.Endure, // Res
-            RuneSet.Fatal, // Attack
-
-            // Here be magic
-            RuneSet.Despair,
-            RuneSet.Vampire,
-
-            RuneSet.Violent,
-            RuneSet.Nemesis,
-            RuneSet.Will,
-            RuneSet.Shield,
-            RuneSet.Revenge,
-            RuneSet.Destroy,
-
-            // Ally sets
-            RuneSet.Fight,
-            RuneSet.Determination,
-            RuneSet.Enhance,
-            RuneSet.Accuracy,
-            RuneSet.Tolerance,
-        }.ToImmutableArray();
-
-        public static ImmutableArray<RuneSet> Set4 = ImmutableArray.Create(RuneSet.Swift, RuneSet.Rage, RuneSet.Fatal, RuneSet.Despair, RuneSet.Vampire, RuneSet.Violent);
-        public static ImmutableArray<RuneSet> Set2 = ImmutableArray.Create(RuneSet.Energy, RuneSet.Guard, RuneSet.Blade, RuneSet.Focus, RuneSet.Endure, RuneSet.Nemesis, RuneSet.Will, RuneSet.Shield, RuneSet.Revenge, RuneSet.Destroy,
-        RuneSet.Fight, RuneSet.Determination, RuneSet.Enhance, RuneSet.Accuracy, RuneSet.Tolerance);
-
-        class RuneSetException : Exception
-        {
-            public RuneSetException()
-            {
-            }
-
-            public RuneSetException(string message)
-                : base(message)
-            {
-            }
-
-            public RuneSetException(string message, Exception inner)
-                : base(message, inner)
-            {
-            }
-        };
-
-        public static IEnumerable<RuneSet> ValidSets (ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
-        {
-            if (!RequiredSets.Any() && !IncludeSets.Any())
-                // Everything is valid
-                return Set2.Union(Set4);
-
-            int required_4set = RequiredSets.Count(r => Rune.Set4.Contains(r));
-            int required_2set = RequiredSets.Count(r => Rune.Set2.Contains(r));
-            var required_runes = required_2set * 2 + required_4set * 4;
-            if (required_runes > 6)
-                // invalid so send an empty set
-                return new RuneSet[0];
-            if (required_runes == 6)
-                // requires 6 runes so IncludeSets cannot be used
-                return RequiredSets;
-            bool hasInclude2 = IncludeSets.Any(s => Rune.Set2.Contains(s));
-            bool hasInclude4 = IncludeSets.Any(s => Rune.Set4.Contains(s));
-            if (required_runes == 4)
-            {
-                if (required_2set == 0 && !hasInclude2 && !AllowBroken)
-                    // no 2-sets or broken so automatically supplement required 4-set with all 2-sets
-                    return RequiredSets.Union(Rune.Set2);
-                else if (AllowBroken)
-                    // allow all sets (since broken runes could be pulled from 4-sets)
-                    return RequiredSets.Union(IncludeSets);
-                else
-                    // requires 4 runes and does not allow broken so only allows 2 sets from includes
-                    return RequiredSets.Union(IncludeSets.Where(s => Rune.Set2.Contains(s)));
-            }
-            // requires 2 or fewer runes so all includes are valid
-            if (required_2set == 0 && !hasInclude2 && !AllowBroken)
-                // no 2-sets or broken are available so implicitly supplement the 4-set(s) with 2-sets
-                return IncludeSets.Union(RequiredSets).Union(Rune.Set2);
-            else
-                // the sets are comprehensive
-                return IncludeSets.Union(RequiredSets);
-        }
 
         public static ParallelQuery<Rune> FilterBySets (ParallelQuery<Rune> rsGlobal, ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
         {
 
-            var validSets = ValidSets(RequiredSets, IncludeSets, AllowBroken);
+            var validSets = RuneSets.ValidSets(RequiredSets, IncludeSets, AllowBroken);
             return rsGlobal.Where(r => validSets.Contains(r.Set));
         }
 
@@ -793,9 +705,165 @@ namespace RuneOptim.swar {
         }
     }
 
-    // Define an extension method in a non-nested static class.
-    public static class Extensions
+    // Enums up Runesets
+    [Flags]
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum RuneSet
     {
+        [EnumMember(Value = "???")]
+        Unknown = -1, // SW Proxy say what?
+
+        [EnumMember(Value = "")]
+        Null = 0, // No set
+
+        Energy          = 1 << 0, // Health
+        Guard           = 1 << 1, // Def
+        Swift           = 1 << 2, // Speed
+        Blade           = 1 << 3, // CRate
+        Rage            = 1 << 4, // CDmg
+        Focus           = 1 << 5, // Acc
+        Endure          = 1 << 6, // Res
+        Fatal           = 1 << 7, // Attack
+
+        __unknown9      = 1 << 8,
+
+        // Here be magic
+        Despair         = 1 << 9,
+        Vampire         = 1 << 10,
+
+        __unknown12     = 1 << 11,
+
+        Violent         = 1 << 12,
+        Nemesis         = 1 << 13,
+        Will            = 1 << 14,
+        Shield          = 1 << 15,
+        Revenge         = 1 << 16,
+        Destroy         = 1 << 17,
+
+        // Ally sets
+        Fight           = 1 << 18,
+        Determination   = 1 << 19,
+        Enhance         = 1 << 20,
+        Accuracy        = 1 << 21,
+        Tolerance       = 1 << 22,
+
+        Broken          = 1 << 23,
+
+    }
+
+    public class RuneSets
+    {
+
+        public static readonly ImmutableArray<RuneSet> All = new RuneSet[] {
+            RuneSet.Energy, // Health
+            RuneSet.Guard, // Def
+            RuneSet.Swift, // Speed
+            RuneSet.Blade, // CRate
+            RuneSet.Rage, // CDmg
+            RuneSet.Focus, // Acc
+            RuneSet.Endure, // Res
+            RuneSet.Fatal, // Attack
+
+            // Here be magic
+            RuneSet.Despair,
+            RuneSet.Vampire,
+
+            RuneSet.Violent,
+            RuneSet.Nemesis,
+            RuneSet.Will,
+            RuneSet.Shield,
+            RuneSet.Revenge,
+            RuneSet.Destroy,
+
+            // Ally sets
+            RuneSet.Fight,
+            RuneSet.Determination,
+            RuneSet.Enhance,
+            RuneSet.Accuracy,
+            RuneSet.Tolerance,
+        }.ToImmutableArray();
+
+        public static ImmutableArray<RuneSet> Set4 = ImmutableArray.Create(RuneSet.Swift, RuneSet.Rage, RuneSet.Fatal, RuneSet.Despair, RuneSet.Vampire, RuneSet.Violent);
+        public static ImmutableArray<RuneSet> Set2 = ImmutableArray.Create(RuneSet.Energy, RuneSet.Guard, RuneSet.Blade, RuneSet.Focus, RuneSet.Endure, RuneSet.Nemesis, RuneSet.Will, RuneSet.Shield, RuneSet.Revenge, RuneSet.Destroy,
+        RuneSet.Fight, RuneSet.Determination, RuneSet.Enhance, RuneSet.Accuracy, RuneSet.Tolerance);
+
+
+        public static IEnumerable<RuneSet> ValidSets(ObservableCollection<RuneSet> RequiredSets, ObservableCollection<RuneSet> IncludeSets, bool AllowBroken)
+        {
+            if (!RequiredSets.Any() && !IncludeSets.Any())
+                // Everything is valid
+                return Set2.Union(Set4);
+
+            int required_4set = RequiredSets.Count(r => Set4.Contains(r));
+            int required_2set = RequiredSets.Count(r => Set2.Contains(r));
+            var required_runes = required_2set * 2 + required_4set * 4;
+            if (required_runes > 6)
+                // invalid so send an empty set
+                return new RuneSet[0];
+            if (required_runes == 6)
+                // requires 6 runes so IncludeSets cannot be used
+                return RequiredSets;
+            bool hasInclude2 = IncludeSets.Any(s => Set2.Contains(s));
+            bool hasInclude4 = IncludeSets.Any(s => Set4.Contains(s));
+            if (required_runes == 4)
+            {
+                if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                    // no 2-sets or broken so automatically supplement required 4-set with all 2-sets
+                    return RequiredSets.Union(Set2);
+                else if (AllowBroken)
+                    // allow all sets (since broken runes could be pulled from 4-sets)
+                    return RequiredSets.Union(IncludeSets);
+                else
+                    // requires 4 runes and does not allow broken so only allows 2 sets from includes
+                    return RequiredSets.Union(IncludeSets.Where(s => Set2.Contains(s)));
+            }
+            // requires 2 or fewer runes so all includes are valid
+            if (required_2set == 0 && !hasInclude2 && !AllowBroken)
+                // no 2-sets or broken are available so implicitly supplement the 4-set(s) with 2-sets
+                return IncludeSets.Union(RequiredSets).Union(Set2);
+            else
+                // the sets are comprehensive
+                return IncludeSets.Union(RequiredSets);
+        }
+    }
+
+
+    // Define an extension method in a non-nested static class.
+    public static class RuneSetExtensions
+    {
+
+        public static ImmutableArray<RuneSet> Set4 = RuneSets.Set4;
+        public static ImmutableArray<RuneSet> Set2 = RuneSets.Set2;
+        public static ImmutableArray<RuneSet> All = RuneSets.All;
+
+        class RuneSetException : Exception
+        {
+            public RuneSetException()
+            {
+            }
+
+            public RuneSetException(string message)
+                : base(message)
+            {
+            }
+
+            public RuneSetException(string message, Exception inner)
+                : base(message, inner)
+            {
+            }
+        };
+
+        // todo: consider hashSet.Contains
+        // Number of runes required for set to be complete
+        public static int Size(this RuneSet set)
+        {
+            if (RuneSets.Set4.Contains(set))
+                return 4;
+            else if (Set2.Contains(set))
+                return 2;
+            throw new RuneSetException("Unknown Set: " + set);
+        }
+
         public static Stats AsStats(this RuneSet set)
         {
             Stats stats = new Stats();
@@ -843,51 +911,6 @@ namespace RuneOptim.swar {
             }
             return stats;
         }
-    }
-
-    // Enums up Runesets
-    [Flags]
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum RuneSet
-    {
-        [EnumMember(Value = "???")]
-        Unknown = -1, // SW Proxy say what?
-
-        [EnumMember(Value = "")]
-        Null = 0, // No set
-
-        Energy          = 1 << 0, // Health
-        Guard           = 1 << 1, // Def
-        Swift           = 1 << 2, // Speed
-        Blade           = 1 << 3, // CRate
-        Rage            = 1 << 4, // CDmg
-        Focus           = 1 << 5, // Acc
-        Endure          = 1 << 6, // Res
-        Fatal           = 1 << 7, // Attack
-
-        __unknown9      = 1 << 8,
-
-        // Here be magic
-        Despair         = 1 << 9,
-        Vampire         = 1 << 10,
-
-        __unknown12     = 1 << 11,
-
-        Violent         = 1 << 12,
-        Nemesis         = 1 << 13,
-        Will            = 1 << 14,
-        Shield          = 1 << 15,
-        Revenge         = 1 << 16,
-        Destroy         = 1 << 17,
-
-        // Ally sets
-        Fight           = 1 << 18,
-        Determination   = 1 << 19,
-        Enhance         = 1 << 20,
-        Accuracy        = 1 << 21,
-        Tolerance       = 1 << 22,
-
-        Broken          = 1 << 23,
 
     }
 

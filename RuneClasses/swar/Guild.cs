@@ -214,7 +214,6 @@ namespace RuneOptim.swar
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             GuildSkill gs = new GuildSkill();
-            object v;
             switch (reader.TokenType)
             {
                 case JsonToken.StartArray:
