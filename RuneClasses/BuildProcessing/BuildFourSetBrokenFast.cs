@@ -26,7 +26,7 @@ namespace RuneOptim.BuildProcessing {
             // todo: maybe consider a BuildFourAndTwoSetFast
             if (b.RequiredSets.Count < 1)
                 return false;
-            if (!b.RequiredSets.Any(rs => Rune.SetSize(rs) == 4))
+            if (!b.RequiredSets.Any(rs => rs.Size() == 4))
                 return false;
 
             return b.AllowBroken;
@@ -38,7 +38,7 @@ namespace RuneOptim.BuildProcessing {
 
             protected override Rune[][] messupRunes(IEnumerable<Rune> inRunes) {
 
-                var set4 = build.RequiredSets.FirstOrDefault(rs => Rune.SetSize(rs) == 4);
+                var set4 = build.RequiredSets.FirstOrDefault(rs => rs.Size() == 4);
 
                 var reqs = inRunes.Where(r => r.Set == set4).OrderByDescending(r => build.CalcScore(r, this.build.Mon)).ToArray();
                 var opts = inRunes.Except(reqs).OrderByDescending(r => build.CalcScore(r, this.build.Mon)).ToArray();

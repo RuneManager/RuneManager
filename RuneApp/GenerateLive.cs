@@ -9,6 +9,7 @@ using System.Threading;
 using System.Collections.Concurrent;
 using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
+using static RuneOptim.swar.RuneSetExtensions;
 
 namespace RuneApp {
     // Generates a bunch of builds to preview the stats
@@ -259,14 +260,14 @@ namespace RuneApp {
                         if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.UsedInBuild))
                             li.ForeColor = Color.Gray;
                         else {
-                            if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2) &&
-                                b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
+                            if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 2) &&
+                                b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 4)) {
                                 li.ForeColor = Color.Green;
                             }
-                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2)) {
+                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 2)) {
                                 li.ForeColor = Color.Goldenrod;
                             }
-                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
+                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 4)) {
                                 li.ForeColor = Color.DarkBlue;
                             }
                         }
@@ -696,14 +697,14 @@ namespace RuneApp {
                         if (Program.Settings.TestGray && b.Current.Runes.Any(r => r.UsedInBuild))
                             li.ForeColor = Color.Gray;
                         else {
-                            if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2) &&
-                                b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
+                            if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 2) &&
+                                b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 4)) {
                                 li.ForeColor = Color.Green;
                             }
-                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 2)) {
+                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 2)) {
                                 li.ForeColor = Color.Goldenrod;
                             }
-                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && Rune.SetSize(rs) == 4)) {
+                            else if (b.Current.Sets.Any(rs => RuneProperties.MagicalSets.Contains(rs) && rs.Size() == 4)) {
                                 li.ForeColor = Color.DarkBlue;
                             }
                         }

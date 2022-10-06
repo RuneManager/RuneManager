@@ -584,7 +584,7 @@ namespace RuneApp {
                 var ss = (RuneSet)sl.Tag;
                 if (Build.RequiredSets.Contains(ss)) {
                     int num = Build.RequiredSets.Count(s => s == ss);
-                    if (Rune.SetSize(ss) == 2 && num < 3) {
+                    if (ss.Size() == 2 && num < 3) {
                         Build.RequiredSets.Add(ss);
                     }
                 }

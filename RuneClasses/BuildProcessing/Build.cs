@@ -391,10 +391,13 @@ namespace RuneOptim.BuildProcessing
         public List<string>[] SlotStats { get; set; } = new List<string>[6];
 
         /// <summary>
-        /// Sets to consider using.
+        /// Sets expicitly selected in the optimizer as optional.
         /// </summary>
         [JsonProperty("BuildSets")]
         public ObservableCollection<RuneSet> BuildSets { get; set; } = new ObservableCollection<RuneSet>();
+
+        [JsonIgnore]
+        public IEnumerable<RuneSet> OptionalSets { get => RuneSets.ValidSets(RequiredSets, BuildSets, AllowBroken); }
 
         [JsonIgnore]
         public BuildUsage BuildUsage { get; set; }
@@ -1675,7 +1678,7 @@ namespace RuneOptim.BuildProcessing
             int required = 0;
             foreach (var rs in requiredSets)
             {
-                required += Rune.SetSize(rs);
+                required += rs.Size();
                 if (setCounts.ContainsKey(rs))
                 {
                     setCounts[rs]++;
@@ -1689,7 +1692,7 @@ namespace RuneOptim.BuildProcessing
                 return setCounts;
             foreach (var bs in buildSets)
             {
-                setCounts[bs] = (int)Math.Floor((decimal)(6-required) / Rune.SetSize(bs));
+                setCounts[bs] = (int)Math.Floor((decimal)(6-required) / bs.Size());
             }
             return setCounts;
         }
@@ -1727,7 +1730,7 @@ namespace RuneOptim.BuildProcessing
                 foreach (var set in runesBySet)
                 {
                     maxBySlot[set.Key] = GetMaxBySlot(Runes, attrWithMin.ToArray());
-                    maxByFullSet[set.Key] = GetMaxByFullSet(maxBySlot[set.Key], Rune.SetSize(set.Key) == 4);
+                    maxByFullSet[set.Key] = GetMaxByFullSet(maxBySlot[set.Key], set.Key.Size() == 4);
                 }
 
                 // deep copy rune lists as set of ineligible runes
@@ -1741,8 +1744,9 @@ namespace RuneOptim.BuildProcessing
                     }
                 }
 
+                var optionalSets = RuneSets.ValidSets(RequiredSets, BuildSets, AllowBroken);
                 // iterate through possible set combinations, removing eligible runes from ineligible
-                foreach (var sets in ValidSets(RequiredSets, BuildSets))
+                foreach (var sets in ValidSets(RequiredSets, optionalSets))
                 {
                     RemoveEligible(sets, maxBySlot, maxByFullSet, ineligible);
                 }
@@ -1783,11 +1787,11 @@ namespace RuneOptim.BuildProcessing
             foreach (var set in sets)
                 baseBonus += set.AsStats();
 
-            if (sets.Any(s => Rune.SetSize(s) == 4))
+            if (sets.Any(s => s.Size() == 4))
             {
                 // 4+2
-                RuneSet set4 = sets.First(s => Rune.SetSize(s) == 4);
-                RuneSet set2 = sets.First(s => Rune.SetSize(s) == 2);
+                RuneSet set4 = sets.First(s => s.Size() == 4);
+                RuneSet set2 = sets.First(s => s.Size() == 2);
                 for (int first = 0; first < 5; first++)
                 {
                     for (int second = first+1; second < 6; second++)
@@ -1969,7 +1973,7 @@ namespace RuneOptim.BuildProcessing
         /// <returns></returns>
         private IEnumerable<RuneSet[]> ValidSets(IEnumerable<RuneSet> required, IEnumerable<RuneSet> included)
         {
-            int remaining = 6 - required.Select(s => Rune.SetSize(s)).Sum();
+            int remaining = 6 - required.Select(s => s.Size()).Sum();
 
             // required sets exhaust space
             if (remaining == 0)
@@ -1994,8 +1998,8 @@ namespace RuneOptim.BuildProcessing
             if (remaining == 0)
                 yield return baseline.ToArray();
             List<RuneSet[]> sets = new List<RuneSet[]>();
-            foreach (var set in optional.Where(s => Rune.SetSize(s) <= remaining)) {
-                foreach (var result in ExtendSets(baseline.Concat(new[] { set }), optional, remaining - Rune.SetSize(set)))
+            foreach (var set in optional.Where(s => s.Size() <= remaining)) {
+                foreach (var result in ExtendSets(baseline.Concat(new[] { set }), optional, remaining - set.Size()))
                     yield return result;
             }
         }
@@ -2271,7 +2275,7 @@ namespace RuneOptim.BuildProcessing
                         slots += 1;
                 }
                 // if there isn't enough slots
-                if (slots < Rune.SetSize(s)) {
+                if (slots < s.Size()) {
                     // remove that set
                     for (int i = 0; i < 6; i++) {
                         Runes[i] = Runes[i].Where(r => r.Set != s).ToArray();

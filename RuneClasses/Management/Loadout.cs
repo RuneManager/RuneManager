@@ -679,7 +679,7 @@ namespace RuneOptim.Management {
                 else
                 {
                     // found a pair (the second or forth or sixth)
-                    if (Rune.SetSize(r.Set) == 2) {
+                    if (r.Set.Size() == 2) {
                         // a pair from a 2-set is a complete set
                         sets[ind] = r.Set;
                         setNum += 2;
@@ -764,7 +764,7 @@ namespace RuneOptim.Management {
                     // look for more in the set
                     set = rune.Set;
                     // how many runes we need to get
-                    getNum = Rune.SetSize(set);
+                    getNum = set.Size();
                     // how many we got
                     gotNum = 1;
                     // we have now used this slot

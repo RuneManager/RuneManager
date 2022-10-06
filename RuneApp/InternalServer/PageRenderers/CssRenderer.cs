@@ -87,7 +87,7 @@ namespace RuneApp.InternalServer {
                     for (int i = 1; i < 7; i++)
                         cssStr.Append("\r\n.rune-body.rune-slot" + i + " {\r\n\tbackground-image: url(/runes/rune" + i + ".png);\r\n}");
 
-                    foreach (RuneSet rs in Rune.RuneSets)
+                    foreach (RuneSet rs in RuneSets.All)
                         cssStr.Append("\r\n.rune-set." + rs + " {\r\n\tbackground-image: url(/runes/" + rs + ".png);\r\n}");
 
                     return new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(cssStr.ToString()) };

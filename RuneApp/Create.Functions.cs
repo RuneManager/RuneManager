@@ -346,7 +346,7 @@ namespace RuneApp {
                 return;
 
             // will be empty if the configuration is invalid
-            var validSets = Rune.ValidSets(Build.RequiredSets, Build.BuildSets, Build.AllowBroken);
+            var validSets = Build.OptionalSets;
 
             foreach (var sl in setList.Items.OfType<ListViewItem>()) {
                 var ss = (RuneSet)sl.Tag;

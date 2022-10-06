@@ -68,8 +68,8 @@ namespace RuneOptim.BuildProcessing {
                 }
             }
 
-            var doTwos = !build.BuildSets.Any(se => Rune.SetSize(se) == 4);
-            if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => Rune.SetSize(se) == 4))
+            var doTwos = !build.BuildSets.Any(se => se.Size() == 4);
+            if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => se.Size() == 4))
                 doTwos = true;
 
             // try to get 3 sets of 2s
@@ -123,7 +123,7 @@ namespace RuneOptim.BuildProcessing {
             HashSet<BitLoad> bLoads = new HashSet<BitLoad>();
 
             foreach (var gb in sets) {
-                var ii = Rune.SetSize(gb.Key);
+                var ii = gb.Key.Size();
                 var gba = gb.ToArray();
                 if (gba.Length < ii)
                     continue;
@@ -156,8 +156,8 @@ namespace RuneOptim.BuildProcessing {
             this.kill = 0;
             this.plus = 0;
 
-            twos = bLoads.Where(b => Rune.SetSize(b.Set) == 2).ToArray();
-            fours = bLoads.Where(b => Rune.SetSize(b.Set) == 4).ToArray();
+            twos = bLoads.Where(b => b.Set.Size() == 2).ToArray();
+            fours = bLoads.Where(b => b.Set.Size() == 4).ToArray();
         }
 
         
@@ -169,8 +169,8 @@ namespace RuneOptim.BuildProcessing {
 
             skip = b2.AsParallel().Sum(__b => b4.Count(__c => (__b.Bit | __c.Bit) == 63));
 
-            var doTwos = !build.BuildSets.Any(se => Rune.SetSize(se) == 4);
-            if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => Rune.SetSize(se) == 4))
+            var doTwos = !build.BuildSets.Any(se => se.Size() == 4);
+            if (build.RequiredSets.Any() && !build.RequiredSets.Any(se => se.Size() == 4))
                 doTwos = true;
 
 
