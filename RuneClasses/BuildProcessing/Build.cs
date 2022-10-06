@@ -1725,11 +1725,11 @@ namespace RuneOptim.BuildProcessing
             while (true)
             {
                 // get maximums for each slot combination
-                Dictionary<RuneSet, Stats[]> maxBySlot = new Dictionary<RuneSet, Stats[]>();
-                Dictionary<RuneSet, Stats[]> maxByFullSet = new Dictionary<RuneSet, Stats[]>();
+                Dictionary<RuneSet, Attrs[]> maxBySlot = new Dictionary<RuneSet, Attrs[]>();
+                Dictionary<RuneSet, Attrs[]> maxByFullSet = new Dictionary<RuneSet, Attrs[]>();
                 foreach (var set in runesBySet)
                 {
-                    maxBySlot[set.Key] = new Stats[6];
+                    maxBySlot[set.Key] = new Attrs[6];
                     for (var i = 0; i < 6; i++)
                     {
                         maxBySlot[set.Key][i] = GetMaxBySlot(runesBySet[set.Key][i], attrWithMin.ToArray(), i);
@@ -1786,13 +1786,13 @@ namespace RuneOptim.BuildProcessing
         /// <param name="sets"></param>
         /// <param name="maxBySetAndSlot"></param>
         /// <param name="ineligible"></param>
-        private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Stats[]> maxBySlot, Dictionary<RuneSet, Stats[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible)
+        private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Attrs[]> maxBySlot, Dictionary<RuneSet, Attrs[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible)
         {
             if (ineligible.Count == 0)
                 return;
-            var percentBonuses = Shrines + Leader + Guild.AsStats();
+            Attrs percentBonuses = new Attrs(Shrines) + new Attrs(Leader) + new Attrs(Guild.AsAttrs());
             foreach (var set in sets)
-                percentBonuses += set.AsStats();
+                percentBonuses += set.AsAttrs();
 
             if (sets.Any(s => s.Size() == 4))
             {
@@ -1810,6 +1810,7 @@ namespace RuneOptim.BuildProcessing
                             continue;
 
                         // Mon[attr] already applied to get raw stat numbers
+                        // 4-set indexes are "inverted" so we use the same index for both
                         var runeMax = maxBySetAndSlot[set4][index] + maxBySetAndSlot[set2][index];
                         for (int slot = 0; slot < 6; slot ++)
                         {
@@ -1818,9 +1819,7 @@ namespace RuneOptim.BuildProcessing
                                 continue;
                             ineligible[slotSet][slot] = RemoveEligibleBySlot(
                                 ineligible[slotSet][slot],
-                                percentBonuses,
-                                // the best runes for all 6 slots minus the best rune for this slot (so we can test other runes in its place)
-                                runeMax - maxBySlot[slotSet][slot],
+                                percentBonuses + runeMax - maxBySlot[slotSet][slot],
                                 // we have to pass around slot numbers for calls to predictions
                                 slot
                             ).ToArray();
@@ -1853,8 +1852,7 @@ namespace RuneOptim.BuildProcessing
                             continue;
                         ineligible[slotSet][slot] = RemoveEligibleBySlot(
                             ineligible[slotSet][slot],
-                            percentBonuses,
-                            setMax - maxBySlot[slotSet][slot],
+                            percentBonuses + setMax - maxBySlot[slotSet][slot],
                             slot
                         ).ToArray();
                     }
@@ -1862,7 +1860,7 @@ namespace RuneOptim.BuildProcessing
             }
         }
 
-        public IEnumerable<Rune> RemoveEligibleBySlot(IEnumerable<Rune> ineligible, Stats percentBonuses, Stats flatRuneStats, int slot)
+        public IEnumerable<Rune> RemoveEligibleBySlot(IEnumerable<Rune> ineligible, Attrs bonuses, int slot)
         {
             if (ineligible == null || ineligible.Count() == 0)
                 return ineligible;
@@ -1872,28 +1870,41 @@ namespace RuneOptim.BuildProcessing
             GetPrediction(fake, pred);
 
             // stats that are diven by a flat and a percentage
-            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.SpeedPercent})
+            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent})
             {
                 // these sets are analyzed using a float where 0.01 represents 1%
                 if (Minimum[attr].EqualTo(0))
                     continue;
 
                 // pick the runes which can't achieve the minimum
-                var eligible = ineligible.Where(r => Math.Ceiling(
+                ineligible = ineligible.Where(r => Math.Ceiling(
                     // monster base
                     Mon[attr]
                     // rune percentage bonus
                     + Mon[attr] * r[attr, fake[slot] ?? 0, pred[slot]] * 0.01f
                     // rune flat bonus
                     + r[attr - 1, fake[slot] ?? 0, pred[slot]]
-                    // other runes
-                    + flatRuneStats[attr]
                     // other (percentage) bonus
-                    + Mon[attr] * percentBonuses[attr] * 0.01f
-                    ) >= Minimum[attr]
+                    + Mon[attr] * bonuses[attr] * 0.01f
+                    // other runes
+                    + bonuses[attr - 1]
+                    ) < Minimum[attr]
                 );
-
-                ineligible = ineligible.Except(eligible);
+            }
+            // Speed is in the opposite order of other stats so we need to special case it
+            if (!Minimum[Attr.Speed].EqualTo(0))
+            {
+                ineligible = ineligible.Where(r => Math.Ceiling(
+                    // monster base
+                    Mon[Attr.Speed]
+                    // rune flat bonus
+                    + r[Attr.Speed, fake[slot] ?? 0, pred[slot]]
+                    // other (percentage) bonus
+                    + Mon[Attr.Speed] * bonuses[Attr.SpeedPercent] * 0.01f
+                    // other runes
+                    + bonuses[Attr.Speed]
+                    ) < Minimum[Attr.Speed]
+                );
             }
 
             // stats that are only a percentage
@@ -1903,19 +1914,15 @@ namespace RuneOptim.BuildProcessing
                 if (Minimum[attr].EqualTo(0))
                     continue;
 
-                var eligible = ineligible.Where(r =>
+                ineligible = ineligible.Where(r =>
                     // monster base
                     Mon[attr]
                     // flat bonus
                     + r[attr, fake[slot] ?? 0, pred[slot]]
-                    // rune bonus
-                    + flatRuneStats[attr]
-                    // other percentage bonuses
-                    + percentBonuses[attr]
-                    >= Minimum[attr]
+                    // other bonuses
+                    + bonuses[attr]
+                    < Minimum[attr]
                 );
-
-                ineligible = ineligible.Except(eligible);
             }
 
             return ineligible;
@@ -1929,18 +1936,14 @@ namespace RuneOptim.BuildProcessing
         private List<Attr> AttrWithMin(Stats minimum)
         {
             List<Attr> minStats = new List<Attr>();
-            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.AttackPercent, Attr.DefensePercent, Attr.Speed, Attr.CritRate, Attr.CritDamage, Attr.Resistance, Attr.Accuracy })
+            foreach (var attr in new Attr[] { Attr.HealthPercent, Attr.HealthFlat, Attr.AttackPercent, Attr.AttackFlat, 
+                Attr.DefensePercent, Attr.DefenseFlat, Attr.Speed, Attr.CritRate, Attr.CritDamage, 
+                Attr.Resistance, Attr.Accuracy })
             {
                 // these sets are analyzed using a float where 0.01 represents 1%
                 if (!Minimum[attr].EqualTo(0))
                 {
                     minStats.Add(attr);
-                    if (attr == Attr.HealthPercent)
-                        minStats.Add(Attr.HealthFlat);
-                    else if (attr == Attr.AttackPercent)
-                        minStats.Add(Attr.AttackFlat);
-                    else if (attr == Attr.DefensePercent)
-                        minStats.Add(Attr.DefenseFlat);
                 }
             }
             return minStats;
@@ -2016,7 +2019,7 @@ namespace RuneOptim.BuildProcessing
             }
         }
 
-        private Stats GetMaxBySlot(Rune[] runes, Attr[] attrs, int slot)
+        private Attrs GetMaxBySlot(Rune[] runes, Attr[] attrs, int slot)
         {
             int?[] fake = new int?[6];
             bool[] pred = new bool[6];
@@ -2026,7 +2029,7 @@ namespace RuneOptim.BuildProcessing
             // if no rune exist we need to prevent the system from treating the set as completable
             if (runes == null || runes.Length == 0)
                 return null;
-            Stats slotMaximum = new Stats();
+            Attrs slotMaximum = new Attrs();
             foreach (var rune in runes)
             {
                 foreach (var attr in attrs)
@@ -2048,10 +2051,10 @@ namespace RuneOptim.BuildProcessing
         /// <param name="set"></param>
         /// <param name="attrs"></param>
         /// <returns></returns>
-        private Stats[] GetMaxByFullSet(Stats[] slotMaximums, bool set4)
+        private Attrs[] GetMaxByFullSet(Attrs[] slotMaximums, bool set4)
         {
 
-            Stats[] setMaximums = new Stats[15];
+            Attrs[] setMaximums = new Attrs[15];
             // for each set
             for (var first = 0; first < 5; first ++)
             {
@@ -2069,7 +2072,7 @@ namespace RuneOptim.BuildProcessing
                             setMaximums[index] = slotMaximums[first] + slotMaximums[second];
                     } else
                     {
-                        setMaximums[index] = new Stats();
+                        setMaximums[index] = new Attrs();
                         for (var slot = 0; slot < 6; slot++) {
                             if (slot == first || slot == second)
                                 continue;
