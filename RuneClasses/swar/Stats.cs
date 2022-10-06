@@ -139,7 +139,7 @@ namespace RuneOptim.swar
         }
 
         public event EventHandler<StatModEventArgs> OnStatChanged;
-
+        
         public Stats() { }
 
         public Stats(double i) { SetTo(i); }

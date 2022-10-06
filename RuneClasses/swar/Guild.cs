@@ -6,7 +6,7 @@ using System.Security.Policy;
 
 namespace RuneOptim.swar
 {
-    public class Guild
+    public class Guild : Attrs
     {
         [JsonProperty("price")]
         public int Price;
@@ -46,13 +46,13 @@ namespace RuneOptim.swar
         [JsonIgnore]
         public long Resistance => GuildInfo == null ? 0 : GuildInfo.Resistance;
 
-        public Stats AsStats(string zone = "Dungeon")
+        public Attrs AsAttrs(string zone = "Dungeon")
         {
-            Stats stats = new Stats();
+            Attrs stats = new Attrs();
             stats.Attack = Attack;
             stats.Defense = Defense;
             stats.Health = Health;
-            stats.Speed = Speed;
+            stats.SpeedPercent = Speed;
             stats.CritRate = CritRate;
             stats.CritDamage = CritDamage;
             stats.Resistance = Resistance;
