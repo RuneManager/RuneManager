@@ -217,7 +217,7 @@ namespace RuneOptim.BuildProcessing
                         if (filt.Count != null || filt.Type == FilterType.SumN) {
 
                             var requiredSets = RequiredSets.Count;
-                            var eligibleSets = RequiredSets.Count + BuildSets.Except(RequiredSets).Count();
+                            var eligibleSets = ValidSets(RequiredSets, BuildSets).Count();
                             // if we only counted required sets, but no 2-size sets
                             if (eligibleSets == RequiredSets.Count && !RequiredSets.Any(s => RuneSets.Set2.Contains(s))) {
                                 requiredSets += 1;
@@ -301,7 +301,7 @@ namespace RuneOptim.BuildProcessing
             }
             catch (Exception e) {
                 // cascade the error since higher-level processes update the UI
-                throw e;
+                throw;
             }
             finally {
                 IsRunning = false;
