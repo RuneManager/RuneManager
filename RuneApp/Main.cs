@@ -1317,6 +1317,9 @@ namespace RuneApp {
         {
             Build b = Program.Builds.FirstOrDefault(bu => bu.ID == l.BuildID);
             nli.Tag = l;
+            // TODO: Handle missing build more elegantly (or don't delete)
+            if (b == null)
+                return;
             nli.Text = b.ID.ToString();
             nli.Name = b.ID.ToString();
             nli.UseItemStyleForSubItems = false;
