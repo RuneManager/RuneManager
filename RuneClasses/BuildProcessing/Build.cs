@@ -485,7 +485,8 @@ namespace RuneOptim.BuildProcessing
 
         [JsonIgnore]
         public Stats Shrines { get; set; } = new Stats();
-        public Guild Guild { get; set; }
+        [JsonIgnore]
+        public Guild Guild { get; set; } = new Guild();
 
         [JsonProperty("LeaderBonus")]
         public Stats Leader { get; set; } = new Stats();

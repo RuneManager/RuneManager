@@ -18,6 +18,7 @@ using RuneOptim.swar;
 using RuneOptim.Management;
 using System.ComponentModel;
 using System.Collections.Concurrent;
+using System.Drawing.Text;
 
 namespace RuneApp {
 
@@ -1258,16 +1259,15 @@ namespace RuneApp {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     foreach (var l in e.NewItems.OfType<Loadout>())
                     {
+                        // Add event handler to Mon.OnRunesChanged
                         var mm = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID)?.Mon;
                         if (mm != null)
                         {
                             mm.OnRunesChanged += Mm_OnRunesChanged;
                         }
-
-                        ColorizeRuneList();
+                        // Update UI
                         Invoke((MethodInvoker)delegate {
-                            ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
-
+                            // update build list label to "Loaded" (if it exists)
                             var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bi => (bi.Tag as Build).ID == l.BuildID);
                             if (bli != null)
                             {
@@ -1277,12 +1277,15 @@ namespace RuneApp {
                                     bli.SubItems[3].Text = "Loaded";
                                 }
                             }
-
+                            // Get or create laodout item (matching on BuildID)
+                            ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
                             ListViewItemLoad(nli, l);
                             if (!loadoutList.Items.Contains(nli))
                                 loadoutList.Items.Add(nli);
                         });
                     }
+                    // Colorize the Loadouts List
+                    ColorizeRuneList();
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
                     loadoutList.Items.Clear();
@@ -1317,18 +1320,21 @@ namespace RuneApp {
         {
             Build b = Program.Builds.FirstOrDefault(bu => bu.ID == l.BuildID);
             nli.Tag = l;
-            // TODO: Handle missing build more elegantly (or don't delete)
+            // also required when build is null
+            while (nli.SubItems.Count < 6)
+                nli.SubItems.Add("");
+            // must suppor missing build for "load loadouts"
             if (b == null)
+            {
+                nli.Text = "Build Missing";
                 return;
+            }
             nli.Text = b.ID.ToString();
             nli.Name = b.ID.ToString();
             nli.UseItemStyleForSubItems = false;
-            while (nli.SubItems.Count < 6)
-                nli.SubItems.Add("");
             nli.SubItems[0] = new ListViewItem.ListViewSubItem(nli, b.MonName);
             nli.SubItems[1] = new ListViewItem.ListViewSubItem(nli, b.ID.ToString());
             nli.SubItems[2] = new ListViewItem.ListViewSubItem(nli, b.Mon.Id.ToString());
-
             l.RecountDiff(b.Mon.Id);
 
             // For colors, see http://www.flounder.com/csharp_color_table.htm
@@ -1359,7 +1365,8 @@ namespace RuneApp {
                     // no runes can be swapped without increasing inventory
                     nli.SubItems[3].BackColor = Color.LightPink;
                 // (LEGACY) Has Inventory Rune going into Empty Slot i.e. always free to equip
-                if (inventoryRunes.Any(ru => b.Mon.Runes.Count() < ru.Slot - 1 || b.Mon.Runes[ru.Slot - 1] == null))
+                // need to use "slot" explicitly
+                if (inventoryRunes.Any(ru => !b.Mon.Runes.Any(r => r.Slot == ru.Slot)))
                     nli.SubItems[3].ForeColor = Color.Green;
             }
             nli.SubItems[4] = new ListViewItem.ListViewSubItem(nli, l.Powerup.ToString());
@@ -1385,91 +1392,103 @@ namespace RuneApp {
         {
             if (loadoutList.SelectedItems.Count == 0)
                 lastFocused = null;
-            if (loadoutList.FocusedItem != null && lastFocused != loadoutList.FocusedItem && loadoutList.SelectedItems.Count == 1)
+            // only update on changes
+            if (loadoutList.FocusedItem != null && loadoutList.SelectedItems.Count == 1)
             {
+                if (lastFocused == loadoutList.FocusedItem)
+                    return;
+                lastFocused = loadoutList.FocusedItem;
+
                 var item = loadoutList.FocusedItem;
                 if (item.Tag != null)
                 {
                     Loadout load = (Loadout)item.Tag;
-
-                    var monid = ulong.Parse(item.SubItems[2].Text);
-                    var bid = int.Parse(item.SubItems[1].Text);
-
-                    var build = Program.Builds.FirstOrDefault(b => b.ID == bid);
-
+                    Build build = Program.Builds.FirstOrDefault(b => b.ID == load.BuildID);
                     Monster mon = null;
-                    if (build == null)
-                        mon = Program.Data.GetMonster(monid);
-                    else
+
+                    if (build != null)
                         mon = build.Mon;
+                    else if (item.SubItems[2].Text != "")
+                        mon = Program.Data.GetMonster(ulong.Parse(item.SubItems[2].Text));
 
-                    ShowMon(mon, load.GetStats(mon));
-
-                    ShowStats(load.GetStats(mon), mon);
-
-                    ShowLoadout(load);
-
-                    var dmon = Program.Data.GetMonster(monid);
-                    if (dmon != null)
-                    {
-                        var dmonld = dmon.Current.Leader;
-                        var dmonsh = dmon.Current.Shrines;
-                        var dmongu = dmon.Current.Guild;
-                        var dmonbu = dmon.Current.Buffs;
-                        dmon.Current.Leader = load.Leader;
-                        dmon.Current.Shrines = load.Shrines;
-                        dmon.Current.Guild = load.Guild;
-                        dmon.Current.Buffs = load.Buffs;
-                        var dmonfl = dmon.Current.FakeLevel;
-                        var dmonps = dmon.Current.PredictSubs;
-                        dmon.Current.FakeLevel = load.FakeLevel;
-                        dmon.Current.PredictSubs = load.PredictSubs;
-
-                        if (build != null)
-                        {
-                            var beforeScore = build.CalcScore(dmon.GetStats());
-                            var afterScore = build.CalcScore(load.GetStats(mon));
-                            groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
-                            groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
-                            var dScore = load.DeltaPoints;
-                            if (dScore == 0)
-                                dScore = afterScore - beforeScore;
-                            string str = dScore.ToString("0.##");
-                            if (dScore != 0)
-                                str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
-                            groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
-                        }
-                        ShowDiff(dmon.GetStats(), load.GetStats(mon), build);
-
-                        dmon.Current.Leader = dmonld;
-                        dmon.Current.Shrines = dmonsh;
-                        dmon.Current.Guild = dmongu;
-                        dmon.Current.Buffs = dmonbu;
-                        dmon.Current.FakeLevel = dmonfl;
-                        dmon.Current.PredictSubs = dmonps;
-
-                    }
+                    if (mon != null)
+                        ShowLoadoutUI(load, build, mon);
+                    else
+                        // e.g. imported load where build has been deleted
+                        ClearLoadoutUI();
                 }
-                lastFocused = loadoutList.FocusedItem;
             }
             else
             {
-                ShowMon(null);
-                ShowLoadout(null);
-                ShowDiff(null, null);
+                ClearLoadoutUI();
             }
 
+            // show mana cost to unequip all selected mons
             int cost = 0;
             foreach (ListViewItem li in loadoutList.SelectedItems)
             {
                 if (li.Tag is Loadout load)
                 {
+                    if (li.SubItems[2].Text == "")
+                        continue;
                     var mon = Program.Data.GetMonster(ulong.Parse(li.SubItems[2].Text));
                     if (mon != null)
                         cost += mon.SwapCost(load);
                 }
             }
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
+        }
+
+        private void ShowLoadoutUI(Loadout load, Build build, Monster mon) {
+            // internally, ShowStats ShowLoadout
+            ShowMon(mon, load.GetStats(mon));
+
+            // Show Diff
+            if (mon != null)
+            {
+                var dmonld = mon.Current.Leader;
+                var dmonsh = mon.Current.Shrines;
+                var dmongu = mon.Current.Guild;
+                var dmonbu = mon.Current.Buffs;
+                var dmonfl = mon.Current.FakeLevel;
+                var dmonps = mon.Current.PredictSubs;
+                mon.Current.Leader = load.Leader;
+                mon.Current.Shrines = load.Shrines;
+                mon.Current.Guild = load.Guild;
+                mon.Current.Buffs = load.Buffs;
+                mon.Current.FakeLevel = load.FakeLevel;
+                mon.Current.PredictSubs = load.PredictSubs;
+
+                if (build != null)
+                {
+                    var beforeScore = build.CalcScore(mon.GetStats());
+                    var afterScore = build.CalcScore(load.GetStats(mon));
+                    groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
+                    groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
+                    var dScore = load.DeltaPoints;
+                    if (dScore == 0)
+                        dScore = afterScore - beforeScore;
+                    string str = dScore.ToString("0.##");
+                    if (dScore != 0)
+                        str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
+                    groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
+                }
+                ShowDiff(mon.GetStats(), load.GetStats(mon), build);
+
+                mon.Current.Leader = dmonld;
+                mon.Current.Shrines = dmonsh;
+                mon.Current.Guild = dmongu;
+                mon.Current.Buffs = dmonbu;
+                mon.Current.FakeLevel = dmonfl;
+                mon.Current.PredictSubs = dmonps;
+
+            }
+        }
+
+        private void ClearLoadoutUI()
+        {
+            ShowMon(null);
+            ShowDiff(null, null);
         }
 
         private void tsBtnLoadsClear_Click(object sender, EventArgs e)

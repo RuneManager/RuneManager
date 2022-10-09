@@ -377,12 +377,14 @@ namespace RuneOptim.Management {
                 return;
             for (int i = 0; i < 6; i++)
             {
-                var ids = RuneIDs[i];
-                Runes[i] = runes.FirstOrDefault(r => r.Id == ids);
+                var runeID = RuneIDs[i];
+                if (runeID == null)
+                    continue;
+                Runes[i] = runes.FirstOrDefault(r => r.Id == runeID);
                 if (Runes[i] != null)
                 {
                     Runes[i].UsedInBuild = true;
-                    if (HasManageStats)
+                    if (HasManageStats && ManageStats != null)
                         foreach (var ms in ManageStats[i])
                             Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
                 }

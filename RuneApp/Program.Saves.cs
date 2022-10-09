@@ -235,7 +235,7 @@ namespace RuneApp
                 foreach (var load in lloads)
                 {
                     // inject Rune instances into laodout
-                    load.LinkRunes(Program.Data.Runes);
+                    load.LinkRunes(Data.Runes);
                     // inject Shrines and Guilds (for accurate recalculation)
                     load.Shrines = Data.Shrines;
                     load.Guild = Data.Guild;
@@ -243,7 +243,7 @@ namespace RuneApp
                     // restore UI for associated build
                     Build build = Program.Builds.FirstOrDefault(b => b.ID == load.BuildID);
                     if (build != null)
-                        BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Done"));
+                        BuildsPrintTo?.Invoke(null, PrintToEventArgs.GetEvent(build, "Loaded"));
                 }
                 return LoadSaveResult.Success;
             }
