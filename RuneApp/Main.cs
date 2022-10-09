@@ -1446,23 +1446,25 @@ namespace RuneApp {
             // Show Diff
             if (mon != null)
             {
-                var dmonld = mon.Current.Leader;
-                var dmonsh = mon.Current.Shrines;
-                var dmongu = mon.Current.Guild;
-                var dmonbu = mon.Current.Buffs;
-                var dmonfl = mon.Current.FakeLevel;
-                var dmonps = mon.Current.PredictSubs;
-                mon.Current.Leader = load.Leader;
-                mon.Current.Shrines = load.Shrines;
-                mon.Current.Guild = load.Guild;
-                mon.Current.Buffs = load.Buffs;
-                mon.Current.FakeLevel = load.FakeLevel;
-                mon.Current.PredictSubs = load.PredictSubs;
+                // this semes to be necessary to get rune sources
+                var displayMon = Program.Data.GetMonster(mon.Id);
+                var dmonld = displayMon.Current.Leader;
+                var dmonsh = displayMon.Current.Shrines;
+                var dmongu = displayMon.Current.Guild;
+                var dmonbu = displayMon.Current.Buffs;
+                var dmonfl = displayMon.Current.FakeLevel;
+                var dmonps = displayMon.Current.PredictSubs;
+                displayMon.Current.Leader = load.Leader;
+                displayMon.Current.Shrines = load.Shrines;
+                displayMon.Current.Guild = load.Guild;
+                displayMon.Current.Buffs = load.Buffs;
+                displayMon.Current.FakeLevel = load.FakeLevel;
+                displayMon.Current.PredictSubs = load.PredictSubs;
 
                 if (build != null)
                 {
-                    var beforeScore = build.CalcScore(mon.GetStats());
-                    var afterScore = build.CalcScore(load.GetStats(mon));
+                    var beforeScore = build.CalcScore(displayMon.GetStats());
+                    var afterScore = build.CalcScore(load.GetStats(displayMon));
                     groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
                     groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
                     var dScore = load.DeltaPoints;
@@ -1473,14 +1475,14 @@ namespace RuneApp {
                         str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
                     groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
                 }
-                ShowDiff(mon.GetStats(), load.GetStats(mon), build);
+                ShowDiff(displayMon.GetStats(), load.GetStats(displayMon), build);
 
-                mon.Current.Leader = dmonld;
-                mon.Current.Shrines = dmonsh;
-                mon.Current.Guild = dmongu;
-                mon.Current.Buffs = dmonbu;
-                mon.Current.FakeLevel = dmonfl;
-                mon.Current.PredictSubs = dmonps;
+                displayMon.Current.Leader = dmonld;
+                displayMon.Current.Shrines = dmonsh;
+                displayMon.Current.Guild = dmongu;
+                displayMon.Current.Buffs = dmonbu;
+                displayMon.Current.FakeLevel = dmonfl;
+                displayMon.Current.PredictSubs = dmonps;
 
             }
         }
