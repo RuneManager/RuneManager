@@ -1412,15 +1412,23 @@ namespace RuneApp {
                         mon = Program.Data.GetMonster(ulong.Parse(item.SubItems[2].Text));
 
                     if (mon != null)
-                        ShowLoadoutUI(load, build, mon);
+                    {
+                        // internally, ShowStats ShowLoadout
+                        ShowMon(mon, load);
+                        ShowLoadout(load, build);
+                    }
                     else
+                    {
                         // e.g. imported load where build has been deleted
-                        ClearLoadoutUI();
+                        ShowMon(null);
+                        ShowLoadout(load);
+                    }
                 }
             }
             else
             {
-                ClearLoadoutUI();
+                ShowMon(null);
+                ShowLoadout(null);
             }
 
             // show mana cost to unequip all selected mons
@@ -1439,58 +1447,60 @@ namespace RuneApp {
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
         }
 
-        private void ShowLoadoutUI(Loadout load, Build build, Monster mon) {
-            // internally, ShowStats ShowLoadout
-            ShowMon(mon, load.GetStats(mon));
-
-            // Show Diff
-            if (mon != null)
+        private void ShowLoadout(Loadout load, Build build = null) {
+            if (load == null)
             {
-                // this semes to be necessary to get rune sources
-                var displayMon = Program.Data.GetMonster(mon.Id);
-                var dmonld = displayMon.Current.Leader;
-                var dmonsh = displayMon.Current.Shrines;
-                var dmongu = displayMon.Current.Guild;
-                var dmonbu = displayMon.Current.Buffs;
-                var dmonfl = displayMon.Current.FakeLevel;
-                var dmonps = displayMon.Current.PredictSubs;
-                displayMon.Current.Leader = load.Leader;
-                displayMon.Current.Shrines = load.Shrines;
-                displayMon.Current.Guild = load.Guild;
-                displayMon.Current.Buffs = load.Buffs;
-                displayMon.Current.FakeLevel = load.FakeLevel;
-                displayMon.Current.PredictSubs = load.PredictSubs;
-
-                if (build != null)
-                {
-                    var beforeScore = build.CalcScore(displayMon.GetStats());
-                    var afterScore = build.CalcScore(load.GetStats(displayMon));
-                    groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
-                    groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
-                    var dScore = load.DeltaPoints;
-                    if (dScore == 0)
-                        dScore = afterScore - beforeScore;
-                    string str = dScore.ToString("0.##");
-                    if (dScore != 0)
-                        str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
-                    groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
-                }
-                ShowDiff(displayMon.GetStats(), load.GetStats(displayMon), build);
-
-                displayMon.Current.Leader = dmonld;
-                displayMon.Current.Shrines = dmonsh;
-                displayMon.Current.Guild = dmongu;
-                displayMon.Current.Buffs = dmonbu;
-                displayMon.Current.FakeLevel = dmonfl;
-                displayMon.Current.PredictSubs = dmonps;
-
+                ShowDiff(null, null);
+                return;
             }
+            Monster mon = build.Mon;
+            if (mon == null)
+                mon = Program.Data.GetMonster(build.MonId);
+            if (mon == null)
+            {
+                ShowDiff(null, null);
+                return;
+            }
+
+            var dmonld = mon.Current.Leader;
+            var dmonsh = mon.Current.Shrines;
+            var dmongu = mon.Current.Guild;
+            var dmonbu = mon.Current.Buffs;
+            var dmonfl = mon.Current.FakeLevel;
+            var dmonps = mon.Current.PredictSubs;
+            mon.Current.Leader = load.Leader;
+            mon.Current.Shrines = load.Shrines;
+            mon.Current.Guild = load.Guild;
+            mon.Current.Buffs = load.Buffs;
+            mon.Current.FakeLevel = load.FakeLevel;
+            mon.Current.PredictSubs = load.PredictSubs;
+
+            if (build != null)
+            {
+                var beforeScore = build.CalcScore(mon.GetStats());
+                var afterScore = build.CalcScore(load.GetStats(mon));
+                groupBox1.Controls.Find("PtscompBefore", false).FirstOrDefault().Text = beforeScore.ToString("0.##");
+                groupBox1.Controls.Find("PtscompAfter", false).FirstOrDefault().Text = afterScore.ToString("0.##");
+                var dScore = load.DeltaPoints;
+                if (dScore == 0)
+                    dScore = afterScore - beforeScore;
+                string str = dScore.ToString("0.##");
+                if (dScore != 0)
+                    str += " (" + (afterScore - beforeScore).ToString("0.##") + ")";
+                groupBox1.Controls.Find("PtscompDiff", false).FirstOrDefault().Text = str;
+            }
+            ShowDiff(mon.GetStats(), load.GetStats(mon), build);
+
+            mon.Current.Leader = dmonld;
+            mon.Current.Shrines = dmonsh;
+            mon.Current.Guild = dmongu;
+            mon.Current.Buffs = dmonbu;
+            mon.Current.FakeLevel = dmonfl;
+            mon.Current.PredictSubs = dmonps;
         }
 
         private void ClearLoadoutUI()
         {
-            ShowMon(null);
-            ShowDiff(null, null);
         }
 
         private void tsBtnLoadsClear_Click(object sender, EventArgs e)

@@ -2,21 +2,16 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using RuneOptim;
-using System.Threading;
-using System.Diagnostics;
-using System.Net;
-using System.Reflection;
 using Newtonsoft.Json;
-using System.Text;
 using RuneOptim.BuildProcessing;
 using RuneOptim.swar;
 using RuneOptim.Management;
 
-namespace RuneApp {
+namespace RuneApp
+{
     public partial class Main {
 
         // Functions for working with the Swar Save data
@@ -167,17 +162,18 @@ namespace RuneApp {
             Help.Location = new Point(Location.X + Width, Location.Y);
         }
 
-        private void ShowMon(Monster mon, Stats cur = null) {
+        private void ShowMon(Monster mon, Loadout load = null) {
             displayMon = mon;
             if (mon != null) {
-                cur = cur ?? mon.GetStats();
+                if (load == null)
+                    load = mon.Current;
 
                 statName.Text = mon.FullName;
                 statID.Text = mon.Id.ToString();
                 statLevel.Text = mon.Level.ToString();
 
-                ShowStats(cur, mon);
-                ShowLoadout(mon.Current);
+                ShowStats(load.GetStats(mon), mon);
+                ShowLoadout(load);
 
                 var fname = Environment.CurrentDirectory.Replace("\\", "/") + "/data/unit/" + Program.GetMonIconName(mon.MonsterTypeId) + ".png";
                 if (File.Exists(fname))
