@@ -9,6 +9,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using System.Linq.Expressions;
 using RuneOptim.Management;
+using System.Security.Authentication.ExtendedProtection;
 
 namespace RuneOptim.swar {
     // The monster stores its base stats in its base class

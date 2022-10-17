@@ -1415,7 +1415,7 @@ namespace RuneApp {
                     {
                         // internally, ShowStats ShowLoadout
                         ShowMon(mon, load);
-                        ShowLoadout(load, build);
+                        ShowDelta(load, build);
                     }
                     else
                     {
@@ -1447,8 +1447,14 @@ namespace RuneApp {
             toolStripStatusLabel2.Text = "Unequip: " + cost.ToString();
         }
 
-        private void ShowLoadout(Loadout load, Build build = null) {
-            if (load == null)
+        /// <summary>
+        /// Display the monster delta.  This method injects a bunch of configurations into
+        /// Monster.Current so the delta is apples-to-apples.
+        /// </summary>
+        /// <param name="load"></param>
+        /// <param name="build"></param>
+        private void ShowDelta(Loadout load, Build build = null) {
+            if (load == null || build == null)
             {
                 ShowDiff(null, null);
                 return;
