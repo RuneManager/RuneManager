@@ -253,17 +253,18 @@ namespace RuneApp {
 
         private void Mm_OnRunesChanged(object sender, EventArgs e)
         {
-            var bb = Program.Builds.FirstOrDefault(b => b.Mon != null && b.Mon == (sender as Monster));
-            if (bb == null)
+            var build = Program.Builds.FirstOrDefault(b => b.Mon != null && b.Mon == (sender as Monster));
+            if (build == null)
                 return;
 
-            var l = Program.Loads.FirstOrDefault(lo => lo.BuildID == bb.ID);
-            if (l == null)
+            var load = Program.Loads.FirstOrDefault(l => l.BuildID == build.ID);
+            if (load == null)
                 return;
 
             Invoke((MethodInvoker)delegate {
-                ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
-                ListViewItemLoad(nli, l);
+                ListViewItem lli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == load.BuildID) ?? new ListViewItem();
+                // what is supposed to happen to orphaned `new` item?
+                ListViewItemLoad(lli, load);
             });
         }
 
@@ -830,13 +831,13 @@ namespace RuneApp {
             // Highlight the related loadout
             if (b1 != null)
             {
-                var llvi = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout)?.BuildID == b1.ID);
-                if (llvi != null)
+                var lli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout)?.BuildID == b1.ID);
+                if (lli != null)
                 {
                     loadoutList.SelectedItems.Clear();
                     // one of these triggers cascading updates
-                    llvi.Selected = true;
-                    llvi.Focused = true;
+                    lli.Selected = true;
+                    lli.Focused = true;
                 }
             }
 
@@ -1257,10 +1258,10 @@ namespace RuneApp {
             switch (e.Action)
             {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (var l in e.NewItems.OfType<Loadout>())
+                    foreach (var load in e.NewItems.OfType<Loadout>())
                     {
                         // Add event handler to Mon.OnRunesChanged
-                        var mm = Program.Builds.FirstOrDefault(b => b.ID == l.BuildID)?.Mon;
+                        var mm = Program.Builds.FirstOrDefault(b => b.ID == load.BuildID)?.Mon;
                         if (mm != null)
                         {
                             mm.OnRunesChanged += Mm_OnRunesChanged;
@@ -1268,7 +1269,7 @@ namespace RuneApp {
                         // Update UI
                         Invoke((MethodInvoker)delegate {
                             // update build list label to "Loaded" (if it exists)
-                            var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bi => (bi.Tag as Build).ID == l.BuildID);
+                            var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bi => (bi.Tag as Build).ID == load.BuildID);
                             if (bli != null)
                             {
                                 var ahh = bli.SubItems[3].Text;
@@ -1278,10 +1279,10 @@ namespace RuneApp {
                                 }
                             }
                             // Get or create laodout item (matching on BuildID)
-                            ListViewItem nli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == l.BuildID) ?? new ListViewItem();
-                            ListViewItemLoad(nli, l);
-                            if (!loadoutList.Items.Contains(nli))
-                                loadoutList.Items.Add(nli);
+                            ListViewItem lli = loadoutList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Loadout).BuildID == load.BuildID) ?? new ListViewItem();
+                            ListViewItemLoad(lli, load);
+                            if (!loadoutList.Items.Contains(lli))
+                                loadoutList.Items.Add(lli);
                         });
                     }
                     // Colorize the Loadouts List
@@ -1433,13 +1434,13 @@ namespace RuneApp {
 
             // show mana cost to unequip all selected mons
             int cost = 0;
-            foreach (ListViewItem li in loadoutList.SelectedItems)
+            foreach (ListViewItem lli in loadoutList.SelectedItems)
             {
-                if (li.Tag is Loadout load)
+                if (lli.Tag is Loadout load)
                 {
-                    if (li.SubItems[2].Text == "")
+                    if (lli.SubItems[2].Text == "")
                         continue;
-                    var mon = Program.Data.GetMonster(ulong.Parse(li.SubItems[2].Text));
+                    var mon = Program.Data.GetMonster(ulong.Parse(lli.SubItems[2].Text));
                     if (mon != null)
                         cost += mon.SwapCost(load);
                 }
@@ -1520,21 +1521,21 @@ namespace RuneApp {
         }
 
         private void tsBtnLoadsRemove_Click(object sender, EventArgs e) {
-            foreach (ListViewItem li in loadoutList.SelectedItems) {
-                Loadout l = (Loadout)li.Tag;
-                Program.RemoveLoad(l);
+            foreach (ListViewItem lli in loadoutList.SelectedItems) {
+                Loadout load = (Loadout)lli.Tag;
+                Program.RemoveLoad(load);
             }
             ColorizeRuneList();
         }
 
         private void tsBtnLoadsLock_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem li in loadoutList.SelectedItems)
+            foreach (ListViewItem lli in loadoutList.SelectedItems)
             {
-                Loadout l = (Loadout)li.Tag;
-                l.Lock();
-                ColorizeRuneList();
+                Loadout load = (Loadout)lli.Tag;
+                load.Lock();
             }
+            ColorizeRuneList();
         }
 
         private void tsBtnLoadsSave_Click(object sender, EventArgs e)
@@ -1767,8 +1768,8 @@ namespace RuneApp {
                 RuneDisplay.UpdateLoad(displayMon.Current);
             if (loadoutList.SelectedItems.Count == 1)
             {
-                var ll = loadoutList.SelectedItems[0].Tag as Loadout;
-                RuneDisplay.UpdateLoad(ll);
+                var lli = loadoutList.SelectedItems[0].Tag as Loadout;
+                RuneDisplay.UpdateLoad(lli);
             }
         }
 
