@@ -377,12 +377,14 @@ namespace RuneOptim.Management {
                 return;
             for (int i = 0; i < 6; i++)
             {
-                var ids = RuneIDs[i];
-                Runes[i] = runes.FirstOrDefault(r => r.Id == ids);
+                var runeID = RuneIDs[i];
+                if (runeID == null)
+                    continue;
+                Runes[i] = runes.FirstOrDefault(r => r.Id == runeID);
                 if (Runes[i] != null)
                 {
                     Runes[i].UsedInBuild = true;
-                    if (HasManageStats)
+                    if (HasManageStats && ManageStats != null)
                         foreach (var ms in ManageStats[i])
                             Runes[i].ManageStats.AddOrUpdate(ms.Key, ms.Value, (s, d) => ms.Value);
                 }
@@ -447,7 +449,8 @@ namespace RuneOptim.Management {
         public int HealthPercent {
             get {
 
-                var c = healthPercentCache + (int)shrines.Health + 
+                var c = healthPercentCache + 
+                    (int)shrines.Health + 
                     (int)guild.Health +
                     (int)leader.Health;
                 return c;
@@ -465,7 +468,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int AttackPercent {
             get {
-                var c = attackPercentCache + (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] +
+                var c = attackPercentCache + 
+                    (int)shrines.Attack + (int)shrines.DamageSkillups[(int)Element - 1] +
                     (int)guild.Attack +
                     (int)leader.Attack;
                 return c;
@@ -483,7 +487,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int DefensePercent {
             get {
-                var c = defensePercentCache + (int)shrines.Defense +
+                var c = defensePercentCache +
+                    (int)shrines.Defense +
                     (int)guild.Defense +
                     (int)leader.Defense;
                 return c;
@@ -502,7 +507,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int SpeedPercent {
             get {
-                var c = speedPercentCache + (int)shrines.Speed +
+                var c = speedPercentCache + 
+                    (int)shrines.Speed +
                     (int)guild.Speed +
                     (int)leader.Speed;
                 return c;
@@ -512,7 +518,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int CritRate {
             get {
-                var c = critRateCache + (int)shrines.CritRate +
+                var c = critRateCache + 
+                    (int)shrines.CritRate +
                     (int)guild.CritRate +
                     (int)leader.CritRate;
                 return c;
@@ -523,7 +530,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int CritDamage {
             get {
-                var c = critDamageCache + (int)shrines.CritDamage +
+                var c = critDamageCache + 
+                    (int)shrines.CritDamage +
                     (int)guild.CritDamage +
                     (int)leader.CritDamage;
                 return c;
@@ -533,7 +541,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int Accuracy {
             get {
-                var c = accuracyCache + (int)shrines.Accuracy +
+                var c = accuracyCache +
+                    (int)shrines.Accuracy +
                     (int)guild.Accuracy +
                     (int)leader.Accuracy;
                 return c;
@@ -543,7 +552,8 @@ namespace RuneOptim.Management {
         [JsonIgnore]
         public int Resistance {
             get {
-                var c = resistanceCache + (int)shrines.Resistance +
+                var c = resistanceCache +
+                    (int)shrines.Resistance +
                     (int)guild.Resistance +
                     (int)leader.Resistance;
                 return c;

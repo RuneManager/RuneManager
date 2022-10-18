@@ -29,7 +29,7 @@ namespace RuneOptim.swar
         public readonly ObservableCollection<ulong> LockedUnits = new ObservableCollection<ulong>();
 
         [JsonProperty("rune_lock_list")]
-        public readonly ObservableCollection<ulong> LockedRunes = new ObservableCollection<ulong>();
+        public readonly ObservableCollection<RuneLock> LockedRunes = new ObservableCollection<RuneLock>();
 
         [JsonProperty("building_list")]
         public readonly ObservableCollection<Building> Buildings = new ObservableCollection<Building>();
@@ -197,15 +197,15 @@ namespace RuneOptim.swar
         private void LockedRunes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                    foreach (var i in e.NewItems.Cast<ulong>()) {
-                        var rune = GetRune(i);
+                    foreach (var i in e.NewItems.Cast<RuneLock>()) {
+                        var rune = GetRune(i.Id);
                         if (rune != null)
                             rune.Locked = true;
                     }
                     break;
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                    foreach (var i in e.OldItems.Cast<ulong>()) {
-                        var rune = GetRune(i);
+                    foreach (var i in e.OldItems.Cast<RuneLock>()) {
+                        var rune = GetRune(i.Id);
                         if (rune != null)
                             rune.Locked = false;
                     }
@@ -338,7 +338,7 @@ namespace RuneOptim.swar
                             }
                         }
                         r.PrebuildAttributes();
-                        if (LockedRunes.Contains(r.Id))
+                        if (LockedRunes.Any(l => l.Id == r.Id))
                             r.Locked = true;
                     }
                     break;

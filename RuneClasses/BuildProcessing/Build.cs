@@ -11,6 +11,7 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Combinatorics.Collections;
+using System.ServiceModel;
 
 namespace RuneOptim.BuildProcessing
 {
@@ -484,7 +485,8 @@ namespace RuneOptim.BuildProcessing
 
         [JsonIgnore]
         public Stats Shrines { get; set; } = new Stats();
-        public Guild Guild { get; set; }
+        [JsonIgnore]
+        public Guild Guild { get; set; } = new Guild();
 
         [JsonProperty("LeaderBonus")]
         public Stats Leader { get; set; } = new Stats();
@@ -1748,11 +1750,13 @@ namespace RuneOptim.BuildProcessing
                     }
                 }
 
+                List<RuneSet[]> cache = new List<RuneSet[]>();
                 var optionalSets = RuneSets.ValidSets(RequiredSets, BuildSets, AllowBroken);
                 // iterate through possible set combinations, removing eligible runes from ineligible
                 foreach (var sets in ValidSets(RequiredSets, optionalSets))
                 {
-                    RemoveEligible(sets, maxBySlot, maxByFullSet, ineligible);
+
+                    RemoveEligible(sets, maxBySlot, maxByFullSet, ineligible, cache);
                 }
 
                 // break if no changes
@@ -1786,13 +1790,17 @@ namespace RuneOptim.BuildProcessing
         /// <param name="sets"></param>
         /// <param name="maxBySetAndSlot"></param>
         /// <param name="ineligible"></param>
-        private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Attrs[]> maxBySlot, Dictionary<RuneSet, Attrs[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible)
+        private void RemoveEligible(RuneSet[] sets, Dictionary<RuneSet, Attrs[]> maxBySlot, Dictionary<RuneSet, Attrs[]> maxBySetAndSlot, Dictionary<RuneSet, Rune[][]> ineligible, List<RuneSet[]> cache)
         {
-            if (ineligible.Count == 0)
-                return;
             Attrs percentBonuses = new Attrs(Shrines) + new Attrs(Leader) + new Attrs(Guild.AsAttrs());
             foreach (var set in sets)
+            {
+                if (!ineligible.ContainsKey(set))
+                    return;
+                if (!ineligible[set].Select(r => r == null ? new Rune[0] : r).Any())
+                    return;
                 percentBonuses += set.AsAttrs();
+            }
 
             if (sets.Any(s => s.Size() == 4))
             {
@@ -1839,6 +1847,18 @@ namespace RuneOptim.BuildProcessing
                     int set1index = FullSetIndex(indexes[0], indexes[1]);
                     int set2index = FullSetIndex(indexes[2], indexes[3]);
                     int set3index = FullSetIndex(indexes[4], indexes[5]);
+
+                    // Don't repeate combinations that are equivalent
+                    // e.g. Guard in 1 + 2, Guard in 3 + 4 is the same as Guard in 1 + 3, Guard in 2 + 4, etc.
+                    RuneSet[] cacheItem = new RuneSet[6];
+                    for (int i = 0; i < 6; i++)
+                    {
+                        cacheItem[i] = sets[i / 2];
+                    }
+                    if (cache.Contains(cacheItem))
+                        continue;
+                    else
+                        cache.Add(cacheItem);
 
                     // one of the sets is missing a rune so nothing can be eligible
                     if (maxBySetAndSlot[sets[0]][set1index] == null || maxBySetAndSlot[sets[1]][set2index] == null || maxBySetAndSlot[sets[2]][set3index] == null)
