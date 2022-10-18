@@ -88,7 +88,7 @@ namespace RuneApp {
                     if (string.IsNullOrEmpty(logFileName)) { logFileName = "log file"; }
                     MessageBox.Show($"Critical Error {ex.GetType()}\r\nDetails in {logFileName}.", "Error");
                     LineLog.Fatal($"Fatal during load {ex.GetType()}", ex);
-                    throw ex;
+                    throw;
                 }
 
 
