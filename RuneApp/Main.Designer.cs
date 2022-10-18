@@ -129,8 +129,8 @@
             this.runesLevel = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesMaxEff = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.tabBuilds = new System.Windows.Forms.TabPage();
-            this.listView4 = new System.Windows.Forms.ListView();
+            this.tabArtifacts = new System.Windows.Forms.TabPage();
+            this.viewArtifactList = new System.Windows.Forms.ListView();
             this.buildID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
@@ -215,7 +215,7 @@
             this.tsMonTab.SuspendLayout();
             this.tabRunes.SuspendLayout();
             this.tsRuneTab.SuspendLayout();
-            this.tabBuilds.SuspendLayout();
+            this.tabArtifacts.SuspendLayout();
             this.toolStrip5.SuspendLayout();
             this.tabCrafts.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -987,8 +987,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabMonsters);
             this.tabControl1.Controls.Add(this.tabRunes);
-            this.tabControl1.Controls.Add(this.tabBuilds);
             this.tabControl1.Controls.Add(this.tabCrafts);
+            this.tabControl1.Controls.Add(this.tabArtifacts);
             this.tabControl1.Location = new System.Drawing.Point(2, 2);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(2);
             this.tabControl1.Name = "tabControl1";
@@ -1229,32 +1229,32 @@
             // 
             // tabBuilds
             // 
-            this.tabBuilds.Controls.Add(this.listView4);
-            this.tabBuilds.Controls.Add(this.toolStrip5);
-            this.tabBuilds.Location = new System.Drawing.Point(4, 22);
-            this.tabBuilds.Margin = new System.Windows.Forms.Padding(2);
-            this.tabBuilds.Name = "tabBuilds";
-            this.tabBuilds.Size = new System.Drawing.Size(244, 622);
-            this.tabBuilds.TabIndex = 2;
-            this.tabBuilds.Text = "Builds";
-            this.tabBuilds.UseVisualStyleBackColor = true;
+            this.tabArtifacts.Controls.Add(this.viewArtifactList);
+            this.tabArtifacts.Controls.Add(this.toolStrip5);
+            this.tabArtifacts.Location = new System.Drawing.Point(4, 22);
+            this.tabArtifacts.Margin = new System.Windows.Forms.Padding(2);
+            this.tabArtifacts.Name = "tabArtifacts";
+            this.tabArtifacts.Size = new System.Drawing.Size(244, 622);
+            this.tabArtifacts.TabIndex = 2;
+            this.tabArtifacts.Text = "Artifacts";
+            this.tabArtifacts.UseVisualStyleBackColor = true;
             // 
             // listView4
             // 
-            this.listView4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.viewArtifactList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listView4.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.viewArtifactList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.buildID});
-            this.listView4.HideSelection = false;
-            this.listView4.Location = new System.Drawing.Point(2, 23);
-            this.listView4.Margin = new System.Windows.Forms.Padding(2);
-            this.listView4.Name = "listView4";
-            this.listView4.Size = new System.Drawing.Size(192, 600);
-            this.listView4.TabIndex = 1;
-            this.listView4.UseCompatibleStateImageBehavior = false;
-            this.listView4.View = System.Windows.Forms.View.Details;
-            this.listView4.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.viewArtifactList.HideSelection = false;
+            this.viewArtifactList.Location = new System.Drawing.Point(2, 23);
+            this.viewArtifactList.Margin = new System.Windows.Forms.Padding(2);
+            this.viewArtifactList.Name = "listView4";
+            this.viewArtifactList.Size = new System.Drawing.Size(192, 600);
+            this.viewArtifactList.TabIndex = 1;
+            this.viewArtifactList.UseCompatibleStateImageBehavior = false;
+            this.viewArtifactList.View = System.Windows.Forms.View.Details;
+            this.viewArtifactList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
             // 
             // buildID
             // 
@@ -2035,8 +2035,8 @@
             this.tabRunes.PerformLayout();
             this.tsRuneTab.ResumeLayout(false);
             this.tsRuneTab.PerformLayout();
-            this.tabBuilds.ResumeLayout(false);
-            this.tabBuilds.PerformLayout();
+            this.tabArtifacts.ResumeLayout(false);
+            this.tabArtifacts.PerformLayout();
             this.toolStrip5.ResumeLayout(false);
             this.toolStrip5.PerformLayout();
             this.tabCrafts.ResumeLayout(false);
@@ -2129,13 +2129,13 @@
         private System.Windows.Forms.ToolStrip tsRuneTab;
         private System.Windows.Forms.ToolStripButton RuneTab_UnfilterButton;
         private System.Windows.Forms.ListView loadoutList;
-        private System.Windows.Forms.TabPage tabBuilds;
+        private System.Windows.Forms.TabPage tabArtifacts;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ToolStrip toolStrip4;
         private System.Windows.Forms.ToolStripButton tsBtnLoadsClear;
         private System.Windows.Forms.ToolStrip toolStrip5;
         private System.Windows.Forms.ToolStripButton toolStripButton5;
-        private System.Windows.Forms.ListView listView4;
+        private System.Windows.Forms.ListView viewArtifactList;
         private System.Windows.Forms.ColumnHeader buildID;
         private System.Windows.Forms.Label statLevel;
         private System.Windows.Forms.Label statID;

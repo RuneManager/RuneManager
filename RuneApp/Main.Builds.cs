@@ -73,7 +73,7 @@ namespace RuneApp {
             this.Invoke((MethodInvoker)delegate {
                 if (!IsDisposed) {
                     if (lastLvi == null || (lastLvi.Tag as Build)?.ID != b.ID)
-                        lastLvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
+                        lastLvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bli => (bli.Tag as Build)?.ID == b.ID);
                     if (lastLvi == null)
                         return;
                     while (lastLvi.SubItems.Count < 4)
@@ -83,7 +83,7 @@ namespace RuneApp {
             });
         }
 
-        private void RegenBuildList() {
+        private void RefreshBuildPriority() {
             foreach (var bli in buildList.Items.OfType<ListViewItem>()) {
                 if (bli.Tag is Build b) {
                     bli.SubItems[1].Text = b.Priority.ToString();
@@ -116,6 +116,20 @@ namespace RuneApp {
                 buildList.Items.AddRange(blis.ToArray());
                 buildList.Sort();
             });
+        }
+
+        /// <summary>
+        /// Refresh the build list UI from the attached build
+        /// </summary>
+        public void RefreshBuildList()
+        {
+            // TODO: Combine with RebuildBuildList?
+            foreach (ListViewItem bli in buildList.Items)
+            {
+                if (bli.Tag is Build b)
+                    ListViewItemBuild(bli, b);
+            }
+
         }
 
     }

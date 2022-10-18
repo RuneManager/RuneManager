@@ -331,40 +331,13 @@ namespace RuneApp
         /// (Re)initializes (or clears) all fields (on app start, reload, or load)
         /// </summary>
         public void RebuildLists() {
-            // Grab current sorting (to restore after recreate)
-            var oldMonSort = dataMonsterList.ListViewItemSorter;
-            dataMonsterList.ListViewItemSorter = null;
-            var oldRuneSort = dataRuneList.ListViewItemSorter;
-            dataRuneList.ListViewItemSorter = null;
+            viewBuildsList.Items.Clear();
 
-            dataMonsterList.Items.Clear();
-            dataRuneList.Items.Clear();
-            listView4.Items.Clear();
+            RebuidRuneList();
+            RebuildMonsterList();
 
             if (Program.Data == null)
                 return;
-
-            // Apply priority to all monsters
-            int maxPri = 0;
-            // Next unused priority
-            if (Program.Builds.Count > 0)
-                maxPri = Program.Builds.Max(b => b.Priority) + 1;
-            foreach (var mon in Program.Data.Monsters) {
-                // Priority is (1) Build priority or (2) if runed, the next priority in sequence
-                mon.Priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
-            }
-
-            // Populate the MonsterList
-            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
-            ColorMonsWithBuilds();
-            // Restore the sort order (and apply it)
-            dataMonsterList.ListViewItemSorter = oldMonSort;
-            if (dataMonsterList.ListViewItemSorter != null)
-            {
-                var sorter = (ListViewSort)dataMonsterList.ListViewItemSorter;
-                sorter.ShouldSort = true;
-                dataMonsterList.Sort();
-            }
 
             // Populate the CraftLIst
             dataCraftList.Items.AddRange(Program.Data.Crafts.Select(craft => new ListViewItem() {
@@ -378,8 +351,56 @@ namespace RuneApp
                 }
             }).ToArray());
 
+            RefreshBuildList();
+        }
+
+        public void RebuildMonsterList()
+        {
+            // Grab current sorting (to restore after recreate)
+            var oldMonSort = dataMonsterList.ListViewItemSorter;
+            dataMonsterList.ListViewItemSorter = null;
+            dataMonsterList.Items.Clear();
+
+            if (Program.Data == null)
+                return;
+
+            // Apply priority to all monsters in data model
+            int maxPri = 0;
+            // Next unused priority
+            if (Program.Builds.Count > 0)
+                maxPri = Program.Builds.Max(b => b.Priority) + 1;
+            foreach (var mon in Program.Data.Monsters)
+            {
+                // Priority is (1) Build priority or (2) if runed, the next priority in sequence
+                mon.Priority = (Program.Builds?.FirstOrDefault(b => b.MonId == mon.Id)?.Priority) ?? (mon.Current?.RuneCount > 0 ? (maxPri++) : 0);
+            }
+
+            // Populate the MonsterList UI
+            dataMonsterList.Items.AddRange(Program.Data.Monsters.Select(mon => ListViewItemMonster(mon)).ToArray());
+            ColorMonsWithBuilds();
+            // Restore the sort order (and apply it)
+            dataMonsterList.ListViewItemSorter = oldMonSort;
+            if (dataMonsterList.ListViewItemSorter != null)
+            {
+                var sorter = (ListViewSort)dataMonsterList.ListViewItemSorter;
+                sorter.ShouldSort = true;
+                dataMonsterList.Sort();
+            }
+
+        }
+
+        public void RebuidRuneList()
+        {
+            var oldRuneSort = dataRuneList.ListViewItemSorter;
+            dataRuneList.ListViewItemSorter = null;
             // Populate the RuneList
-            foreach (Rune rune in Program.Data.Runes) {
+            dataRuneList.Items.Clear();
+
+            if (Program.Data == null)
+                return;
+
+            foreach (Rune rune in Program.Data.Runes)
+            {
                 dataRuneList.Items.Add(ListViewItemRune(rune));
             }
             ColorizeRuneList();
@@ -391,13 +412,8 @@ namespace RuneApp
                 dataRuneList.Sort();
             }
 
-            // Regenerate the Build list text
-            // TODO: Combine with RebuildBuildList?
-            foreach (ListViewItem bli in buildList.Items) {
-                if (bli.Tag is Build b)
-                    ListViewItemBuild(bli, b);
-            } 
         }
+
         public void RefreshLoadouts()
         {
             foreach (ListViewItem item in loadoutList.Items)

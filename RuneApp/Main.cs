@@ -920,7 +920,7 @@ namespace RuneApp {
                         Program.BuildPriority(build, -1);
                 }
 
-                RegenBuildList();
+                RefreshBuildPriority();
 
                 buildList.Sort();
             }
@@ -936,7 +936,7 @@ namespace RuneApp {
                         Program.BuildPriority(build, 1);
                 }
 
-                RegenBuildList();
+                RefreshBuildPriority();
 
                 buildList.Sort();
             }
