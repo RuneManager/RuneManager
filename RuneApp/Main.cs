@@ -434,18 +434,18 @@ namespace RuneApp {
             if (sender is Monster mon)
             {
                 Invoke((MethodInvoker)delegate {
-                    var nli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
+                    var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
                     if (deleted)
                     {
-                        if (nli != null)
-                            dataMonsterList.Items.Remove(nli);
+                        if (mli != null)
+                            dataMonsterList.Items.Remove(mli);
                         return;
                     }
 
-                    bool add = nli == null;
-                    nli = ListViewItemMonster(mon, nli);
+                    bool add = mli == null;
+                    mli = ListViewItemMonster(mon, mli);
                     if (add)
-                        dataMonsterList.Items.Add(nli);
+                        dataMonsterList.Items.Add(mli);
 
                     if (displayMon?.Id == mon.Id)
                         ShowMon(displayMon);
@@ -478,9 +478,9 @@ namespace RuneApp {
                     Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.Priority == pri - 1);
                     if (mon2 != null)
                     {
-                        ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.FullName);
+                        ListViewItem mli = dataMonsterList.FindItemWithText(mon2.FullName);
                         mon2.Priority += 1;
-                        listMon.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
+                        mli.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
                     }
                     mon.Priority -= 1;
                     dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
@@ -505,9 +505,9 @@ namespace RuneApp {
                     Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.Priority == pri + 1);
                     if (mon2 != null)
                     {
-                        ListViewItem listMon = dataMonsterList.FindItemWithText(mon2.FullName);
+                        ListViewItem mli = dataMonsterList.FindItemWithText(mon2.FullName);
                         mon2.Priority -= 1;
-                        listMon.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
+                        mli.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
                     }
                     mon.Priority += 1;
                     dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
@@ -540,7 +540,7 @@ namespace RuneApp {
             if (Program.Builds.Any())
                 nextId = Program.Builds.Max(q => q.ID) + 1;
 
-            Build bb = new Build(mon)
+            Build build = new Build(mon)
             {
                 New = true,
                 ID = nextId,
@@ -551,16 +551,16 @@ namespace RuneApp {
                 AllowBroken = true,
             };
 
-            while (Program.Builds.Any(b => b.ID == bb.ID))
+            while (Program.Builds.Any(b => b.ID == build.ID))
             {
-                bb.ID++;
+                build.ID++;
             }
 
-            Program.Builds.Add(bb);
+            Program.Builds.Add(build);
 
-            var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.Mon.FullName));
-            if (lv1li != null)
-                lv1li.ForeColor = Color.Green;
+            var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == build.Mon.FullName));
+            if (mli != null)
+                mli.ForeColor = Color.Green;
         }
 
         private void tsBtnLink_Click(object sender, EventArgs e)
@@ -628,20 +628,20 @@ namespace RuneApp {
             if (Program.Data?.Monsters == null)
                 return;
 
-            foreach (ListViewItem li in dataMonsterList.SelectedItems)
+            foreach (ListViewItem smli in dataMonsterList.SelectedItems)
             {
-                if (!(li.Tag is Monster mon))
+                if (!(smli.Tag is Monster mon))
                     continue;
 
                 for (int i = 1; i < 7; i++)
                 {
-                    var r = mon.Current.RemoveRune(i);
-                    if (r == null)
+                    var rune = mon.Current.RemoveRune(i);
+                    if (rune == null)
                         continue;
 
-                    r.AssignedId = 0;
-                    r.Assigned = null;
-                    r.AssignedName = "Inventory";
+                    rune.AssignedId = 0;
+                    rune.Assigned = null;
+                    rune.AssignedName = "Inventory";
                 }
             }
         }
@@ -695,9 +695,9 @@ namespace RuneApp {
 
                 Program.Builds.Add(bb);
 
-                var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.Mon.FullName));
-                if (lv1li != null)
-                    lv1li.ForeColor = Color.Green;
+                var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.Mon.FullName));
+                if (mli != null)
+                    mli.ForeColor = Color.Green;
             }
         }
 
@@ -736,9 +736,9 @@ namespace RuneApp {
                             if (!loading)
                                 buildList.Sort();
                         });
-                        var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.Mon?.Id ?? b.MonId).ToString()));
-                        if (lv1li != null) {
-                            lv1li.ForeColor = Color.Green;
+                        var mli = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.Mon?.Id ?? b.MonId).ToString()));
+                        if (mli != null) {
+                            mli.ForeColor = Color.Green;
                         }
                     }
                     break;
@@ -747,11 +747,11 @@ namespace RuneApp {
                         var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(lvi => b.Equals(lvi.Tag));
                         buildList.Items.Remove(bli);
 
-                        var lv1li = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.Mon.FullName));
-                        if (lv1li != null) {
-                            lv1li.ForeColor = Color.Black;
-                            if (lv1li.Tag is Monster mon && mon.InStorage)
-                                lv1li.ForeColor = Color.Gray;
+                        var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.Mon.FullName));
+                        if (mli != null) {
+                            mli.ForeColor = Color.Black;
+                            if (mli.Tag is Monster mon && mon.InStorage)
+                                mli.ForeColor = Color.Gray;
                         }
                     }
                     break;

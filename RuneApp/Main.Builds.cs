@@ -98,22 +98,22 @@ namespace RuneApp {
                 buildList.Items.Clear();
             });
 
-            var lviList = new List<ListViewItem>();
+            var blis = new List<ListViewItem>();
 
-            foreach (var b in Program.Builds) {
-                ListViewItem li = new ListViewItem();
+            foreach (var build in Program.Builds) {
+                ListViewItem bli = new ListViewItem();
                 this.Invoke((MethodInvoker)delegate {
-                    ListViewItemBuild(li, b);
+                    ListViewItemBuild(bli, build);
                 });
-                lviList.Add(li);
-                var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.Mon?.Id ?? b.MonId).ToString()));
-                if (lv1li != null) {
-                    lv1li.ForeColor = Color.Green;
+                blis.Add(bli);
+                var mli = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (build.Mon?.Id ?? build.MonId).ToString()));
+                if (mli != null) {
+                    mli.ForeColor = Color.Green;
                 }
             }
 
             this.Invoke((MethodInvoker)delegate {
-                buildList.Items.AddRange(lviList.ToArray());
+                buildList.Items.AddRange(blis.ToArray());
                 buildList.Sort();
             });
         }

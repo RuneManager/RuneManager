@@ -361,8 +361,8 @@ namespace RuneApp
             dataMonsterList.ListViewItemSorter = oldMonSort;
             if (dataMonsterList.ListViewItemSorter != null)
             {
-                var mlvs = (ListViewSort)dataMonsterList.ListViewItemSorter;
-                mlvs.ShouldSort = true;
+                var sorter = (ListViewSort)dataMonsterList.ListViewItemSorter;
+                sorter.ShouldSort = true;
                 dataMonsterList.Sort();
             }
 
