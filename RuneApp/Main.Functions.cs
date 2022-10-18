@@ -393,9 +393,9 @@ namespace RuneApp
 
             // Regenerate the Build list text
             // TODO: Combine with RebuildBuildList?
-            foreach (ListViewItem lvi in buildList.Items) {
-                if (lvi.Tag is Build b)
-                    ListViewItemBuild(lvi, b);
+            foreach (ListViewItem bli in buildList.Items) {
+                if (bli.Tag is Build b)
+                    ListViewItemBuild(bli, b);
             } 
         }
         public void RefreshLoadouts()

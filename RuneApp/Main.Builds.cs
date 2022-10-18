@@ -84,9 +84,9 @@ namespace RuneApp {
         }
 
         private void RegenBuildList() {
-            foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
-                if (lvi.Tag is Build b) {
-                    lvi.SubItems[1].Text = b.Priority.ToString();
+            foreach (var bli in buildList.Items.OfType<ListViewItem>()) {
+                if (bli.Tag is Build b) {
+                    bli.SubItems[1].Text = b.Priority.ToString();
                 }
             }
         }
