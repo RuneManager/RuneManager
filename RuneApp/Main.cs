@@ -48,7 +48,7 @@ namespace RuneApp {
             Program.BuildsProgressTo += Program_BuildsProgressTo;
 
             buildList.Items.Add("Loading...");
-            dataMonsterList.Items.Add("Loading...");
+            viewMonsterList.Items.Add("Loading...");
 
             var loadTask = Task.Run(() =>
             {
@@ -121,25 +121,25 @@ namespace RuneApp {
                 // initialize sorters (with sane ordering)
                 var sorter = new ListViewSort();
                 this.Invoke((MethodInvoker)delegate {
-                    dataMonsterList.ListViewItemSorter = sorter;
+                    viewMonsterList.ListViewItemSorter = sorter;
                     // work backwards; like clicking, the last sort is the most prominent
                     // seems to support only two levels without calling `Sort`
                     sorter.OnColumnClick(colMonID.Index); // ascending ID (so first acquired is earlier among non-prioritized units)
-                    dataMonsterList.Sort();
+                    viewMonsterList.Sort();
                     sorter.OnColumnClick(colMonName.Index); // ascending name
-                    dataMonsterList.Sort();
+                    viewMonsterList.Sort();
                     sorter.OnColumnClick(colMonLevel.Index, false); // descending level
-                    dataMonsterList.Sort();
+                    viewMonsterList.Sort();
                     sorter.OnColumnClick(colMonGrade.Index, false); // descending grade
-                    dataMonsterList.Sort();
+                    viewMonsterList.Sort();
                     sorter.OnColumnClick(colMonPriority.Index); // ascending priority
-                    dataMonsterList.Sort();
+                    viewMonsterList.Sort();
 
-                    dataRuneList.ListViewItemSorter = new ListViewSort();
+                    viewRuneList.ListViewItemSorter = new ListViewSort();
 
                     sorter = new ListViewSort();
                     sorter.OnColumnClick(1);
-                    dataCraftList.ListViewItemSorter = sorter;
+                    viewCraftList.ListViewItemSorter = sorter;
 
                     sorter = new ListViewSort();
                     sorter.OnColumnClick(1);
@@ -321,18 +321,18 @@ namespace RuneApp {
             if (sender is Rune rune)
             {
                 Invoke((MethodInvoker)delegate {
-                    var nli = dataRuneList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Rune).Id == rune.Id);
+                    var nli = viewRuneList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Rune).Id == rune.Id);
                     if (deleted)
                     {
                         if (nli != null)
-                            dataRuneList.Items.Remove(nli);
+                            viewRuneList.Items.Remove(nli);
                         return;
                     }
 
                     bool add = nli == null;
                     nli = ListViewItemRune(rune, nli);
                     if (add)
-                        dataRuneList.Items.Add(nli);
+                        viewRuneList.Items.Add(nli);
 
                     if (this.runeInventory.RuneId == rune.Id)
                         runeInventory.SetRune(rune);
@@ -346,7 +346,7 @@ namespace RuneApp {
 
         private void runetab_list_select(object sender, EventArgs e)
         {
-            if (dataRuneList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag is Rune rune)
+            if (viewRuneList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag is Rune rune)
             {
                 runeInventory.Show();
                 runeInventory.SetRune(rune);
@@ -372,7 +372,7 @@ namespace RuneApp {
         private void runelistSwapLocked(object sender, EventArgs e)
         {
             // swap the selected runes locked state
-            foreach (ListViewItem li in dataRuneList.SelectedItems)
+            foreach (ListViewItem li in viewRuneList.SelectedItems)
             {
                 if (li.Tag is Rune rune)
                 {
@@ -398,7 +398,7 @@ namespace RuneApp {
 
         private void crafttab_list_select(object sender, EventArgs e)
         {
-            if (dataCraftList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag is Craft craft)
+            if (viewCraftList.SelectedItems.OfType<ListViewItem>().FirstOrDefault()?.Tag is Craft craft)
             {
                 runeInventory.Show();
                 runeInventory.SetCraft(craft);
@@ -420,7 +420,7 @@ namespace RuneApp {
 
         private void ColorMonsWithBuilds()
         {
-            foreach (ListViewItem lvim in dataMonsterList.Items)
+            foreach (ListViewItem lvim in viewMonsterList.Items)
             {
                 if (Program.Builds.Any(b => b.Mon == lvim.Tag as Monster))
                 {
@@ -434,18 +434,18 @@ namespace RuneApp {
             if (sender is Monster mon)
             {
                 Invoke((MethodInvoker)delegate {
-                    var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
+                    var mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(li => (li.Tag as Monster).Id == mon.Id);
                     if (deleted)
                     {
                         if (mli != null)
-                            dataMonsterList.Items.Remove(mli);
+                            viewMonsterList.Items.Remove(mli);
                         return;
                     }
 
                     bool add = mli == null;
                     mli = ListViewItemMonster(mon, mli);
                     if (add)
-                        dataMonsterList.Items.Add(mli);
+                        viewMonsterList.Items.Add(mli);
 
                     if (displayMon?.Id == mon.Id)
                         ShowMon(displayMon);
@@ -455,7 +455,7 @@ namespace RuneApp {
 
         private void monstertab_list_select(object sender, EventArgs e)
         {
-            if (dataMonsterList?.FocusedItem?.Tag is Monster mon)
+            if (viewMonsterList?.FocusedItem?.Tag is Monster mon)
             {
                 ShowMon(mon);
                 lastFocused = null;
@@ -464,13 +464,13 @@ namespace RuneApp {
 
         private void tsBtnMonMoveUp_Click(object sender, EventArgs e)
         {
-            if (dataMonsterList?.FocusedItem?.Tag is Monster mon)
+            if (viewMonsterList?.FocusedItem?.Tag is Monster mon)
             {
                 int maxPri = Program.Data.Monsters.Max(x => x.Priority);
                 if (mon.Priority == 0)
                 {
                     mon.Priority = maxPri + 1;
-                    dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
+                    viewMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
                 }
                 else if (mon.Priority != 1)
                 {
@@ -478,26 +478,26 @@ namespace RuneApp {
                     Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.Priority == pri - 1);
                     if (mon2 != null)
                     {
-                        ListViewItem mli = dataMonsterList.FindItemWithText(mon2.FullName);
+                        ListViewItem mli = viewMonsterList.FindItemWithText(mon2.FullName);
                         mon2.Priority += 1;
                         mli.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
                     }
                     mon.Priority -= 1;
-                    dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
+                    viewMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
                 }
-                dataMonsterList.Sort();
+                viewMonsterList.Sort();
             }
         }
 
         private void tsBtnMonMoveDown_Click(object sender, EventArgs e)
         {
-            if (dataMonsterList?.FocusedItem?.Tag is Monster mon)
+            if (viewMonsterList?.FocusedItem?.Tag is Monster mon)
             {
                 int maxPri = Program.Data.Monsters.Max(x => x.Priority);
                 if (mon.Priority == 0)
                 {
                     mon.Priority = maxPri + 1;
-                    dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
+                    viewMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (maxPri + 1).ToString();
                 }
                 else if (mon.Priority != maxPri)
                 {
@@ -505,14 +505,14 @@ namespace RuneApp {
                     Monster mon2 = Program.Data.Monsters.FirstOrDefault(x => x.Priority == pri + 1);
                     if (mon2 != null)
                     {
-                        ListViewItem mli = dataMonsterList.FindItemWithText(mon2.FullName);
+                        ListViewItem mli = viewMonsterList.FindItemWithText(mon2.FullName);
                         mon2.Priority -= 1;
                         mli.SubItems[colMonPriority.Index].Text = mon2.Priority.ToString();
                     }
                     mon.Priority += 1;
-                    dataMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
+                    viewMonsterList.FocusedItem.SubItems[colMonPriority.Index].Text = (mon.Priority).ToString();
                 }
-                dataMonsterList.Sort();
+                viewMonsterList.Sort();
             }
 
         }
@@ -524,8 +524,8 @@ namespace RuneApp {
 
         private void tsBtnLockMon_Click(object sender, EventArgs e)
         {
-            if (dataMonsterList.SelectedItems.Count <= 0) return;
-            if (!(dataMonsterList.SelectedItems[0].Tag is Monster mon))
+            if (viewMonsterList.SelectedItems.Count <= 0) return;
+            if (!(viewMonsterList.SelectedItems[0].Tag is Monster mon))
                 return;
 
             var existingLock = Program.Builds.FirstOrDefault(b => b.Mon == mon);
@@ -558,7 +558,7 @@ namespace RuneApp {
 
             Program.Builds.Add(build);
 
-            var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == build.Mon.FullName));
+            var mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == build.Mon.FullName));
             if (mli != null)
                 mli.ForeColor = Color.Green;
         }
@@ -628,7 +628,7 @@ namespace RuneApp {
             if (Program.Data?.Monsters == null)
                 return;
 
-            foreach (ListViewItem smli in dataMonsterList.SelectedItems)
+            foreach (ListViewItem smli in viewMonsterList.SelectedItems)
             {
                 if (!(smli.Tag is Monster mon))
                     continue;
@@ -648,8 +648,8 @@ namespace RuneApp {
 
         private void tsBtnMonMakeBuild_Click(object sender, EventArgs e)
         {
-            if (dataMonsterList.SelectedItems.Count <= 0) return;
-            if (!(dataMonsterList.SelectedItems[0].Tag is Monster mon))
+            if (viewMonsterList.SelectedItems.Count <= 0) return;
+            if (!(viewMonsterList.SelectedItems[0].Tag is Monster mon))
                 return;
             if (Program.Builds.Any(b => b.MonId == mon.Id))
             {
@@ -695,7 +695,7 @@ namespace RuneApp {
 
                 Program.Builds.Add(bb);
 
-                var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.Mon.FullName));
+                var mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == bb.Mon.FullName));
                 if (mli != null)
                     mli.ForeColor = Color.Green;
             }
@@ -726,7 +726,7 @@ namespace RuneApp {
             switch (e.Action) {
                 case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
                     List<ListViewItem> tempMons = null;
-                    this.Invoke((MethodInvoker)delegate { tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList(); });
+                    this.Invoke((MethodInvoker)delegate { tempMons = viewMonsterList.Items.OfType<ListViewItem>().ToList(); });
 
                     foreach (var b in e.NewItems.OfType<Build>()) {
                         ListViewItem bli = new ListViewItem();
@@ -747,7 +747,7 @@ namespace RuneApp {
                         var bli = buildList.Items.OfType<ListViewItem>().FirstOrDefault(lvi => b.Equals(lvi.Tag));
                         buildList.Items.Remove(bli);
 
-                        var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.Mon.FullName));
+                        var mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == b.Mon.FullName));
                         if (mli != null) {
                             mli.ForeColor = Color.Black;
                             if (mli.Tag is Monster mon && mon.InStorage)
@@ -1070,11 +1070,11 @@ namespace RuneApp {
                             if (build.Mon != before)
                             {
                                 // TODO: check tag?
-                                var mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.FullName));
+                                var mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == before.FullName));
                                 if (mli != null)
                                     mli.ForeColor = before.InStorage ? Color.Gray : Color.Black;
 
-                                mli = dataMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.Build.Mon.FullName));
+                                mli = viewMonsterList.Items.OfType<ListViewItem>().FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == ff.Build.Mon.FullName));
                                 if (mli != null)
                                     mli.ForeColor = Color.Green;
 

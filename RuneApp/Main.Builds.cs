@@ -94,7 +94,7 @@ namespace RuneApp {
         public void RebuildBuildList() {
             List<ListViewItem> tempMons = null;
             this.Invoke((MethodInvoker)delegate {
-                tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList();
+                tempMons = viewMonsterList.Items.OfType<ListViewItem>().ToList();
                 buildList.Items.Clear();
             });
 

@@ -30,7 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
-            this.dataMonsterList = new System.Windows.Forms.ListView();
+            this.viewMonsterList = new System.Windows.Forms.ListView();
             this.colMonName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colMonGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.colMonPriority = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -120,7 +120,7 @@
             this.RuneTab_UnfilterButton = new System.Windows.Forms.ToolStripButton();
             this.RuneTab_LockButton = new System.Windows.Forms.ToolStripButton();
             this.RuneTab_SaveButton = new System.Windows.Forms.ToolStripButton();
-            this.dataRuneList = new System.Windows.Forms.ListView();
+            this.viewRuneList = new System.Windows.Forms.ListView();
             this.runesSet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesID = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.runesGrade = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -135,7 +135,7 @@
             this.toolStrip5 = new System.Windows.Forms.ToolStrip();
             this.toolStripButton5 = new System.Windows.Forms.ToolStripButton();
             this.tabCrafts = new System.Windows.Forms.TabPage();
-            this.dataCraftList = new System.Windows.Forms.ListView();
+            this.viewCraftList = new System.Windows.Forms.ListView();
             this.chCraftId = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chCraftSet = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.chCraftAttr = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -235,32 +235,32 @@
             this.fileBox.SuspendLayout();
             this.SuspendLayout();
             // 
-            // dataMonsterList
+            // viewMonsterList
             // 
-            this.dataMonsterList.AllowColumnReorder = true;
-            this.dataMonsterList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.viewMonsterList.AllowColumnReorder = true;
+            this.viewMonsterList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataMonsterList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.viewMonsterList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.colMonName,
             this.colMonGrade,
             this.colMonPriority,
             this.colMonID,
             this.colMonType,
             this.colMonLevel});
-            this.dataMonsterList.FullRowSelect = true;
-            this.dataMonsterList.HideSelection = false;
-            this.dataMonsterList.Location = new System.Drawing.Point(0, 25);
-            this.dataMonsterList.Margin = new System.Windows.Forms.Padding(2);
-            this.dataMonsterList.MultiSelect = false;
-            this.dataMonsterList.Name = "dataMonsterList";
-            this.dataMonsterList.Size = new System.Drawing.Size(242, 603);
-            this.dataMonsterList.TabIndex = 0;
-            this.dataMonsterList.UseCompatibleStateImageBehavior = false;
-            this.dataMonsterList.View = System.Windows.Forms.View.Details;
-            this.dataMonsterList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
-            this.dataMonsterList.SelectedIndexChanged += new System.EventHandler(this.monstertab_list_select);
-            this.dataMonsterList.DoubleClick += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
+            this.viewMonsterList.FullRowSelect = true;
+            this.viewMonsterList.HideSelection = false;
+            this.viewMonsterList.Location = new System.Drawing.Point(0, 25);
+            this.viewMonsterList.Margin = new System.Windows.Forms.Padding(2);
+            this.viewMonsterList.MultiSelect = false;
+            this.viewMonsterList.Name = "viewMonsterList";
+            this.viewMonsterList.Size = new System.Drawing.Size(242, 603);
+            this.viewMonsterList.TabIndex = 0;
+            this.viewMonsterList.UseCompatibleStateImageBehavior = false;
+            this.viewMonsterList.View = System.Windows.Forms.View.Details;
+            this.viewMonsterList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.viewMonsterList.SelectedIndexChanged += new System.EventHandler(this.monstertab_list_select);
+            this.viewMonsterList.DoubleClick += new System.EventHandler(this.tsBtnMonMakeBuild_Click);
             // 
             // colMonName
             // 
@@ -999,7 +999,7 @@
             // tabMonsters
             // 
             this.tabMonsters.Controls.Add(this.tsMonTab);
-            this.tabMonsters.Controls.Add(this.dataMonsterList);
+            this.tabMonsters.Controls.Add(this.viewMonsterList);
             this.tabMonsters.Location = new System.Drawing.Point(4, 22);
             this.tabMonsters.Margin = new System.Windows.Forms.Padding(2);
             this.tabMonsters.Name = "tabMonsters";
@@ -1099,7 +1099,7 @@
             // tabRunes
             // 
             this.tabRunes.Controls.Add(this.tsRuneTab);
-            this.tabRunes.Controls.Add(this.dataRuneList);
+            this.tabRunes.Controls.Add(this.viewRuneList);
             this.tabRunes.Location = new System.Drawing.Point(4, 22);
             this.tabRunes.Margin = new System.Windows.Forms.Padding(2);
             this.tabRunes.Name = "tabRunes";
@@ -1151,13 +1151,13 @@
             this.RuneTab_SaveButton.Text = "Save save.json";
             this.RuneTab_SaveButton.Click += new System.EventHandler(this.runetab_savebutton_click);
             // 
-            // dataRuneList
+            // viewRuneList
             // 
-            this.dataRuneList.AllowColumnReorder = true;
-            this.dataRuneList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.viewRuneList.AllowColumnReorder = true;
+            this.viewRuneList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataRuneList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.viewRuneList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.runesSet,
             this.runesID,
             this.runesGrade,
@@ -1166,20 +1166,20 @@
             this.runesLevel,
             this.runesEff,
             this.runesMaxEff});
-            this.dataRuneList.FullRowSelect = true;
-            this.dataRuneList.HideSelection = false;
-            this.dataRuneList.Location = new System.Drawing.Point(0, 25);
-            this.dataRuneList.Margin = new System.Windows.Forms.Padding(2);
-            this.dataRuneList.MultiSelect = false;
-            this.dataRuneList.Name = "dataRuneList";
-            this.dataRuneList.Size = new System.Drawing.Size(245, 601);
-            this.dataRuneList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.dataRuneList.TabIndex = 1;
-            this.dataRuneList.UseCompatibleStateImageBehavior = false;
-            this.dataRuneList.View = System.Windows.Forms.View.Details;
-            this.dataRuneList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
-            this.dataRuneList.SelectedIndexChanged += new System.EventHandler(this.runetab_list_select);
-            this.dataRuneList.DoubleClick += new System.EventHandler(this.runelistSwapLocked);
+            this.viewRuneList.FullRowSelect = true;
+            this.viewRuneList.HideSelection = false;
+            this.viewRuneList.Location = new System.Drawing.Point(0, 25);
+            this.viewRuneList.Margin = new System.Windows.Forms.Padding(2);
+            this.viewRuneList.MultiSelect = false;
+            this.viewRuneList.Name = "viewRuneList";
+            this.viewRuneList.Size = new System.Drawing.Size(245, 601);
+            this.viewRuneList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.viewRuneList.TabIndex = 1;
+            this.viewRuneList.UseCompatibleStateImageBehavior = false;
+            this.viewRuneList.View = System.Windows.Forms.View.Details;
+            this.viewRuneList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.viewRuneList.SelectedIndexChanged += new System.EventHandler(this.runetab_list_select);
+            this.viewRuneList.DoubleClick += new System.EventHandler(this.runelistSwapLocked);
             // 
             // runesSet
             // 
@@ -1239,7 +1239,7 @@
             this.tabArtifacts.Text = "Artifacts";
             this.tabArtifacts.UseVisualStyleBackColor = true;
             // 
-            // listView4
+            // viewArtifactList
             // 
             this.viewArtifactList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -1281,7 +1281,7 @@
             // 
             // tabCrafts
             // 
-            this.tabCrafts.Controls.Add(this.dataCraftList);
+            this.tabCrafts.Controls.Add(this.viewCraftList);
             this.tabCrafts.Controls.Add(this.toolStrip7);
             this.tabCrafts.Location = new System.Drawing.Point(4, 22);
             this.tabCrafts.Name = "tabCrafts";
@@ -1290,31 +1290,31 @@
             this.tabCrafts.Text = "Crafts";
             this.tabCrafts.UseVisualStyleBackColor = true;
             // 
-            // dataCraftList
+            // viewCraftList
             // 
-            this.dataCraftList.AllowColumnReorder = true;
-            this.dataCraftList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.viewCraftList.AllowColumnReorder = true;
+            this.viewCraftList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataCraftList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.viewCraftList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.chCraftId,
             this.chCraftSet,
             this.chCraftAttr,
             this.chCraftGrade,
             this.chCraftType});
-            this.dataCraftList.FullRowSelect = true;
-            this.dataCraftList.HideSelection = false;
-            this.dataCraftList.Location = new System.Drawing.Point(2, 27);
-            this.dataCraftList.Margin = new System.Windows.Forms.Padding(2);
-            this.dataCraftList.MultiSelect = false;
-            this.dataCraftList.Name = "dataCraftList";
-            this.dataCraftList.Size = new System.Drawing.Size(240, 593);
-            this.dataCraftList.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.dataCraftList.TabIndex = 2;
-            this.dataCraftList.UseCompatibleStateImageBehavior = false;
-            this.dataCraftList.View = System.Windows.Forms.View.Details;
-            this.dataCraftList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
-            this.dataCraftList.SelectedIndexChanged += new System.EventHandler(this.crafttab_list_select);
+            this.viewCraftList.FullRowSelect = true;
+            this.viewCraftList.HideSelection = false;
+            this.viewCraftList.Location = new System.Drawing.Point(2, 27);
+            this.viewCraftList.Margin = new System.Windows.Forms.Padding(2);
+            this.viewCraftList.MultiSelect = false;
+            this.viewCraftList.Name = "viewCraftList";
+            this.viewCraftList.Size = new System.Drawing.Size(240, 593);
+            this.viewCraftList.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            this.viewCraftList.TabIndex = 2;
+            this.viewCraftList.UseCompatibleStateImageBehavior = false;
+            this.viewCraftList.View = System.Windows.Forms.View.Details;
+            this.viewCraftList.ColumnClick += new System.Windows.Forms.ColumnClickEventHandler(this.listView2_ColumnClick);
+            this.viewCraftList.SelectedIndexChanged += new System.EventHandler(this.crafttab_list_select);
             // 
             // chCraftId
             // 
@@ -2069,7 +2069,7 @@
 
         #endregion
 
-        private System.Windows.Forms.ListView dataMonsterList;
+        private System.Windows.Forms.ListView viewMonsterList;
         private System.Windows.Forms.ColumnHeader colMonName;
         private System.Windows.Forms.ColumnHeader colMonGrade;
         private System.Windows.Forms.ColumnHeader colMonPriority;
@@ -2117,7 +2117,7 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabMonsters;
         private System.Windows.Forms.TabPage tabRunes;
-        private System.Windows.Forms.ListView dataRuneList;
+        private System.Windows.Forms.ListView viewRuneList;
         private System.Windows.Forms.ColumnHeader runesSet;
         private System.Windows.Forms.ColumnHeader runesID;
         private System.Windows.Forms.ColumnHeader runesGrade;
@@ -2213,7 +2213,7 @@
         private System.Windows.Forms.Button btnRefreshSave;
         private System.Windows.Forms.ColumnHeader colMonID;
         private System.Windows.Forms.TabPage tabCrafts;
-        private System.Windows.Forms.ListView dataCraftList;
+        private System.Windows.Forms.ListView viewCraftList;
         private System.Windows.Forms.ColumnHeader chCraftSet;
         private System.Windows.Forms.ToolStrip toolStrip7;
         private System.Windows.Forms.ColumnHeader chCraftAttr;
