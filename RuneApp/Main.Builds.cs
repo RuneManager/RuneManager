@@ -73,7 +73,7 @@ namespace RuneApp {
             this.Invoke((MethodInvoker)delegate {
                 if (!IsDisposed) {
                     if (lastLvi == null || (lastLvi.Tag as Build)?.ID != b.ID)
-                        lastLvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(ll => (ll.Tag as Build)?.ID == b.ID);
+                        lastLvi = buildList.Items.OfType<ListViewItem>().FirstOrDefault(bli => (bli.Tag as Build)?.ID == b.ID);
                     if (lastLvi == null)
                         return;
                     while (lastLvi.SubItems.Count < 4)
@@ -83,10 +83,10 @@ namespace RuneApp {
             });
         }
 
-        private void RegenBuildList() {
-            foreach (var lvi in buildList.Items.OfType<ListViewItem>()) {
-                if (lvi.Tag is Build b) {
-                    lvi.SubItems[1].Text = b.Priority.ToString();
+        private void RefreshBuildPriority() {
+            foreach (var bli in buildList.Items.OfType<ListViewItem>()) {
+                if (bli.Tag is Build b) {
+                    bli.SubItems[1].Text = b.Priority.ToString();
                 }
             }
         }
@@ -94,28 +94,42 @@ namespace RuneApp {
         public void RebuildBuildList() {
             List<ListViewItem> tempMons = null;
             this.Invoke((MethodInvoker)delegate {
-                tempMons = dataMonsterList.Items.OfType<ListViewItem>().ToList();
+                tempMons = viewMonsterList.Items.OfType<ListViewItem>().ToList();
                 buildList.Items.Clear();
             });
 
-            var lviList = new List<ListViewItem>();
+            var blis = new List<ListViewItem>();
 
-            foreach (var b in Program.Builds) {
-                ListViewItem li = new ListViewItem();
+            foreach (var build in Program.Builds) {
+                ListViewItem bli = new ListViewItem();
                 this.Invoke((MethodInvoker)delegate {
-                    ListViewItemBuild(li, b);
+                    ListViewItemBuild(bli, build);
                 });
-                lviList.Add(li);
-                var lv1li = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (b.Mon?.Id ?? b.MonId).ToString()));
-                if (lv1li != null) {
-                    lv1li.ForeColor = Color.Green;
+                blis.Add(bli);
+                var mli = tempMons.FirstOrDefault(i => i.SubItems.OfType<ListViewItem.ListViewSubItem>().Any(s => s.Text == (build.Mon?.Id ?? build.MonId).ToString()));
+                if (mli != null) {
+                    mli.ForeColor = Color.Green;
                 }
             }
 
             this.Invoke((MethodInvoker)delegate {
-                buildList.Items.AddRange(lviList.ToArray());
+                buildList.Items.AddRange(blis.ToArray());
                 buildList.Sort();
             });
+        }
+
+        /// <summary>
+        /// Refresh the build list UI from the attached build
+        /// </summary>
+        public void RefreshBuildList()
+        {
+            // TODO: Combine with RebuildBuildList?
+            foreach (ListViewItem bli in buildList.Items)
+            {
+                if (bli.Tag is Build b)
+                    ListViewItemBuild(bli, b);
+            }
+
         }
 
     }

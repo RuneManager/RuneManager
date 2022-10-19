@@ -151,15 +151,15 @@ namespace RuneApp {
             #region DoubleBuffered and Sort
             this.SetDoubleBuffered();
             buildList.SetDoubleBuffered();
-            dataMonsterList.SetDoubleBuffered();
-            dataRuneList.SetDoubleBuffered();
-            dataCraftList.SetDoubleBuffered();
+            viewMonsterList.SetDoubleBuffered();
+            viewRuneList.SetDoubleBuffered();
+            viewCraftList.SetDoubleBuffered();
             loadoutList.SetDoubleBuffered();
 
             buildList.ListViewItemSorter = null;
-            dataMonsterList.ListViewItemSorter = null;
-            dataRuneList.ListViewItemSorter = null;
-            dataCraftList.ListViewItemSorter = null;
+            viewMonsterList.ListViewItemSorter = null;
+            viewRuneList.ListViewItemSorter = null;
+            viewCraftList.ListViewItemSorter = null;
             loadoutList.ListViewItemSorter = null;
             #endregion
 
